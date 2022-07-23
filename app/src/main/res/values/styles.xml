@@ -1,0 +1,60 @@
+<resources>
+
+    <style name="titleNormalTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/textTitle</item>
+        <item name="android:textSize">@dimen/textTitle</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="titleSubNormalTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/textTitleSub</item>
+        <item name="android:textSize">@dimen/textTitleSub</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="horizontalDividerLine">
+        <item name="android:background">#34ffffff</item>
+        <item name="android:layout_marginTop">3dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+    </style>
+
+    <style name="checkboxStyle" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/selector_checkbox</item>
+        <item name="android:layout_width">@dimen/listIconNormal</item>
+        <item name="android:layout_height">@dimen/listIconNormal</item>
+    </style>
+
+    <style name="titleSmallTextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/textTitleSub</item>
+        <item name="android:textSize">@dimen/textSmall</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">1dp</item>
+    </style>
+
+    <style name="browserBottomTextView">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/textTitle</item>
+        <item name="android:textSize">@dimen/textTitle</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginLeft">5dp</item>
+        <item name="android:layout_marginRight">5dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:background">@drawable/selector_round_dark_corner_small</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+</resources>

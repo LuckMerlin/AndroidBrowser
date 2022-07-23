@@ -1,0 +1,20 @@
+<resources>
+    <dimen name="textSmall">13sp</dimen>
+    <dimen name="textMedium">15sp</dimen>
+    <dimen name="textTitle">16sp</dimen>
+    <dimen name="textTitleSub">14sp</dimen>
+    <dimen name="textTitleSmall">12sp</dimen>
+    <dimen name="listItemNormal">55dp</dimen>
+    <dimen name="listItemSmall">45dp</dimen>
+    <dimen name="listIconNormal">40dp</dimen>
+    <dimen name="titleIconSize">28dp</dimen>
+    <dimen name="listItemSizeSmall">40dp</dimen>
+    <dimen name="listItemSizeLessMedium">50dp</dimen>
+    <dimen name="listItemSizeMedium">60dp</dimen>
+    <dimen name="iconSizeLittle">25dp</dimen>
+    <dimen name="iconSizeSmall">30dp</dimen>
+    <dimen name="iconSizeMedium">40dp</dimen>
+    <dimen name="iconSizeLarge">50dp</dimen>
+    <dimen name="contentGap">5dp</dimen>
+    <dimen name="gridListChildSize">100dp</dimen>
+</resources>

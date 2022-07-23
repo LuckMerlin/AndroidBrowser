@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="textNormal">#ffffff</color>
+    <color name="text">#666666</color>
+    <color name="textFocus">#999999</color>
+    <color name="textTitle">#ffffff</color>
+    <color name="browserBackground">#55000000</color>
+    <color name="textTitleSub">#ffffff</color>
+    <color name="syncNull">@android:color/transparent</color>
+    <color name="syncNeed">#ff0</color>
+    <color name="syncFail">#f00</color>
+    <color name="syncedNone">#ccc</color>
+    <color name="synced">#0f0</color>
+</resources>

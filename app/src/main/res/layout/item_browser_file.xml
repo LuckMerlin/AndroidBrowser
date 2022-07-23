@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable name="path" type="com.luckmerlin.browser.file.File" />
+        <variable name="selected" type="boolean" />
+        <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
+        <variable name="icon" type="android.graphics.drawable.Drawable" />
+        <import type="com.luckmerlin.browser.utils.Time"/>
+        <import type="com.luckmerlin.browser.utils.FileSize"/>
+        <import type="com.luckmerlin.browser.file.Mode"/>
+        <import type="android.view.View"/>
+    </data>
+    <LinearLayout
+        android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent">
+
+        <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
+            android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <ImageView android:imageDrawable="@{icon}"
+                android:layout_width="50dp" android:layout_height="50dp"/>
+        </FrameLayout>
+
+        <FrameLayout android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
+                android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="@{path.name??``}" android:textColor="@color/textTitle" android:textSize="12sp"
+                    android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <Space  android:layout_width="match_parent" android:layout_height="5dp"/>
+                <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:text="@{Time.formatTime(path.modifyTime)??``}" android:textColor="@color/textTitleSub" android:textSize="10sp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
+                    <TextView android:text="@{path.total>0?``+path.total:FileSize.formatSizeText(path.length)}" android:textColor="@color/textTitleSub" android:textSize="10sp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <CheckBox android:layout_gravity="center_vertical|right" android:checked="@{selected}"
+                android:visibility="@{mode.isMode(Mode.MODE_MULTI_CHOOSE)?View.VISIBLE:View.INVISIBLE}"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </FrameLayout>
+    </LinearLayout>
+</layout>
