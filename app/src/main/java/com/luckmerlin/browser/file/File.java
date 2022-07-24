@@ -17,6 +17,10 @@ public class File extends JsonObject{
         return optString(Label.LABEL_NAME,null);
     }
 
+    public String getMime(){
+        return optString(Label.LABEL_MIME,null);
+    }
+
     public long getModifyTime() {
         return optLoong(Label.LABEL_MODIFY_TIME,0);
     }
@@ -26,7 +30,11 @@ public class File extends JsonObject{
     }
 
     public long getTotal() {
-        return optLoong(Label.LABEL_SIZE,0);
+        return optLoong(Label.LABEL_SIZE,-1);
+    }
+
+    public boolean isDirectory(){
+        return getTotal()>=0;
     }
 
     public String getParent(){

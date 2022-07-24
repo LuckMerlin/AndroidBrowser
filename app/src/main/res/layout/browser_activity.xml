@@ -9,6 +9,7 @@
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.text.method.LinkMovementMethod"/>
+        <import type="com.luckmerlin.browser.binding.ClickBinding"/>
     </data>
    <FrameLayout android:background="@drawable/background" android:fitsSystemWindows="true"
        android:layout_width="match_parent" android:layout_height="match_parent">
@@ -17,7 +18,9 @@
            <LinearLayout android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                android:layout_gravity="center_vertical" android:gravity="center_vertical"
                android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-               <ImageView android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
+               <ImageView android:src="@drawable/ic_back"
+                   binding:bind="@{ClickBinding.create(null).setClickId(R.drawable.ic_back)}"
+                   android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
                    android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
                <LinearLayout android:orientation="vertical" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content">
                    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">

@@ -2,12 +2,15 @@ package com.luckmerlin.browser;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+
 import androidx.databinding.ObservableField;
 
 import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.http.Reply;
+import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Http;
@@ -25,7 +28,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
-        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick {
+        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick, OnClickListener {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
@@ -36,6 +39,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
              loadFiles(args,from,pageSize,callback));
+
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPageLoadedListener(this);
@@ -79,7 +83,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return null!=client?client.loadFiles(args,from,pageSize,callback):null;
     }
 
-    private boolean browserPath(String path,String debug){
+    private boolean browserPath(String path){
         if (null==path||path.length()<=0){
             return false;
         }
@@ -105,8 +109,30 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public void onPathSpanClick(File path, int start, int end, String value) {
         if (null!=value&&value.length()>0){
-            browserPath(value,"After path span click.");
+            browserPath(value);
         }
+    }
+
+    public boolean browserBack(){
+        Folder folder=mCurrentFolder.get();
+        String parent=null!=folder?folder.getParent():null;
+        return null!=parent&&parent.length()>0&&browserPath(parent);
+    }
+
+    @Override
+    public boolean onClick(View view,int clickId, int count, Object obj) {
+        switch (clickId){
+            case R.drawable.ic_back:
+                return browserBack()||true;
+        }
+        if (null!=obj&&obj instanceof File){
+            File file=(File)obj;
+            if (file.isDirectory()){
+                return browserPath(file.getPath());
+            }
+            return toast("点击文件 "+file.getName());
+        }
+        return false;
     }
 
     private Client getClient(){

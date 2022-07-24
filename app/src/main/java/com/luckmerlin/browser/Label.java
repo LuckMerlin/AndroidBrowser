@@ -16,6 +16,7 @@ public interface Label {
     String LABEL_ACCESS_TIME = "accessTime";
     String LABEL_CHANGE_TIME = "changeTime";
     String LABEL_MODIFY_TIME = "modifyTime";
+    String LABEL_MIME="mime";
     String LABEL_PARENT = "parent";
     String LABEL_CHILDREN = "children";
     String LABEL_SEP= "sep";
