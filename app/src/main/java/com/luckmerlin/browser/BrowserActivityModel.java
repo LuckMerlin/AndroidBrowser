@@ -24,20 +24,24 @@ import com.merlin.model.OnActivityCreate;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class BrowserActivityModel extends BaseModel implements OnActivityCreate {
+public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
+        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
-    private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter(
-            (Folder args, File from, int pageSize, PageListAdapter.OnPageLoad<File> callback)-> {
-            Client client=mBrowserClient.get();
-            return null!=client?client.loadFiles(args,from,pageSize,callback):null;
-    });
-
+    private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
+    private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
+    private final ObservableField<String> mSearchInput=new ObservableField<>();
+    private final PathSpanClick mPathSpanClick=new PathSpanClick();
+    private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
+            ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
+             loadFiles(args,from,pageSize,callback));
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
+        mBrowserAdapter.setOnPageLoadedListener(this);
+        mPathSpanClick.setOnClickListener(this);
         mBrowserClient.set(new NasClient(getHttp()));
-        mNotifyText.set("我们都是好孩是打发撒方大是的发送到发萨法沙发沙发啊是的发送到发的说法子");
+//        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
         //
         JSONObject json=new JSONObject();
@@ -70,6 +74,40 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate 
 //        ddd(new HttpParser<Activity>());
     }
 
+    private Canceler loadFiles(BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback){
+        Client client=getClient();
+        return null!=client?client.loadFiles(args,from,pageSize,callback):null;
+    }
+
+    private boolean browserPath(String path,String debug){
+        if (null==path||path.length()<=0){
+            return false;
+        }
+        BrowserListAdapter adapter=mBrowserAdapter;
+        String searchInput=mSearchInput.get();
+        return null!=adapter&&adapter.reset(new BrowseQuery(path,searchInput),null);
+    }
+
+    @Override
+    public void onPageLoad(boolean succeed, PageListAdapter.Page<File> page) {
+        if (succeed&&null!=page&&page instanceof Folder){
+            Folder folder=(Folder)page;
+            mCurrentFolder.set(folder);
+            mCurrentPath.set(mPathSpanClick.generate(folder));
+        }
+    }
+
+    @Override
+    public void onPathSpanClick(File path, int start, int end, String value) {
+        if (null!=value&&value.length()>0){
+            browserPath(value,"After path span click.");
+        }
+    }
+
+    private Client getClient(){
+        return mBrowserClient.get();
+    }
+
     public ObservableField<Client> getBrowserClient() {
         return mBrowserClient;
     }
@@ -80,6 +118,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate 
 
     public BrowserListAdapter getBrowserAdapter() {
         return mBrowserAdapter;
+    }
+
+    public ObservableField<Folder> getCurrentFolder() {
+        return mCurrentFolder;
+    }
+
+    public ObservableField<CharSequence> getCurrentPath() {
+        return mCurrentPath;
     }
 
     public ObservableField<String> getNotifyText() {

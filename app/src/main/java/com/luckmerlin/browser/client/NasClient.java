@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.client;
 
+import com.luckmerlin.browser.BrowseQuery;
+import com.luckmerlin.browser.BrowserListAdapter;
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.File;
@@ -34,9 +36,9 @@ public class NasClient implements Client {
     }
 
     @Override
-    public Canceler loadFiles(Folder folder, File from, int pageSize, PageListAdapter.OnPageLoad<File> callback) {
+    public Canceler loadFiles(BrowseQuery query, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback) {
         Http http=mHttp;
-        String folderPath=null!=folder?folder.getPath():null;
+        String folderPath=null!=query?query.mFolderPath:null;
         folderPath=null!=folderPath?folderPath:"./";
         return null==callback||null==http?null:http.request(new Request<Reply<Folder>>().onParse((String text, Http http2, Response res)->
                         new Reply<Folder>(text).parser((Object fromObj)-> null!=fromObj?new Folder(fromObj):null)).
@@ -45,9 +47,9 @@ public class NasClient implements Client {
                     if (null==resultFolder){
                         callback.onPageLoad(false,null);
                     }else{
-                        callback.onPageLoad(true,new PageListAdapter.Page<File>(resultFolder.getChildren()));
+                        callback.onPageLoad(true,resultFolder);
                     }
-                }).url("/file/browser/").header(Label.LABEL_BROWSER_FOLDER,folderPath).
+                }).url("/file/browser/").header(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_SEARCH,null!=query?query.mSearchInput:null).
                 header(Label.LABEL_FROM_INDEX,null!=from?from.getPath():null).header(Label.LABEL_PAGE_SIZE,pageSize).
                 header(Label.LABEL_ORDER_BY,"size").post());
     }

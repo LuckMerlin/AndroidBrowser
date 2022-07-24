@@ -9,5 +9,5 @@ public interface Client {
     String getName();
     long getAvailable();
     long getTotal();
-    Canceler loadFiles(Folder folder, File from, int pageSize, PageListAdapter.OnPageLoad<File> callback);
+    Canceler loadFiles(BrowseQuery query, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback);
 }

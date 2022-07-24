@@ -8,6 +8,7 @@
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
+        <import type="android.text.method.LinkMovementMethod"/>
     </data>
    <FrameLayout android:background="@drawable/background" android:fitsSystemWindows="true"
        android:layout_width="match_parent" android:layout_height="match_parent">
@@ -23,9 +24,9 @@
                        <TextView android:textSize="10sp"
                            style="@style/titleNormalTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                        <include binding:client="@{vm.browserClient}" layout="@layout/item_client_name"/>
-                       <TextView android:text="@{` (`+((null==vm.browserAdapter.currentSelectSize||(vm.browserAdapter.currentSelectSize&lt;0))?``:``+vm.browserAdapter.currentSelectSize+`/`)+vm.browserAdapter.currentFolder.total+')'}"
+                       <TextView android:text="@{` (`+((null==vm.browserAdapter.currentSelectSize||(vm.browserAdapter.currentSelectSize&lt;0))?``:``+vm.browserAdapter.currentSelectSize+`/`)+vm.currentFolder.total+')'}"
                            style="@style/titleNormalTextView" android:textStyle="bold"
-                           android:visibility="@{(null==vm.browserClient&amp;&amp;null==vm.browserAdapter.currentFolder)?View.GONE:View.VISIBLE}"
+                           android:visibility="@{(null==vm.browserClient&amp;&amp;null==vm.currentFolder)?View.GONE:View.VISIBLE}"
                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                    </LinearLayout>
                    <LinearLayout android:layout_width="match_parent" android:orientation="horizontal" android:layout_height="wrap_content">
@@ -51,10 +52,11 @@
                android:layout_marginTop="1dp" android:layout_marginBottom="1dp"
                style="@style/horizontalDividerLine"/>
            <HorizontalScrollView android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_marginLeft="5dp"
-               android:visibility="@{null==vm.browserAdapter.currentFolder?View.INVISIBLE:View.VISIBLE}" android:scrollbars="none"
+               android:visibility="@{null==vm.currentFolder?View.INVISIBLE:View.VISIBLE}" android:scrollbars="none"
                android:layout_width="match_parent" android:layout_height="wrap_content">
-               <TextView android:layout_width="wrap_content" android:singleLine="true" android:textSize="@dimen/textSmall"
-                   android:layout_height="wrap_content" />
+               <TextView android:text="@{vm.currentPath??``}" android:layout_width="wrap_content"
+                   android:movementMethod="@{LinkMovementMethod.getInstance()}" android:textColor="@color/textTitleSub"
+                   android:singleLine="true" android:textSize="@dimen/textSmall" android:layout_height="wrap_content" />
            </HorizontalScrollView>
            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:paddingLeft="8dp" android:paddingRight="8dp"

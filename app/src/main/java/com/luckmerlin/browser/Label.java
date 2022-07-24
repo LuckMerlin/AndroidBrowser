@@ -7,6 +7,7 @@ public interface Label {
     String LABEL_MSG = "msg";
     String LABEL_BROWSER_FOLDER = "browserFolder";
     String LABEL_FROM_INDEX = "fromIndex";
+    String LABEL_SEARCH = "search";
     String LABEL_PAGE_SIZE = "pageSize";
     String LABEL_ORDER_BY = "orderBy";
     String LABEL_LENGTH = "length";

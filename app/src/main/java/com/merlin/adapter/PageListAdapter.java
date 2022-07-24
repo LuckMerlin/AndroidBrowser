@@ -17,6 +17,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
     private A mArgs;
     private LoadingPage<A,T> mLoadingPage;
     private PageLoader<A,T> mPageLoader;
+    private OnPageLoadListener<T> mOnPageLoadedListener;
 
     protected PageListAdapter() {
         this(new ItemCallback<>());
@@ -30,6 +31,11 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         super(config);
     }
 
+    public final PageListAdapter<A,T> setOnPageLoadedListener(OnPageLoadListener<T> listener) {
+        this.mOnPageLoadedListener = listener;
+        return this;
+    }
+
     public final PageListAdapter<A,T> setPageLoader(PageLoader<A,T> pageLoader) {
         this.mPageLoader = pageLoader;
         return this;
@@ -40,12 +46,16 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         return this;
     }
 
-    protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoad<T> callback){
+    protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback){
         PageLoader pageLoader=mPageLoader;
         return null!=pageLoader?pageLoader.onPageLoad(args,from,pageSize,callback):null;
     }
 
-    public final boolean reset(A args,int pageSize,OnPageLoad<T> callback){
+    public final boolean reset(A args,OnPageLoadListener<T> callback){
+        return reset(args,mPageSize,callback);
+    }
+
+    public final boolean reset(A args,int pageSize,OnPageLoadListener<T> callback){
         clean();
         mArgs=null!=args?args:mArgs;
         return loadNext(pageSize,callback);
@@ -55,10 +65,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         return mArgs;
     }
 
-    public final boolean loadPre(int pageSize, OnPageLoad<T> callback){
+    public final boolean loadPre(int pageSize, OnPageLoadListener<T> callback){
         return load(getFirst(),pageSize==0?10:pageSize>0?-pageSize:pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
-                addAll(0,null!=page?page.mData:null);
+                addAll(0,null!=page?page.getPageData():null);
             }
             if (null!=callback){
                 callback.onPageLoad(succeed,page);
@@ -66,10 +76,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         });
     }
 
-    public final boolean loadNext(int pageSize,OnPageLoad<T> callback){
+    public final boolean loadNext(int pageSize,OnPageLoadListener<T> callback){
         return load(getLatest(), pageSize==0?10:pageSize > 0 ? pageSize : -pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
-                addAll(Integer.MAX_VALUE,null!=page?page.mData:null);
+                addAll(Integer.MAX_VALUE,null!=page?page.getPageData():null);
             }
             if (null!=callback){
                 callback.onPageLoad(succeed,page);
@@ -77,7 +87,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         });
     }
 
-    private boolean load(T from,int pageSize,OnPageLoad<T> callback){
+    private boolean load(T from,int pageSize,OnPageLoadListener<T> callback){
         LoadingPage<A,T> loadingPage=mLoadingPage;
         if (null!=loadingPage){
             if (null!=callback){
@@ -89,11 +99,17 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         loadingPage=mLoadingPage=new LoadingPage<A,T>(args,from,pageSize,callback){
             @Override
             public void onPageLoad(boolean succeed, Page page) {
+                boolean currentLoadFinish=false;
                 LoadingPage<A,T> loadingPage=mLoadingPage;
                 if (null!=loadingPage&&loadingPage==this){
+                    currentLoadFinish=true;
                     mLoadingPage=null;
                 }
                 super.onPageLoad(succeed, page);
+                OnPageLoadListener<T> onPageLoad=mOnPageLoadedListener;
+                if (currentLoadFinish&&null!=onPageLoad){
+                    onPageLoad.onPageLoad(succeed,page);
+                }
             }
         };
         loadingPage.canceler(onPageLoad(args,from,pageSize,loadingPage));
@@ -120,27 +136,23 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         }
     }
 
-    public static class Page<T>{
-        private List<T> mData;
-
-        public Page(List<T> data){
-            mData=data;
-        }
+    public static interface Page<T>{
+        List<T> getPageData();
     }
 
-    public interface OnPageLoad<T>{
+    public interface OnPageLoadListener<T>{
         void onPageLoad(boolean succeed,Page<T> page);
     }
 
-    private static class LoadingPage<A,T> implements OnPageLoad<T>,Canceler{
+    private static class LoadingPage<A,T> implements OnPageLoadListener<T>,Canceler{
         private final A mArgs;
         private final T mFrom;
         private final int mPageSize;
-        private final OnPageLoad<T> mCallback;
+        private final OnPageLoadListener<T> mCallback;
         private Canceler mCanceler;
         private boolean mCanceled=false;
 
-        protected LoadingPage(A args,T from,int pageSize,OnPageLoad<T> callback){
+        protected LoadingPage(A args,T from,int pageSize,OnPageLoadListener<T> callback){
             mArgs=args;
             mFrom=from;
             mPageSize=pageSize;
@@ -149,7 +161,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
 
         @Override
         public void onPageLoad(boolean succeed,Page<T> page) {
-            OnPageLoad<T> callback=mCallback;
+            OnPageLoadListener<T> callback=mCallback;
             if (null!=callback){
                 callback.onPageLoad(succeed,page);
             }
@@ -175,6 +187,6 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
     }
 
     public interface PageLoader<A,T>{
-        Canceler onPageLoad(A args, T from, int pageSize, OnPageLoad<T> callback);
+        Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback);
     }
 }

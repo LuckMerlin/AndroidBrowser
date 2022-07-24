@@ -19,11 +19,11 @@ import com.luckmerlin.browser.file.Mode;
 import com.merlin.adapter.PageListAdapter;
 import java.util.List;
 
-public class BrowserListAdapter extends PageListAdapter<Folder,File> {
+public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();
     private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
 
-    protected BrowserListAdapter(PageLoader<Folder,File> pageLoader) {
+    protected BrowserListAdapter(PageLoader<BrowseQuery,File> pageLoader) {
         setPageLoader(pageLoader);
     }
 
@@ -39,13 +39,13 @@ public class BrowserListAdapter extends PageListAdapter<Folder,File> {
         return mCurrentSelectSize;
     }
 
-    public final boolean setFolder(Folder folder){
+    public final boolean setFolder(BrowseQuery folder){
         return setFolder(folder,false);
     }
 
-    public final boolean setFolder(Folder folder,boolean force){
+    public final boolean setFolder(BrowseQuery folder,boolean force){
         if (null!=folder){
-            Folder current=getCurrent();
+            BrowseQuery current=getCurrent();
             if (!force&&null!=current&&current.equals(folder)){
                 return false;
             }
@@ -70,10 +70,6 @@ public class BrowserListAdapter extends PageListAdapter<Folder,File> {
             fileBinding.setMode(mBrowserMode.get());
             fileBinding.setIcon(itemView.getResources().getDrawable(R.drawable.hidisk_icon_folder));
         }
-    }
-
-    public Folder getCurrentFolder() {
-        return getCurrent();
     }
 
     public boolean isAllChoose(){
