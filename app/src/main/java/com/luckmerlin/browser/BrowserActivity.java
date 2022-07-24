@@ -1,6 +1,9 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
+import android.content.Context;
+import android.widget.Toast;
+
 import androidx.databinding.DataBindingUtil;
 
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
@@ -13,7 +16,12 @@ public class BrowserActivity extends ModelActivity implements OnModelResolve {
     @Override
     public Model onResolveModel(Activity activity) {
         BrowserActivityBinding browserActivityBinding=DataBindingUtil.setContentView(activity,R.layout.browser_activity);
-        BrowserActivityModel model=new BrowserActivityModel();
+        BrowserActivityModel model=new BrowserActivityModel(){
+            @Override
+            public Context getContext() {
+                return BrowserActivity.this;
+            }
+        };
         browserActivityBinding.setVm(model);
         return model;
     }

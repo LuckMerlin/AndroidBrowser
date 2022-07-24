@@ -90,10 +90,15 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     @Override
     public void onPageLoad(boolean succeed, PageListAdapter.Page<File> page) {
-        if (succeed&&null!=page&&page instanceof Folder){
-            Folder folder=(Folder)page;
-            mCurrentFolder.set(folder);
-            mCurrentPath.set(mPathSpanClick.generate(folder));
+        if (succeed){
+            if (null!=page&&page instanceof Folder){
+                Folder folder=(Folder)page;
+                mCurrentFolder.set(folder);
+                mCurrentPath.set(mPathSpanClick.generate(folder));
+                if (mBrowserAdapter.getSize()>0&&folder.isEmpty()){
+                    toast(R.string.noMoreData,500);
+                }
+            }
         }
     }
 

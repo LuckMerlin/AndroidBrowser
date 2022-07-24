@@ -20,6 +20,11 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         return optJsonArray(Label.LABEL_CHILDREN);
     }
 
+    public final boolean isEmpty(){
+        JsonArray array=getChildrenArray();
+        return null==array||array.length()<=0;
+    }
+
     public List<File> getChildren(){
         JsonArray array=getChildrenArray();
         return null!=array?array.getList((Object from)-> null!=from?new File(from):null):null;

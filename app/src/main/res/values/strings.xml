@@ -53,6 +53,7 @@
     <string name="toWhich">To %1s</string>
     <string name="local">Local</string>
     <string name="emptyContent">Content empty</string>
+    <string name="noMoreData">No more data</string>
     <string name="transporterNotBind">Conveyor not prepared</string>
     <string name="noneTargetFolder">None target folder</string>
     <string name="notActionHere">Not access for action here</string>

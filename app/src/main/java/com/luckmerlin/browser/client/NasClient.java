@@ -42,7 +42,7 @@ public class NasClient implements Client {
         folderPath=null!=folderPath?folderPath:"./";
         return null==callback||null==http?null:http.request(new Request<Reply<Folder>>().onParse((String text, Http http2, Response res)->
                         new Reply<Folder>(text).parser((Object fromObj)-> null!=fromObj?new Folder(fromObj):null)).
-                onFinish((Reply<Folder> data, Response response)-> {
+                    onFinish((Reply<Folder> data, Response response)-> {
                     Folder resultFolder=null!=data&&data.isSucceed()?data.getData():null;
                     if (null==resultFolder){
                         callback.onPageLoad(false,null);
@@ -50,7 +50,7 @@ public class NasClient implements Client {
                         callback.onPageLoad(true,resultFolder);
                     }
                 }).url("/file/browser/").header(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_SEARCH,null!=query?query.mSearchInput:null).
-                header(Label.LABEL_FROM_INDEX,null!=from?from.getPath():null).header(Label.LABEL_PAGE_SIZE,pageSize).
+                header(Label.LABEL_FROM,null!=from?from.getName():null).header(Label.LABEL_PAGE_SIZE,pageSize).
                 header(Label.LABEL_ORDER_BY,"size").post());
     }
 }
