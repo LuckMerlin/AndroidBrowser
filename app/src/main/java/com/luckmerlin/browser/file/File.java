@@ -49,7 +49,7 @@ public class File extends JsonObject{
         String parent=getParent();
         String sep=getSep();
         String name=getName();
-        return null!=parent&&null!=sep&&null!=name?parent+sep+name:null;
+        return null!=parent&&null!=sep&&null!=name?(parent.equals(sep)?"":parent)+sep+name:null;
     }
 
 }

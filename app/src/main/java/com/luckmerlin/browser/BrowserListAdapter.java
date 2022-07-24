@@ -24,11 +24,11 @@ import java.util.List;
 
 public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();
-    private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
     private ObservableField<Boolean> mPageLoading=new ObservableField<Boolean>();
 
     protected BrowserListAdapter(PageLoader<BrowseQuery,File> pageLoader) {
         setPageLoader(pageLoader);
+        setFixedHolder(VIEW_TYPE_EMPTY,R.layout.item_content_empty);
     }
 
     protected BrowserListAdapter(DiffUtil.ItemCallback diffCallback) {
@@ -77,7 +77,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             ItemBrowserFileBinding fileBinding=((ItemBrowserFileBinding)binding);
             File file=getItem(position);
             fileBinding.setPath(file);
-            fileBinding.setMode(mBrowserMode.get());
+//            fileBinding.setMode();
             fileBinding.setClickBinding(new ClickBinding(file));
             fileBinding.setIconBinding(new IconImageBinding(file));
         }
@@ -85,10 +85,6 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public boolean isAllChoose(){
         return false;
-    }
-
-    public final ObservableField<Mode> getBrowserMode() {
-        return mBrowserMode;
     }
 
     public ObservableField<Boolean> getPageLoading() {

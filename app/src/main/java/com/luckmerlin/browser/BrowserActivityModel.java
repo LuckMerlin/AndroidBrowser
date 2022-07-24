@@ -3,14 +3,17 @@ package com.luckmerlin.browser;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.databinding.ObservableField;
 
 import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.http.Reply;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Http;
@@ -28,13 +31,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
-        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick, OnClickListener {
+        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
+        OnClickListener, OnLongClickListener {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
     private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
     private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
+    private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
@@ -47,6 +52,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mBrowserClient.set(new NasClient(getHttp()));
 //        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
+        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         //
         JSONObject json=new JSONObject();
         try {
@@ -113,6 +119,26 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
     }
 
+    public boolean entryMode(Mode mode){
+        Mode current=mBrowserMode.get();
+        if ((null==current&&null==mode)||(null!=current&&null!=mode&&current==mode)){
+            return true;
+        }
+        mBrowserMode.set(mode);
+        return true;
+    }
+
+    @Override
+    public boolean onLongClick(View view, int clickId, Object obj) {
+        if (null!=obj&&obj instanceof File){
+//            File file=(File)obj;
+//            return toast("点击文件 "+file.getName());
+            entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
+            return true;
+        }
+        return true;
+    }
+
     public boolean browserBack(){
         Folder folder=mCurrentFolder.get();
         String parent=null!=folder?folder.getParent():null;
@@ -122,8 +148,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public boolean onClick(View view,int clickId, int count, Object obj) {
         switch (clickId){
-            case R.drawable.ic_back:
+            case R.drawable.selector_back:
                 return browserBack()||true;
+            case R.drawable.selector_cancel:
+                return entryMode(null)||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -161,5 +189,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public ObservableField<String> getNotifyText() {
         return mNotifyText;
+    }
+
+    public final ObservableField<Mode> getBrowserMode() {
+        return mBrowserMode;
     }
 }

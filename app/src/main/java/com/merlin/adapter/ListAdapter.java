@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,20 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
 
     protected ListAdapter(AsyncDifferConfig<T> config) {
         super(config);
+    }
+
+    public final ListAdapter<T> setFixedHolder(int viewType,Object holder){
+        Map<Integer,Object> viewHolders=mFixedViewHolder;
+        if (null==holder){
+            if (null!=viewHolders&&viewHolders.remove(viewType)!=null){
+                if (viewHolders.size()<=0){
+                    mFixedViewHolder=null;
+                }
+            }
+        }else{
+            (null!=viewHolders?viewHolders:(mFixedViewHolder=new HashMap<>())).put(viewType,holder);
+        }
+        return this;
     }
 
     public final boolean setData(List<T> data){

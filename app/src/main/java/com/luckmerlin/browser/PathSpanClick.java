@@ -62,7 +62,7 @@ public class PathSpanClick {
                     startIndex=end;
                 }
             }
-            return builder;
+            return builder.length()>0?builder:path;
         }
         return path;
     }
