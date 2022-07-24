@@ -22,6 +22,7 @@ import java.util.List;
 public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();
     private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
+    private ObservableField<Boolean> mPageLoading=new ObservableField<Boolean>();
 
     protected BrowserListAdapter(PageLoader<BrowseQuery,File> pageLoader) {
         setPageLoader(pageLoader);
@@ -55,6 +56,12 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     }
 
     @Override
+    protected void onPageLoadingChange(boolean loading) {
+        super.onPageLoadingChange(loading);
+        mPageLoading.set(loading);
+    }
+
+    @Override
     protected Object onCreateDataViewHolder(ViewGroup parent) {
         return R.layout.item_browser_file;
     }
@@ -80,4 +87,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return mBrowserMode;
     }
 
+    public ObservableField<Boolean> getPageLoading() {
+        return mPageLoading;
+    }
 }

@@ -1,23 +1,46 @@
 package com.merlin.adapter;
 
+import android.view.ViewParent;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Headers;
 
 import java.util.HashMap;
 import java.util.List;
 
-public class PageListAdapter<A,T> extends ListAdapter<T> {
+public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefreshLayout.OnRefreshListener {
     private boolean mEmptyReset=true;
     private int mPageSize;
     private A mArgs;
     private LoadingPage<A,T> mLoadingPage;
     private PageLoader<A,T> mPageLoader;
     private OnPageLoadListener<T> mOnPageLoadedListener;
+    private SwipeRefreshLayout mRefreshLayout;
+    private final RecyclerView.OnScrollListener mOnScrollListener=new RecyclerView.OnScrollListener(){
+        @Override
+        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+            super.onScrollStateChanged(recyclerView, newState);
+            switch (newState){
+                case RecyclerView.SCROLL_STATE_IDLE:
+                    RecyclerView.LayoutManager manager=null!=recyclerView?recyclerView.getLayoutManager():null;
+                    if (null!=manager&&manager instanceof LinearLayoutManager){
+                        LinearLayoutManager layoutManager=(LinearLayoutManager)manager;
+                        if (layoutManager.findLastVisibleItemPosition()>=getSize()-1){
+                            loadNext(mPageSize,null);
+                        }
+                    }
+                    break;
+            }
+        }
+    };
 
     protected PageListAdapter() {
         this(new ItemCallback<>());
@@ -46,6 +69,15 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         return this;
     }
 
+    @Override
+    public void onRefresh() {
+        SwipeRefreshLayout refreshLayout=mRefreshLayout;
+        if (null!=refreshLayout){
+            refreshLayout.setRefreshing(false);
+        }
+        reset(mArgs,null);
+    }
+
     protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback){
         PageLoader pageLoader=mPageLoader;
         return null!=pageLoader?pageLoader.onPageLoad(args,from,pageSize,callback):null;
@@ -57,6 +89,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
 
     public final boolean reset(A args,int pageSize,OnPageLoadListener<T> callback){
         clean();
+        mLoadingPage=null;
         mArgs=null!=args?args:mArgs;
         return loadNext(pageSize,callback);
     }
@@ -87,6 +120,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         });
     }
 
+    protected void onPageLoadingChange(boolean loading){
+        //Do nothing
+    }
+
     private boolean load(T from,int pageSize,OnPageLoadListener<T> callback){
         LoadingPage<A,T> loadingPage=mLoadingPage;
         if (null!=loadingPage){
@@ -96,6 +133,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
             return false;
         }
         A args=mArgs;
+        onPageLoadingChange(true);
         loadingPage=mLoadingPage=new LoadingPage<A,T>(args,from,pageSize,callback){
             @Override
             public void onPageLoad(boolean succeed, Page page) {
@@ -104,6 +142,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
                 if (null!=loadingPage&&loadingPage==this){
                     currentLoadFinish=true;
                     mLoadingPage=null;
+                    onPageLoadingChange(false);
                 }
                 super.onPageLoad(succeed, page);
                 OnPageLoadListener<T> onPageLoad=mOnPageLoadedListener;
@@ -133,6 +172,25 @@ public class PageListAdapter<A,T> extends ListAdapter<T> {
         super.onAttachedToRecyclerView(recyclerView);
         if (null!=recyclerView&&(mEmptyReset&&getSize()<=0)){
             reset(null,mPageSize,null);
+            ViewParent parent=recyclerView.getParent();
+            if (null!=parent&&parent instanceof SwipeRefreshLayout){
+                SwipeRefreshLayout refreshLayout=mRefreshLayout=(SwipeRefreshLayout)parent;
+                refreshLayout.setOnRefreshListener(this);
+            }
+            recyclerView.addOnScrollListener(mOnScrollListener);
+        }
+    }
+
+    @Override
+    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView);
+        if (null!=recyclerView){
+            recyclerView.removeOnScrollListener(mOnScrollListener);
+        }
+        SwipeRefreshLayout refreshLayout=mRefreshLayout;
+        if (null!=refreshLayout){
+            mRefreshLayout=null;
+            refreshLayout.setOnRefreshListener(null);
         }
     }
 

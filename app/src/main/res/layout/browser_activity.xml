@@ -59,11 +59,16 @@
                    android:singleLine="true" android:textSize="@dimen/textSmall" android:layout_height="wrap_content" />
            </HorizontalScrollView>
            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-               <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:paddingLeft="8dp" android:paddingRight="8dp"
-                   android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp">
-                   <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent"
-                       android:adapter="@{vm.browserAdapter}" android:layout_height="match_parent"/>
-               </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+               <FrameLayout android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp">
+                   <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:paddingLeft="8dp" android:paddingRight="8dp"
+                        android:layout_width="match_parent" android:layout_height="match_parent">
+                       <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent" android:overScrollMode="always"
+                           android:adapter="@{vm.browserAdapter}" android:layout_height="match_parent"/>
+                   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                   <ProgressBar android:visibility="@{vm.browserAdapter.pageLoading?View.VISIBLE:View.INVISIBLE}"
+                       style="@android:style/Widget.ProgressBar.Large" android:layout_gravity="center"
+                       android:layout_width="50dp" android:layout_height="50dp"/>
+               </FrameLayout>
                <LinearLayout android:visibility="@{vm.browserAdapter.browserMode!=null?View.VISIBLE:View.GONE}" android:paddingLeft="50dp"
                    android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
                    android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
