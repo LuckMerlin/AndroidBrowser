@@ -47,6 +47,7 @@
    R.drawable.selector_choose_none:R.drawable.selector_choose_all:
    R.drawable.selector_menu,null,Touch.CLICK)}" -->
                <ImageView android:src="@drawable/selector_menu"
+                   binding:bind="@{ClickBinding.create(R.drawable.selector_menu)}"
                    android:layout_width="30dp" android:layout_height="30dp"/>
            </LinearLayout>
            <TextView android:text="@{vm.notifyText??``}" android:singleLine="true" android:textColor="#fff"
@@ -77,8 +78,10 @@
                <LinearLayout android:visibility="@{vm.browserMode!=null?View.VISIBLE:View.GONE}" android:paddingLeft="50dp"
                    android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
                    android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                   <TextView  style="@style/browserBottomTextView"/>
                    <TextView style="@style/browserBottomTextView"/>
+                   <TextView android:text="@string/cancel"
+                       binding:bind="@{ClickBinding.create(null).setClickId(R.string.cancel)}"
+                       style="@style/browserBottomTextView"/>
                </LinearLayout>
            </LinearLayout>
        </LinearLayout>

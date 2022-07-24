@@ -26,6 +26,10 @@ public class ClickBinding extends ObjectBinding{
         return this;
     }
 
+    public static ClickBinding create(int clickId){
+        return create(null).setClickId(clickId);
+    }
+
     public static ClickBinding create(Object obj){
         return new ClickBinding(obj);
     }

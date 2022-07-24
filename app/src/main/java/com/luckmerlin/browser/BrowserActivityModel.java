@@ -1,8 +1,10 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.databinding.ObservableField;
@@ -16,6 +18,7 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.dialog.WindowDialog;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.OnHttpFinish;
 import com.luckmerlin.http.OnResponse;
@@ -23,6 +26,7 @@ import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Response;
 import com.luckmerlin.http.TextParser;
 import com.luckmerlin.object.Parser;
+import com.luckmerlin.view.ViewCreator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -151,7 +155,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             case R.drawable.selector_back:
                 return browserBack()||true;
             case R.drawable.selector_cancel:
+            case R.string.cancel:
                 return entryMode(null)||true;
+            case R.drawable.selector_menu:
+                return showBrowserContextMenu(view.getContext())||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -161,6 +168,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return toast("点击文件 "+file.getName());
         }
         return false;
+    }
+
+    private boolean showBrowserContextMenu(Context context){
+        WindowDialog windowDialog=new WindowDialog();
+        windowDialog.setContentView(new ViewCreator().inflate(context,R.layout.browser_content_menus),null);
+        return windowDialog.show(null);
     }
 
     private Client getClient(){
