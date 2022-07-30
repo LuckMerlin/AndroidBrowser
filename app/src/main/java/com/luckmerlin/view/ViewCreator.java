@@ -19,7 +19,6 @@ public class ViewCreator {
         }else if (obj instanceof Integer){
             try{
                 String name=resources.getResourceTypeName((Integer)obj);
-
             }catch (Exception e){
             }
         }

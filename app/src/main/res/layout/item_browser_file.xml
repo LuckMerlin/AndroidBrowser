@@ -5,6 +5,7 @@
     <data>
         <variable name="path" type="com.luckmerlin.browser.file.File" />
         <variable name="selected" type="boolean" />
+        <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="iconBinding" type="com.luckmerlin.browser.binding.ImageBinding" />
         <variable name="clickBinding" type="com.luckmerlin.browser.binding.ClickBinding" />

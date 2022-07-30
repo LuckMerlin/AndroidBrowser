@@ -4,23 +4,29 @@
     <data>
         <variable name="message" type="String" />
     </data>
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+    <FrameLayout android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@{message.length()&lt;=0?@string/emptyContent:message}"
-            android:padding="10dp"
-            android:minWidth="150dp"
-            android:minHeight="20dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            android:textSize="@dimen/textTitle"
-            android:textColor="@color/textTitle"
-            android:textStyle="bold"/>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:src="@drawable/icon_content_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@{message.length()&lt;=0?@string/emptyContent:message}"
+                android:layout_marginTop="2dp"
+                android:layout_marginBottom="2dp"
+                android:textSize="@dimen/textTitle"
+                android:textColor="@color/textTitle"
+                android:textStyle="bold"/>
+        </LinearLayout>
 
+    </FrameLayout>
 </layout>

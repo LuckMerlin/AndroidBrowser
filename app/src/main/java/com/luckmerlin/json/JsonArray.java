@@ -28,7 +28,7 @@ public class JsonArray {
         return mArray.length();
     }
 
-    public final <T> List<T> getList(Parser<Object,T> parser){
+    public final <T> List<T> getList(Parser<Object,T> parser) throws JSONException {
         JSONArray array=null!=parser?mArray:null;
         int length=null!=array?array.length():-1;
         if (length>0){
@@ -55,7 +55,7 @@ public class JsonArray {
                 array.put(json);
                 return makeJson(array);
             }else if (json instanceof JsonObject){
-                return makeJson(((JsonObject)json).mJSONObject);
+                return makeJson(((JsonObject)json));
             }else if (json instanceof JSONArray){
                 return (JSONArray) json;
             }
@@ -63,5 +63,9 @@ public class JsonArray {
         } catch (JSONException e) {
         }
         return new JSONArray();
+    }
+
+    public final JSONArray getArray() {
+        return mArray;
     }
 }

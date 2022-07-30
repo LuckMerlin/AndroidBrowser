@@ -20,4 +20,12 @@ public class Debug {
     public static void E(String msg){
         E(null,msg);
     }
+
+    public static void W(String tag,String msg){
+        Log.w(null!=tag?tag:TAG,null!=msg?msg:"");
+    }
+
+    public static void W(String msg){
+        W(null,msg);
+    }
 }

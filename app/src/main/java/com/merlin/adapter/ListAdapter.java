@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.os.Debug;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +19,8 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.luckmerlin.debug.Debug;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -64,8 +65,16 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     public final boolean setData(List<T> data){
+        List<T> current=mDataList;
+        int currentSize=null!=current?current.size():0;
+        int dataSize=null!=data?data.size():0;
         mDataList=null!=data?new ArrayList<>(data):null;
-        notifyDataSetChanged();
+        if (currentSize>dataSize){
+            notifyItemRangeRemoved(dataSize,currentSize-dataSize);
+        }else if (currentSize<dataSize){
+            notifyItemRangeInserted(currentSize,dataSize-currentSize);
+        }
+        notifyItemRangeChanged(0,currentSize,"ItemData");
         return true;
     }
 
@@ -179,7 +188,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public int getItemViewType(int position) {
         long total=getSize();
         if (position<=0){
-            if (total==0){
+            if (total<=0){
                 return VIEW_TYPE_EMPTY;
             }
             return getFixedViewHolder(VIEW_TYPE_HEAD)==null?VIEW_TYPE_DATA:VIEW_TYPE_HEAD;
@@ -213,7 +222,8 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     protected void onCreateViewHolderCreated(ViewGroup parent, int viewType,RecyclerView.ViewHolder viewHolder){
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null!=view&&view.getLayoutParams()==null){
-            ViewGroup.LayoutParams params=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            ViewGroup.LayoutParams params=new ViewGroup.LayoutParams
+                    (ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             view.setLayoutParams(params);
         }
     }
@@ -223,8 +233,9 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         Map<Integer,Object> fixedViewHolder=mFixedViewHolder;
         Context context=null!=parent?parent.getContext():null;
         Object object=null!=fixedViewHolder?fixedViewHolder.get(viewType):null;
-        RecyclerView.ViewHolder viewHolder=null!=object?inflateViewHolder(context,onCreateViewHolder(object,parent,viewType)):null;
-        viewHolder=null==viewHolder&&viewType==VIEW_TYPE_DATA?inflateViewHolder(context,onCreateDataViewHolder(parent)):viewHolder;
+        RecyclerView.ViewHolder viewHolder=null!=object?inflateViewHolder(context,object):null;
+        viewHolder=null==viewHolder&&viewType==VIEW_TYPE_DATA?inflateViewHolder(context,
+                onCreateDataViewHolder(parent)):viewHolder;
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null==view){
             viewHolder=new RecyclerView.ViewHolder(new View(parent.getContext())) {};
@@ -237,16 +248,16 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return null;
     }
 
-    protected Object onCreateViewHolder(Object object,ViewGroup parent, int viewType){
-        return null;
-    }
-
     @Override
     public int getItemCount() {
         int size=getSize();
         size=size<=0?0:size;
         Map<Integer,Object> holders=mFixedViewHolder;
-        return (size<=0?0:size)+(null!=holders?(null!=holders.get(VIEW_TYPE_HEAD)?1:0)+(null!=holders.get(VIEW_TYPE_TAIL)?1:0):0);
+        if (size<=0){
+            return null!=holders.get(VIEW_TYPE_EMPTY)?1:0;
+        }
+        return size+(null!=holders?(null!=holders.get(VIEW_TYPE_HEAD)?1:0)
+                +(null!=holders.get(VIEW_TYPE_TAIL)?1:0):0);
     }
 
     @Override
@@ -301,7 +312,8 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
                     return inflateViewHolder(context,resources.getDrawable((Integer)viewHolder));
                 }else if (name.equals("layout")){
                     try{
-                        return inflateViewHolder(context,DataBindingUtil.inflate(LayoutInflater.from(context),(Integer)viewHolder,null,true));
+                        ViewDataBinding binding=DataBindingUtil.inflate(LayoutInflater.from(context),(Integer)viewHolder,null,true);
+                        return inflateViewHolder(context,binding);
                     }catch (Exception e){
                         //Do nothing
                     }

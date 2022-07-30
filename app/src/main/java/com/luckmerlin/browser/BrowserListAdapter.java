@@ -77,6 +77,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             ItemBrowserFileBinding fileBinding=((ItemBrowserFileBinding)binding);
             File file=getItem(position);
             fileBinding.setPath(file);
+            fileBinding.setPosition(position+1);
 //            fileBinding.setMode();
             fileBinding.setClickBinding(new ClickBinding(file));
             fileBinding.setIconBinding(new IconImageBinding(file));

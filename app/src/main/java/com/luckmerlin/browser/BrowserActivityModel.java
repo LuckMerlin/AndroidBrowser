@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.databinding.ObservableField;
 
+import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -53,10 +54,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPageLoadedListener(this);
         mPathSpanClick.setOnClickListener(this);
-        mBrowserClient.set(new NasClient(getHttp()));
+//        mBrowserClient.set(new NasClient(getHttp()));
+        mBrowserClient.set(new LocalClient());
 //        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
-        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
+//        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         //
         JSONObject json=new JSONObject();
         try {

@@ -4,20 +4,23 @@ import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.object.Parser;
+
+import org.json.JSONException;
+
 import java.util.List;
 
 public class Reply<T> extends JsonObject {
     private Parser<Object,T> mDataParser;
 
     public Reply(){
-        this(null);
+        super();
     }
 
-    public Reply(String json){
+    public Reply(String json) {
         this(json,null);
     }
 
-    public Reply(String json,Parser<Object,T> parser){
+    public Reply(String json,Parser<Object,T> parser) {
         super(json);
     }
 

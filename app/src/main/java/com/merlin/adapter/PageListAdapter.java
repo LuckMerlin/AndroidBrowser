@@ -72,10 +72,8 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     @Override
     public void onRefresh() {
         SwipeRefreshLayout refreshLayout=mRefreshLayout;
-        if (null!=refreshLayout){
-            refreshLayout.setRefreshing(false);
-        }
-        reset(mArgs,null);
+        reset(mArgs,null!=refreshLayout?(boolean succeed, Page<T> page)->
+                refreshLayout.setRefreshing(false):null);
     }
 
     protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback){
@@ -88,10 +86,16 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean reset(A args,int pageSize,OnPageLoadListener<T> callback){
-        clean();
         mLoadingPage=null;
         mArgs=null!=args?args:mArgs;
-        return loadNext(pageSize,callback);
+        return load(null, pageSize, (boolean succeed, Page<T> page)-> {
+                if (succeed){
+                    setData(null!=page?page.getPageData():null);
+                }
+                if (null!=callback){
+                    callback.onPageLoad(succeed,page);
+                }
+        });
     }
 
     public final A getCurrent() {
@@ -110,7 +114,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean loadNext(int pageSize,OnPageLoadListener<T> callback){
-        return load(getLatest(), pageSize==0?10:pageSize > 0 ? pageSize : -pageSize,(boolean succeed, Page<T> page)-> {
+        return load(getLatest(), pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(Integer.MAX_VALUE,null!=page?page.getPageData():null);
             }
@@ -125,6 +129,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     private boolean load(T from,int pageSize,OnPageLoadListener<T> callback){
+        pageSize=pageSize==0?10:pageSize > 0 ? pageSize : -pageSize;
         LoadingPage<A,T> loadingPage=mLoadingPage;
         if (null!=loadingPage){
             if (null!=callback){

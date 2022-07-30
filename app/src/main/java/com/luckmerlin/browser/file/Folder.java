@@ -3,21 +3,26 @@ package com.luckmerlin.browser.file;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonArray;
 import com.merlin.adapter.PageListAdapter;
+import org.json.JSONException;
 
 import java.util.List;
 
 public class Folder extends File implements PageListAdapter.Page<File> {
 
     public Folder(){
-        this(null);
+        super();
     }
 
-    public Folder(Object json){
+    public Folder(Object json)   {
         super(json);
     }
 
     public JsonArray getChildrenArray(){
         return optJsonArray(Label.LABEL_CHILDREN);
+    }
+
+    public Folder setChildren(Object children){
+        return setArraySafe(this,Label.LABEL_CHILDREN,children);
     }
 
     public final boolean isEmpty(){
@@ -27,7 +32,12 @@ public class Folder extends File implements PageListAdapter.Page<File> {
 
     public List<File> getChildren(){
         JsonArray array=getChildrenArray();
-        return null!=array?array.getList((Object from)-> null!=from?new File(from):null):null;
+        try {
+            return null!=array?array.getList((Object from)-> null!=from?new File(from):null):null;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
