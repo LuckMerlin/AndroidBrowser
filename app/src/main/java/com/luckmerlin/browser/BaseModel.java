@@ -8,9 +8,11 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.browser.http.MHttp;
 import com.luckmerlin.http.Request;
+import com.luckmerlin.view.Content;
+import com.luckmerlin.view.ViewContent;
 import com.merlin.model.Model;
 
-public class BaseModel implements Model {
+public abstract class BaseModel extends ViewContent implements Model {
     private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.9:5001");
 
     public final <T> Canceler request(Request<T> request){
@@ -46,9 +48,5 @@ public class BaseModel implements Model {
             return true;
         }
         return false;
-    }
-
-    public Context getContext(){
-        return null;
     }
 }

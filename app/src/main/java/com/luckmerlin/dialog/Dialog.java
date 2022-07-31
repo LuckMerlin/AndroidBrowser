@@ -1,11 +1,11 @@
 package com.luckmerlin.dialog;
 
-import android.view.View;
-import android.view.ViewGroup;
+import com.luckmerlin.view.Content;
+import com.luckmerlin.view.LayoutParamsResolver;
 
 public interface Dialog {
-    boolean setContentView(View view, ViewGroup.LayoutParams params);
-    boolean show(ViewGroup.LayoutParams params);
+    boolean setContentView(Content content);
+    boolean show(LayoutParamsResolver resolver);
     boolean dismiss();
     boolean isShowing();
 }

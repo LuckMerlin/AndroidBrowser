@@ -111,7 +111,7 @@ public class LocalClient implements Client {
         return new File().setTotal(total).setLength(file.length()).setMime("text/css").
                 setSep(java.io.File.separator).
                 setModifyTime(file.lastModified()).
-                setParent(file.getAbsoluteFile().getParent()).setName(file.getName());
+                setParent(file.getParent()).setName(file.getName());
     }
 
     private void notifyFinish(boolean succeed, PageListAdapter.Page<File> page,PageListAdapter.OnPageLoadListener<File> callback){

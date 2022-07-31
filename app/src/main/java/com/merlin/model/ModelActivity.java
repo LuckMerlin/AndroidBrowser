@@ -2,25 +2,44 @@ package com.merlin.model;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
 
-public class ModelActivity extends Activity {
-    private Model mModel=null;
+import com.luckmerlin.view.Content;
+import com.luckmerlin.view.ContentResolver;
+
+public abstract class ModelActivity extends Activity implements ContentResolver{
+    private Content mModel=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Model model=mModel=this instanceof OnModelResolve?((OnModelResolve)this).onResolveModel(this):null;
-        if (null!=model&&model instanceof OnActivityCreate){
-            ((OnActivityCreate)model).onCreate(savedInstanceState,this);
+        Content model=mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent():null;
+        if (null!=model){
+            View contentView=model.onCreateContentView(this);
+            if (null!=contentView){
+                setContentView(contentView);
+            }
+            if (model instanceof OnActivityCreate){
+                ((OnActivityCreate)model).onCreate(savedInstanceState,this);
+            }
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Model model=mModel;
+        Content model=mModel;
         if (null!=model&&model instanceof OnActivityDestroy){
             ((OnActivityDestroy)model).onDestroy(this);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Content model=mModel;
+        if (null!=model&&model instanceof OnBackPress&&((OnBackPress)model).onBackPressed()){
+            return;
+        }
+        super.onBackPressed();
     }
 }

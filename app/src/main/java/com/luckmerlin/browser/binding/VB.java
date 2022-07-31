@@ -1,40 +1,48 @@
 package com.luckmerlin.browser.binding;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewParent;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
+import com.luckmerlin.view.ViewIterator;
 
-public class ClickBinding extends ObjectBinding{
+public class VB extends ObjectBinding{
     private OnClickListener mOnClickListener;
     private OnLongClickListener mLongClickListener;
     private int mClickId=View.NO_ID;
     private boolean mEnableLongClick=false;
 
-    public ClickBinding(Object object) {
+    public VB(Object object) {
         super(object);
     }
 
-    public ClickBinding setListener(OnClickListener listener){
+    public VB setListener(OnClickListener listener){
         mOnClickListener=listener;
         return this;
     }
 
-    public ClickBinding enableLongClick(boolean enable){
+    public VB enableLongClick(boolean enable){
         mEnableLongClick=enable;
         return this;
     }
 
-    public static ClickBinding create(int clickId){
+    public static VB create(int clickId){
         return create(null).setClickId(clickId);
     }
 
-    public static ClickBinding create(Object obj){
-        return new ClickBinding(obj);
+    public static VB clickId(int clickId){
+        return clickId(clickId,null);
     }
 
-    public ClickBinding setClickId(int id){
+    public static VB clickId(int clickId, Object obj){
+        return new VB(obj).setClickId(clickId);
+    }
+
+    public static VB create(Object obj){
+        return new VB(obj);
+    }
+
+    public VB setClickId(int id){
         mClickId=id;
         return this;
     }
@@ -82,40 +90,36 @@ public class ClickBinding extends ObjectBinding{
     }
 
     private boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj){
-        if (null==view){
+        return iterate(view, (Object child)-> child instanceof OnLongClickListener&&
+                ((OnLongClickListener)child).onLongClick(root,clickId,obj));
+    }
+
+    private boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
+        return iterate(view, (Object child)-> child instanceof OnClickListener&&
+                ((OnClickListener)child).onClick(root,clickId,count,obj));
+    }
+
+    private boolean iterate(Object obj,Iterator iterator){
+        if (null==obj||null==iterator){
             return false;
-        }else if (view instanceof OnLongClickListener&&((OnLongClickListener)view).onLongClick(root,clickId,obj)){
+        }else if (iterator.iterate(obj)){
             return true;
-        }
-        ViewParent parent=view.getParent();
-        if (null!=parent&&parent instanceof View){
-            return dispatchLongClick2View((View) parent,root,clickId,obj);
-        }
-        Context context=null!=root?root.getContext():null;
-        if (null==context){
-            return false;
-        }else if (context instanceof OnLongClickListener&&((OnLongClickListener)context).onLongClick(root,clickId,obj)){
-            return true;
+        }else if (obj instanceof ViewIterator){
+            return iterator.iterate(((ViewIterator)obj).onIterateView());
+        }else if (obj instanceof View){
+            View view=(View)obj;
+            if (iterate(view.getContext(),iterator)){
+                return true;
+            }
+            ViewParent parent=view.getParent();
+            if (null!=parent&&parent instanceof View){
+                return iterate((View) parent,iterator);
+            }
         }
         return false;
     }
 
-    private boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
-        if (null==view){
-            return false;
-        }else if (view instanceof OnClickListener&&((OnClickListener)view).onClick(root,clickId,count,obj)){
-            return true;
-        }
-        ViewParent parent=view.getParent();
-        if (null!=parent&&parent instanceof View){
-            return dispatchClick2View((View) parent,root,clickId,count,obj);
-        }
-        Context context=null!=root?root.getContext():null;
-        if (null==context){
-            return false;
-        }else if (context instanceof OnClickListener&&((OnClickListener)context).onClick(root,clickId,count,obj)){
-            return true;
-        }
-        return false;
+    private interface Iterator{
+        boolean iterate(Object obj);
     }
 }

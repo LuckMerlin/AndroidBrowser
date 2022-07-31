@@ -3,33 +3,30 @@ package com.luckmerlin.browser;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
 import androidx.databinding.ObservableField;
+import androidx.databinding.ViewDataBinding;
 
+import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
-import com.luckmerlin.browser.client.NasClient;
+import com.luckmerlin.browser.databinding.BrowserActivityBinding;
+import com.luckmerlin.browser.dialog.MenuContextDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.http.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.debug.Debug;
-import com.luckmerlin.dialog.WindowDialog;
-import com.luckmerlin.http.Http;
-import com.luckmerlin.http.OnHttpFinish;
-import com.luckmerlin.http.OnResponse;
-import com.luckmerlin.http.Request;
-import com.luckmerlin.http.Response;
-import com.luckmerlin.http.TextParser;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.dialog.FixedLayoutParams;
+import com.luckmerlin.dialog.WindowContentDialog;
+import com.luckmerlin.view.Content;
 import com.luckmerlin.view.ViewCreator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
+import com.merlin.model.Model;
 import com.merlin.model.OnActivityCreate;
 
 import org.json.JSONException;
@@ -51,6 +48,21 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
              loadFiles(args,from,pageSize,callback));
 
     @Override
+    protected View onCreateContent(Context context) {
+        ViewDataBinding binding=DataBindingUtil.inflate(context,R.layout.browser_activity);
+        if (null!= binding&&binding instanceof BrowserActivityBinding){
+            ((BrowserActivityBinding)binding).setVm(this);
+            return binding.getRoot();
+        }
+        return null;
+    }
+
+//    @Override
+//    public View onCreateContentView(Context context) {
+//        return DataBindingUtil.inflate(context,R.layout.browser_activity);
+//    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPageLoadedListener(this);
         mPathSpanClick.setOnClickListener(this);
@@ -59,6 +71,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
 //        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
+        //
         //
         JSONObject json=new JSONObject();
         try {
@@ -71,6 +84,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        showBrowserContextMenu(activity);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);
@@ -173,9 +187,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean showBrowserContextMenu(Context context){
-        WindowDialog windowDialog=new WindowDialog();
-        windowDialog.setContentView(new ViewCreator().inflate(context,R.layout.browser_content_menus),null);
-        return windowDialog.show(null);
+        WindowContentDialog windowDialog=new WindowContentDialog(context);
+        MenuContextDialogContent content=new MenuContextDialogContent().setTitle("你比");
+        windowDialog.setContentView(content);
+        return windowDialog.show(new FixedLayoutParams(0.5f, 0.5f, Gravity.CENTER));
     }
 
     private Client getClient(){

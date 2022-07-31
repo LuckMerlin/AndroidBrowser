@@ -2,9 +2,7 @@ package com.luckmerlin.browser;
 
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
@@ -12,13 +10,10 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.luckmerlin.browser.binding.ClickBinding;
+import com.luckmerlin.browser.binding.VB;
 import com.luckmerlin.browser.binding.IconImageBinding;
-import com.luckmerlin.browser.binding.ImageBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
 import com.luckmerlin.browser.file.File;
-import com.luckmerlin.browser.file.Folder;
-import com.luckmerlin.browser.file.Mode;
 import com.merlin.adapter.PageListAdapter;
 import java.util.List;
 
@@ -79,7 +74,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
 //            fileBinding.setMode();
-            fileBinding.setClickBinding(new ClickBinding(file));
+            fileBinding.setClickBinding(new VB(file));
             fileBinding.setIconBinding(new IconImageBinding(file));
         }
     }

@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="content" type="com.luckmerlin.browser.dialog.MenuContextDialogContent" />
+        <import type="com.luckmerlin.browser.binding.VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+    </data>
+    <LinearLayout android:id="@+id/eedddddd"
+        android:orientation="vertical" android:background="@drawable/round_corner_gray"
+        binding:bind="@{VB.clickId(R.layout.browser_content_menus)}"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:padding="@dimen/contentGap">
 
-</LinearLayout>
+        <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+        </ScrollView>
+    </LinearLayout>
+</layout>

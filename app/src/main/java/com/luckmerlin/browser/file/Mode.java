@@ -75,8 +75,13 @@ public final class Mode {
         return this;
     }
 
-    public final boolean isMode(int mode){
-        return mode==mMode;
+    public final boolean isMode(int... modes){
+        for (int child:modes) {
+            if (child==mMode){
+                return true;
+            }
+        }
+        return false;
     }
 
     public Map<String, String> getExtra() {

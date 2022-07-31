@@ -1,5 +1,7 @@
 package com.luckmerlin.stream;
 
+import com.luckmerlin.debug.Debug;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,27 +66,31 @@ public class FileStream extends AbstractStream {
         Closeable openStream=mOpenStream;
         if (null!=openStream){
             if (!(openStream instanceof OutputStream)){
+                Debug.D("Fail open file output stream while opened not match stream.");
                 return null;
             }
+            Debug.D("Use opened output stream.");
             return (OutputStream)openStream;
         }
         File file=mFile;
         if (null==file){
+            Debug.D("Fail open output stream while file invalid.");
             return null;
         }else if (!file.exists()){
             File parent=file.getParentFile();
-            if (null==parent){
-                return null;
-            }else if (!parent.exists()){
+            if (null!=parent&&!parent.exists()){
+                Debug.D("Create folder before  open output stream."+parent);
                 parent.mkdirs();
             }
+            Debug.D("Create file before open output stream."+file);
             file.createNewFile();
             if (!file.exists()){
+                Debug.D("Fail open output stream while file create fail.");
                 return null;
             }
         }
         final FileOutputStream fileOutputStream=new FileOutputStream(file);
-        return new OutputStream(file.length()) {
+        OutputStream outputStream= new OutputStream(file.length()) {
             @Override
             public void write(int b) throws IOException {
                 fileOutputStream.write(b);
@@ -94,11 +100,15 @@ public class FileStream extends AbstractStream {
             public void close() throws IOException {
                 closeStream(fileOutputStream);
                 Closeable openStream=mOpenStream;
+                Debug.D("Close file streams.");
                 if (null!=openStream&&openStream==this){
+                    Debug.D("All file stream closed.");
                     mOpenStream=null;
                 }
             }
         };
+        mOpenStream=outputStream;
+        return outputStream;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.luckmerlin.stream;
 
+import com.luckmerlin.debug.Debug;
+
 import java.io.Closeable;
 import java.io.IOException;
 
@@ -11,20 +13,25 @@ public abstract class AbstractStream implements Stream{
 
     public final boolean writeStream(Stream stream,OnProgressChange progressChange){
         if (null==stream){
+            Debug.E("Fail write stream while stream is invalid.");
             return false;
         }
         OutputStream outputStream=null;InputStream inputStream=null;
         try {
             outputStream=openOutputStream();
             if (null==outputStream){
+                Debug.E("Fail write stream while output stream open failed.");
                 return false;
             }
+            Debug.D("Opened output stream for write stream.");
             final long currentLength=outputStream.length();
             inputStream=stream.openInputStream(currentLength<=0?0:currentLength);
             if (null==inputStream){
+                Debug.E("Fail write stream while input stream open failed.");
                 return false;
             }
             final long inputTotal=inputStream.length();
+            Debug.D("Opened input stream for write stream.currentLength="+currentLength+" inputTotal="+inputTotal);
             notifyProgressChange(currentLength,inputTotal,progressChange);
             final int bufferLength=1024;
             int read=0;
@@ -40,6 +47,7 @@ public abstract class AbstractStream implements Stream{
             }
             return true;
         } catch (Exception e) {
+            Debug.E("Exception write stream."+e);
             e.printStackTrace();
         }finally {
             closeStream(outputStream,inputStream);

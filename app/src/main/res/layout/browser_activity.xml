@@ -9,7 +9,7 @@
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.text.method.LinkMovementMethod"/>
-        <import type="com.luckmerlin.browser.binding.ClickBinding"/>
+        <import type="com.luckmerlin.browser.binding.VB"/>
     </data>
    <FrameLayout android:background="@drawable/background" android:fitsSystemWindows="true"
        android:layout_width="match_parent" android:layout_height="match_parent">
@@ -19,8 +19,7 @@
                android:layout_gravity="center_vertical" android:gravity="center_vertical"
                android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
 
-               <ImageView android:src="@{vm.browserMode==null?@drawable/selector_back:@drawable/selector_cancel}"
-                   binding:bind="@{ClickBinding.create(null).setClickId(vm.browserMode==null?R.drawable.selector_back:R.drawable.selector_cancel)}"
+               <ImageView android:src="@drawable/selector_back" binding:bind="@{VB.clickId(R.drawable.selector_back)}"
                    android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
                    android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
 
@@ -46,8 +45,8 @@
                <!--                binding:lmBinding="@{Touch.imageRes(vm.browserAdapter.browserMode.isMode(Mode.MODE_MULTI_CHOOSE)?vm.browserAdapter.isAllChoose?
    R.drawable.selector_choose_none:R.drawable.selector_choose_all:
    R.drawable.selector_menu,null,Touch.CLICK)}" -->
-               <ImageView android:src="@drawable/selector_menu"
-                   binding:bind="@{ClickBinding.create(R.drawable.selector_menu)}"
+               <ImageView android:src="@{vm.browserMode==null?@drawable/selector_menu:@drawable/selector_cancel}"
+                   binding:bind="@{VB.create(vm.browserMode==null?R.drawable.selector_menu:R.drawable.selector_cancel)}"
                    android:layout_width="30dp" android:layout_height="30dp"/>
            </LinearLayout>
            <TextView android:text="@{vm.notifyText??``}" android:singleLine="true" android:textColor="#fff"
@@ -75,12 +74,11 @@
                        style="@android:style/Widget.ProgressBar.Large" android:layout_gravity="center"
                        android:layout_width="50dp" android:layout_height="50dp"/>
                </FrameLayout>
-               <LinearLayout android:visibility="@{vm.browserMode!=null?View.VISIBLE:View.GONE}" android:paddingLeft="50dp"
-                   android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
+               <LinearLayout android:visibility="@{vm.browserMode.isMode(Mode.MODE_COPY,Mode.MODE_UPLOAD,Mode.MODE_MOVE,Mode.MODE_DOWNLOAD)?View.VISIBLE:View.GONE}"
+                   android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
                    android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
                    <TextView style="@style/browserBottomTextView"/>
-                   <TextView android:text="@string/cancel"
-                       binding:bind="@{ClickBinding.create(null).setClickId(R.string.cancel)}"
+                   <TextView android:text="@string/cancel" binding:bind="@{VB.clickId(R.string.cancel)}"
                        style="@style/browserBottomTextView"/>
                </LinearLayout>
            </LinearLayout>
