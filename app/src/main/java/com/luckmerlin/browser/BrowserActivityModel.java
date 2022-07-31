@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
@@ -22,11 +21,8 @@ import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
-import com.luckmerlin.view.Content;
-import com.luckmerlin.view.ViewCreator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
-import com.merlin.model.Model;
 import com.merlin.model.OnActivityCreate;
 
 import org.json.JSONException;
@@ -56,11 +52,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         return null;
     }
-
-//    @Override
-//    public View onCreateContentView(Context context) {
-//        return DataBindingUtil.inflate(context,R.layout.browser_activity);
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {

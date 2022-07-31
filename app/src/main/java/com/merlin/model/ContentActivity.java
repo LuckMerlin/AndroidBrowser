@@ -3,11 +3,10 @@ package com.merlin.model;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
-
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.ContentResolver;
 
-public abstract class ModelActivity extends Activity implements ContentResolver{
+public abstract class ContentActivity extends Activity implements ContentResolver{
     private Content mModel=null;
 
     @Override

@@ -8,10 +8,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.luckmerlin.view.Content;
-import com.merlin.model.Model;
-import com.merlin.model.ModelActivity;
+import com.merlin.model.ContentActivity;
 
-public class BrowserActivity extends ModelActivity {
+public class BrowserActivity extends ContentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

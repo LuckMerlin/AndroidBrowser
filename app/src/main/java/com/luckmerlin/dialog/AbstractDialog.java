@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
-import android.widget.FrameLayout;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.LayoutParamsResolver;
@@ -29,8 +28,7 @@ public abstract class AbstractDialog implements Dialog{
         return true;
     }
 
-
-    protected abstract boolean onShow(View view);
+    protected abstract boolean onShow(View view,LayoutParamsResolver resolver);
 
     @Override
     public final boolean show(LayoutParamsResolver resolver) {
@@ -41,11 +39,7 @@ public abstract class AbstractDialog implements Dialog{
         } else if (root.getParent() != null) {
             return false;
         }
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        if (null != resolver) {
-            resolver.onResolveLayoutParams(context, params);
-        }
-        return onShow(root);
+        return onShow(root,resolver);
     }
 
     @Override
@@ -57,6 +51,12 @@ public abstract class AbstractDialog implements Dialog{
     public boolean isShowing() {
         View root=mRoot;
         return null!=root&&root.getParent()!=null&&root.getVisibility()==View.VISIBLE;
+    }
+
+    protected final void resolveLayoutParams(Context context,ViewGroup.LayoutParams params,LayoutParamsResolver resolver){
+        if (null!=resolver){
+            resolver.onResolveLayoutParams(context,params);
+        }
     }
 
     private boolean removeFromParent(View view){
