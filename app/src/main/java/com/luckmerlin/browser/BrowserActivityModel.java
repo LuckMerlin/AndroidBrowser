@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
@@ -19,6 +20,7 @@ import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.merlin.adapter.ListAdapter;
@@ -166,6 +168,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return entryMode(null)||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
+            case R.string.multiChoose:
+                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -181,7 +185,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         WindowContentDialog windowDialog=new WindowContentDialog(context);
         MenuContextDialogContent content=new MenuContextDialogContent().setTitle("你比");
         windowDialog.setContentView(content);
-        return windowDialog.show(new FixedLayoutParams(0.5f, 0.5f, Gravity.CENTER));
+        return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                0.5f, Gravity.CENTER));
     }
 
     private Client getClient(){

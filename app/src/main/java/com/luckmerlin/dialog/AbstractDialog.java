@@ -7,6 +7,7 @@ import android.view.ViewParent;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.LayoutParamsResolver;
+import com.luckmerlin.view.ViewIterate;
 
 public abstract class AbstractDialog implements Dialog{
     private View mRoot;
@@ -19,7 +20,8 @@ public abstract class AbstractDialog implements Dialog{
     @Override
     public boolean setContentView(Content content) {
         Context context=mContext;
-        View view=null!=context&&null!=content?content.onCreateContentView(context):null;
+        View view=null!=context&&null!=content?content.onCreateContentView(context,(ViewIterate iterate)->
+                null!=iterate&&iterate.iterate(AbstractDialog.this)):null;
         if (null==context||null==view||(view.getParent()!=null)){
             Debug.E("Fail set window dialog content view while context or view invalid."+context);
             return false;

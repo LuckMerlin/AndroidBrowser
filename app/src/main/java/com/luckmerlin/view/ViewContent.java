@@ -5,32 +5,36 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
-import com.luckmerlin.browser.binding.Iterate;
 
 public abstract class ViewContent implements Content {
     private View mRoot;
 
     protected abstract View onCreateContent(Context context);
 
+    protected boolean onIterateEnable(){
+        return true;//Default enable
+    }
+
     @Override
-    public final View onCreateContentView(Context context) {
+    public final View onCreateContentView(Context context,ViewIterator iterator) {
         View root=mRoot;
         if (null!=root){
             return root;
         }
-        root=mRoot=onCreateContent(context);
-        if (null!=root&&this instanceof Iterate){
+        root=onCreateContent(context);
+        if (null!=root&&root.getParent()==null&&onIterateEnable()){
             FrameLayout frameLayout= new FrameLayout(new ViewIteratorContextWrapper(root.getContext()){
                 @Override
-                public Object onIterateView() {
-                    return ViewContent.this;
+                public boolean onViewIterate(ViewIterate iterate) {
+                    return null!=iterate&&(iterate.iterate(ViewContent.this)||
+                            (null!=iterator&&iterator.onViewIterate(iterate)));
                 }
             });
-            frameLayout.addView(root,new FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            return frameLayout;
+            frameLayout.addView(root,new FrameLayout.LayoutParams(ViewGroup.
+                    LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            root=frameLayout;
         }
-        return root;
+        return mRoot=root;
     }
 
     public final boolean removeFromParent(){

@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.view.View;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.ContentResolver;
+import com.luckmerlin.view.ViewIterate;
 
-public abstract class ContentActivity extends Activity implements ContentResolver{
+public abstract class ContentActivity extends Activity implements ContentResolver {
     private Content mModel=null;
 
     @Override
@@ -14,7 +15,8 @@ public abstract class ContentActivity extends Activity implements ContentResolve
         super.onCreate(savedInstanceState);
         Content model=mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent():null;
         if (null!=model){
-            View contentView=model.onCreateContentView(this);
+            View contentView= model.onCreateContentView(this,(ViewIterate iterate)->
+                    null!=iterate&&((null!=model&&iterate.iterate(model))));
             if (null!=contentView){
                 setContentView(contentView);
             }
@@ -40,5 +42,9 @@ public abstract class ContentActivity extends Activity implements ContentResolve
             return;
         }
         super.onBackPressed();
+    }
+
+    public final Content getContent() {
+        return mModel;
     }
 }

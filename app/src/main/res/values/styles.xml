@@ -16,6 +16,15 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="contextMenuTextView" parent="titleNormalTextView">
+        <item name="android:minWidth">160dp</item>
+        <item name="android:layout_marginTop">2dp</item>
+        <item name="android:layout_marginBottom">2dp</item>
+        <item name="android:paddingTop">5dp</item>
+        <item name="android:paddingBottom">5dp</item>
+        <item name="android:background">@drawable/round_corner_gray</item>
+    </style>
+
     <style name="horizontalDividerLine">
         <item name="android:background">#34ffffff</item>
         <item name="android:layout_marginTop">3dp</item>

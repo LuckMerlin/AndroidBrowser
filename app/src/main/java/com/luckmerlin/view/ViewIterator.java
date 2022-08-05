@@ -1,5 +1,5 @@
 package com.luckmerlin.view;
 
 public interface ViewIterator {
-    Object onIterateView();
+    boolean onViewIterate(ViewIterate iterate);
 }

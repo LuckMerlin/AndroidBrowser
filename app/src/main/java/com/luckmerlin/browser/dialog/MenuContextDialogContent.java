@@ -21,10 +21,11 @@ public class MenuContextDialogContent extends ViewContent implements OnClickList
 
     @Override
     public boolean onClick(View view, int clickId, int count, Object obj) {
+        removeFromParent();//Anyone view click to dismiss
         switch (clickId){
             case R.layout.browser_content_menus:
                 Debug.D("WERWERQWEQ  "+clickId);
-                return removeFromParent()||true;
+                return true;
         }
         return false;
     }
