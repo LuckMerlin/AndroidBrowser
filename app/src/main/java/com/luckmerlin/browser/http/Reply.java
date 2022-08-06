@@ -33,12 +33,24 @@ public class Reply<T> extends JsonObject {
         return optInt(Label.LABEL_CODE, def);
     }
 
+    public final Reply<T> setCode(int code){
+        return putSafe(this,Label.LABEL_CODE,code);
+    }
+
+    public final Reply<T> setMessage(String msg){
+        return putSafe(this,Label.LABEL_MSG,msg);
+    }
+
     public final String getMessage(String def){
-        return optString(Label.LABEL_CODE, def);
+        return optString(Label.LABEL_MSG, def);
     }
 
     public final boolean isSucceed(){
         return getCode(Code.CODE_UNKNOWN)==Code.CODE_SUCCEED;
+    }
+
+    public final Reply<T> setData(Object data){
+        return putSafe(this,Label.LABEL_DATA,data);
     }
 
     public final Object getDataJson(){

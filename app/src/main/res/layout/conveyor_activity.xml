@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="vm" type="com.luckmerlin.browser.ConveyorActivityModel" />
+        <import type="android.text.Html"/>
+        <import type="android.view.View"/>
+        <import type="com.luckmerlin.browser.utils.FileSize"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="com.luckmerlin.browser.file.Mode"/>
+        <import type="android.text.method.LinkMovementMethod"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+    </data>
+   <FrameLayout android:fitsSystemWindows="true" android:background="#55000000"
+       android:layout_width="match_parent" android:layout_height="match_parent">
+
+       <ImageView android:src="@drawable/selector_back" binding:bind="@{VB.clickId(R.drawable.selector_back)}"
+           android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
+           android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
+
+   </FrameLayout>
+</layout>

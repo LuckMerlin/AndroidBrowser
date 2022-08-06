@@ -4,9 +4,12 @@ import android.os.Environment;
 
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.http.Reply;
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.debug.Debug;
 import com.merlin.adapter.PageListAdapter;
 
@@ -19,7 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class LocalClient implements Client {
+public class LocalClient extends AbstractClient {
     private String mRootPath=Environment.getDataDirectory().getAbsolutePath()+"/../";
 
     @Override
@@ -38,21 +41,22 @@ public class LocalClient implements Client {
     }
 
     @Override
-    public Canceler loadFiles(BrowseQuery query, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback) {
+    public Canceler loadFiles(BrowseQuery query, File from, int pageSize, OnFinish<Reply<Folder>> callback) {
         String pathValue=null!=query?query.mFolderPath:null;
         String browserPath=null!=pathValue&&pathValue.length()>0?pathValue:mRootPath;
         final java.io.File browserFile=null!=browserPath&&browserPath.length()>0?new java.io.File(browserPath):null;
+        final Reply<Folder> reply=new Reply<>();
         if (null==browserFile){
             Debug.W("Can't load client while query file invalid."+browserPath);
-            notifyFinish(false,null,callback);
+            notifyFinish(reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file invalid."),callback);
             return null;
         }else if (!browserFile.exists()){
             Debug.W("Can't load client while query file not exist."+browserPath);
-            notifyFinish(false,null,callback);
+            notifyFinish(reply.setCode(Code.CODE_NOT_EXIST).setMessage("Query file not exist."),callback);
             return null;
         }else if (!browserFile.isDirectory()){
             Debug.W("Can't load client while query file not directory.");
-            notifyFinish(false,null,callback);
+            notifyFinish(reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file not directory."),callback);
             return null;
         }
         String filterName=null!=query?query.mSearchInput:null;
@@ -95,8 +99,18 @@ public class LocalClient implements Client {
         }else{
             folder.setChildren(files);
         }
-        notifyFinish(true,folder, callback);
+        notifyFinish(reply.setCode(Code.CODE_SUCCEED).setMessage("Succeed").setData(folder), callback);
         return ()->false;
+    }
+
+    @Override
+    public Canceler createFile(File parent, String name, boolean isDir, OnFinish<Reply<File>> onFinish) {
+        return null;
+    }
+
+    @Override
+    public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
+        return null;
     }
 
     private File createLoadFile(java.io.File file){
@@ -112,11 +126,5 @@ public class LocalClient implements Client {
                 setSep(java.io.File.separator).
                 setModifyTime(file.lastModified()).
                 setParent(file.getParent()).setName(file.getName());
-    }
-
-    private void notifyFinish(boolean succeed, PageListAdapter.Page<File> page,PageListAdapter.OnPageLoadListener<File> callback){
-        if (null!=callback){
-            callback.onPageLoad(succeed,page);
-        }
     }
 }

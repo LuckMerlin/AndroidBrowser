@@ -4,15 +4,19 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.view.LayoutParamsResolver;
 
 public class FixedLayoutParams implements LayoutParamsResolver {
     public Number mWidth;
     public Number mHeight;
     public int mGravity= Gravity.NO_GRAVITY;
+    public Number mMaxWidth;
+    public Number mMaxHeight;
 
     public FixedLayoutParams(){
         this(null,null);
@@ -26,6 +30,16 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         mWidth=width;
         mHeight=height;
         mGravity=gravity;
+    }
+
+    public FixedLayoutParams setMaxHeight(Number maxHeight) {
+        this.mMaxHeight = maxHeight;
+        return this;
+    }
+
+    public FixedLayoutParams setMaxWidth(Number maxWidth) {
+        this.mMaxWidth = maxWidth;
+        return this;
     }
 
     @Override
@@ -52,18 +66,25 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         if (null==full||full.length<2){
             return new int[]{ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT};
         }
-        return new int[]{computeSize(mWidth,full[0]),computeSize(mHeight,full[1])};
+        return new int[]{computeSize(mWidth,computeSize(mMaxWidth,0,full[0]),full[0]),
+                computeSize(mHeight,computeSize(mMaxHeight,0,full[1]),full[1])};
     }
 
-    private int computeSize(Number size,int full){
+    private int computeSize(Number size,int max,int full){
         if (null==size){
             return ViewGroup.LayoutParams.MATCH_PARENT;
         }else if(size instanceof Integer){
+//            Debug.D("AAAAAAAA "+size+" "+max);
+            if (max>0){
+                if (((Integer)size)>0&&((Integer)size)>max){
+                    return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST);
+                }
+            }
             return (Integer)size;
         }else if(size instanceof Long){
             return ((Long)size).intValue();
         }else if(size instanceof Double){
-            return computeSize(((Double)size).floatValue(),full);
+            return computeSize(((Double)size).floatValue(),max,full);
         }else if (size instanceof Float){
             return (int)(full*(Float)size);
         }

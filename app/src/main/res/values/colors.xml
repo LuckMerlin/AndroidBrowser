@@ -14,4 +14,7 @@
     <color name="iconNormal">#ffffff</color>
     <color name="iconPressed">#888a8a8a</color>
     <color name="iconDisable">#33e6e6e6</color>
+    <color name="buttonNormal">#88ffffff</color>
+    <color name="buttonPressed">#33ffffff</color>
+    <color name="buttonDisable">#11ffffff</color>
 </resources>

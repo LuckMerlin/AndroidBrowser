@@ -19,8 +19,13 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView  binding:bind="@{VB.clickId(R.string.conveyor)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.setAsHome)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.create)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
-                <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.goTo)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.terminal)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.exit)}" style="@style/contextMenuTextView" />
             </LinearLayout>
         </ScrollView>
 

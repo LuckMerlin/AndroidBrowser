@@ -13,8 +13,16 @@ public class Debug {
         D(null,msg);
     }
 
-    public static void E(String tag,String msg){
+    public static void E(String tag,String msg,Throwable throwable){
         Log.e(null!=tag?tag:TAG,null!=msg?msg:"");
+    }
+
+    public static void E(String msg,Throwable throwable){
+        Log.e(null,null!=msg?msg:"");
+    }
+
+    public static void E(String tag,String msg){
+        E(tag,msg,null);
     }
 
     public static void E(String msg){

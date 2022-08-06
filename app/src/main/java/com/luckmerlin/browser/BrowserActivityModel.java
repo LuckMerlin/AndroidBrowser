@@ -13,16 +13,20 @@ import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
+import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.MenuContextDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.http.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
+import com.luckmerlin.view.Content;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -43,7 +47,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
-             loadFiles(args,from,pageSize,callback));
+             loadFiles(args, from, pageSize, null!=callback?(Reply<Folder> data)->
+             callback.onPageLoad(null!=data&&data.isSucceed(),null!=data?data.getData():null) :null));
 
     @Override
     protected View onCreateContent(Context context) {
@@ -77,7 +82,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        showBrowserContextMenu(activity);
+//        showBrowserContextMenu(activity);
+        createFile();
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);
@@ -97,7 +103,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        ddd(new HttpParser<Activity>());
     }
 
-    private Canceler loadFiles(BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback){
+    private Canceler loadFiles(BrowseQuery args, File from, int pageSize,OnFinish<Reply<Folder>> callback){
         Client client=getClient();
         return null!=client?client.loadFiles(args,from,pageSize,callback):null;
     }
@@ -170,6 +176,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
                 return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
+            case R.string.setAsHome:
+                return setCurrentAsHome()||true;
+            case R.string.conveyor:
+                return startActivity(ConveyorActivity.class)||true;
+            case R.string.create:
+                return createFile()||true;
+            case R.string.exit:
+                return finishActivity()||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -186,7 +200,23 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         MenuContextDialogContent content=new MenuContextDialogContent().setTitle(getString(R.string.app_name));
         windowDialog.setContentView(content);
         return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+    }
+
+    private boolean createFile(){
+        Client client=mBrowserClient.get();
+        return null!=showContentDialog(new CreateFileDialogContent(client),null);
+    }
+
+    private boolean setCurrentAsHome(){
+        Client client=mBrowserClient.get();
+        Folder folder=mCurrentFolder.get();
+        if (null==client||null==folder){
+            return false;
+        }
+        return null!=client.setHome(folder,(Reply<File> data)->
+                toast(getString(null!=data&&data.isSucceed()?R.string.whichSucceed:
+                    R.string.whichFailed,getString(R.string.setAsHome))));
     }
 
     private Client getClient(){
