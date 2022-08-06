@@ -7,8 +7,7 @@
         <variable name="selected" type="boolean" />
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
-        <variable name="iconBinding" type="com.luckmerlin.browser.binding.ImageBinding" />
-        <variable name="clickBinding" type="com.luckmerlin.browser.binding.ViewBinding" />
+        <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
         <import type="com.luckmerlin.browser.utils.Time"/>
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
@@ -20,8 +19,7 @@
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
-            <ImageView binding:bind="@{iconBinding}"
-                android:layout_width="50dp" android:layout_height="50dp"/>
+            <ImageView android:layout_width="50dp" android:layout_height="50dp"/>
         </FrameLayout>
 
         <FrameLayout android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content">

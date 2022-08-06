@@ -9,7 +9,7 @@
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.text.method.LinkMovementMethod"/>
-        <import type="com.luckmerlin.browser.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
     </data>
    <FrameLayout android:background="@drawable/background" android:fitsSystemWindows="true"
        android:layout_width="match_parent" android:layout_height="match_parent">

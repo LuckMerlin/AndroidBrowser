@@ -1,4 +1,4 @@
-package com.luckmerlin.browser.binding;
+package com.luckmerlin.binding;
 
 import android.view.View;
 

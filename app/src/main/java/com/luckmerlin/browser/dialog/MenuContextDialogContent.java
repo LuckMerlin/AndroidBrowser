@@ -1,7 +1,6 @@
 package com.luckmerlin.browser.dialog;
 
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import androidx.databinding.ObservableField;
 import com.luckmerlin.browser.R;

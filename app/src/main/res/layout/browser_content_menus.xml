@@ -3,30 +3,26 @@
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="content" type="com.luckmerlin.browser.dialog.MenuContextDialogContent" />
-        <import type="com.luckmerlin.browser.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
     <LinearLayout android:orientation="vertical" android:background="@drawable/round_corner_gray"
         android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:padding="@dimen/contentGap">
+        android:paddingTop="5dp" android:paddingBottom="15dp"
+        android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
         <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
-            android:layout_gravity="center_horizontal"
+            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <ScrollView android:layout_gravity="center" android:scrollbars="none" android:layout_marginTop="5dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
-                <TextView  android:text="@string/multiChoose"  style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
             </LinearLayout>
         </ScrollView>
+
     </LinearLayout>
 </layout>

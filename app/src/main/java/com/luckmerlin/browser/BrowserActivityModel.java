@@ -186,7 +186,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         MenuContextDialogContent content=new MenuContextDialogContent().setTitle(getString(R.string.app_name));
         windowDialog.setContentView(content);
         return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                0.5f, Gravity.CENTER));
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
     }
 
     private Client getClient(){

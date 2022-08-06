@@ -1,32 +1,45 @@
-package com.luckmerlin.browser.binding;
+package com.luckmerlin.binding;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewParent;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.view.ViewIterate;
 import com.luckmerlin.view.ViewIterator;
 import com.merlin.model.ContentActivity;
-
 import java.util.HashSet;
 import java.util.Set;
 
-public class ViewBinding extends ObjectBinding{
+public class ViewBinding extends ObjectBinding {
     private int mClickId=View.NO_ID;
     private boolean mEnableLongClick=false;
     private boolean mAutoFill=true;
     private OnViewBinding mOnViewBinding;
 
     public ViewBinding(Object object) {
-        super(object);
+        setObject(object);
     }
 
     public ViewBinding enableLongClick(boolean enable){
         mEnableLongClick=enable;
         return this;
+    }
+
+    public ViewBinding fill(boolean enable){
+        mAutoFill=enable;
+        return this;
+    }
+
+    public final boolean isAutoFill() {
+        return mAutoFill;
     }
 
     public ViewBinding setBinding(OnViewBinding binding){
@@ -67,10 +80,12 @@ public class ViewBinding extends ObjectBinding{
 
         @Override
         public void onViewBinding(Binding binding, View view) {
-            if (null==binding||null==view){
-                return;
-            }
-            if (binding instanceof ViewBinding){
+            checkClick(binding,view);
+            checkFill(binding,view);
+        }
+
+        public void checkClick(Binding binding, View view){
+            if (null!=binding&&null!=view&&binding instanceof ViewBinding){
                 ViewBinding viewBinding=(ViewBinding)binding;
                 final int clickId=viewBinding.mClickId;
                 final Object object=viewBinding.getObject();
@@ -82,6 +97,59 @@ public class ViewBinding extends ObjectBinding{
                 }
             }
         }
+
+        public void checkFill(Binding binding, View view){
+            if (null==binding||!(binding instanceof ViewBinding)){
+                return;
+            }
+            ViewBinding viewBinding=(ViewBinding)binding;
+            Object resObject=viewBinding.isAutoFill()?getResource(view.getContext(),viewBinding.mClickId):null;
+            if (null==resObject){
+                return;
+            }else if (resObject instanceof Drawable){
+                if (view instanceof ImageView){
+                    ((ImageView)view).setImageDrawable((Drawable)resObject);
+                }else if (view instanceof CompoundButton){
+                    ((CompoundButton)view).setButtonDrawable((Drawable)resObject);
+                }
+            }else if (resObject instanceof CharSequence){
+                if (view instanceof TextView){
+                    ((TextView)view).setText((CharSequence)resObject);
+                }
+            }
+        }
+
+        public final Object getResource(Context context,int resId){
+            return ViewBinding.getResource(context,resId);
+        }
+
+        public final boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj){
+            return ViewBinding.dispatchLongClick2View(view,root,clickId,obj);
+        }
+
+        public final boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
+            return ViewBinding.dispatchClick2View(view,root,clickId,count,obj);
+        }
+    }
+
+    private static Object getResource(Context context,int resId){
+        Resources resources=null!=context?context.getResources():null;
+        if (null==resources){
+            return null;
+        }
+        try {
+            String name=resources.getResourceTypeName(resId);
+            if (null==name){
+                return null;
+            }else if (name.equals("string")){
+                return resources.getString(resId);
+            }else if (name.equals("drawable")){
+                return resources.getDrawable(resId);
+            }
+        }catch (Exception e){
+
+        }
+        return null;
     }
 
     private static boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj){
