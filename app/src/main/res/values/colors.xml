@@ -11,4 +11,7 @@
     <color name="syncFail">#f00</color>
     <color name="syncedNone">#ccc</color>
     <color name="synced">#0f0</color>
+    <color name="iconNormal">#ffffff</color>
+    <color name="iconPressed">#888a8a8a</color>
+    <color name="iconDisable">#33e6e6e6</color>
 </resources>

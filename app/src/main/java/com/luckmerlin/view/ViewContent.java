@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 public abstract class ViewContent implements Content {
     private View mRoot;
@@ -51,8 +52,35 @@ public abstract class ViewContent implements Content {
         return mRoot;
     }
 
+    public final boolean toast(int textId,int duration,Object...args){
+        return toast(getString(textId,args),duration);
+    }
+
+    public final boolean toast(String text){
+        return toast(text,3000);
+    }
+
+    public final boolean toast(String text,int duration){
+        Context context=getContext();
+        if (null!=context){
+            Toast.makeText(context,null!=text?text:"",duration).show();
+            return true;
+        }
+        return false;
+    }
+
     public final Context getContext(){
         View root=getRoot();
         return null!=root?root.getContext():null;
+    }
+
+    public final String getString(int resId, Object... formatArgs){
+        Context context=getContext();
+        return null!=context?context.getString(resId,formatArgs):null;
+    }
+
+    public final CharSequence getText(int resId){
+        Context context=getContext();
+        return null!=context?context.getText(resId):null;
     }
 }

@@ -3,7 +3,7 @@
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="content" type="com.luckmerlin.browser.dialog.MenuContextDialogContent" />
-        <import type="com.luckmerlin.browser.binding.VB"/>
+        <import type="com.luckmerlin.browser.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
     <LinearLayout android:orientation="vertical" android:background="@drawable/round_corner_gray"

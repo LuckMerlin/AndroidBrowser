@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.luckmerlin.browser.binding.VB;
+import com.luckmerlin.browser.binding.ViewBinding;
 import com.luckmerlin.browser.binding.IconImageBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
 import com.luckmerlin.browser.file.File;
@@ -74,7 +74,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
 //            fileBinding.setMode();
-            fileBinding.setClickBinding(new VB(file));
+            fileBinding.setClickBinding(new ViewBinding(file));
             fileBinding.setIconBinding(new IconImageBinding(file));
         }
     }

@@ -183,7 +183,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean showBrowserContextMenu(Context context){
         WindowContentDialog windowDialog=new WindowContentDialog(context);
-        MenuContextDialogContent content=new MenuContextDialogContent().setTitle("你比");
+        MenuContextDialogContent content=new MenuContextDialogContent().setTitle(getString(R.string.app_name));
         windowDialog.setContentView(content);
         return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 0.5f, Gravity.CENTER));

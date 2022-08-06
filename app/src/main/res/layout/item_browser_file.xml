@@ -8,7 +8,7 @@
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="iconBinding" type="com.luckmerlin.browser.binding.ImageBinding" />
-        <variable name="clickBinding" type="com.luckmerlin.browser.binding.VB" />
+        <variable name="clickBinding" type="com.luckmerlin.browser.binding.ViewBinding" />
         <import type="com.luckmerlin.browser.utils.Time"/>
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
