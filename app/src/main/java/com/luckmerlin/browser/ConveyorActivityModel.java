@@ -28,7 +28,7 @@ public class ConveyorActivityModel extends BaseModel implements OnActivityCreate
     protected View onCreateContent(Context context) {
         //
         for (int i = 0; i < 1000; i++) {
-            if (i%4<2){
+            if (i%8<4){
                 mConveyorListAdapter.add(new TestTask().setName("单 "+i));
             }else{
                 mConveyorListAdapter.add(new TaskGroup().setName("多 "+i));

@@ -14,14 +14,16 @@
         <import type="com.luckmerlin.browser.BrowserBinding" alias="BB"/>
         <import type="android.view.View"/>
     </data>
-    <LinearLayout android:paddingBottom="2dp" android:paddingTop="2dp" android:orientation="horizontal"
-        android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:paddingBottom="4dp" android:paddingTop="4dp" android:orientation="horizontal"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:paddingLeft="5dp" android:paddingRight="5dp">
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
             <ImageView binding:bind="@{VB.create(task).img(BB.instance)}"
-                android:layout_width="50dp" android:layout_height="50dp"/>
+                android:layout_width="60dp" android:layout_height="60dp"/>
         </FrameLayout>
+
         <TextView android:text="@{task.name??``}" android:textColor="@color/textTitle"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

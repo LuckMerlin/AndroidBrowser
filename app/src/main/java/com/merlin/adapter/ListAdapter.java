@@ -227,7 +227,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null!=view&&view.getLayoutParams()==null){
             ViewGroup.LayoutParams params=new ViewGroup.LayoutParams
-                    (ViewGroup.LayoutParams.WRAP_CONTENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+                    (ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             view.setLayoutParams(params);
         }
     }

@@ -17,7 +17,6 @@ public final class BrowserBinding implements ImageFetcher {
 
     @Override
     public void fetchImage(View view, Binding binding, OnImageFetch callback) {
-        Debug.D("SSSSS "+view);
        if (null!=view&&binding instanceof ViewBinding){
            ViewBinding viewBinding=(ViewBinding)binding;
            Object obj=viewBinding.getObject();

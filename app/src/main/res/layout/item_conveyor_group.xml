@@ -13,18 +13,34 @@
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.view.View"/>
     </data>
-    <LinearLayout binding:bind="@{clickBinding.enableLongClick(true)}"
-        android:paddingBottom="2dp" android:paddingTop="2dp" android:orientation="horizontal"
-        android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:paddingBottom="4dp" android:paddingTop="4dp" android:orientation="horizontal"
+        android:paddingLeft="5dp" android:paddingRight="5dp" android:gravity="center_vertical"
+        android:layout_marginTop="1dp" android:layout_marginBottom="1dp"
+        android:background="#11000000" android:layout_width="match_parent" android:layout_height="match_parent">
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content" android:layout_height="wrap_content">
+            android:layout_width="60dp" android:layout_height="60dp">
             <ImageView android:src="@drawable/hidisk_icon_exe"
-                android:layout_width="50dp" android:layout_height="50dp"/>
+                android:layout_width="match_parent" android:layout_height="match_parent"/>
         </FrameLayout>
 
-        <TextView android:text="@{task.name??``}" android:textColor="@color/textTitle"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <LinearLayout android:orientation="vertical" android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_weight="1"
+            android:layout_width="0dp" android:layout_height="wrap_content" android:layout_gravity="center_vertical">
+
+            <TextView android:text="@{task.name??``}" android:textColor="@color/textTitle" android:textSize="14sp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+            <TextView android:text="@{`我和我的祖国`}" android:textColor="@color/textTitleSub" android:textSize="12sp"
+                android:layout_marginLeft="5dp" android:paddingTop="2dp" android:paddingBottom="2dp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+            <ProgressBar android:progress="50" style="@android:style/Widget.ProgressBar.Horizontal"
+                android:progressDrawable="@drawable/progress_bar"
+                android:layout_width="match_parent" android:layout_height="2dp"/>
+        </LinearLayout>
+
+        <ImageView android:layout_width="60dp" android:src="@drawable/selector_pause"
+            android:padding="10dp" android:layout_height="60dp"/>
 
     </LinearLayout>
 </layout>
