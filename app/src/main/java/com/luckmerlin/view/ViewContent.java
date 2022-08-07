@@ -5,6 +5,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
@@ -12,8 +14,9 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
-
+import androidx.annotation.RequiresApi;
 import com.luckmerlin.debug.Debug;
+import java.util.concurrent.Executor;
 
 public abstract class ViewContent implements Content {
     private View mRoot;
@@ -167,6 +170,38 @@ public abstract class ViewContent implements Content {
             }catch (Exception e){
                 Debug.E("Exception start activity.e="+e,e);
             }
+        }
+        return false;
+    }
+
+    public final ComponentName startService(Intent service){
+        Context context=null!=service?getContext():null;
+        return null!=context?context.startService(service):null;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public final ComponentName startForegroundService(Intent service){
+        Context context=null!=service?getContext():null;
+        return null!=context?context.startForegroundService(service):null;
+    }
+
+    public final boolean bindService(Intent service,ServiceConnection conn, int flags){
+        Context context=null!=service?getContext():null;
+        return null!=context&&context.bindService(service,conn,flags);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.Q)
+    public final boolean bindService(Intent service, int flags, Executor executor, ServiceConnection conn){
+        Context context=null!=service?getContext():null;
+        return null!=context&&context.bindService(service,flags,executor,conn);
+    }
+
+    public final boolean unbindService(ServiceConnection connection){
+        Context context=null!=connection?getContext():null;
+        if (null!=context){
+            Debug.D("Unbind service."+connection);
+            context.unbindService(connection);
+            return true;
         }
         return false;
     }

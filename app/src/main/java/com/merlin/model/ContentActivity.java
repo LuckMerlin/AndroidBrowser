@@ -1,6 +1,7 @@
 package com.merlin.model;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,9 +17,15 @@ public abstract class ContentActivity extends Activity implements ContentResolve
     private Content mModel=null;
 
     @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(newBase);
+        mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent():null;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Content model=mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent():null;
+        Content model=mModel;
         if (null!=model){
             View contentView= model.onCreateContentView(this,(ViewIterate iterate)->
                     null!=iterate&&((null!=model&&iterate.iterate(model))));

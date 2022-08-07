@@ -8,9 +8,8 @@ import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.CreateFileContentDialogBinding;
 import com.luckmerlin.browser.file.File;
-import com.luckmerlin.browser.http.Reply;
+import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.OnFinish;
 
 public class CreateFileDialogContent extends BaseContent implements OnClickListener {
     public final ObservableField<Boolean> mCreateDir=new ObservableField<>();

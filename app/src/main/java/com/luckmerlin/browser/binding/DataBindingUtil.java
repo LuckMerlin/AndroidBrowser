@@ -2,6 +2,7 @@ package com.luckmerlin.browser.binding;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.databinding.ViewDataBinding;
 
@@ -10,6 +11,10 @@ public class DataBindingUtil {
 
     public static <T extends ViewDataBinding> T inflate(Context context, int layoutId) {
         return null!=context?inflate(context,layoutId,null,true):null;
+    }
+
+    public static ViewDataBinding getBinding(View view){
+        return null==view?null:androidx.databinding.DataBindingUtil.getBinding(view);
     }
 
     public static <T extends ViewDataBinding> T inflate(Context context,

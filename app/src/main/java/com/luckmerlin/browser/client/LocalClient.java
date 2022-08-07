@@ -3,20 +3,14 @@ package com.luckmerlin.browser.client;
 import android.os.Environment;
 
 import com.luckmerlin.browser.BrowseQuery;
-import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
-import com.luckmerlin.browser.http.Reply;
+import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.debug.Debug;
-import com.merlin.adapter.PageListAdapter;
 
-import org.json.JSONException;
-
-import java.lang.reflect.Field;
-import java.nio.file.spi.FileTypeDetector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

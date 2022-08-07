@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewParent;
@@ -23,6 +24,7 @@ public class ViewBinding extends ObjectBinding {
     private boolean mEnableLongClick=false;
     private boolean mAutoFill=true;
     private OnViewBinding mOnViewBinding;
+    private ImageFetcher mImage;
 
     public ViewBinding(Object object) {
         setObject(object);
@@ -68,6 +70,28 @@ public class ViewBinding extends ObjectBinding {
         return this;
     }
 
+    public ViewBinding img(int img){
+        return img(img!=Resources.ID_NULL?(View view,Binding binding, ImageFetcher.OnImageFetch callback)->
+                callback.onImageFetched(getResource(null!=view?view.getContext():null,img)):null);
+    }
+
+    public ViewBinding img(Bitmap img){
+        return img(null!=img?(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img):null);
+    }
+
+    public ViewBinding img(Drawable img){
+        return img(null!=img?(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img):null);
+    }
+
+    public ViewBinding img(ImageFetcher img){
+        mImage=img;
+        return this;
+    }
+
+    public Object getImage() {
+        return mImage;
+    }
+
     @Override
     public void onBind(View view) {
         if (null!=view){
@@ -103,18 +127,22 @@ public class ViewBinding extends ObjectBinding {
                 return;
             }
             ViewBinding viewBinding=(ViewBinding)binding;
+            //
             Object resObject=viewBinding.isAutoFill()?getResource(view.getContext(),viewBinding.mClickId):null;
             if (null==resObject){
-                return;
-            }else if (resObject instanceof Drawable){
-                if (view instanceof ImageView){
-                    ((ImageView)view).setImageDrawable((Drawable)resObject);
-                }else if (view instanceof CompoundButton){
-                    ((CompoundButton)view).setButtonDrawable((Drawable)resObject);
-                }
+               //Do nothing
+            }else if (resObject instanceof Drawable||resObject instanceof Bitmap){
+                setViewImage(view,resObject);
             }else if (resObject instanceof CharSequence){
                 if (view instanceof TextView){
                     ((TextView)view).setText((CharSequence)resObject);
+                }
+            }
+            //Check image fetcher
+            if (view instanceof ImageView) {
+                ImageFetcher imageFetcher = viewBinding.mImage;
+                if (null != imageFetcher) {
+                    imageFetcher.fetchImage(view, binding,(Object image) ->setViewImage(view,image));
                 }
             }
         }
@@ -130,6 +158,27 @@ public class ViewBinding extends ObjectBinding {
         public final boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
             return ViewBinding.dispatchClick2View(view,root,clickId,count,obj);
         }
+    }
+
+    private static boolean setViewImage(View view,Object img){
+        if (null==view||null==img){
+            return false;
+        }
+        if (view instanceof ImageView){
+            if (img instanceof Drawable){
+                ((ImageView)view).setImageDrawable((Drawable)img);
+                return true;
+            }else if (img instanceof Bitmap){
+                ((ImageView)view).setImageBitmap((Bitmap)img);
+                return true;
+            }
+        }else if (view instanceof CompoundButton){
+            if (img instanceof Drawable){
+                ((CompoundButton)view).setButtonDrawable((Drawable)img);
+                return true;
+            }
+        }
+        return false;
     }
 
     private static Object getResource(Context context,int resId){

@@ -25,6 +25,7 @@
 
         <activity android:name=".ConveyorActivity"
             android:theme="@android:style/Theme.Wallpaper.NoTitleBar"/>
+        <service android:name=".ConveyorService"/>
     </application>
 
 </manifest>

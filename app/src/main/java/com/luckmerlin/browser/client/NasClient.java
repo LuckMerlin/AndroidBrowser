@@ -6,7 +6,7 @@
 //import com.luckmerlin.browser.Label;
 //import com.luckmerlin.browser.file.File;
 //import com.luckmerlin.browser.file.Folder;
-//import com.luckmerlin.browser.http.Reply;
+//import com.luckmerlin.core.Reply;
 //import com.luckmerlin.core.Canceler;
 //import com.luckmerlin.http.Http;
 //import com.luckmerlin.http.Request;

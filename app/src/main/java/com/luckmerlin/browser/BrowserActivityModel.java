@@ -18,15 +18,13 @@ import com.luckmerlin.browser.dialog.MenuContextDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.http.Reply;
+import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
-import com.luckmerlin.view.Content;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -83,7 +81,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             e.printStackTrace();
         }
 //        showBrowserContextMenu(activity);
-        createFile();
+//        createFile();
+        startActivity(ConveyorActivity.class);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);

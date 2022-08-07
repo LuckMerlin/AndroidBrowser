@@ -33,10 +33,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     private List<T> mDataList;
     private Map<Integer,Object> mFixedViewHolder;
     private WeakReference<RecyclerView> mRecyclerView;
-    public static final int VIEW_TYPE_HEAD=0;
-    public static final int VIEW_TYPE_TAIL=1;
-    public static final int VIEW_TYPE_EMPTY=2;
-    public static final int VIEW_TYPE_DATA=3;
+    public static final int VIEW_TYPE_HEAD=-1;
+    public static final int VIEW_TYPE_TAIL=-2;
+    public static final int VIEW_TYPE_EMPTY=-3;
+    public static final int VIEW_TYPE_DATA=-4;
 
     protected ListAdapter() {
         this(new ItemCallback<>());
@@ -76,6 +76,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         }
         notifyItemRangeChanged(0,currentSize,"ItemData");
         return true;
+    }
+
+    public final boolean add(T data){
+        return add(Integer.MAX_VALUE,data);
     }
 
     public final boolean add(int index,T data){
@@ -229,13 +233,12 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public final RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Map<Integer,Object> fixedViewHolder=mFixedViewHolder;
         Context context=null!=parent?parent.getContext():null;
         Object object=null!=fixedViewHolder?fixedViewHolder.get(viewType):null;
         RecyclerView.ViewHolder viewHolder=null!=object?inflateViewHolder(context,object):null;
-        viewHolder=null==viewHolder&&viewType==VIEW_TYPE_DATA?inflateViewHolder(context,
-                onCreateDataViewHolder(parent)):viewHolder;
+        viewHolder=null==viewHolder?inflateViewHolder(context, onCreateViewTypeHolder(viewType,parent)):viewHolder;
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null==view){
             viewHolder=new RecyclerView.ViewHolder(new View(parent.getContext())) {};
@@ -244,7 +247,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return viewHolder;
     }
 
-    protected Object onCreateDataViewHolder(ViewGroup parent){
+    protected Object onCreateViewTypeHolder(int viewType,ViewGroup parent){
         return null;
     }
 
@@ -254,7 +257,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         size=size<=0?0:size;
         Map<Integer,Object> holders=mFixedViewHolder;
         if (size<=0){
-            return null!=holders.get(VIEW_TYPE_EMPTY)?1:0;
+            return null!=holders&&null!=holders.get(VIEW_TYPE_EMPTY)?1:0;
         }
         return size+(null!=holders?(null!=holders.get(VIEW_TYPE_HEAD)?1:0)
                 +(null!=holders.get(VIEW_TYPE_TAIL)?1:0):0);

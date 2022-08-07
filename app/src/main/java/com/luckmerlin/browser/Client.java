@@ -2,10 +2,9 @@ package com.luckmerlin.browser;
 
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
-import com.luckmerlin.browser.http.Reply;
+import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
-import com.merlin.adapter.PageListAdapter;
 
 public interface Client {
     String getName();

@@ -1,15 +1,13 @@
-package com.luckmerlin.browser.http;
+package com.luckmerlin.core;
 
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.object.Parser;
 
-import org.json.JSONException;
-
 import java.util.List;
 
-public class Reply<T> extends JsonObject {
+public class Reply<T> extends JsonObject implements Result<T> {
     private Parser<Object,T> mDataParser;
 
     public Reply(){
@@ -33,6 +31,10 @@ public class Reply<T> extends JsonObject {
         return optInt(Label.LABEL_CODE, def);
     }
 
+    public final Reply<T> set(int code,String msg,T data){
+        return setCode(code).setMessage(msg).setData(data);
+    }
+
     public final Reply<T> setCode(int code){
         return putSafe(this,Label.LABEL_CODE,code);
     }
@@ -41,8 +43,8 @@ public class Reply<T> extends JsonObject {
         return putSafe(this,Label.LABEL_MSG,msg);
     }
 
-    public final String getMessage(String def){
-        return optString(Label.LABEL_MSG, def);
+    public final String getMessage(){
+        return optString(Label.LABEL_MSG, null);
     }
 
     public final boolean isSucceed(){

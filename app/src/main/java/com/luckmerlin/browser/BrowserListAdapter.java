@@ -59,8 +59,9 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     }
 
     @Override
-    protected Object onCreateDataViewHolder(ViewGroup parent) {
-        return R.layout.item_browser_file;
+    protected Object onCreateViewTypeHolder(int viewType, ViewGroup parent) {
+        return viewType==VIEW_TYPE_DATA? R.layout.item_browser_file:
+                super.onCreateViewTypeHolder(viewType,parent);
     }
 
     @Override
