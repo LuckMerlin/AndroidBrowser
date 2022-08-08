@@ -145,6 +145,13 @@ public abstract class ViewContent implements Content {
         return null!=uiLooper&&null!=current&&current==uiLooper;
     }
 
+    public final Activity getActivity(){
+        Context context=getContext();
+        context=null!=context?context instanceof Activity?(Activity)context:context instanceof ContextWrapper?
+                ((ContextWrapper)context).getBaseContext():null:null;
+        return null!=context&&context instanceof Activity?(Activity)context:null;
+    }
+
     public final boolean startActivity(Object intent){
         return startActivity(intent,null);
     }

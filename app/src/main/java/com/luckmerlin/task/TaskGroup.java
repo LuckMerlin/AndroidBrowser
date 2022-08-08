@@ -15,7 +15,7 @@ public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
     private A mExecuting=null;
 
     @Override
-    public R execute(Object arg, OnProgressChange callback) {
+    protected R onExecute(Object arg, OnProgressChange callback) {
         while (true){
             A next= next();
             if (null==next){

@@ -4,30 +4,31 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.luckmerlin.browser.binding.DataBindingUtil;
+import com.luckmerlin.core.Canceler;
 import com.luckmerlin.debug.Debug;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,RecyclerView.ViewHolder> {
     private List<T> mDataList;
@@ -37,6 +38,9 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public static final int VIEW_TYPE_TAIL=-2;
     public static final int VIEW_TYPE_EMPTY=-3;
     public static final int VIEW_TYPE_DATA=-4;
+    private OnItemAttachChange<T> mOnItemAttachChange;
+    private DirtyDataChecker<T> mDirtyDataChecker;
+    private List<T> mAttachViewHolders;
 
     protected ListAdapter() {
         this(new ItemCallback<>());
@@ -67,8 +71,8 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public final boolean setData(List<T> data){
         List<T> current=mDataList;
         int currentSize=null!=current?current.size():0;
-        int dataSize=null!=data?data.size():0;
         mDataList=null!=data?new ArrayList<>(data):null;
+        int dataSize=null!=data?data.size():0;
         if (currentSize>dataSize){
             notifyItemRangeRemoved(dataSize,currentSize-dataSize);
         }else if (currentSize<dataSize){
@@ -96,9 +100,9 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     public final boolean remove(T data){
-        if (null!=data){
-            List<T> dataList=mDataList;
-            int index=null!=dataList?dataList.indexOf(data):-1;
+        List<T> dataList=null!=data?mDataList:null;
+        if (null!=dataList){
+            int index=dataList.indexOf(data);
             if (index>=0){
                 dataList.remove(index);
                 notifyItemRemoved(index);
@@ -147,8 +151,26 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return getItem(getSize()-1);
     }
 
+    public final ListAdapter<T> setDirtyDataChecker(DirtyDataChecker<T> dirtyDataChecker){
+        mDirtyDataChecker=dirtyDataChecker;
+        return this;
+    }
+
+    public final ListAdapter<T> setOnItemAttachChange(OnItemAttachChange<T> callback){
+        mOnItemAttachChange=callback;
+        return this;
+    }
+
+    public final OnItemAttachChange getOnItemAttachChange() {
+        return mOnItemAttachChange;
+    }
+
+    public final DirtyDataChecker<T> getDirtyDataChecker() {
+        return mDirtyDataChecker;
+    }
+
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position, @NonNull List<Object> payloads) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position,  List<Object> payloads) {
         super.onBindViewHolder(holder, position, payloads);
         onBindData(holder,position,payloads);
     }
@@ -157,8 +179,44 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         //Do nothing
     }
 
+    public final boolean replace(T data){
+        return replace(data,data);
+    }
+
+    public final boolean replace(Object obj,T data){
+        List<T> dataList=mDataList;
+        if (null==obj||null==data||null==dataList){
+            return false;
+        }
+        int index = dataList.indexOf(obj);
+        if (index>=0){
+            dataList.remove(index);
+            dataList.add(index,data);
+            notifyItemChanged(index,"replace");
+            return true;
+        }
+        return false;
+    }
+
+    public final int indexPosition(Object data){
+        List<T> dataList=null!=data?mDataList:null;
+        return null!=dataList?dataList.indexOf(data):-1;
+    }
+
+    public final boolean isAttached(T data){
+        List<T> attachViewHolders=null!=data?mAttachViewHolders:null;
+        if (null!=attachViewHolders){
+            for (T child:attachViewHolders) {
+                if (null!=child&&child.equals(data)){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     @Override
-    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+    public void onAttachedToRecyclerView( RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
         WeakReference<RecyclerView> current=mRecyclerView;
         mRecyclerView=null;
@@ -174,7 +232,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     @Override
-    public void onDetachedFromRecyclerView(@NonNull RecyclerView recyclerView) {
+    public void onDetachedFromRecyclerView( RecyclerView recyclerView) {
         super.onDetachedFromRecyclerView(recyclerView);
         WeakReference<RecyclerView> current=mRecyclerView;
         mRecyclerView=null;
@@ -254,6 +312,60 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
 
     protected Object onCreateViewTypeHolder(int viewType,ViewGroup parent){
         return null;
+    }
+
+    protected void onItemAttachChanged(boolean attach,RecyclerView.ViewHolder holder){
+        //Do nothing
+    }
+
+    private final Map<RecyclerView.ViewHolder,Canceler> mDirtyChecking=new HashMap<>();
+
+    @Override
+    public final void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        //
+        List<T> attachViewHolders=mAttachViewHolders;
+        attachViewHolders=null!=attachViewHolders?attachViewHolders:(mAttachViewHolders=new CopyOnWriteArrayList<>());
+        T data=getItem(holder.getAdapterPosition());
+        if (null!=data){
+            attachViewHolders.remove(data);
+            attachViewHolders.add(data);
+        }
+        //
+        Map<RecyclerView.ViewHolder, Canceler> dirtyChecking=mDirtyChecking;
+        DirtyDataChecker<T> checker=mDirtyDataChecker;
+        Canceler canceler=null;
+        if (null!=dirtyChecking&&null!=checker&&null!=(canceler=checker.checkDataDirty(holder, this, (T newData)-> {
+            dirtyChecking.remove(holder);
+        }))){
+            dirtyChecking.put(holder,canceler);
+        }
+        //
+        onItemAttachChanged(true,holder);
+        OnItemAttachChange attachChange=mOnItemAttachChange;
+        if (null!=attachChange){
+            attachChange.onItemAttachChanged(true,holder,this);
+        }
+    }
+
+    @Override
+    public final void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        List<T> attachViewHolders=mAttachViewHolders;
+        T data=null!=attachViewHolders?getItem(holder.getAdapterPosition()):null;
+        if (null!=data){
+            attachViewHolders.remove(data);
+        }
+        Map<RecyclerView.ViewHolder,Canceler> dirtyChecking=null!=holder?mDirtyChecking:null;
+        Canceler canceler=null!=dirtyChecking?dirtyChecking.remove(holder):null;
+        if (null!=canceler){
+            canceler.cancel();
+        }
+        onItemAttachChanged(false,holder);
+        OnItemAttachChange attachChange=mOnItemAttachChange;
+        if (null!=attachChange){
+            attachChange.onItemAttachChanged(false,holder,this);
+        }
     }
 
     @Override
@@ -342,13 +454,25 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     static class ItemCallback<T> extends DiffUtil.ItemCallback<T>{
 
         @Override
-        public boolean areItemsTheSame(@NonNull T oldItem, @NonNull T newItem) {
+        public boolean areItemsTheSame( T oldItem,  T newItem) {
             return false;
         }
 
         @Override
-        public boolean areContentsTheSame(@NonNull T oldItem, @NonNull T newItem) {
+        public boolean areContentsTheSame( T oldItem,  T newItem) {
             return false;
         }
+    }
+
+    public interface OnItemAttachChange<T>{
+        void onItemAttachChanged(boolean attach,RecyclerView.ViewHolder holder,ListAdapter<T> listAdapter);
+    }
+
+    public interface OnDataDirtyCheckFinish<T>{
+        void onDataDirtyCheckFinish(T newData);
+    }
+
+    public interface DirtyDataChecker<T>{
+        Canceler checkDataDirty(RecyclerView.ViewHolder holder, ListAdapter<T> listAdapter,OnDataDirtyCheckFinish<T> callback);
     }
 }

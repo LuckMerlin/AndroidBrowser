@@ -13,7 +13,9 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.task.TaskGroup;
@@ -29,15 +31,45 @@ public class ConveyorActivityModel extends BaseModel implements
 
     @Override
     protected View onCreateContent(Context context) {
-        //
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 100; i++) {
+            AbstractTask task=null;
             if (i%8<4){
-                mConveyorListAdapter.add(new TestTask().setName("单 "+i));
+                mConveyorListAdapter.add(task=new TestTask().setName("单 "+i));
             }else{
-                mConveyorListAdapter.add(new TaskGroup().setName("多 "+i));
+                mConveyorListAdapter.add(task=new TaskGroup().setName("多 "+i));
             }
+            final AbstractTask finTask=task;
+            final int finlInt=i;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (null!=context&&context instanceof Activity&&!((Activity)context).isDestroyed()){
+                        try {
+                            Progress progress=finTask.getProgress();
+                            int[] ddd=new int[1];
+                            progress=null!=progress?progress:new Progress() {
+                                @Override
+                                public long getTotal() {
+                                    return 100;
+                                }
+
+                                @Override
+                                public long getPosition() {
+                                    return ++ddd[0]>100?ddd[0]=0:ddd[0];
+                                }
+                            };
+                            finTask.setProgress(progress);
+                            Thread.sleep(10);
+                            if(mConveyorListAdapter.isAttached(finTask)){
+                                post(()->mConveyorListAdapter.replace(finTask));
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
         }
-        //
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
             ((ConveyorActivityBinding)binding).setVm(this);
