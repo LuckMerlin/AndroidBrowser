@@ -15,7 +15,7 @@
        android:layout_width="match_parent" android:layout_height="match_parent">
 
        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-           <ImageView android:src="@drawable/selector_back" binding:bind="@{VB.clickId(R.drawable.selector_back)}"
+           <ImageView binding:bind="@{VB.clickId(R.drawable.selector_back)}"
                android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
                android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
 

@@ -2,6 +2,7 @@ package com.luckmerlin.browser;
 
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ViewDataBinding;
@@ -35,6 +36,17 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             return null!=parent?inflateViewHolder(parent.getContext(),R.layout.item_conveyor_single):null;
         }
         return super.onCreateViewTypeHolder(viewType, parent);
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams onCreateViewHolderLayoutParams(ViewGroup parent, int viewType, RecyclerView.ViewHolder viewHolder) {
+        if (viewType==VIEW_TYPE_DATA||viewType==VIEW_TYPE_DATA_GROUP){
+            FrameLayout.LayoutParams params=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.bottomMargin=2;
+            params.topMargin=2;
+            return params;
+        }
+        return super.onCreateViewHolderLayoutParams(parent, viewType, viewHolder);
     }
 
     @Override

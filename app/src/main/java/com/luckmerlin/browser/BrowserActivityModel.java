@@ -25,6 +25,7 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
+import com.luckmerlin.object.Parser;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -46,7 +47,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
              loadFiles(args, from, pageSize, null!=callback?(Reply<Folder> data)->
-             callback.onPageLoad(null!=data&&data.isSucceed(),null!=data?data.getData():null) :null));
+             callback.onPageLoad(null!=data&&data.isSucceed(),null!=data?data.
+                     parser((Object child)->null!=child?new Folder(child):null).getData():null) :null));
 
     @Override
     protected View onCreateContent(Context context) {
@@ -82,7 +84,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
 //        showBrowserContextMenu(activity);
 //        createFile();
-        startActivity(ConveyorActivity.class);
+//        startActivity(ConveyorActivity.class);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);

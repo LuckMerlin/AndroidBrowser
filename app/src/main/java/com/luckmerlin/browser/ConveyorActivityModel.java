@@ -11,6 +11,7 @@ import android.view.View;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
+import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Task;
@@ -18,8 +19,10 @@ import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.task.TaskGroup;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
+import com.merlin.model.OnBackPress;
 
-public class ConveyorActivityModel extends BaseModel implements OnActivityCreate, OnActivityDestroy {
+public class ConveyorActivityModel extends BaseModel implements
+        OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
     private ServiceConnection mServiceConnection;
     private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
     private TaskExecutor mExecutor;
@@ -48,6 +51,20 @@ public class ConveyorActivityModel extends BaseModel implements OnActivityCreate
         if (null!=executor){
 
         }
+    }
+
+    @Override
+    public boolean onClick(View view, int clickId, int count, Object obj) {
+        switch (clickId){
+            case R.drawable.selector_back:
+                return onBackPressed();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return finishActivity();
     }
 
     @Override

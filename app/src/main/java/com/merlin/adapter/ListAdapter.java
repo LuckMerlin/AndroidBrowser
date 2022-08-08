@@ -223,10 +223,15 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return this;
     }
 
-    protected void onCreateViewHolderCreated(ViewGroup parent, int viewType,RecyclerView.ViewHolder viewHolder){
+    protected ViewGroup.LayoutParams onCreateViewHolderLayoutParams(ViewGroup parent, int viewType,RecyclerView.ViewHolder viewHolder){
+        return null;
+    }
+
+    protected void onViewHolderCreated(ViewGroup parent, int viewType,RecyclerView.ViewHolder viewHolder){
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null!=view&&view.getLayoutParams()==null){
-            ViewGroup.LayoutParams params=new ViewGroup.LayoutParams
+            ViewGroup.LayoutParams params=onCreateViewHolderLayoutParams(parent,viewType,viewHolder);
+            params=null!=params?params:new ViewGroup.LayoutParams
                     (ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             view.setLayoutParams(params);
         }
@@ -243,7 +248,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         if (null==view){
             viewHolder=new RecyclerView.ViewHolder(new View(parent.getContext())) {};
         }
-        onCreateViewHolderCreated(parent,viewType,viewHolder);
+        onViewHolderCreated(parent,viewType,viewHolder);
         return viewHolder;
     }
 
