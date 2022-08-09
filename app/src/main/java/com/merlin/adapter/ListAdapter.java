@@ -20,7 +20,6 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.ChangeUpdate;
 import com.luckmerlin.core.OnChangeUpdate;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -493,51 +492,4 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public interface DirtyDataChecker<T>{
         Canceler checkDataDirty(RecyclerView.ViewHolder holder, ListAdapter<T> listAdapter,OnDataDirtyCheckFinish<T> callback);
     }
-
-//    private static class CallbackPool{
-//        private static final Object sPoolSync = new Object();
-//        private static CallbackPool sPool;
-//        private static int sPoolSize = 0;
-//        private CallbackPool next;
-//        private static final int FLAG_IN_USE = 1 << 0;
-//        private int flags;
-//
-//        private CallbackPool(){}
-//
-//        private static CallbackPool obtain() {
-//            synchronized (sPoolSync) {
-//                if (sPool != null) {
-//                    CallbackPool m = sPool;
-//                    sPool = m.next;
-//                    m.next = null;
-//                    m.flags = 0; // clear in-use flag
-//                    sPoolSize--;
-//                    return m;
-//                }
-//            }
-//            return new CallbackPool();
-//        }
-//
-//        void recycleUnchecked() {
-//            // Mark the message as in use while it remains in the recycled object pool.
-//            // Clear out all other details.
-//            flags = FLAG_IN_USE;
-//            obj = null;
-//            replyTo = null;
-//            sendingUid = UID_NONE;
-//            workSourceUid = UID_NONE;
-//            when = 0;
-//            target = null;
-//            callback = null;
-//            data = null;
-//
-//            synchronized (sPoolSync) {
-//                if (sPoolSize < MAX_POOL_SIZE) {
-//                    next = sPool;
-//                    sPool = this;
-//                    sPoolSize++;
-//                }
-//            }
-//        }
-//    }
 }

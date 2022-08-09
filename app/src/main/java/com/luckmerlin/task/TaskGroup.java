@@ -9,22 +9,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result> extends AbstractTask<Object,R>
+public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
+        extends AbstractTask<Object,R>
         implements TaskExecutor<A>,Task<Object,R>{
     private final Map<A,Object> mExecutedMap=new HashMap<>();
     private A mExecuting=null;
 
+    public TaskGroup(Progress progress) {
+        super(progress);
+    }
+
     @Override
-    protected R onExecute(Object arg, OnProgressChange callback) {
+    protected R onExecute(Object arg) {
         while (true){
             A next= next();
             if (null==next){
                 return (R) new Reply().set(Code.CODE_SUCCEED,"None next.",null);
             }
             final OnProgressChange innerProgress=(Task task, Progress progress)-> {
-                if (null!=callback){
-                    callback.onProgressChanged(TaskGroup.this,progress);
-                }
+                notifyProgress(task,progress);
             };
             setTaskValue(next,innerProgress);
             mExecuting=next;

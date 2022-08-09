@@ -29,54 +29,21 @@ public class ConveyorActivityModel extends BaseModel implements
         OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
     private ServiceConnection mServiceConnection;
     private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
-    private TaskExecutor mExecutor;
-
     @Override
     protected View onCreateContent(Context context) {
         for (int i = 0; i < 100; i++) {
             AbstractTask task=null;
             if (i%8<4){
-                mConveyorListAdapter.add(task=new TestTask(){
-                    @Override
-                    protected Object onExecute(Object arg, OnProgressChange callback) {
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                while (null!=context&&context instanceof Activity&&!((Activity)context).isDestroyed()){
-                                    try {
-                                        Progress progress=getProgress();
-                                        int[] ddd=new int[1];
-                                        progress=null!=progress?progress:new Progress() {
-                                            @Override
-                                            public long getTotal() {
-                                                return 100;
-                                            }
-
-                                            @Override
-                                            public long getPosition() {
-                                                return ++ddd[0]>100?ddd[0]=0:ddd[0];
-                                            }
-                                        };
-                                        setProgress(progress);
-                                        Thread.sleep(10);
-                                        iterateUpdaters((Matcher<OnChangeUpdate>) (OnChangeUpdate data)-> {
-                                                data.onChangeUpdated(null);
-                                                return false;
-                                        });
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }).start();
-                        return super.onExecute(arg, callback);
-                    }
-                }.setName("单 "+i));
+                mConveyorListAdapter.add((task=new TestTask((Activity) context)).setName("单 "+i));
             }else{
-                mConveyorListAdapter.add(task=new TaskGroup().setName("多 "+i));
+                mConveyorListAdapter.add(task=new TaskGroup(null).setName("多 "+i));
             }
-            task.execute(null,null);
+            final Task finalTask=task;
+            new Thread(()->{
+                finalTask.execute(null,null);
+            }).start();
         }
+        //
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
             ((ConveyorActivityBinding)binding).setVm(this);
@@ -86,7 +53,7 @@ public class ConveyorActivityModel extends BaseModel implements
     }
 
     private void setTaskExecutor(TaskExecutor executor){
-        mExecutor=executor;
+//        mExecutor=executor;
         if (null!=executor){
 
         }

@@ -38,7 +38,7 @@ public class ConveyorService extends Service {
     }
 
     private static class ConveyorBinder extends Binder implements TaskExecutor<Task> {
-        private final TaskGroup mTasks=new TaskGroup();
+        private final TaskGroup mTasks=new TaskGroup(null);
 
         @Override
         public boolean add(Task task) {

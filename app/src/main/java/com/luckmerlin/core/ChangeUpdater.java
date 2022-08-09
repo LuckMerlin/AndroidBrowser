@@ -1,5 +1,7 @@
 package com.luckmerlin.core;
 
+import com.luckmerlin.debug.Debug;
+
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -25,9 +27,8 @@ public class ChangeUpdater implements ChangeUpdate{
     public final boolean iterateUpdaters(Matcher<OnChangeUpdate> matcher){
         List<OnChangeUpdate> listeners=mListeners;
         if (null!=listeners){
-            Boolean matched=null;
             for (OnChangeUpdate child:listeners) {
-                if (null==(matched=null==matcher?matcher.match(child):null)){
+                if (null!=matcher&&null==matcher.match(child)){
                     break;
                 }
             }
