@@ -44,18 +44,18 @@ public class ConveyorActivityModel extends BaseModel implements
         mConveyorListAdapter.add(streamCopyTask);
         new Thread(()->streamCopyTask.execute(null,null)).start();
         //
-        for (int i = 0; i < 100; i++) {
-            AbstractTask task=null;
-            if (i%8<4){
-                mConveyorListAdapter.add((task=new TestTask((Activity) context)).setName("单 "+i));
-            }else{
-                mConveyorListAdapter.add(task=new TaskGroup(null).setName("多 "+i));
-            }
-            final Task finalTask=task;
-            new Thread(()->{
-                finalTask.execute(null,null);
-            }).start();
-        }
+//        for (int i = 0; i < 100; i++) {
+//            AbstractTask task=null;
+//            if (i%8<4){
+//                mConveyorListAdapter.add((task=new TestTask((Activity) context)).setName("单 "+i));
+//            }else{
+//                mConveyorListAdapter.add(task=new TaskGroup(null).setName("多 "+i));
+//            }
+//            final Task finalTask=task;
+//            new Thread(()->{
+//                finalTask.execute(null,null);
+//            }).start();
+//        }
         //
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
