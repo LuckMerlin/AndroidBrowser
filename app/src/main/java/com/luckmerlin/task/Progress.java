@@ -3,6 +3,8 @@ package com.luckmerlin.task;
 public interface Progress {
     long getTotal();
     long getPosition();
+    String getTitle();
+    String getSpeed();
 
     default int intValue(){
         long total=getTotal();

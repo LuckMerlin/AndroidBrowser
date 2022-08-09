@@ -17,7 +17,7 @@ public class FileStream extends AbstractStream {
     }
 
     @Override
-    public InputStream openInputStream(long skip)throws Exception {
+    public InputStream openInputStream(long skip,Convertor convertor)throws Exception {
         Closeable openStream=mOpenStream;
         if (null!=openStream){
             if (!(openStream instanceof InputStream)){
@@ -37,14 +37,14 @@ public class FileStream extends AbstractStream {
         if (skip>0){
             fileInputStream.skip(skip);
         }
-        InputStream inputStream= new InputStream() {
+        InputStream inputStream= new InputStream(skip,convertor) {
             @Override
             public long length() {
                 return file.length();
             }
 
             @Override
-            public int read() throws IOException {
+            protected int onRead() throws IOException {
                 return fileInputStream.read();
             }
 
@@ -62,7 +62,7 @@ public class FileStream extends AbstractStream {
     }
 
     @Override
-    public OutputStream openOutputStream() throws Exception{
+    public OutputStream openOutputStream(Convertor convertor) throws Exception{
         Closeable openStream=mOpenStream;
         if (null!=openStream){
             if (!(openStream instanceof OutputStream)){
@@ -90,9 +90,9 @@ public class FileStream extends AbstractStream {
             }
         }
         final FileOutputStream fileOutputStream=new FileOutputStream(file);
-        OutputStream outputStream= new OutputStream(file.length()) {
+        OutputStream outputStream= new OutputStream(file.length(),convertor) {
             @Override
-            public void write(int b) throws IOException {
+            protected void onWrite(int b) throws IOException {
                 fileOutputStream.write(b);
             }
 

@@ -13,7 +13,6 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.BrowserBinding" alias="BB"/>
         <import type="android.view.View"/>
-        <import type="com.luckmerlin.browser.Utils"/>
     </data>
     <LinearLayout android:paddingBottom="4dp" android:paddingTop="4dp" android:orientation="horizontal"
         android:paddingLeft="15dp" android:paddingRight="5dp" android:gravity="center_vertical"
@@ -23,6 +22,9 @@
             android:layout_width="60dp" android:layout_height="60dp">
             <ImageView android:src="@drawable/hidisk_icon_html"
                 android:layout_width="match_parent" android:layout_height="match_parent"/>
+            <TextView android:textColor="@color/textTitle" android:text="@{task.progress.speed??``}" android:background="#33000000"
+                android:gravity="center" android:maxLines="1" android:textSize="10sp"
+                android:layout_width="match_parent" android:layout_height="match_parent"/>
         </FrameLayout>
 
         <LinearLayout android:orientation="vertical" android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_weight="1"
@@ -31,11 +33,11 @@
             <TextView android:text="@{task.name??``}" android:textColor="@color/textTitle" android:textSize="14sp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-            <TextView android:text="@{`我和我的祖国`}" android:textColor="@color/textTitleSub" android:textSize="12sp"
+            <TextView android:text="@{task.progress.title??``}" android:textColor="@color/textTitleSub" android:textSize="12sp"
                 android:layout_marginLeft="5dp" android:paddingTop="2dp" android:paddingBottom="2dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-            <ProgressBar android:progress="@{Utils.progress(task.progress)}"
+            <ProgressBar android:progress="@{task.progress.intValue()}"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:progressDrawable="@drawable/progress_bar"
                 android:layout_width="match_parent" android:layout_height="2dp"/>

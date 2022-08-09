@@ -1,5 +1,5 @@
 package com.luckmerlin.stream;
 
 public interface Convertor {
-    int onConvertor(boolean isRead,int data);
+    int onConvert(int data);
 }

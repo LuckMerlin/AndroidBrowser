@@ -5,6 +5,8 @@ import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 
+import java.util.Random;
+
 public class TestTask extends AbstractTask {
     Activity activity;
 
@@ -19,6 +21,7 @@ public class TestTask extends AbstractTask {
             try {
                 Progress progress=getProgress();
                 int[] ddd=new int[1];
+                final Random random=new Random();
                 progress=null!=progress?progress:new Progress() {
                     @Override
                     public long getTotal() {
@@ -28,6 +31,16 @@ public class TestTask extends AbstractTask {
                     @Override
                     public long getPosition() {
                         return ++ddd[0]>100?ddd[0]=0:ddd[0];
+                    }
+
+                    @Override
+                    public String getSpeed() {
+                        return random.nextInt(10000)+"MB";
+                    }
+
+                    @Override
+                    public String getTitle() {
+                        return random.nextInt(24234242)+"发达";
                     }
                 };
                 notifyProgress(progress);
