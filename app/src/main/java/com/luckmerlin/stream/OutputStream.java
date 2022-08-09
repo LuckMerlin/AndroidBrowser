@@ -17,7 +17,7 @@ public abstract class OutputStream implements Closeable {
 
     public final void write(int b) throws IOException{
         Convertor convertor=mConvertor;
-        onWrite(null!=convertor?convertor.onConvert(b):b);
+        onWrite(null!=convertor?convertor.onConvert(false,b):b);
         mWritten++;
     }
 

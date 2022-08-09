@@ -55,8 +55,8 @@ public abstract class AbstractStream implements Stream{
 //        return false;
 //    }
 
-    public final boolean notifyProgressChange(long current,long total,OnProgressChange progressChange){
-        return null==progressChange||progressChange.onProgressChange(current,total);
+    public final boolean notifyProgressChange(long current,long total,long speed,OnProgressChange progressChange){
+        return null==progressChange||progressChange.onProgressChange(current,total,speed);
     }
 
     public final void closeStream(Closeable ... closeables){

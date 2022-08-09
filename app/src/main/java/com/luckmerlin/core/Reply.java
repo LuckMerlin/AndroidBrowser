@@ -48,7 +48,7 @@ public class Reply<T> extends JsonObject implements Result<T> {
     }
 
     public final boolean isSucceed(){
-        return getCode(Code.CODE_UNKNOWN)==Code.CODE_SUCCEED;
+        return getCode(Code.CODE_FAIL)==Code.CODE_SUCCEED;
     }
 
     public final Reply<T> setData(Object data){

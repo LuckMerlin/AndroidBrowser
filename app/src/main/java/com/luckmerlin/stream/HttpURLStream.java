@@ -20,7 +20,7 @@ public class HttpURLStream extends NetStream{
     }
 
     @Override
-    public InputStream openInputStream(long skip) throws Exception {
+    public InputStream openInputStream(long skip,Convertor convertor) throws Exception {
         InputStream inputStream=mInputStream;
         if (null!=inputStream){
             return inputStream;
@@ -33,14 +33,14 @@ public class HttpURLStream extends NetStream{
             return null;
         }
         final java.io.InputStream finalHttpInputStream=httpInputStream;
-        return mInputStream=new InputStream() {
+        return mInputStream=new InputStream(0,convertor) {
             @Override
             public long length() {
                 return mContentLength;
             }
 
             @Override
-            public int read() throws IOException {
+            protected int onRead() throws IOException {
                 return finalHttpInputStream.read();
             }
 
@@ -54,9 +54,10 @@ public class HttpURLStream extends NetStream{
     }
 
     @Override
-    public OutputStream openOutputStream() throws Exception {
+    public OutputStream openOutputStream(Convertor convertor) throws Exception {
         return null;
     }
+
 
     @Override
     public final void close() throws IOException {

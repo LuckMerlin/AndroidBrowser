@@ -11,7 +11,7 @@ import java.net.URLConnection;
 public abstract class URLConnectionStream extends NetStream{
     private HttpStreams mOpenedHttpStream;
 
-    protected abstract HttpStreams onConnectionHttp()throws Exception;
+    protected abstract HttpStreams onConnectionHttp(Convertor convertor)throws Exception;
 
     public static URLConnection createConnection(String url) throws IOException {
         return null!=url&&url.length()>0?createConnection(new URL(url)):null;
@@ -22,13 +22,13 @@ public abstract class URLConnectionStream extends NetStream{
     }
 
     @Override
-    public InputStream openInputStream(long skip) throws Exception {
+    public InputStream openInputStream(long skip,Convertor convertor) throws Exception {
         HttpStreams httpStreams=mOpenedHttpStream;
         if (null!=httpStreams){
             Debug.D("Use cached http input stream.");
             return httpStreams.mInputStream;
         }
-        httpStreams=mOpenedHttpStream=onConnectionHttp();
+        httpStreams=mOpenedHttpStream=onConnectionHttp(convertor);
         if (null==httpStreams){
             Debug.D("Fail open http input stream while connection create fail.");
             return null;
@@ -37,13 +37,13 @@ public abstract class URLConnectionStream extends NetStream{
     }
 
     @Override
-    public OutputStream openOutputStream() throws Exception {
+    public OutputStream openOutputStream(Convertor convertor) throws Exception {
         HttpStreams httpStreams=mOpenedHttpStream;
         if (null!=httpStreams){
             Debug.D("Use cached http output stream.");
             return httpStreams.mOutputStream;
         }
-        httpStreams=mOpenedHttpStream=onConnectionHttp();
+        httpStreams=mOpenedHttpStream=onConnectionHttp(convertor);
         if (null==httpStreams){
             Debug.D("Fail open http output stream while connection create fail.");
             return null;
@@ -63,10 +63,12 @@ public abstract class URLConnectionStream extends NetStream{
         private OutputStream mOutputStream;
         private final long mOutputOpenLength;
         private Long mInputLength;
+        private Convertor mConvertor;
 
-        public HttpStreams(URLConnection connection,long outputOpenLength){
+        public HttpStreams(URLConnection connection,long outputOpenLength,Convertor convertor){
             mURLConnection=connection;
             mOutputOpenLength=outputOpenLength;
+            mConvertor=convertor;
         }
 
         protected HttpStreams connect() throws IOException {
@@ -77,9 +79,9 @@ public abstract class URLConnectionStream extends NetStream{
             connection.connect();
             final java.io.OutputStream outputStream=connection.getDoOutput()?connection.getOutputStream():null;
             if (null!=outputStream){
-                mOutputStream=new OutputStream(mOutputOpenLength) {
+                mOutputStream=new OutputStream(mOutputOpenLength,mConvertor) {
                     @Override
-                    public void write(int b) throws IOException {
+                    protected void onWrite(int b) throws IOException {
                         outputStream.write(b);
                     }
 
@@ -91,7 +93,7 @@ public abstract class URLConnectionStream extends NetStream{
             }
             final java.io.InputStream inputStream=connection.getDoInput()?connection.getInputStream():null;
             if (null!=inputStream){
-                mInputStream=new InputStream() {
+                mInputStream=new InputStream(0,mConvertor) {
                     @Override
                     public long length() {
                         Long inputLength=mInputLength;
@@ -100,7 +102,7 @@ public abstract class URLConnectionStream extends NetStream{
                     }
 
                     @Override
-                    public int read() throws IOException {
+                    protected int onRead() throws IOException {
                         return inputStream.read();
                     }
 

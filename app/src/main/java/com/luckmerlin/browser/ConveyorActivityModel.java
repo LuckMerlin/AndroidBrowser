@@ -11,10 +11,12 @@ import android.view.View;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
+import com.luckmerlin.browser.task.StreamCopyTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.stream.FileStream;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -25,12 +27,23 @@ import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
 
+import java.io.File;
+
 public class ConveyorActivityModel extends BaseModel implements
         OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
     private ServiceConnection mServiceConnection;
     private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
     @Override
     protected View onCreateContent(Context context) {
+
+        //
+        StreamCopyTask streamCopyTask=new StreamCopyTask
+                (new FileStream(new File("/storage/emulated/0/$MuMu共享文件夹/video/独家记忆.mp3")),
+                        new FileStream(new File(
+                                "/storage/emulated/0/$MuMu共享文件夹/video/独家记忆1.mp3")),null);
+        mConveyorListAdapter.add(streamCopyTask);
+        new Thread(()->streamCopyTask.execute(null,null)).start();
+        //
         for (int i = 0; i < 100; i++) {
             AbstractTask task=null;
             if (i%8<4){

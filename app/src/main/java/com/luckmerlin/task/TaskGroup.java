@@ -33,7 +33,7 @@ public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
             mExecuting=next;
             Result result=next.execute(arg,innerProgress);
             mExecuting=null;
-            result=null!=result?result:new Reply().set(Code.CODE_UNKNOWN,"Task none result.",null);
+            result=null!=result?result:new Reply().set(Code.CODE_FAIL,"Task none result.",null);
             setTaskValue(next,result);
         }
     }

@@ -7,6 +7,7 @@ public abstract class InputStream implements Closeable {
     private long mReadLength=0;
     private long mOpenLength;
     private final Convertor mConvertor;
+    private String mTitle;
 
     public InputStream(long openLength,Convertor convertor){
         mOpenLength=openLength;
@@ -19,6 +20,15 @@ public abstract class InputStream implements Closeable {
 
     public final long getReadLength() {
         return mReadLength;
+    }
+
+    public final InputStream setTitle(String title) {
+        this.mTitle = title;
+        return this;
+    }
+
+    public final String getTitle(){
+        return mTitle;
     }
 
     public abstract long length();

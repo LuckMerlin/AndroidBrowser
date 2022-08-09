@@ -9,7 +9,7 @@ public class HttpURLConnectionStream extends URLConnectionStream{
     }
 
     @Override
-    protected HttpStreams onConnectionHttp() throws Exception {
-        return new HttpStreams(createConnection(mStreamUrl),0).connect();
+    protected HttpStreams onConnectionHttp(Convertor convertor) throws Exception {
+        return new HttpStreams(createConnection(mStreamUrl),0,convertor).connect();
     }
 }

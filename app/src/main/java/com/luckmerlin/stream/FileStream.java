@@ -56,7 +56,7 @@ public class FileStream extends AbstractStream {
                     mOpenStream=null;
                 }
             }
-        };
+        }.setTitle(file.getName());
         mOpenStream=inputStream;
         return inputStream;
     }
