@@ -1,6 +1,8 @@
 package com.luckmerlin.task;
 
-public abstract class AbstractTask<A,R> implements Task<A,R>{
+import com.luckmerlin.core.ChangeUpdater;
+
+public abstract class AbstractTask<A,R> extends ChangeUpdater implements Task<A,R>{
     private String mName;
     private Progress mProgress;
 

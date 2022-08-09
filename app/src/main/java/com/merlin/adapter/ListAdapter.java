@@ -18,17 +18,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.debug.Debug;
+import com.luckmerlin.core.ChangeUpdate;
+import com.luckmerlin.core.OnChangeUpdate;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,RecyclerView.ViewHolder> {
     private List<T> mDataList;
@@ -40,7 +38,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public static final int VIEW_TYPE_DATA=-4;
     private OnItemAttachChange<T> mOnItemAttachChange;
     private DirtyDataChecker<T> mDirtyDataChecker;
-    private List<T> mAttachViewHolders;
+    private Map<T,OnChangeUpdate> mAttachViewHolders;
 
     protected ListAdapter() {
         this(new ItemCallback<>());
@@ -187,15 +185,17 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         List<T> dataList=mDataList;
         if (null==obj||null==data||null==dataList){
             return false;
+        }else if (isUiThread()){
+            int index = dataList.indexOf(obj);
+            if (index>=0){
+                dataList.remove(index);
+                dataList.add(index,data);
+                notifyItemChanged(index,"replace");
+                return true;
+            }
+            return false;
         }
-        int index = dataList.indexOf(obj);
-        if (index>=0){
-            dataList.remove(index);
-            dataList.add(index,data);
-            notifyItemChanged(index,"replace");
-            return true;
-        }
-        return false;
+        return postIfPossible(()->replace(obj,data),0);
     }
 
     public final int indexPosition(Object data){
@@ -204,9 +204,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     public final boolean isAttached(T data){
-        List<T> attachViewHolders=null!=data?mAttachViewHolders:null;
-        if (null!=attachViewHolders){
-            for (T child:attachViewHolders) {
+        Map<T,OnChangeUpdate> attachViewHolders=null!=data?mAttachViewHolders:null;
+        Set<T> set=null!=attachViewHolders?attachViewHolders.keySet():null;
+        if (null!=set){
+            for (T child:set) {
                 if (null!=child&&child.equals(data)){
                     return true;
                 }
@@ -324,12 +325,15 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public final void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         //
-        List<T> attachViewHolders=mAttachViewHolders;
-        attachViewHolders=null!=attachViewHolders?attachViewHolders:(mAttachViewHolders=new CopyOnWriteArrayList<>());
-        T data=getItem(holder.getAdapterPosition());
+        Map<T,OnChangeUpdate> attachViewHolders=mAttachViewHolders;
+        attachViewHolders=null!=attachViewHolders?attachViewHolders:(mAttachViewHolders=new HashMap<>());
+        final T data=getItem(holder.getAdapterPosition());
         if (null!=data){
-            attachViewHolders.remove(data);
-            attachViewHolders.add(data);
+            OnChangeUpdate onChangeUpdate=null;
+            if (data instanceof ChangeUpdate){
+                ((ChangeUpdate)data).addChangeListener(onChangeUpdate=(Object newData)->replace(data));
+            }
+            attachViewHolders.put(data,onChangeUpdate);
         }
         //
         Map<RecyclerView.ViewHolder, Canceler> dirtyChecking=mDirtyChecking;
@@ -351,10 +355,13 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     @Override
     public final void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
-        List<T> attachViewHolders=mAttachViewHolders;
+        Map<T,OnChangeUpdate> attachViewHolders=mAttachViewHolders;
         T data=null!=attachViewHolders?getItem(holder.getAdapterPosition()):null;
         if (null!=data){
-            attachViewHolders.remove(data);
+            OnChangeUpdate callback=attachViewHolders.remove(data);
+            if (null!=callback&&data instanceof ChangeUpdate){
+                ((ChangeUpdate)data).removeChangeListener(callback);
+            }
         }
         Map<RecyclerView.ViewHolder,Canceler> dirtyChecking=null!=holder?mDirtyChecking:null;
         Canceler canceler=null!=dirtyChecking?dirtyChecking.remove(holder):null;
@@ -394,6 +401,17 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
+    }
+
+    public final boolean postIfPossible(Runnable runnable,int delay){
+        RecyclerView recyclerView=null!=runnable?getRecyclerView():null;
+        return null!=recyclerView&&(delay>0?recyclerView.postDelayed(runnable,delay):recyclerView.post(runnable));
+    }
+
+    public final boolean isUiThread(){
+        Looper looper=Looper.myLooper();
+        Looper uiLooper=Looper.getMainLooper();
+        return null!=looper&&null!=uiLooper&&looper==uiLooper;
     }
 
     public final RecyclerView.ViewHolder inflateViewHolder(Context context, Object viewHolder){
@@ -475,4 +493,51 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     public interface DirtyDataChecker<T>{
         Canceler checkDataDirty(RecyclerView.ViewHolder holder, ListAdapter<T> listAdapter,OnDataDirtyCheckFinish<T> callback);
     }
+
+//    private static class CallbackPool{
+//        private static final Object sPoolSync = new Object();
+//        private static CallbackPool sPool;
+//        private static int sPoolSize = 0;
+//        private CallbackPool next;
+//        private static final int FLAG_IN_USE = 1 << 0;
+//        private int flags;
+//
+//        private CallbackPool(){}
+//
+//        private static CallbackPool obtain() {
+//            synchronized (sPoolSync) {
+//                if (sPool != null) {
+//                    CallbackPool m = sPool;
+//                    sPool = m.next;
+//                    m.next = null;
+//                    m.flags = 0; // clear in-use flag
+//                    sPoolSize--;
+//                    return m;
+//                }
+//            }
+//            return new CallbackPool();
+//        }
+//
+//        void recycleUnchecked() {
+//            // Mark the message as in use while it remains in the recycled object pool.
+//            // Clear out all other details.
+//            flags = FLAG_IN_USE;
+//            obj = null;
+//            replyTo = null;
+//            sendingUid = UID_NONE;
+//            workSourceUid = UID_NONE;
+//            when = 0;
+//            target = null;
+//            callback = null;
+//            data = null;
+//
+//            synchronized (sPoolSync) {
+//                if (sPoolSize < MAX_POOL_SIZE) {
+//                    next = sPool;
+//                    sPool = this;
+//                    sPoolSize++;
+//                }
+//            }
+//        }
+//    }
 }
