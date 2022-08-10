@@ -65,7 +65,7 @@ public class StreamCopyTask<R> extends AbstractTask<StreamArgs, Response<R>> {
             }
             Debug.D("Opened copy task output stream.");
             long openLength=outputStream.getOpenLength();
-            inputStream=toStream.openInputStream(openLength,convertor);
+            inputStream=fromStream.openInputStream(openLength,convertor);
             if (null==inputStream){
                 Debug.W("Fail execute copy stream task while open input stream fail.");
                 return new Response(Code.CODE_ERROR,"Open input stream fail");
@@ -73,7 +73,7 @@ public class StreamCopyTask<R> extends AbstractTask<StreamArgs, Response<R>> {
             Debug.D("Opened copy task input stream.openLength="+openLength);
             final String inputTitle=inputStream.getTitle();
             final TaskProgress progress=new TaskProgress();
-            Debug.D("Coping stream task.openLength="+openLength);
+            Debug.D("Coping stream task.openLength="+openLength+" total="+inputStream.getTotal());
             if (!new StreamCopier().copy(inputStream, outputStream, new byte[1024],
                     (long current, long total, long speed) ->{
                 progress.setPosition(current).setTotal(total).setSpeed(""+speed).setTitle(inputTitle);

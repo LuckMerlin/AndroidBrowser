@@ -18,7 +18,7 @@ public class Debug {
     }
 
     public static void E(String msg,Throwable throwable){
-        Log.e(null,null!=msg?msg:"");
+       E(null,msg,throwable);
     }
 
     public static void E(String tag,String msg){

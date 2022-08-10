@@ -35,12 +35,11 @@ public class ConveyorActivityModel extends BaseModel implements
     private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
     @Override
     protected View onCreateContent(Context context) {
-
         //
         StreamCopyTask streamCopyTask=new StreamCopyTask
-                (new FileStream(new File("/storage/emulated/0/$MuMu共享文件夹/video/独家记忆.mp3")),
+                (new FileStream(new File("/sdcard/Download/test.png")),
                         new FileStream(new File(
-                                "/storage/emulated/0/$MuMu共享文件夹/video/独家记忆1.mp3")),null);
+                                "/sdcard/Download/test2.png")),null);
         mConveyorListAdapter.add(streamCopyTask);
         new Thread(()->streamCopyTask.execute(null,null)).start();
         //

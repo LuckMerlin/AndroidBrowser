@@ -21,18 +21,23 @@ public class FileStream extends AbstractStream {
         Closeable openStream=mOpenStream;
         if (null!=openStream){
             if (!(openStream instanceof InputStream)){
+                Debug.W("Fail open file input stream while already open but not as InputStream. "+openStream);
                 return null;
             }
             return (InputStream)openStream;
         }
         File file=mFile;
         if (null==file){
+            Debug.W("Fail open file input stream while file invalid.");
             return null;
         }else if (!file.exists()){
+            Debug.W("Fail open file input stream while file not exist.");
             return null;
         }else if (!file.isFile()){
+            Debug.W("Fail open file input stream while file is not file.");
             return null;
         }
+        Debug.W("Opening file input stream.");
         final FileInputStream fileInputStream=new FileInputStream(file);
         if (skip>0){
             fileInputStream.skip(skip);
@@ -57,6 +62,7 @@ public class FileStream extends AbstractStream {
                 }
             }
         }.setTitle(file.getName());
+        Debug.W("Opened file input stream.");
         mOpenStream=inputStream;
         return inputStream;
     }
@@ -89,6 +95,7 @@ public class FileStream extends AbstractStream {
                 return null;
             }
         }
+        Debug.W("Opening file output stream."+file);
         final FileOutputStream fileOutputStream=new FileOutputStream(file);
         OutputStream outputStream= new OutputStream(file.length(),convertor) {
             @Override
@@ -108,6 +115,7 @@ public class FileStream extends AbstractStream {
             }
         };
         mOpenStream=outputStream;
+        Debug.W("Opened file output stream.");
         return outputStream;
     }
 
