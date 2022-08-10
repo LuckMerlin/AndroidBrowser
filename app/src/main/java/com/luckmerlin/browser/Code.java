@@ -8,4 +8,6 @@ public interface Code {
     int CODE_EMPTY=-103;
     int CODE_ERROR=-104;
     int CODE_CANCEL=-105;
+    int CODE_ALREADY=-106;
+    int CODE_EXIST=-107;
 }

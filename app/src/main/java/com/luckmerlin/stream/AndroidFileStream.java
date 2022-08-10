@@ -8,11 +8,11 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-public class FileStream extends AbstractStream {
+public class AndroidFileStream extends AbstractStreamSource {
     private final File mFile;
     private Closeable mOpenStream;
 
-    public FileStream(File file){
+    public AndroidFileStream(File file){
         mFile=file;
     }
 
@@ -37,9 +37,9 @@ public class FileStream extends AbstractStream {
             Debug.W("Fail open file input stream while file is not file.");
             return null;
         }
-        Debug.W("Opening file input stream.");
+        Debug.W("Opening file input stream.skip="+skip+" total="+file.length()+" "+file);
         final FileInputStream fileInputStream=new FileInputStream(file);
-        if (skip>0){
+        if ((skip=(skip>=0?skip:0))>0){
             fileInputStream.skip(skip);
         }
         InputStream inputStream= new InputStream(skip,convertor) {
@@ -61,7 +61,8 @@ public class FileStream extends AbstractStream {
                     mOpenStream=null;
                 }
             }
-        }.setTitle(file.getName());
+        };
+        inputStream.setTitle(file.getName());
         Debug.W("Opened file input stream.");
         mOpenStream=inputStream;
         return inputStream;
@@ -95,8 +96,8 @@ public class FileStream extends AbstractStream {
                 return null;
             }
         }
-        Debug.W("Opening file output stream."+file);
-        final FileOutputStream fileOutputStream=new FileOutputStream(file);
+        Debug.W("Opening file output stream."+file.length()+" "+file);
+        final FileOutputStream fileOutputStream=new FileOutputStream(file,true);
         OutputStream outputStream= new OutputStream(file.length(),convertor) {
             @Override
             protected void onWrite(int b) throws IOException {

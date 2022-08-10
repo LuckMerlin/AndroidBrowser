@@ -1,24 +1,25 @@
 package com.luckmerlin.stream;
 
-import java.io.Closeable;
 import java.io.IOException;
 
-public abstract class OutputStream implements Closeable {
+public abstract class OutputStream extends AbstractStream {
     private long mWritten=0;
-    private long mOpenLength;
-    private final Convertor mConvertor;
 
     public OutputStream(long openLength,Convertor convertor){
-        mOpenLength=openLength;
-        mConvertor=convertor;
+        super(openLength,convertor);
+    }
+
+    @Override
+    public final long getReadOrWriteLength() {
+        return mWritten;
     }
 
     protected abstract void onWrite(int b)throws IOException;
 
     public final void write(int b) throws IOException{
         Convertor convertor=mConvertor;
-        onWrite(null!=convertor?convertor.onConvert(false,b):b);
         mWritten++;
+        onWrite(null!=convertor?convertor.onConvert(b,this):b);
     }
 
     public final void write(byte b[]) throws IOException {
@@ -37,20 +38,6 @@ public abstract class OutputStream implements Closeable {
         for (int i = 0 ; i < len ; i++) {
             write(b[off + i]);
         }
-    }
-
-    public final long getTotal(){
-        long writeLength= getWrittenLength();
-        long openLength= getOpenLength();
-        return (writeLength>=0?writeLength:0)+(openLength>=0?openLength:0);
-    }
-
-    public final long getOpenLength() {
-        return mOpenLength;
-    }
-
-    public final long getWrittenLength(){
-        return mWritten;
     }
 
 }

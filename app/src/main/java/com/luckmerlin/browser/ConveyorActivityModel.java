@@ -13,16 +13,12 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.task.StreamCopyTask;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.stream.FileStream;
-import com.luckmerlin.task.AbstractTask;
-import com.luckmerlin.task.OnProgressChange;
-import com.luckmerlin.task.Progress;
-import com.luckmerlin.task.Task;
+import com.luckmerlin.stream.AndroidFileStream;
+import com.luckmerlin.stream.Convertor;
+import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.Stream;
 import com.luckmerlin.task.TaskExecutor;
-import com.luckmerlin.task.TaskGroup;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -37,9 +33,12 @@ public class ConveyorActivityModel extends BaseModel implements
     protected View onCreateContent(Context context) {
         //
         StreamCopyTask streamCopyTask=new StreamCopyTask
-                (new FileStream(new File("/sdcard/Download/test.png")),
-                        new FileStream(new File(
-                                "/sdcard/Download/test2.png")),null);
+                (new AndroidFileStream(new File("/sdcard/testn.png")),
+                        new AndroidFileStream(new File(
+                                "/sdcard/test2.png")),null);
+        new File("/sdcard/test2.png").delete();
+        streamCopyTask.setName("测司法所大发送");
+        streamCopyTask.setConvertor(new CoderConvertor());
         mConveyorListAdapter.add(streamCopyTask);
         new Thread(()->streamCopyTask.execute(null,null)).start();
         //

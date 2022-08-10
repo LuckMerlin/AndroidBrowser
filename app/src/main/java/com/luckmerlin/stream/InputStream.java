@@ -1,34 +1,17 @@
 package com.luckmerlin.stream;
 
-import java.io.Closeable;
 import java.io.IOException;
 
-public abstract class InputStream implements Closeable {
-    private long mReadLength=0;
-    private long mOpenLength;
-    private final Convertor mConvertor;
-    private String mTitle;
+public abstract class InputStream extends AbstractStream {
+    private long mReadLength;
 
     public InputStream(long openLength,Convertor convertor){
-        mOpenLength=openLength;
-        mConvertor=convertor;
+        super(openLength,convertor);
     }
 
-    public final long getOpenLength() {
-        return mOpenLength;
-    }
-
-    public final long getReadLength() {
+    @Override
+    public final long getReadOrWriteLength() {
         return mReadLength;
-    }
-
-    public final InputStream setTitle(String title) {
-        this.mTitle = title;
-        return this;
-    }
-
-    public final String getTitle(){
-        return mTitle;
     }
 
     public abstract long length();
@@ -51,7 +34,7 @@ public abstract class InputStream implements Closeable {
             return -1;
         }
         b[off] = (byte)c;
-
+        mReadLength++;
         int i = 1;
         try {
             for (; i < len ; i++) {
@@ -59,6 +42,7 @@ public abstract class InputStream implements Closeable {
                 if (c == -1) {
                     break;
                 }
+                mReadLength++;
                 b[off + i] = (byte)c;
             }
         } catch (IOException ee) {
@@ -68,16 +52,9 @@ public abstract class InputStream implements Closeable {
 
     protected abstract int onRead()throws IOException;
 
-    public final int read() throws IOException{
+    private final int read() throws IOException{
         int data=onRead();
-        mReadLength++;
         Convertor convertor=mConvertor;
-        return null!=convertor?convertor.onConvert(true,data):data;
-    }
-
-    public final long getTotal(){
-        long readLength= getTotal();
-        long openLength= getOpenLength();
-        return (readLength>=0?readLength:0)+(openLength>=0?openLength:0);
+        return null!=convertor?convertor.onConvert(data,this):data;
     }
 }
