@@ -3,11 +3,13 @@ package com.luckmerlin.task;
 import com.luckmerlin.core.ChangeUpdater;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
+import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask<A,R> extends ChangeUpdater implements Task<A,R>{
+public abstract class AbstractTask<A,R  extends Result> extends ChangeUpdater implements Task<A,R>{
     private String mName;
     private Progress mProgress;
     private OnProgressChange mNotifier;
+    private R mResult;
 
     public AbstractTask(Progress progress){
         mProgress=progress;
@@ -22,6 +24,7 @@ public abstract class AbstractTask<A,R> extends ChangeUpdater implements Task<A,
 
     @Override
     public final R execute(A arg, OnProgressChange callback) {
+        mResult=null;
         mNotifier=(Task task, Progress progress)-> {
             mProgress=progress;
             iterateUpdaters((Matcher<OnChangeUpdate>) (OnChangeUpdate data)->
@@ -32,7 +35,7 @@ public abstract class AbstractTask<A,R> extends ChangeUpdater implements Task<A,
         };
         R result= onExecute(arg);
         mNotifier=null;
-        return result;
+        return mResult=result;
     }
 
     @Override
@@ -43,6 +46,11 @@ public abstract class AbstractTask<A,R> extends ChangeUpdater implements Task<A,
     @Override
     public final Progress getProgress() {
         return mProgress;
+    }
+
+    @Override
+    public final R getResult() {
+        return mResult;
     }
 
     protected final boolean notifyProgress(){

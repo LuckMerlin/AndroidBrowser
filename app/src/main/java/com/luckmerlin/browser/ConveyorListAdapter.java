@@ -9,6 +9,8 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
+import com.luckmerlin.core.Result;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
 import com.merlin.adapter.PageListAdapter;
@@ -56,13 +58,23 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         ViewDataBinding binding=null!=itemView? DataBindingUtil.getBinding(itemView):null;
         if (null!=binding){
             Task item=getItem(position);
+            Object result=null;
+            Progress progress=null;
+            if (null!=item){
+                result=item.getResult();
+                progress=item.getProgress();
+            }
+            int iconRes=null==result?null!=progress?R.drawable.selector_pause:R.drawable.selector_start:
+                    null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
             if (binding instanceof ItemConveyorGroupBinding){
                 ItemConveyorGroupBinding groupBinding=(ItemConveyorGroupBinding)binding;
                 groupBinding.setPosition(position);
+                groupBinding.setIconResId(iconRes);
                 groupBinding.setTask(item instanceof TaskGroup?(TaskGroup)item:null);
             }else if (binding instanceof ItemConveyorSingleBinding){
                 ItemConveyorSingleBinding singleBinding=(ItemConveyorSingleBinding)binding;
                 singleBinding.setPosition(position);
+                singleBinding.setIconResId(iconRes);
                 singleBinding.setTask(item);
             }
         }

@@ -5,12 +5,14 @@
     <data>
         <variable name="task" type="com.luckmerlin.task.TaskGroup" />
         <variable name="selected" type="boolean" />
+        <variable name="iconResId" type="int" />
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
         <import type="com.luckmerlin.browser.utils.Time"/>
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="android.view.View"/>
         <import type="com.luckmerlin.browser.Utils"/>
     </data>
@@ -40,8 +42,7 @@
                 android:layout_width="match_parent" android:layout_height="2dp"/>
         </LinearLayout>
 
-        <ImageView android:layout_width="60dp" android:src="@drawable/selector_pause"
-            android:padding="10dp" android:layout_height="60dp"/>
+        <ImageView binding:bind="@{VB.clickId(iconResId)}" android:layout_width="60dp" android:padding="10dp" android:layout_height="60dp"/>
 
     </LinearLayout>
 </layout>

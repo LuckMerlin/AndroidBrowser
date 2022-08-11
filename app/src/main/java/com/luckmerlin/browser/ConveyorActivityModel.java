@@ -34,32 +34,32 @@ public class ConveyorActivityModel extends BaseModel implements
     protected View onCreateContent(Context context) {
         //
         StreamCopyTask streamCopyTask=new StreamCopyTask
-                (new AndroidFileStream(new File("/sdcard/testn.png")),
+                (new AndroidFileStream(new File("/sdcard/test.png")),
                         new AndroidFileStream(new File(
                                 "/sdcard/test2.png")),null);
         new File("/sdcard/test2.png").delete();
         streamCopyTask.setName("测司法所大发送");
-        streamCopyTask.setConvertor(new CoderConvertor());
+//        streamCopyTask.setConvertor(new CoderConvertor());
         mConveyorListAdapter.add(streamCopyTask);
-//        new Thread(()->streamCopyTask.execute(null,null)).start();
+        new Thread(()->streamCopyTask.execute(null,null)).start();
 
-        try {
-            byte[] src="我和我的祖国一刻也不能分离".getBytes("utf-8");
-            byte[] test = "我们的".getBytes("utf-8");
-            byte[] target=new byte[src.length];
-
-            for (int i = 0; i < src.length; i++) {
-                int sec=i%test.length;
-                target[i]=src[i];
-                if (sec%2==0){
-                    target[i]=(byte) (~src[i]);
-                    target[i]=(byte)(~target[i]);
-                }
-            }
-            Debug.D("jieguo="+new String(target,"utf-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            byte[] src="我和我的祖国一刻也不能分离".getBytes("utf-8");
+//            byte[] test = "我们的".getBytes("utf-8");
+//            byte[] target=new byte[src.length];
+//            //
+//            for (int i = 0; i < src.length; i++) {
+//                int sec=i%test.length;
+//                target[i]=src[i];
+//                if (sec%2==0){
+//                    target[i]=(byte) (~src[i]);
+//                    target[i]=(byte)(~target[i]);
+//                }
+//            }
+//            Debug.D("jieguo="+new String(target,"utf-8"));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
         //
 //        for (int i = 0; i < 100; i++) {
 //            AbstractTask task=null;
