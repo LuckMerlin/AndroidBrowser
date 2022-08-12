@@ -5,7 +5,7 @@
     <data>
         <variable name="task" type="com.luckmerlin.task.TaskGroup" />
         <variable name="selected" type="boolean" />
-        <variable name="iconResId" type="int" />
+        <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
@@ -42,7 +42,8 @@
                 android:layout_width="match_parent" android:layout_height="2dp"/>
         </LinearLayout>
 
-        <ImageView binding:bind="@{VB.clickId(iconResId)}" android:layout_width="60dp" android:padding="10dp" android:layout_height="60dp"/>
+        <ImageView binding:bind="@{iconBinding}"
+            android:layout_width="60dp" android:padding="10dp" android:layout_height="60dp"/>
 
     </LinearLayout>
 </layout>

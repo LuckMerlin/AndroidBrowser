@@ -108,7 +108,7 @@ public class LocalClient extends AbstractClient {
         return null;
     }
 
-    private File createLoadFile(java.io.File file){
+    public static File createLoadFile(java.io.File file){
         if (null==file){
             return null;
         }

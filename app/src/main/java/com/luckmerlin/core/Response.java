@@ -1,6 +1,6 @@
 package com.luckmerlin.core;
 
-public class Response<T> implements Result<T>{
+public class Response<T> implements CodeResult<T> {
     private Integer mCode=0;
     private String mMsg;
     private T mData;

@@ -10,7 +10,10 @@ import android.os.IBinder;
 import android.view.View;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
+import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
+import com.luckmerlin.browser.task.FileCopyTask;
+import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.StreamCopyTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
@@ -41,6 +44,16 @@ public class ConveyorActivityModel extends BaseModel implements
         streamCopyTask.setName("测司法所大发送");
 //        streamCopyTask.setConvertor(new CoderConvertor());
         mConveyorListAdapter.add(streamCopyTask);
+        //
+        FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
+                (new File("/sdcard/test.png")),null);
+        deleteTask.setName("删除文件 ");
+        mConveyorListAdapter.add(deleteTask);
+        deleteTask.execute(null,null);
+        //
+        new FileCopyTask(LocalClient.createLoadFile(new File("/sdcard/test.png")),
+                LocalClient.createLoadFile(new File("/sdcard/test2.png")),null);
+        //
         new Thread(()->streamCopyTask.execute(null,null)).start();
 
 //        try {
@@ -94,6 +107,8 @@ public class ConveyorActivityModel extends BaseModel implements
         switch (clickId){
             case R.drawable.selector_back:
                 return onBackPressed();
+            case R.drawable.selector_confirm:
+                return showContentDialog(new );
         }
         return false;
     }

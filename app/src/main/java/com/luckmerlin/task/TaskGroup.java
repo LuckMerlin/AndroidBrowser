@@ -1,15 +1,15 @@
 package com.luckmerlin.task;
 
 import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Reply;
-import com.luckmerlin.core.Result;
 import com.luckmerlin.core.Section;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
+public class TaskGroup<A extends Task<Object,?extends CodeResult>, R extends CodeResult>
         extends AbstractTask<Object,R>
         implements TaskExecutor<A>,Task<Object,R>{
     private final Map<A,Object> mExecutedMap=new HashMap<>();
@@ -31,7 +31,7 @@ public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
             };
             setTaskValue(next,innerProgress);
             mExecuting=next;
-            Result result=next.execute(arg,innerProgress);
+            CodeResult result=next.execute(arg,innerProgress);
             mExecuting=null;
             result=null!=result?result:new Reply().set(Code.CODE_FAIL,"Task none result.",null);
             setTaskValue(next,result);
@@ -114,7 +114,7 @@ public class TaskGroup<A extends Task<Object,?extends Result>, R extends Result>
     }
 
     @Override
-    public Result<Section<A>> load(A from, Matcher<A> matcher) {
+    public CodeResult<Section<A>> load(A from, Matcher<A> matcher) {
         return null;
     }
 }

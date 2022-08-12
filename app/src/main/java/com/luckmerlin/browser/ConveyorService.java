@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.Result;
+import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.Section;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Task;
@@ -56,7 +56,7 @@ public class ConveyorService extends Service {
         }
 
         @Override
-        public Result<Section<Task>> load(Task from, Matcher<Task> matcher) {
+        public CodeResult<Section<Task>> load(Task from, Matcher<Task> matcher) {
             return mTasks.load(from,matcher);
         }
 

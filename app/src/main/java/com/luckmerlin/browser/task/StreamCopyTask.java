@@ -13,7 +13,7 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.TaskProgress;
 import com.luckmerlin.utils.Utils;
 
-public class StreamCopyTask<R> extends AbstractTask<StreamArgs, Response<R>> {
+public class StreamCopyTask<R> extends AbstractTask<FileTaskArgs, Response<R>> {
     private StreamSource mFromStream;
     private StreamSource mToStream;
     private Convertor mConvertor;
@@ -39,7 +39,7 @@ public class StreamCopyTask<R> extends AbstractTask<StreamArgs, Response<R>> {
     }
 
     @Override
-    protected Response<R> onExecute(StreamArgs arg) {
+    protected Response<R> onExecute(FileTaskArgs arg) {
         if (mCanceled){
             Debug.W("Canceled execute copy stream task.");
             return new Response(Code.CODE_CANCEL,"Canceled.");

@@ -7,7 +7,7 @@ import com.luckmerlin.object.Parser;
 
 import java.util.List;
 
-public class Reply<T> extends JsonObject implements Result<T> {
+public class Reply<T> extends JsonObject implements CodeResult<T> {
     private Parser<Object,T> mDataParser;
 
     public Reply(){

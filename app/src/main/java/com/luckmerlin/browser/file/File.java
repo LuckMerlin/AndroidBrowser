@@ -17,6 +17,18 @@ public class File extends JsonObject{
         super(json);
     }
 
+    public String getHost() {
+        return optString(Label.LABEL_HOST,null);
+    }
+
+    public File setHost(String host){
+        return putSafe(this,Label.LABEL_HOST,host);
+    }
+
+    public final boolean isLocalFile(){
+        return getHost()==null;
+    }
+
     public String getName() {
         return optString(Label.LABEL_NAME,null);
     }

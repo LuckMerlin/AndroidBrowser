@@ -2,12 +2,8 @@ package com.luckmerlin.browser;
 
 import android.app.Activity;
 
-import com.luckmerlin.core.Result;
+import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.task.AbstractTask;
-import com.luckmerlin.task.OnProgressChange;
-import com.luckmerlin.task.Progress;
-
-import java.util.Random;
 
 public class TestTask extends AbstractTask {
     Activity activity;
@@ -18,7 +14,7 @@ public class TestTask extends AbstractTask {
     }
 
     @Override
-    protected Result onExecute(Object arg) {
+    protected CodeResult onExecute(Object arg) {
         return null;
     }
 
