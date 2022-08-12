@@ -94,14 +94,19 @@ public class ConveyorActivityModel extends BaseModel implements
     private void setTaskExecutor(Executor executor){
 //        mExecutor=executor;
         if (null!=executor){
-            for (int i = 0; i < 100; i++) {
-                StreamCopyTask streamCopyTask=new StreamCopyTask
-                        (new AndroidFileStream(new File("/sdcard/test.png")),
-                                new AndroidFileStream(new File(
-                                        "/sdcard/test"+i+".png")),null);
-                mConveyorListAdapter.add(streamCopyTask);
-                executor.execute(streamCopyTask,null);
-            }
+//            for (int i = 0; i < 100; i++) {
+//                StreamCopyTask streamCopyTask=new StreamCopyTask
+//                        (new AndroidFileStream(new File("/sdcard/test.png")),
+//                                new AndroidFileStream(new File(
+//                                        "/sdcard/test"+i+".png")),null);
+//                mConveyorListAdapter.add(streamCopyTask);
+//                executor.execute(streamCopyTask,null);
+//            }
+            FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
+                (new File("/sdcard/test.png")),null);
+        deleteTask.setName("删除文件 ");
+            mConveyorListAdapter.add(deleteTask);
+            executor.execute(deleteTask,null);
         }
     }
 

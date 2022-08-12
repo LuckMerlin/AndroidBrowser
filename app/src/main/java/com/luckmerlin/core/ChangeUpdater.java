@@ -3,7 +3,7 @@ package com.luckmerlin.core;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class ChangeUpdater implements ChangeUpdate{
+public class ChangeUpdater extends MatcherInvoker implements ChangeUpdate{
     private List<OnChangeUpdate> mListeners;
 
     @Override
@@ -23,15 +23,6 @@ public class ChangeUpdater implements ChangeUpdate{
     }
 
     public final boolean iterateUpdaters(Matcher<OnChangeUpdate> matcher){
-        List<OnChangeUpdate> listeners=mListeners;
-        if (null!=listeners){
-            for (OnChangeUpdate child:listeners) {
-                if (null!=matcher&&null==matcher.match(child)){
-                    break;
-                }
-            }
-            return true;
-        }
-        return false;
+        return match(mListeners,matcher);
     }
 }

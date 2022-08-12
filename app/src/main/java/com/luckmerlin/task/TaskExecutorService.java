@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
+import com.luckmerlin.core.Matcher;
+
 import java.util.List;
 
 public class TaskExecutorService extends Service {
@@ -28,8 +30,8 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public List<Task> getExecuting() {
-            return mExecutor.getExecuting();
+        public void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
+            mExecutor.match(matcher);
         }
     }
 }

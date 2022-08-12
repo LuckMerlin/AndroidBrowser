@@ -3,6 +3,7 @@ package com.luckmerlin.task;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.Matcher;
+import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.core.Section;
@@ -12,13 +13,10 @@ import java.util.Map;
 import java.util.Set;
 //
 public class TaskGroup extends AbstractTask implements Executor{
+    private final MatcherInvoker mMatchInvoker=new MatcherInvoker();
+
     public TaskGroup(Progress progress) {
         super(progress);
-    }
-
-    @Override
-    public boolean onPendingExecute(TaskExecutor executor) {
-        return super.onPendingExecute(executor);
     }
 
     @Override
@@ -32,9 +30,10 @@ public class TaskGroup extends AbstractTask implements Executor{
     }
 
     @Override
-    public List<Task> getExecuting() {
-        return null;
+    public void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
+//        mMatchInvoker.match()
     }
+
     //    private final Map<A,Object> mExecutedMap=new HashMap<>();
 //    private A mExecuting=null;
 //

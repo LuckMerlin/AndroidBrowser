@@ -5,7 +5,7 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask extends ChangeUpdater implements Task,OnPendingExecute{
+public abstract class AbstractTask extends ChangeUpdater implements Task, OnExecutePending {
     private String mName;
     private Progress mProgress;
     private OnProgressChange mNotifier;
@@ -56,9 +56,9 @@ public abstract class AbstractTask extends ChangeUpdater implements Task,OnPendi
     }
 
     @Override
-    public boolean onPendingExecute(TaskExecutor executor) {
+    public boolean onExecutePending(TaskExecutor executor) {
         mPending=true;
-        return true;
+        return false;
     }
 
     @Override

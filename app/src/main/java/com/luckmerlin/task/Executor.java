@@ -1,8 +1,8 @@
 package com.luckmerlin.task;
 
-import java.util.List;
+import com.luckmerlin.core.Matcher;
 
 public interface Executor {
     boolean execute(Task task,OnProgressChange callback);
-    List<Task> getExecuting();
+    void match(Matcher<TaskExecutor.ExecuteTask> matcher);
 }

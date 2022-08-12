@@ -2,17 +2,20 @@ package com.luckmerlin.task;
 
 import android.os.Handler;
 import android.os.Looper;
+
+import com.luckmerlin.core.Matcher;
+import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.debug.Debug;
 
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class TaskExecutor implements Executor{
-    private final LinkedBlockingQueue<Runnable> mWaitingQueue=new LinkedBlockingQueue<>();
+public class TaskExecutor extends MatcherInvoker implements Executor{
+    private final List<ExecuteTask> mWaitingQueue=new CopyOnWriteArrayList<>();
     private ExecutorService mExecutor;
     private boolean mFullExecuting=false;
     private final Handler mHandler=new Handler(Looper.getMainLooper());
@@ -23,7 +26,18 @@ public class TaskExecutor implements Executor{
             Thread thread = new Thread(r);
             thread.setName("TaskExecutorTask");
             return thread;
-        },(Runnable r, ThreadPoolExecutor executor)-> mFullExecuting=mWaitingQueue.offer(r)||true);
+        },(Runnable r, ThreadPoolExecutor executor)-> {
+            mFullExecuting=true;
+            if (null!=r&&r instanceof ExecuteTask){
+                ExecuteTask taskRunnable=(ExecuteTask)r;
+                taskRunnable.setStatus(ExecuteTask.STATUS_WAITING);
+                Task task=taskRunnable.mTask;
+                if (null==task||!(task instanceof OnExecuteWaiting)
+                    ||!((OnExecuteWaiting)task).onExecuteWaiting(TaskExecutor.this)){
+                    mWaitingQueue.add(taskRunnable);
+                }
+            }
+        });
     }
 
     public final boolean execute(Task task){
@@ -40,44 +54,78 @@ public class TaskExecutor implements Executor{
             Debug.E("Fail execute task while executor is invalid.");
             return false;
         }
-        if (task instanceof OnPendingExecute&&!(((OnPendingExecute)task).onPendingExecute(this))){
+        if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
             return false;
         }
-        executor.execute(new TaskRunnable(task,callback) {
+        executor.execute(new ExecuteTask(task,callback) {
             @Override
             public void run() {
-                if (!(task instanceof OnPreExecute)||((OnPreExecute)task).onPendingExecute(TaskExecutor.this)){
+                setStatus(ExecuteTask.STATUS_EXECUTING);
+                if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).onExecuteStart(TaskExecutor.this)){
                     mTask.execute(mCallback);
                 }
+                setStatus(ExecuteTask.STATUS_FINISH);
                 mFullExecuting=false;
+                if (task instanceof OnExecuteFinish&&((OnExecuteFinish)task).onExecuteFinish(TaskExecutor.this)){
+                    //Do nothing
+                }
                 post(()->{
-                    LinkedBlockingQueue<Runnable> waitingQueue=mWaitingQueue;//Check waiting
-                    Runnable runnable=null;
-                    while (!mFullExecuting&&null!=waitingQueue&&(null!=(runnable=waitingQueue.poll())) && runnable instanceof TaskRunnable){
-                        TaskRunnable taskRunnable=(TaskRunnable)runnable;
+                    List<ExecuteTask> waitingQueue=mWaitingQueue;//Check waiting
+                    ExecuteTask taskRunnable=null;
+                    while (!mFullExecuting&&null!=waitingQueue&&waitingQueue.size()>0&& (null!=(taskRunnable=waitingQueue.get(0)))){
                         execute(taskRunnable.mTask,taskRunnable.mCallback);
                     }
                 },-1);
             }
-        });
+        }.setStatus(ExecuteTask.STATUS_PENDING));
         return true;
     }
 
     @Override
-    public List<Task> getExecuting() {
-        return null;
+    public void match(Matcher<ExecuteTask> matcher) {
+        match(mWaitingQueue,matcher);
     }
 
-    public final boolean post(Runnable runnable,int delay){
+    public final boolean post(Runnable runnable, int delay){
         return null!=runnable&mHandler.post(runnable);
     }
 
-    private static abstract class TaskRunnable implements Runnable{
+    public static abstract class ExecuteTask implements Runnable{
+        public final static int STATUS_PENDING=2000;
+        public final static int STATUS_EXECUTING=2001;
+        public final static int STATUS_WAITING=2002;
+        public final static int STATUS_FINISH=2003;
         protected final Task mTask;
         protected final OnProgressChange mCallback;
-        protected TaskRunnable(Task task,OnProgressChange callback){
+        private int mStatus=STATUS_PENDING;
+
+        protected ExecuteTask(Task task,OnProgressChange callback){
             mTask=task;
             mCallback=callback;
+        }
+
+        public final boolean isStatus(int... status) {
+            if (null != status) {
+                for (int i = 0; i < status.length; i++) {
+                    if (status[i]==mStatus){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public final ExecuteTask setStatus(int status){
+            mStatus=status;
+            return this;
+        }
+
+        public final Task getTask() {
+            return mTask;
+        }
+
+        public final OnProgressChange getOnProgressChange() {
+            return mCallback;
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.luckmerlin.browser;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -59,6 +60,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         View itemView=null!=holder?holder.itemView:null;
         ViewDataBinding binding=null!=itemView? DataBindingUtil.getBinding(itemView):null;
         if (null!=binding){
+            Context context=itemView.getContext();
             Task item=getItem(position);
             Object result=null;
             Progress progress=null;
@@ -67,11 +69,13 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
                 progress=item.getProgress();
             }
             int iconRes;Object iconResObj=null;
+            String confirmMessage=null;
             if (null==result){
                 iconRes=item.isPending()?R.drawable.selector_wait:null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
             }else if (result instanceof ConfirmResult){
                 iconResObj=result;
                 iconRes=R.drawable.selector_confirm;
+                confirmMessage=((ConfirmResult)result).makeConfirmMessage(context);
             }else{
                 iconRes=null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
             }
