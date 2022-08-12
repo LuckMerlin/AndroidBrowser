@@ -8,5 +8,9 @@ public abstract class FileTask extends AbstractTask{
     public FileTask(Progress progress) {
         super(progress);
     }
+//
+//    public final FileTaskArgs getArgs() {
+//        return mArgs;
+//    }
 
 }
