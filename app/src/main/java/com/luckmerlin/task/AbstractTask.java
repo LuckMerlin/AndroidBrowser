@@ -5,25 +5,26 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask<A,R  extends Result> extends ChangeUpdater implements Task<A,R>{
+public abstract class AbstractTask extends ChangeUpdater implements Task,OnPendingExecute{
     private String mName;
     private Progress mProgress;
     private OnProgressChange mNotifier;
-    private R mResult;
+    private Result mResult;
+    private boolean mPending=false;
 
     public AbstractTask(Progress progress){
         mProgress=progress;
     }
 
-    public final AbstractTask<A,R> setName(String name) {
+    public final AbstractTask setName(String name) {
         this.mName = name;
         return this;
     }
 
-    protected abstract R onExecute(A arg);
+    protected abstract Result onExecute();
 
     @Override
-    public final R execute(A arg, OnProgressChange callback) {
+    public final Result execute(OnProgressChange callback) {
         mResult=null;
         mNotifier=(Task task, Progress progress)-> {
             mProgress=progress;
@@ -33,7 +34,8 @@ public abstract class AbstractTask<A,R  extends Result> extends ChangeUpdater im
                 callback.onProgressChanged(null!=task?task:this,progress);
             }
         };
-        R result= onExecute(arg);
+        mPending=false;
+        Result result= onExecute();
         mNotifier=null;
         return mResult=result;
     }
@@ -49,8 +51,19 @@ public abstract class AbstractTask<A,R  extends Result> extends ChangeUpdater im
     }
 
     @Override
-    public final R getResult() {
+    public final Result getResult() {
         return mResult;
+    }
+
+    @Override
+    public boolean onPendingExecute(TaskExecutor executor) {
+        mPending=true;
+        return true;
+    }
+
+    @Override
+    public final boolean isPending() {
+        return mPending;
     }
 
     protected final boolean notifyProgress(){

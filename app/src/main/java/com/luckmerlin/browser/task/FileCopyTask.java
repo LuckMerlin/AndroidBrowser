@@ -7,7 +7,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Progress;
 
-public class FileCopyTask extends FileTask<Response> {
+public class FileCopyTask extends FileTask {
     private File mFromFile;
     private File mToFile;
 
@@ -18,7 +18,7 @@ public class FileCopyTask extends FileTask<Response> {
     }
 
     @Override
-    protected Response onExecute(FileTaskArgs arg) {
+    protected Result onExecute() {
         File fromFile=mFromFile;
         if (null==fromFile){
             Debug.W("Fail execute file copy task while from file invalid.");

@@ -27,7 +27,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         int viewType=super.getItemViewType(position);
         if (viewType==VIEW_TYPE_DATA){
             Task task=getItem(position);
-            viewType=null!=task&&task instanceof TaskGroup?VIEW_TYPE_DATA_GROUP:viewType;
+            viewType=null!=task&&task instanceof TaskGroup ?VIEW_TYPE_DATA_GROUP:viewType;
         }
         return viewType;
     }
@@ -68,7 +68,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             }
             int iconRes;Object iconResObj=null;
             if (null==result){
-                iconRes=null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
+                iconRes=item.isPending()?R.drawable.selector_wait:null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
             }else if (result instanceof ConfirmResult){
                 iconResObj=result;
                 iconRes=R.drawable.selector_confirm;

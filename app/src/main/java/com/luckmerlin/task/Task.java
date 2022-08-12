@@ -1,8 +1,11 @@
 package com.luckmerlin.task;
 
-public interface Task<A,R> {
-    R execute(A arg,OnProgressChange callback);
+import com.luckmerlin.core.Result;
+
+public interface Task{
+    Result execute(OnProgressChange callback);
     String getName();
     Progress getProgress();
-    R getResult();
+    Result getResult();
+    boolean isPending();
 }

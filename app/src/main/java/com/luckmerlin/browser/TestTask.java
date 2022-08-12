@@ -3,6 +3,7 @@ package com.luckmerlin.browser;
 import android.app.Activity;
 
 import com.luckmerlin.core.CodeResult;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.task.AbstractTask;
 
 public class TestTask extends AbstractTask {
@@ -14,11 +15,10 @@ public class TestTask extends AbstractTask {
     }
 
     @Override
-    protected CodeResult onExecute(Object arg) {
+    protected Result onExecute() {
         return null;
     }
-
-    //    @Override
+//    @Override
 //    protected Object onExecute(Object arg) {
 //        while (null!=activity &&!((Activity)activity).isDestroyed()){
 //            try {

@@ -21,13 +21,13 @@ import com.luckmerlin.stream.AndroidFileStream;
 import com.luckmerlin.stream.Convertor;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.Stream;
+import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.TaskExecutor;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 
 public class ConveyorActivityModel extends BaseModel implements
         OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
@@ -36,25 +36,21 @@ public class ConveyorActivityModel extends BaseModel implements
     @Override
     protected View onCreateContent(Context context) {
         //
-        StreamCopyTask streamCopyTask=new StreamCopyTask
-                (new AndroidFileStream(new File("/sdcard/test.png")),
-                        new AndroidFileStream(new File(
-                                "/sdcard/test2.png")),null);
-        new File("/sdcard/test2.png").delete();
-        streamCopyTask.setName("测司法所大发送");
+
+//        new File("/sdcard/test2.png").delete();
+//        streamCopyTask.setName("测司法所大发送");
 //        streamCopyTask.setConvertor(new CoderConvertor());
-        mConveyorListAdapter.add(streamCopyTask);
         //
-        FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
-                (new File("/sdcard/test.png")),null);
-        deleteTask.setName("删除文件 ");
-        mConveyorListAdapter.add(deleteTask);
-        deleteTask.execute(null,null);
-        //
-        new FileCopyTask(LocalClient.createLoadFile(new File("/sdcard/test.png")),
-                LocalClient.createLoadFile(new File("/sdcard/test2.png")),null);
-        //
-        new Thread(()->streamCopyTask.execute(null,null)).start();
+//        FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
+//                (new File("/sdcard/test.png")),null);
+//        deleteTask.setName("删除文件 ");
+//        mConveyorListAdapter.add(deleteTask);
+//        deleteTask.execute(null);
+//        //
+//        new FileCopyTask(LocalClient.createLoadFile(new File("/sdcard/test.png")),
+//                LocalClient.createLoadFile(new File("/sdcard/test2.png")),null);
+//        //
+//        new Thread(()->streamCopyTask.execute(null)).start();
 
 //        try {
 //            byte[] src="我和我的祖国一刻也不能分离".getBytes("utf-8");
@@ -95,10 +91,17 @@ public class ConveyorActivityModel extends BaseModel implements
         return null;
     }
 
-    private void setTaskExecutor(TaskExecutor executor){
+    private void setTaskExecutor(Executor executor){
 //        mExecutor=executor;
         if (null!=executor){
-
+            for (int i = 0; i < 100; i++) {
+                StreamCopyTask streamCopyTask=new StreamCopyTask
+                        (new AndroidFileStream(new File("/sdcard/test.png")),
+                                new AndroidFileStream(new File(
+                                        "/sdcard/test"+i+".png")),null);
+                mConveyorListAdapter.add(streamCopyTask);
+                executor.execute(streamCopyTask,null);
+            }
         }
     }
 
@@ -108,7 +111,8 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_back:
                 return onBackPressed();
             case R.drawable.selector_confirm:
-                return showContentDialog(new );
+//                return showContentDialog(new  );
+                return false;
         }
         return false;
     }
@@ -126,8 +130,8 @@ public class ConveyorActivityModel extends BaseModel implements
              @Override
              public void onServiceConnected(ComponentName name, IBinder service) {
                  Debug.D("EEEE onServiceConnected "+service);
-                 if (null!=service&&service instanceof TaskExecutor){
-                    setTaskExecutor((TaskExecutor)service);
+                 if (null!=service&&service instanceof Executor){
+                    setTaskExecutor((Executor)service);
                  }
              }
 

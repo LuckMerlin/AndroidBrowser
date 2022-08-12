@@ -2,6 +2,7 @@ package com.luckmerlin.browser.task;
 
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.Convertor;
 import com.luckmerlin.stream.InputStream;
@@ -13,7 +14,7 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.TaskProgress;
 import com.luckmerlin.utils.Utils;
 
-public class StreamCopyTask<R> extends AbstractTask<FileTaskArgs, Response<R>> {
+public class StreamCopyTask extends AbstractTask {
     private StreamSource mFromStream;
     private StreamSource mToStream;
     private Convertor mConvertor;
@@ -29,7 +30,7 @@ public class StreamCopyTask<R> extends AbstractTask<FileTaskArgs, Response<R>> {
         mToStream=to;
     }
 
-    public final StreamCopyTask<R> setConvertor(Convertor convertor){
+    public final StreamCopyTask setConvertor(Convertor convertor){
         mConvertor=convertor;
         return this;
     }
@@ -39,7 +40,7 @@ public class StreamCopyTask<R> extends AbstractTask<FileTaskArgs, Response<R>> {
     }
 
     @Override
-    protected Response<R> onExecute(FileTaskArgs arg) {
+    protected Result onExecute() {
         if (mCanceled){
             Debug.W("Canceled execute copy stream task.");
             return new Response(Code.CODE_CANCEL,"Canceled.");

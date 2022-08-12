@@ -9,7 +9,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Progress;
 
-public class FileDeleteTask extends FileTask<Result> {
+public class FileDeleteTask extends FileTask {
     private File mFile;
 
     public FileDeleteTask(File file,Progress progress) {
@@ -18,18 +18,17 @@ public class FileDeleteTask extends FileTask<Result> {
     }
 
     @Override
-    protected Result onExecute(FileTaskArgs arg) {
+    protected Result onExecute() {
         File file=mFile;
         if (null==file){
             Debug.W("Fail execute file delete task while arg invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"Delete arg invalid.");
-        }else if (null==arg||!arg.isDirectExecute(false)){
-            return (ConfirmResult)(Context context)-> {
-                    return null;
-            };
         }
+//        else if (null==arg||!arg.isDirectExecute(false)){
+//            return (ConfirmResult)(Context context)-> {
+//                return null;
+//            };
+//        }
         return null;
     }
-
-
 }
