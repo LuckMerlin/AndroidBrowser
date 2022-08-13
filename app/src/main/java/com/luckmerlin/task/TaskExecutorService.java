@@ -30,7 +30,7 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
+        public  void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
             mExecutor.match(matcher);
         }
     }

@@ -30,8 +30,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
         mResult=null;
         mNotifier=(Task task, Progress progress)-> {
             mProgress=progress;
-            iterateUpdaters((Matcher<OnChangeUpdate>) (OnChangeUpdate data)->
-                    null!=data&&data.onChangeUpdated(progress));
+            iterateUpdaters((OnChangeUpdate data)-> null!=data&&data.onChangeUpdated(progress));
             if (null!=callback){
                 callback.onProgressChanged(null!=task?task:this,progress);
             }

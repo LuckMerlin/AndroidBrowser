@@ -102,8 +102,8 @@ public class ConveyorActivityModel extends BaseModel implements
 //                executor.execute(streamCopyTask,null);
 //            }
             FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
-                (new File("/sdcard/test.png")),null);
-        deleteTask.setName("删除文件 ");
+                (new File("/sdcard/test1.png")),null);
+            deleteTask.setName("删除文件 ");
             mConveyorListAdapter.add(deleteTask);
             executor.execute(deleteTask,null);
         }

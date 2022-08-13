@@ -5,6 +5,8 @@
     <string name="goTo">Go</string>
     <string name="terminal">Terminal</string>
     <string name="upload">Upload</string>
+    <string name="file">File</string>
+    <string name="folder">Folder</string>
     <string name="setAsHome">Set Home</string>
     <string name="createFolder">Create Folder</string>
     <string name="createFile">Create File</string>

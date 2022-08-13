@@ -7,12 +7,11 @@ public class MatcherInvoker {
 
     public <T> boolean match(T[] array,Matcher<T> matcher){
         int length=null!=array?array.length:0;
-        if (length<=0){
+        if (length<=0||null==matcher){
             return false;
         }
-        matcher=null!=matcher?matcher:(T data)-> false;
         for (int i = 0; i < length; i++) {
-            if (!matcher.match(array[i])){
+            if (matcher.match(array[i])){
                 break;
             }
         }
@@ -24,12 +23,11 @@ public class MatcherInvoker {
     }
 
     public <T> boolean match(Iterator<T> iterator, Matcher<T> matcher){
-        if (null==iterator){
+        if (null==iterator||null==matcher){
             return false;
         }
-        matcher=null!=matcher?matcher:(T data)-> false;
         while (iterator.hasNext()){
-            if (!matcher.match(iterator.next())){
+            if (matcher.match(iterator.next())){
                 break;
             }
         }
