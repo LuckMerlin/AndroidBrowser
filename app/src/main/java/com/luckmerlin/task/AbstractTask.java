@@ -37,6 +37,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
         };
         mPending=false;
         Result result= onExecute();
+        notifyProgress(mProgress);
         mNotifier=null;
         return mResult=result;
     }
