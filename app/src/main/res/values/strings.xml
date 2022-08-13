@@ -51,6 +51,7 @@
     <string name="finished">Finished</string>
     <string name="notify">Note</string>
     <string name="confirm">Confirm</string>
+    <string name="confirmWhich">Confirm %1s</string>
     <string name="deleteFailedFile">Sure delete UNSUCCEED file</string>
     <string name="reboot">Reboot</string>
     <string name="toWhich">To %1s</string>

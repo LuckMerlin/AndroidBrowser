@@ -3,6 +3,7 @@ package com.luckmerlin.browser.task;
 import android.content.Context;
 
 import com.luckmerlin.browser.Code;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
@@ -30,12 +31,14 @@ public class FileDeleteTask extends FileTask {
             return new ConfirmResult() {
                 @Override
                 protected Confirm onCreate(Context context) {
-                    return new ConfirmResult.Confirm("", (boolean confirm)-> {
+                    String delete=""+getString(context,R.string.delete);
+                    return new ConfirmResult.Confirm(getString(context, R.string.confirmWhich,
+                            delete+"["+file.getName()+"]"), (boolean confirm)-> {
                         FileTaskArgs args=mArgs;
                         args=null!=args?args:(mArgs=new FileTaskArgs());
                         args.setDirectExecute(confirm);
                         return FileDeleteTask.this;
-                    });
+                    }).setTitle(delete);
                 }
             };
         }

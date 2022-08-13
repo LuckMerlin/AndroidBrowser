@@ -21,13 +21,13 @@
             android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
             android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <TextView binding:bind="@{VB.clickId(R.string.confirm)}"
-            android:layout_gravity="center" android:textColor="@color/textTitle"
-            android:textSize="18sp" android:textStyle="bold" android:gravity="center"
-            android:background="@drawable/selector_button"
-            android:paddingTop="5dp" android:paddingLeft="5dp" android:layout_marginTop="30dp"
-            android:layout_marginLeft="40dp" android:layout_marginRight="40dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <LinearLayout android:orientation="horizontal" android:layout_gravity="center" android:gravity="center"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView binding:bind="@{VB.clickId(R.string.confirm)}" style="@style/button"
+                android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
+            <TextView binding:bind="@{VB.clickId(R.string.cancel)}" style="@style/button"
+                android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
+        </LinearLayout>
     </LinearLayout>
     <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
         android:layout_gravity="right|top"

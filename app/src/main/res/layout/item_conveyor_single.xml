@@ -6,6 +6,7 @@
         <variable name="task" type="com.luckmerlin.task.Task" />
         <variable name="selected" type="boolean" />
         <variable name="position" type="int" />
+        <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
         <variable name="confirm" type="com.luckmerlin.task.ConfirmResult.Confirm" />
         <variable name="iconResId" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
@@ -46,7 +47,7 @@
                 android:layout_width="match_parent" android:layout_height="2dp"/>
         </LinearLayout>
 
-        <ImageView binding:bind="@{VB.clickId(iconResId)}" android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp" />
+        <ImageView binding:bind="@{iconBinding}" android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp" />
 
     </LinearLayout>
 </layout>

@@ -1,5 +1,7 @@
 package com.luckmerlin.task;
 
+import android.content.Context;
+
 import com.luckmerlin.core.ChangeUpdater;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
@@ -64,6 +66,10 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
     @Override
     public final boolean isPending() {
         return mPending;
+    }
+
+    protected final String getString(Context context,int textId, Object... args){
+        return null!=context?context.getString(textId,args):null;
     }
 
     protected final boolean notifyProgress(){

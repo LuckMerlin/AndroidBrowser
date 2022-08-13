@@ -87,7 +87,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             }else if (binding instanceof ItemConveyorSingleBinding){
                 ItemConveyorSingleBinding singleBinding=(ItemConveyorSingleBinding)binding;
                 singleBinding.setPosition(position);
-                singleBinding.setIconResId(iconRes);
+                singleBinding.setIconBinding(ViewBinding.clickId(iconRes,item));
                 singleBinding.setConfirm(confirm);
                 singleBinding.setTask(item);
             }

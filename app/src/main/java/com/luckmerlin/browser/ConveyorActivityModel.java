@@ -30,6 +30,8 @@ public class ConveyorActivityModel extends BaseModel implements
         OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
     private ServiceConnection mServiceConnection;
     private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
+    private Executor mExecutor;
+
     @Override
     protected View onCreateContent(Context context) {
         //
@@ -89,7 +91,7 @@ public class ConveyorActivityModel extends BaseModel implements
     }
 
     private void setTaskExecutor(Executor executor){
-//        mExecutor=executor;
+        mExecutor=executor;
         if (null!=executor){
 //            for (int i = 0; i < 100; i++) {
 //                StreamCopyTask streamCopyTask=new StreamCopyTask
@@ -113,12 +115,21 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_back:
                 return onBackPressed();
             case R.drawable.selector_confirm:
-                Result result=null!=obj&&obj instanceof Task?((Task)obj).getResult():null;
+                Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
+                Result result=null!=task?task.getResult():null;
                 ConfirmResult.Confirm confirm=null!=result&&result instanceof ConfirmResult?((ConfirmResult)result).make(getContext()):null;
                 if (null==confirm){
                     return toast(R.string.error,0)||true;
                 }
-                return null!=showContentDialog(new ConfirmDialogContent(confirm),null);
+                return null!=showContentDialog(new ConfirmDialogContent(confirm){
+                    @Override
+                    protected void onConfirmFinish(boolean confirmed, Object confirmObj) {
+                        Executor executor=confirmed&&null!=confirmObj?mExecutor:null;
+                        if (null!=executor){
+                            executor.execute(task,null);
+                        }
+                    }
+                },null);
         }
         return false;
     }
