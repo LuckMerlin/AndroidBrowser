@@ -14,7 +14,6 @@ import com.luckmerlin.task.TaskProgress;
 
 public class FileDeleteTask extends FileTask {
     private File mFile;
-    private FileTaskArgs mArgs;
 
     public FileDeleteTask(File file,Progress progress) {
         super(progress);
@@ -25,23 +24,18 @@ public class FileDeleteTask extends FileTask {
     @Override
     protected Result onExecute() {
         File file=mFile;
-        FileTaskArgs arg=mArgs;
         if (null==file){
             Debug.W("Fail execute file delete task while arg invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"Delete arg invalid.");
-        } else if (null==arg||!arg.isDirectExecute(false)){
+        } else if (isConfirmEnabled()){
             return new ConfirmResult() {
                 @Override
                 protected Confirm onCreate(Context context) {
                     String delete=""+getString(context,R.string.delete);
                     return new ConfirmResult.Confirm(getString(context, R.string.confirmWhich,
                             delete+(getString(context,file.isDirectory()?R.string.folder:R.string.file))
-                                    +"["+file.getName()+"]"), (boolean confirm)-> {
-                        FileTaskArgs args=mArgs;
-                        args=null!=args?args:(mArgs=new FileTaskArgs());
-                        args.setDirectExecute(confirm);
-                        return FileDeleteTask.this;
-                    }).setTitle(delete);
+                                    +"["+file.getName()+"]"), (boolean confirm)->
+                            null!=enableConfirm(!confirm)?FileDeleteTask.this:FileDeleteTask.this).setTitle(delete);
                 }
             };
         }

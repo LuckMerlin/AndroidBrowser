@@ -91,10 +91,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
         //
         if (!executeTask.isStatus(ExecuteTask.STATUS_PENDING,ExecuteTask.
-                STATUS_INTERRUPTED,ExecuteTask.STATUS_FINISH)){
+                STATUS_INTERRUPTED,ExecuteTask.STATUS_FINISH,ExecuteTask.STATUS_WAITING)){
             Debug.E("Fail execute task while task status is not need execute.status="+executeTask.mStatus);
             return false;
         }
+        Debug.D("Pending execute task."+task);
         executor.execute(executeTask.setStatus(ExecuteTask.STATUS_PENDING));
         return true;
     }

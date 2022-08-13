@@ -11,4 +11,8 @@ public interface Progress {
         long pos=getPosition();
         return pos>=0&&total>0?(int)(pos*100.f/total):0;
     }
+
+    default boolean isSucceed(){
+        return intValue()==100;
+    }
 }
