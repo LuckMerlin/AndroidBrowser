@@ -14,23 +14,23 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.TaskProgress;
 import com.luckmerlin.utils.Utils;
 
-public class StreamCopyTask extends AbstractTask {
+public class StreamSourceCopyTask extends AbstractTask {
     private StreamSource mFromStream;
     private StreamSource mToStream;
     private Convertor mConvertor;
     private boolean mCanceled=false;
 
-    public StreamCopyTask(StreamSource from, StreamSource to) {
+    public StreamSourceCopyTask(StreamSource from, StreamSource to) {
         this(from,to,null);
     }
 
-    public StreamCopyTask(StreamSource from, StreamSource to, Progress progress) {
+    public StreamSourceCopyTask(StreamSource from, StreamSource to, Progress progress) {
         super(progress);
         mFromStream=from;
         mToStream=to;
     }
 
-    public final StreamCopyTask setConvertor(Convertor convertor){
+    public final StreamSourceCopyTask setConvertor(Convertor convertor){
         mConvertor=convertor;
         return this;
     }
@@ -109,17 +109,5 @@ public class StreamCopyTask extends AbstractTask {
         }finally {
             Utils.closeStream(outputStream,inputStream);
         }
-    }
-
-    public final boolean cancel(boolean cancel){
-        if (mCanceled!=cancel){
-            mCanceled=cancel;
-            return true;
-        }
-        return false;
-    }
-
-    public final boolean isCanceled() {
-        return mCanceled;
     }
 }

@@ -6,13 +6,13 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class TaskGroup extends AbstractTask{
-    private final Map<Task,Boolean> mQueue=new ConcurrentHashMap<>();
+    private final Map<Task,Boolean> mQueue=new HashMap<>();
     private Task mExecuting;
 
     public TaskGroup(Progress progress) {
@@ -39,9 +39,9 @@ public class TaskGroup extends AbstractTask{
         }
     }
 
-    public final TaskGroup add(Task... task){
+    public final TaskGroup add(Task... tasks){
         Map<Task,Boolean> queue=mQueue;
-        return null!=queue?match(task, (Task data)->null!=data&&null!=queue.put(data,queue.get(data)))?this:this:this;
+        return null!=queue?match(tasks, (Task data)->null!=data&&null!=queue.put(data,queue.get(data)))?this:this:this;
     }
 
     public final TaskGroup add(Collection<Task> task){

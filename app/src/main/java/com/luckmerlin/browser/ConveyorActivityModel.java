@@ -13,7 +13,7 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
-import com.luckmerlin.browser.task.FileDeleteTask;
+import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -94,7 +94,7 @@ public class ConveyorActivityModel extends BaseModel implements
         mExecutor=executor;
         if (null!=executor){
 //            for (int i = 0; i < 100; i++) {
-//                StreamCopyTask streamCopyTask=new StreamCopyTask
+//                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
 //                        (new AndroidFileStream(new File("/sdcard/test.png")),
 //                                new AndroidFileStream(new File(
 //                                        "/sdcard/test"+i+".png")),null);
@@ -102,12 +102,22 @@ public class ConveyorActivityModel extends BaseModel implements
 //                executor.execute(streamCopyTask,null);
 //            }
 
-            for (int i = 0; i < 100; i++) {
-                FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
-                        (new File("/sdcard/test"+i+".png")),null);
-                mConveyorListAdapter.add(deleteTask.enableConfirm(false));
-                executor.execute(deleteTask,null);
+            for (int i = 0; i < 1; i++) {
+                FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
+                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
+                mConveyorListAdapter.add(copyTask);
+                executor.execute(copyTask,null);
             }
+            //
+//            TaskGroup group=new TaskGroup(null);
+//            group.setName("删除群组");
+//            for (int i = 0; i < 100; i++) {
+//                FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
+//                        (new File("/sdcard/test"+i+".png")),null);
+//                group.add(deleteTask.enableConfirm(true));
+//            }
+//            mConveyorListAdapter.add(group);
+//            executor.execute(group,null);
         }
     }
 

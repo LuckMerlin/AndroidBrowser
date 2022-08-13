@@ -65,13 +65,13 @@ public class LocalClient extends AbstractClient {
             if (null!=filterName&&filterName.length()>0&&(null==fileName||!fileName.contains(filterName))){
                 return false;
             }
-            File child=createLoadFile(file);
+            File child=createLocalFile(file);
            if (null!=child){
                files.add(child);
            }
             return false;
         });
-        Folder folder= new Folder(createLoadFile(browserFile));
+        Folder folder= new Folder(createLocalFile(browserFile));
         //
         final Comparator<File> comparator=(File file1, File file2)-> {
             boolean directory1=file1.isDirectory();
@@ -108,7 +108,7 @@ public class LocalClient extends AbstractClient {
         return null;
     }
 
-    public static File createLoadFile(java.io.File file){
+    public static File createLocalFile(java.io.File file){
         if (null==file){
             return null;
         }

@@ -13,6 +13,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
     private OnProgressChange mNotifier;
     private Result mResult;
     private boolean mPending=false;
+    private boolean mCanceled=false;
 
     public AbstractTask(Progress progress){
         mProgress=progress;
@@ -61,6 +62,15 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
     public boolean onExecutePending(TaskExecutor executor) {
         mPending=true;
         return false;
+    }
+
+    public final AbstractTask cancel(boolean cancel){
+        mCanceled=cancel;
+        return this;
+    }
+
+    public final boolean isCanceled() {
+        return mCanceled;
     }
 
     @Override
