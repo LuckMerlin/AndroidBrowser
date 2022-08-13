@@ -34,6 +34,7 @@ public class FileDeleteTask extends FileTask {
                         FileTaskArgs args=mArgs;
                         args=null!=args?args:(mArgs=new FileTaskArgs());
                         args.setDirectExecute(confirm);
+                        return FileDeleteTask.this;
                     });
                 }
             };

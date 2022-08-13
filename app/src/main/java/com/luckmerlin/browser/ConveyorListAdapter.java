@@ -68,12 +68,11 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
                 result=item.getResult();
                 progress=item.getProgress();
             }
-            int iconRes;Object iconResObj=null;
+            int iconRes;
             ConfirmResult.Confirm confirm=null;
             if (null==result){
                 iconRes=item.isPending()?R.drawable.selector_wait:null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
             }else if (result instanceof ConfirmResult){
-                iconResObj=result;
                 iconRes=R.drawable.selector_confirm;
                 confirm=((ConfirmResult)result).make(context);
             }else{
@@ -82,12 +81,14 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             if (binding instanceof ItemConveyorGroupBinding){
                 ItemConveyorGroupBinding groupBinding=(ItemConveyorGroupBinding)binding;
                 groupBinding.setPosition(position);
-                groupBinding.setIconBinding(ViewBinding.clickId(iconRes,iconResObj));
+                groupBinding.setConfirm(confirm);
+                groupBinding.setIconBinding(ViewBinding.clickId(iconRes,item));
                 groupBinding.setTask(item instanceof TaskGroup?(TaskGroup)item:null);
             }else if (binding instanceof ItemConveyorSingleBinding){
                 ItemConveyorSingleBinding singleBinding=(ItemConveyorSingleBinding)binding;
                 singleBinding.setPosition(position);
                 singleBinding.setIconResId(iconRes);
+                singleBinding.setConfirm(confirm);
                 singleBinding.setTask(item);
             }
         }

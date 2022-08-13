@@ -12,17 +12,14 @@ import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
-import com.luckmerlin.browser.task.FileCopyTask;
+import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.task.FileDeleteTask;
-import com.luckmerlin.browser.task.StreamCopyTask;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.stream.AndroidFileStream;
-import com.luckmerlin.stream.Convertor;
-import com.luckmerlin.stream.InputStream;
-import com.luckmerlin.stream.Stream;
+import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.TaskExecutor;
+import com.luckmerlin.task.Task;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -116,8 +113,12 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_back:
                 return onBackPressed();
             case R.drawable.selector_confirm:
-//                return showContentDialog(new  );
-                return false;
+                Result result=null!=obj&&obj instanceof Task?((Task)obj).getResult():null;
+                ConfirmResult.Confirm confirm=null!=result&&result instanceof ConfirmResult?((ConfirmResult)result).make(getContext()):null;
+                if (null==confirm){
+                    return toast(R.string.error,0)||true;
+                }
+                return null!=showContentDialog(new ConfirmDialogContent(confirm),null);
         }
         return false;
     }

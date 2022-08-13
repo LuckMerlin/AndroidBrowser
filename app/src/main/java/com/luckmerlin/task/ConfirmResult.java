@@ -6,27 +6,28 @@ import com.luckmerlin.core.Result;
 public abstract class ConfirmResult implements Result {
     private Confirm mConfirm;
 
-    public interface OnConfirmFinish{
-        void onConfirmFinish(boolean confirm);
+    public interface OnConfirm{
+        Object onConfirm(boolean confirm);
     }
 
     public class Confirm{
         private String mMessage;
-        private OnConfirmFinish mOnConfirmFinish;
+        private String mTitle;
+        private OnConfirm mOnConfirmFinish;
 
         public Confirm(){
             this(null,null);
         }
 
-        public Confirm(String message,OnConfirmFinish callback) {
-            setMessage(message).setOnConfirmFinish(callback);
+        public Confirm(String message,OnConfirm callback) {
+            setMessage(message).setOnConfirm(callback);
         }
 
         public final String getMessage() {
             return mMessage;
         }
 
-        public final OnConfirmFinish getOnConfirmFinish() {
+        public final OnConfirm getOnConfirm() {
             return mOnConfirmFinish;
         }
 
@@ -35,7 +36,16 @@ public abstract class ConfirmResult implements Result {
             return this;
         }
 
-        public final Confirm setOnConfirmFinish(OnConfirmFinish callback) {
+        public final Confirm setTitle(String title) {
+            mTitle = title;
+            return this;
+        }
+
+        public final String getTitle() {
+            return mTitle;
+        }
+
+        public final Confirm setOnConfirm(OnConfirm callback) {
             mOnConfirmFinish = callback;
             return this;
         }

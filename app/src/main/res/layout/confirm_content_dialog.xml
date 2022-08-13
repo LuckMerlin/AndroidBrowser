@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="content" type="com.luckmerlin.browser.dialog.ConfirmDialogContent" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+    </data>
+    <FrameLayout android:background="@drawable/round_corner_gray"
+        android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:layout_marginTop="10dp"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minWidth="300dp" android:paddingTop="5dp" android:paddingBottom="15dp"
+        android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
+
+        <TextView android:text="@{content.confirm.title??@string/confirm}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
+            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView android:text="@{content.confirm.message??``}" android:textColor="@color/textNormal"
+            android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView binding:bind="@{VB.clickId(R.string.confirm)}"
+            android:layout_gravity="center" android:textColor="@color/textTitle"
+            android:textSize="18sp" android:textStyle="bold" android:gravity="center"
+            android:background="@drawable/selector_button"
+            android:paddingTop="5dp" android:paddingLeft="5dp" android:layout_marginTop="30dp"
+            android:layout_marginLeft="40dp" android:layout_marginRight="40dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    </LinearLayout>
+    <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
+        android:layout_gravity="right|top"
+        android:layout_width="40dp" android:layout_height="40dp"/>
+    </FrameLayout>
+</layout>

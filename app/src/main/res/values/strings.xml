@@ -19,6 +19,7 @@
     <string name="move">Move</string>
     <string name="scanCurrent">Scan</string>
     <string name="browser">Browser</string>
+    <string name="error">Error</string>
     <string name="sureWhich">Sure %1s</string>
     <string name="skipWhich">Skip %1s</string>
     <string name="noneWhichPermission">None %1s permission</string>
@@ -49,6 +50,7 @@
     <string name="summeryItemWhich">%1d Item(s)</string>
     <string name="finished">Finished</string>
     <string name="notify">Note</string>
+    <string name="confirm">Confirm</string>
     <string name="deleteFailedFile">Sure delete UNSUCCEED file</string>
     <string name="reboot">Reboot</string>
     <string name="toWhich">To %1s</string>
