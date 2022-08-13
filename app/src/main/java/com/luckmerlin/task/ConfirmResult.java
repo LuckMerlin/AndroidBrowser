@@ -3,13 +3,14 @@ package com.luckmerlin.task;
 import android.content.Context;
 import com.luckmerlin.core.Result;
 
-public interface ConfirmResult extends Result {
+public abstract class ConfirmResult implements Result {
+    private Confirm mConfirm;
 
     public interface OnConfirmFinish{
         void onConfirmFinish(boolean confirm);
     }
 
-    class Confirm{
+    public class Confirm{
         private String mMessage;
         private OnConfirmFinish mOnConfirmFinish;
 
@@ -40,5 +41,10 @@ public interface ConfirmResult extends Result {
         }
     }
 
-    Confirm create(Context context);
+    protected abstract Confirm onCreate(Context context);
+
+    public final Confirm make(Context context){
+        Confirm confirm=mConfirm;
+        return null!=confirm?confirm:null!=context?mConfirm=onCreate(context):null;
+    }
 }

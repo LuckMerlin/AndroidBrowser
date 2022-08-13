@@ -27,12 +27,18 @@ public class FileDeleteTask extends FileTask {
             Debug.W("Fail execute file delete task while arg invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"Delete arg invalid.");
         } else if (null==arg||!arg.isDirectExecute(false)){
-            return (ConfirmResult)(Context context)->new ConfirmResult.Confirm("", (boolean confirm)-> {
-                FileTaskArgs args=mArgs;
-                args=null!=args?args:(mArgs=new FileTaskArgs());
-                args.setDirectExecute(confirm);
-            });
+            return new ConfirmResult() {
+                @Override
+                protected Confirm onCreate(Context context) {
+                    return new ConfirmResult.Confirm("", (boolean confirm)-> {
+                        FileTaskArgs args=mArgs;
+                        args=null!=args?args:(mArgs=new FileTaskArgs());
+                        args.setDirectExecute(confirm);
+                    });
+                }
+            };
         }
+        Debug.D("FASFSFFASDFA");
         return null;
     }
 }
