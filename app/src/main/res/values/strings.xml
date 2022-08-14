@@ -8,6 +8,8 @@
     <string name="file">File</string>
     <string name="folder">Folder</string>
     <string name="setAsHome">Set Home</string>
+    <string name="replace">Replace</string>
+    <string name="areYourSureWhich">Are you sure %1s?</string>
     <string name="createFolder">Create Folder</string>
     <string name="createFile">Create File</string>
     <string name="create">Create</string>

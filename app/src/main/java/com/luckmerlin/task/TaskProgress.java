@@ -12,8 +12,8 @@ public final class TaskProgress implements Progress{
         return this;
     }
 
-    public TaskProgress setSpeed(String mSpeed) {
-        this.mSpeed = mSpeed;
+    public TaskProgress setSpeed(String speed) {
+        this.mSpeed = speed;
         return this;
     }
 

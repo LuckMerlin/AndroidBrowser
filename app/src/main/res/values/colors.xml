@@ -5,7 +5,7 @@
     <color name="textFocus">#999999</color>
     <color name="textTitle">#ffffff</color>
     <color name="browserBackground">#55000000</color>
-    <color name="textTitleSub">#ffffff</color>
+    <color name="textTitleSub">#aaffffff</color>
     <color name="syncNull">@android:color/transparent</color>
     <color name="syncNeed">#ff0</color>
     <color name="syncFail">#f00</color>

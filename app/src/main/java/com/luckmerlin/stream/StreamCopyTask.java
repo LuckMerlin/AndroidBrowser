@@ -36,7 +36,6 @@ public class StreamCopyTask extends AbstractTask {
             }
             final long openLength=outputStream.getOpenLength();
             final TaskProgress progress=new TaskProgress();
-            progress.setPosition(openLength);
             notifyProgress(progress);
             Debug.D("Opened copy task output stream.openLength="+openLength);
             inputStream=mInputStream;
@@ -60,11 +59,12 @@ public class StreamCopyTask extends AbstractTask {
             Debug.D("Coping stream task.openLength="+openLength+" inputTotal="+inputTotal);
             byte[] buffer=mBuffer;
             buffer=null!=buffer&&buffer.length>0?buffer:new byte[1024];
-            if (!new StreamCopier().copy(inputStream, outputStream,buffer,
-                    (long current, long total, long speed) ->{
-                        progress.setPosition(current).setTotal(total).
-                                setSpeed(""+speed).setTitle(inputTitle);
-                        notifyProgress(progress);
+            if (!new StreamCopier().copy(inputStream, outputStream,buffer, (long current, long total, long speed) ->{
+                        int value=progress.intValue();
+                        progress.setSpeed(""+speed).setPosition(current).setTotal(total).setTitle(inputTitle);
+                        if (value!=progress.intValue()){
+                            notifyProgress(progress);
+                        }
                         return (canceled[0]=isCanceled())?false:true;
                     })){
                 Debug.D("Fail execute stream copy task while copy fail.openLength="+openLength);

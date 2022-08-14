@@ -1,10 +1,8 @@
 package com.luckmerlin.browser.task;
 
 import android.content.Context;
-import android.os.FileUtils;
-
 import com.luckmerlin.browser.Code;
-import com.luckmerlin.browser.Utils;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Response;
@@ -14,11 +12,9 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.stream.StreamCopyTask;
 import com.luckmerlin.task.ConfirmResult;
-import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskProgress;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -112,6 +108,7 @@ public class FileCopyTask extends FileTask {
                     fileOutputStream.write(b);
                 }
             };
+            outputStream.setTitle(androidFile.getName());
             return new Response<OutputStream>().set(Code.CODE_SUCCEED,"Succeed.",outputStream);
         }
         return null;
@@ -154,6 +151,7 @@ public class FileCopyTask extends FileTask {
                     return fileInputStream.read();
                 }
             };
+            inputStream.setTitle(androidFile.getName());
             return new Response<InputStream>().set(Code.CODE_SUCCEED,"Succeed.",inputStream);
         }
         return null;
@@ -183,6 +181,9 @@ public class FileCopyTask extends FileTask {
         }
         OutputStream outputStream=null;InputStream inputStream=null;
         try {
+            if (null!=onProgressChange){
+                onProgressChange.onFileProgressChange(fromFile,toFile,new TaskProgress().setTitle(fromFile.getName()));
+            }
             if (fromFile.isDirectory()){//Is folder
                 Response<File> response=createFolder(toFile);
                 response=null!=response?response:new Response<File>().set(Code.CODE_FAIL,
@@ -212,7 +213,11 @@ public class FileCopyTask extends FileTask {
                                 setSep(child.getSep()).setParent(toPath),onProgressChange);
                         childResponse=null!=childResponse?childResponse:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
                         if (!(childResponse instanceof Response)||!((Response)childResponse).isSucceed()){
-                            Debug.W("Fail copy file while children copy fail.path="+fromPath);
+                            if (childResponse instanceof ConfirmResult){
+                                Debug.W("Children copy need confirm.path="+fromPath);
+                            }else{
+                                Debug.W("Fail copy file while children copy fail.path="+fromPath);
+                            }
                             break;
                         }
                     }
@@ -230,19 +235,10 @@ public class FileCopyTask extends FileTask {
                 return new Response(childOutputResponse.getCode(Code.CODE_FAIL),childOutputResponse.getMessage());
             }
             Debug.D("Succeed open file copy output stream."+toPath);
-            long openLength=outputStream.getOpenLength();
-            if (openLength>0&&isConfirmEnabled()){//Need confirm
-                return new ConfirmResult() {
-                    @Override
-                    protected Confirm onCreate(Context context) {
-                        return new Confirm().setTitle("确认覆盖?").setOnConfirm((boolean confirm)->
-                                null!=enableConfirm(!confirm)?FileCopyTask.this:FileCopyTask.this);
-                    }
-                };
-            }
+            final long outputOpenLength=outputStream.getOpenLength();
             //
             Debug.D("To open file copy input stream."+fromPath);
-            Response<InputStream> childInputResponse=openInputStream(openLength,fromFile);
+            Response<InputStream> childInputResponse=openInputStream(outputOpenLength,fromFile);
             inputStream=null!=childInputResponse?childInputResponse.getData():null;
             if (null==inputStream){
                 Debug.W("Fail execute file copy task while open input stream fail.");
@@ -251,10 +247,25 @@ public class FileCopyTask extends FileTask {
                 Debug.W("Fail execute file copy task while open input stream fail.");
                 return new Response(childInputResponse.getCode(Code.CODE_FAIL),childInputResponse.getMessage());
             }
+            if (outputOpenLength>0){
+                if (inputStream.getTotal()==outputOpenLength){
+                    Debug.W("Not need execute file copy task while already done.");
+                    return new Response(Code.CODE_ALREADY,"Already done.");
+                }else if (isConfirmEnabled()){//Need confirm
+                    return new ConfirmResult() {
+                        @Override
+                        protected Confirm onCreate(Context context) {
+                            return new Confirm().setMessage(getString(context, R.string.areYourSureWhich,
+                                    getString(context,R.string.replace)+" "+toFile.getName())+
+                                    "\n"+toPath).setOnConfirm((boolean confirm)->
+                                    null!=enableConfirm(!confirm)?FileCopyTask.this:FileCopyTask.this);
+                        }
+                    };
+                }
+            }
             byte[] buffer=mBuffer;
-            buffer=null!=buffer?buffer:(mBuffer=new byte[1024*1024]);
-            notifyProgress();
-            return new StreamCopyTask(inputStream,outputStream,buffer,null).
+            buffer=null!=buffer?buffer:(mBuffer=new byte[1024]);
+            return new StreamCopyTask(inputStream,outputStream,buffer,null).setName(fromFile.getName()).
                     execute(null!=onProgressChange?(Task task, Progress progress)->
                             onProgressChange.onFileProgressChange(fromFile,toFile,progress):null);
         }catch (Exception e){
