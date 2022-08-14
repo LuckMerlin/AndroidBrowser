@@ -13,13 +13,16 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
+import com.luckmerlin.browser.task.AndroidFileStream;
 import com.luckmerlin.browser.task.FileCopyTask;
+import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
+import com.luckmerlin.task.TaskGroup;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -102,19 +105,27 @@ public class ConveyorActivityModel extends BaseModel implements
 //                executor.execute(streamCopyTask,null);
 //            }
 
+
+            FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
+//                    (new File("/sdcard/Test")),LocalClient.createLocalFile
+                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
+                    (new File("/sdcard/Test2")),null);
+            mConveyorListAdapter.add(copyTask);
+            executor.execute(copyTask,null);
+
             for (int i = 0; i < 1; i++) {
-                FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
-                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
-                mConveyorListAdapter.add(copyTask);
-                executor.execute(copyTask,null);
+//                FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
+//                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
+//                mConveyorListAdapter.add(copyTask);
+//                executor.execute(copyTask,null);
             }
             //
 //            TaskGroup group=new TaskGroup(null);
 //            group.setName("删除群组");
 //            for (int i = 0; i < 100; i++) {
-//                FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
+//                FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLocalFile
 //                        (new File("/sdcard/test"+i+".png")),null);
-//                group.add(deleteTask.enableConfirm(true));
+//                group.add(deleteTask.enableConfirm(false));
 //            }
 //            mConveyorListAdapter.add(group);
 //            executor.execute(group,null);

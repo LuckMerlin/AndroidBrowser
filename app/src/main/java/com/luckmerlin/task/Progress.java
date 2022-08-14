@@ -6,6 +6,10 @@ public interface Progress {
     String getTitle();
     String getSpeed();
 
+    default Progress getSubProgress(){
+        return null;
+    }
+
     default int intValue(){
         long total=getTotal();
         long pos=getPosition();

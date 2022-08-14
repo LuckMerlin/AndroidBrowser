@@ -16,12 +16,16 @@ public class StreamCopier {
         int bufferLength=buffer.length;
         int read=-1;long total=inputStream.length();
         Debug.D("Copy stream from into output."+outputStream.getTotal()+"/"+total);
+        long time=System.currentTimeMillis();long lastTime=time;long speed=0;
         while ((read=inputStream.read(buffer,0,bufferLength))>=0){
             if (read<=0){
                 continue;
             }
             outputStream.write(buffer,0,read);
-            if (null==progressChange||progressChange.onProgressChange(outputStream.getTotal(),total,0)){
+            time=System.currentTimeMillis();
+            speed=lastTime>time?read/time-lastTime:speed;
+            lastTime=time;
+            if (null==progressChange||progressChange.onProgressChange(outputStream.getTotal(),total,speed)){
                 continue;
             }
             return false;

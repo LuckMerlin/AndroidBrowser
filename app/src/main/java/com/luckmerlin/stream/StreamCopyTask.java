@@ -12,9 +12,15 @@ import com.luckmerlin.utils.Utils;
 public class StreamCopyTask extends AbstractTask {
     private final InputStream mInputStream;
     private final OutputStream mOutputStream;
+    private final byte[] mBuffer;
 
     public StreamCopyTask(InputStream inputStream, OutputStream outputStream, Progress progress) {
+        this(inputStream,outputStream,null,progress);
+    }
+
+    public StreamCopyTask(InputStream inputStream, OutputStream outputStream,byte[] buffer, Progress progress) {
         super(progress);
+        mBuffer=buffer;
         mInputStream=inputStream;
         mOutputStream=outputStream;
     }
@@ -52,9 +58,12 @@ public class StreamCopyTask extends AbstractTask {
             }
             Debug.D("Opened copy task input stream.inputTotal="+inputTotal);
             Debug.D("Coping stream task.openLength="+openLength+" inputTotal="+inputTotal);
-            if (!new StreamCopier().copy(inputStream, outputStream, new byte[1024],
+            byte[] buffer=mBuffer;
+            buffer=null!=buffer&&buffer.length>0?buffer:new byte[1024];
+            if (!new StreamCopier().copy(inputStream, outputStream,buffer,
                     (long current, long total, long speed) ->{
-                        progress.setPosition(current).setTotal(total).setSpeed(""+speed).setTitle(inputTitle);
+                        progress.setPosition(current).setTotal(total).
+                                setSpeed(""+speed).setTitle(inputTitle);
                         notifyProgress(progress);
                         return (canceled[0]=isCanceled())?false:true;
                     })){

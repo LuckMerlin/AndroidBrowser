@@ -5,6 +5,7 @@ public final class TaskProgress implements Progress{
     private long mPosition;
     private String mTitle;
     private String mSpeed;
+    private Progress mSubProgress;
 
     public TaskProgress setPosition(long mPosition) {
         this.mPosition = mPosition;
@@ -24,6 +25,16 @@ public final class TaskProgress implements Progress{
     public TaskProgress setTotal(long mTotal) {
         this.mTotal = mTotal;
         return this;
+    }
+
+    public TaskProgress setSubProgress(Progress subProgress) {
+        this.mSubProgress = subProgress;
+        return this;
+    }
+
+    @Override
+    public final Progress getSubProgress() {
+        return mSubProgress;
     }
 
     @Override

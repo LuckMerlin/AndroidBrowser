@@ -18,4 +18,5 @@ public abstract class FileTask extends AbstractTask{
     public final boolean isConfirmEnabled() {
         return mConfirmEnabled;
     }
+
 }

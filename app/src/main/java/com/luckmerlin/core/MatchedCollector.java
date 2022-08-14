@@ -24,14 +24,16 @@ public class MatchedCollector<T> implements Matcher<T>{
 
     @Override
     public final Boolean match(T data) {
-        if (mLimit<=0){
+        int limit=mLimit;
+        limit=limit<0?Integer.MAX_VALUE:limit;
+        if (limit==0){
             return null;
         }
         Boolean matchedBool=null!=data? onMatch(data):false;
         if (null!=matchedBool&&matchedBool){
             List<T> matched=mMatched;
             (matched=null!=matched?matched:(mMatched=new ArrayList<>())).add(data);
-            if (matched.size()>=mLimit){
+            if (matched.size()>=limit){
                 return null;
             }
         }
