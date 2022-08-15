@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
 import com.luckmerlin.browser.file.File;
+import com.luckmerlin.browser.file.Mode;
 import com.merlin.adapter.PageListAdapter;
 import java.util.List;
 
 public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();
     private ObservableField<Boolean> mPageLoading=new ObservableField<Boolean>();
+    private Mode mMode;
 
     protected BrowserListAdapter(PageLoader<BrowseQuery,File> pageLoader) {
         setPageLoader(pageLoader);
@@ -52,6 +54,39 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return false;
     }
 
+    public final boolean setMode(Mode mode){
+        mMode=mode;
+        notifyAttachedItemChanged();
+        return true;
+    }
+
+    public final boolean selectFile(File file){
+        Mode current=mMode;
+        int index= null!=file&&null!=current?indexPosition(file):-1;
+        if (index>=0){
+            current.add(file);
+            notifyItemChanged(index,"SelectFile.");
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean unSelectFile(File file){
+        Mode current=mMode;
+        int index= null!=file&&null!=current?indexPosition(file):-1;
+        if (index>=0){
+            current.remove(file);
+            notifyItemChanged(index,"UnselectFile.");
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean isSelectedFile(File file){
+        Mode current=null!=file?mMode:null;
+        return null!=current&&current.isContains(file);
+    }
+
     @Override
     protected void onPageLoadingChange(boolean loading) {
         super.onPageLoadingChange(loading);
@@ -73,13 +108,11 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             File file=getItem(position);
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
-//            fileBinding.setMode();
+            Mode mode=mMode;
+            fileBinding.setMode(mode);
+            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
         }
-    }
-
-    public boolean isAllChoose(){
-        return false;
     }
 
     public ObservableField<Boolean> getPageLoading() {

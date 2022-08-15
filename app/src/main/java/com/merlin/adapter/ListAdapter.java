@@ -114,6 +114,27 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return addAll(Integer.MAX_VALUE,data);
     }
 
+    public final boolean notifyAttachedItemChanged(){
+        Map<T,OnChangeUpdate> attachViewHolders=mAttachViewHolders;
+        Set<T> set=null!=attachViewHolders?attachViewHolders.keySet():null;
+        if (null!=set){
+            for (T child:set) {
+                notifyFirstItemChanged(child);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean notifyFirstItemChanged(Object object){
+        int index=null!=object?indexPosition(object):null;
+        if (index>=0){
+            notifyItemChanged(index,"NotifyFirst");
+            return true;
+        }
+        return false;
+    }
+
     public final boolean addAll(int start,List<T> data){
         int size=null!=data?data.size():-1;
         if (size>0){

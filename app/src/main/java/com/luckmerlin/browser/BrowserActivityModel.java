@@ -151,6 +151,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return true;
         }
         mBrowserMode.set(mode);
+        mBrowserAdapter.setMode(mode);
         return true;
     }
 
@@ -189,6 +190,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return startActivity(ConveyorActivity.class)||true;
             case R.string.create:
                 return createFile()||true;
+            case R.drawable.selector_checkbox:
+                return null!=obj&&obj instanceof File&&toggleSelectFile((File)obj);
+            case R.drawable.selector_choose_none:
+            case R.drawable.selector_choose_all:
+                Mode mode=mBrowserMode.get();
+                return null!=mode&&mode.enableAll(!mode.isAllEnabled())&&mBrowserAdapter.setMode(mode);
             case R.string.exit:
                 return finishActivity()||true;
         }
@@ -208,6 +215,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         windowDialog.setContentView(content);
         return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+    }
+
+    private boolean toggleSelectFile(File file){
+        BrowserListAdapter listAdapter=null!=file?mBrowserAdapter:null;
+        return null!=listAdapter&&listAdapter.isSelectedFile(file)?listAdapter.unSelectFile(file): listAdapter.selectFile(file);
     }
 
     private boolean createFile(){

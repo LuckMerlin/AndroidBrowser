@@ -17,7 +17,7 @@
             android:layout_gravity="center_vertical" android:gravity="center_vertical"
             android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
 
-            <ImageView android:src="@drawable/selector_back" binding:bind="@{VB.clickId(R.drawable.selector_back)}"
+            <ImageView binding:bind="@{VB.create(R.drawable.selector_back)}"
                 android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
                 android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
 
@@ -40,11 +40,7 @@
                     <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </LinearLayout>
-            <!--                binding:lmBinding="@{Touch.imageRes(vm.browserAdapter.browserMode.isMode(Mode.MODE_MULTI_CHOOSE)?vm.browserAdapter.isAllChoose?
-R.drawable.selector_choose_none:R.drawable.selector_choose_all:
-R.drawable.selector_menu,null,Touch.CLICK)}" -->
-            <ImageView android:src="@{vm.browserMode==null?@drawable/selector_menu:@drawable/selector_cancel}"
-                binding:bind="@{VB.create(vm.browserMode==null?R.drawable.selector_menu:R.drawable.selector_cancel)}"
+            <ImageView binding:bind="@{VB.create(vm.browserMode==null?R.drawable.selector_menu:R.drawable.selector_cancel)}"
                 android:layout_width="30dp" android:layout_height="30dp"/>
         </LinearLayout>
         <TextView android:text="@{vm.notifyText??``}" android:singleLine="true" android:textColor="#fff"

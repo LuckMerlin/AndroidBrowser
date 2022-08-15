@@ -9,6 +9,7 @@
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
         <import type="com.luckmerlin.browser.utils.Time"/>
+        <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.BrowserBinding" alias="BB"/>
@@ -39,7 +40,8 @@
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
                 </LinearLayout>
             </LinearLayout>
-            <CheckBox android:layout_gravity="center_vertical|right" android:checked="@{selected}"
+            <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,path)}" android:button="@drawable/selector_checkbox"
+                android:layout_gravity="center_vertical|right" android:checked="@{selected}"
                 android:visibility="@{mode.isMode(Mode.MODE_MULTI_CHOOSE)?View.VISIBLE:View.INVISIBLE}"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </FrameLayout>

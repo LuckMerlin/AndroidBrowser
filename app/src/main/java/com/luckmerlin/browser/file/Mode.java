@@ -15,6 +15,7 @@ public final class Mode {
     private ArrayList mArgs;
     private final int mMode;
     private Map<String,String> mExtra;
+    private boolean mAllEnabled;
 
     public Mode(int mode){
         this(mode,null);
@@ -23,6 +24,27 @@ public final class Mode {
     public Mode(int mode, ArrayList<File> args){
         mMode=mode;
         mArgs=args;
+    }
+
+    public boolean isContains(Object arg){
+        ArrayList<Object> args=null!=arg?mArgs:null;
+        if (null!=args){
+            synchronized (args){
+               return args.contains(arg);
+            }
+        }
+        return false;
+    }
+
+
+    public Mode remove(Object arg){
+        ArrayList<Object> args=null!=arg?mArgs:null;
+        if (null!=args){
+            synchronized (args){
+                args.remove(arg);
+            }
+        }
+        return this;
     }
 
     public Mode add(Object arg){
@@ -73,6 +95,18 @@ public final class Mode {
             }
         }
         return this;
+    }
+
+    public boolean enableAll(boolean enable){
+        if (mAllEnabled!=enable){
+            mAllEnabled=enable;
+            return true;
+        }
+        return false;
+    }
+
+    public final boolean isAllEnabled(){
+        return mAllEnabled;
     }
 
     public final boolean isMode(int... modes){

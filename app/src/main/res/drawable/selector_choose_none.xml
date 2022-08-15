@@ -7,5 +7,5 @@
         android:state_pressed = "true"
         android:drawable = "@drawable/choose_all_normal"/>
 
-    <item android:drawable = "@drawable/choose_none_normal" />
+    <item android:drawable = "@drawable/choose_all_normal" />
 </selector>
