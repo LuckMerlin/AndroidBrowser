@@ -66,8 +66,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     public final boolean setData(List<T> data){
-        List<T> current=mDataList;
-        int currentSize=null!=current?current.size():0;
+        int currentSize=getItemCount();
         mDataList=null!=data?new ArrayList<>(data):null;
         int dataSize=null!=data?data.size():0;
         if (currentSize>dataSize){
@@ -75,7 +74,9 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         }else if (currentSize<dataSize){
             notifyItemRangeInserted(currentSize,dataSize-currentSize);
         }
-        notifyItemRangeChanged(0,currentSize,"ItemData");
+        if (currentSize>0){
+            notifyItemRangeChanged(0,currentSize,"ItemData");
+        }
         return true;
     }
 
@@ -289,8 +290,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         View view=null!=viewHolder?viewHolder.itemView:null;
         if (null!=view&&view.getLayoutParams()==null){
             ViewGroup.LayoutParams params=onCreateViewHolderLayoutParams(parent,viewType,viewHolder);
-            params=null!=params?params:new ViewGroup.LayoutParams
-                    (ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            if (null==params){
+                params=new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        viewType==VIEW_TYPE_EMPTY?ViewGroup.LayoutParams.MATCH_PARENT:ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
             view.setLayoutParams(params);
         }
     }
@@ -394,7 +397,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     @Override
     protected final T getItem(int position) {
         List<T> dataList=mDataList;
-        return null!=dataList&&dataList.size()>position?dataList.get(position):null;
+        return position>=0&&null!=dataList&&dataList.size()>position?dataList.get(position):null;
     }
 
     @Override

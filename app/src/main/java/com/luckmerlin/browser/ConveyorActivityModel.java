@@ -13,16 +13,13 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
-import com.luckmerlin.browser.task.AndroidFileStream;
 import com.luckmerlin.browser.task.FileCopyTask;
-import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskGroup;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -106,11 +103,18 @@ public class ConveyorActivityModel extends BaseModel implements
 //            }
 
 
-            FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
+//            FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
+////                    (new File("/sdcard/Test")),LocalClient.createLocalFile
+//                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
+//                    (new File("/sdcard/Test2")),null);
+//            copyTask.setName("任务名字");
+
+        FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
 //                    (new File("/sdcard/Test")),LocalClient.createLocalFile
-                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
-                    (new File("/sdcard/Test2")),null);
+        (new File("/sdcard/TestNew/ddd.mp3")),LocalClient.createLocalFile
+                    (new File("/sdcard/TestNew/我们.mp3")),null);
             copyTask.setName("任务名字");
+
             mConveyorListAdapter.add(copyTask);
             executor.execute(copyTask,null);
 

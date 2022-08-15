@@ -1,6 +1,8 @@
 package com.luckmerlin.browser.client;
 
 import android.os.Environment;
+import android.os.FileUtils;
+import android.webkit.MimeTypeMap;
 
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
@@ -12,27 +14,18 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.debug.Debug;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 public class LocalClient extends AbstractClient {
-    private String mRootPath=Environment.getDataDirectory().getAbsolutePath()+"/../";
+    private String mRootPath="/sdcard";
 
     @Override
     public String getName() {
         return "Local";
-    }
-
-    @Override
-    public long getAvailable() {
-        return 0;
-    }
-
-    @Override
-    public long getTotal() {
-        return 0;
     }
 
     @Override
@@ -72,6 +65,7 @@ public class LocalClient extends AbstractClient {
             return false;
         });
         Folder folder= new Folder(createLocalFile(browserFile));
+        folder.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
         //
         final Comparator<File> comparator=(File file1, File file2)-> {
             boolean directory1=file1.isDirectory();
@@ -117,9 +111,9 @@ public class LocalClient extends AbstractClient {
             java.io.File[] files=file.listFiles();
             total=null!=files?files.length:0;
         }
-        return new File().setTotal(total).setLength(file.length()).setMime("text/css").
-                setSep(java.io.File.separator).
-                setModifyTime(file.lastModified()).
-                setParent(file.getParent()).setName(file.getName());
+        String parent=file.getParent();
+        parent=null!=parent?parent: java.io.File.separator;
+        return new File().setTotal(total).setLength(file.length()).setSep(java.io.File.separator).
+                setModifyTime(file.lastModified()).setParent(parent).setName(file.getName());
     }
 }

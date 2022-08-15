@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.file;
 
+import android.webkit.MimeTypeMap;
+
 import androidx.annotation.Nullable;
 
 import com.luckmerlin.browser.Label;
@@ -38,7 +40,13 @@ public class File extends JsonObject{
     }
 
     public String getMime(){
-        return optString(Label.LABEL_MIME,null);
+        String mime=optString(Label.LABEL_MIME,null);
+        if (!isDirectory()&&(null==mime||mime.length()<=0)){
+            mime=getName();
+            mime= null!=mime&&mime.length()>0?MimeTypeMap.getFileExtensionFromUrl(mime):null;
+            mime=null!=mime&&mime.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(mime):null;
+        }
+        return mime;
     }
 
     public File setMime(String mime){

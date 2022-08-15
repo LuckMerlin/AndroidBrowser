@@ -21,4 +21,6 @@ public interface Label {
     String LABEL_PARENT = "parent";
     String LABEL_CHILDREN = "children";
     String LABEL_SEP= "sep";
+    String LABEL_AVAILABLE= "available";
+    String LABEL_TOTAL= "total";
 }

@@ -29,13 +29,14 @@ import com.luckmerlin.object.Parser;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
+import com.merlin.model.OnBackPress;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
-        OnClickListener, OnLongClickListener {
+        OnClickListener, OnLongClickListener, OnBackPress {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
@@ -84,7 +85,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
 //        showBrowserContextMenu(activity);
 //        createFile();
-        startActivity(ConveyorActivity.class);
+//        startActivity(ConveyorActivity.class);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);
@@ -116,6 +117,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
         return null!=adapter&&adapter.reset(new BrowseQuery(path,searchInput),null);
+    }
+
+    @Override
+    public final boolean onBackPressed() {
+        return browserBack();
     }
 
     @Override

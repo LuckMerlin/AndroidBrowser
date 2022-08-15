@@ -25,6 +25,22 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         return setArraySafe(this,Label.LABEL_CHILDREN,children);
     }
 
+    public final long getAvailableVolume(){
+        return optLong(Label.LABEL_AVAILABLE);
+    }
+
+    public final long getTotalVolume(){
+        return optLong(Label.LABEL_TOTAL);
+    }
+
+    public Folder setAvailableVolume(long children){
+        return putSafe(this,Label.LABEL_AVAILABLE,children);
+    }
+
+    public Folder setTotalVolume(long children){
+        return putSafe(this,Label.LABEL_TOTAL,children);
+    }
+
     public final boolean isEmpty(){
         JsonArray array=getChildrenArray();
         return null==array||array.length()<=0;
