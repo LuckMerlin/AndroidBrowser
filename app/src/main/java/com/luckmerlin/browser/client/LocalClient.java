@@ -1,9 +1,5 @@
 package com.luckmerlin.browser.client;
 
-import android.os.Environment;
-import android.os.FileUtils;
-import android.webkit.MimeTypeMap;
-
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.File;
@@ -12,9 +8,10 @@ import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.object.Parser;
 
-import java.io.IOException;
-import java.nio.file.Path;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,23 +26,20 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Canceler loadFiles(BrowseQuery query, File from, int pageSize, OnFinish<Reply<Folder>> callback) {
+    public Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize) {
         String pathValue=null!=query?query.mFolderPath:null;
         String browserPath=null!=pathValue&&pathValue.length()>0?pathValue:mRootPath;
         final java.io.File browserFile=null!=browserPath&&browserPath.length()>0?new java.io.File(browserPath):null;
         final Reply<Folder> reply=new Reply<>();
         if (null==browserFile){
             Debug.W("Can't load client while query file invalid."+browserPath);
-            notifyFinish(reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file invalid."),callback);
-            return null;
+            return reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file invalid.");
         }else if (!browserFile.exists()){
             Debug.W("Can't load client while query file not exist."+browserPath);
-            notifyFinish(reply.setCode(Code.CODE_NOT_EXIST).setMessage("Query file not exist."),callback);
-            return null;
+            return reply.setCode(Code.CODE_NOT_EXIST).setMessage("Query file not exist.");
         }else if (!browserFile.isDirectory()){
             Debug.W("Can't load client while query file not directory.");
-            notifyFinish(reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file not directory."),callback);
-            return null;
+            return reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file not directory.");
         }
         String filterName=null!=query?query.mSearchInput:null;
         Debug.D("Loading local client.name="+filterName+" from="+(null!=from?from.getName():"")+" path="+browserPath);
@@ -88,8 +82,8 @@ public class LocalClient extends AbstractClient {
         }else{
             folder.setChildren(files);
         }
-        notifyFinish(reply.setCode(Code.CODE_SUCCEED).setMessage("Succeed").setData(folder), callback);
-        return ()->false;
+        Debug.D("Finish load local client.name="+filterName+" from="+(null!=from?from.getName():"")+" path="+browserPath);
+        return reply.setCode(Code.CODE_SUCCEED).setMessage("Succeed").setData(folder);
     }
 
     @Override
@@ -97,26 +91,32 @@ public class LocalClient extends AbstractClient {
         if (null==parent||!parent.isLocalFile()||!parent.isDirectory()||null==name||name.length()<=0||
                 name.contains(java.io.File.separator)){
             Debug.W("Fail create file while parent or name invalid.parent="+parent+" name="+name);
+            notifyFinish(new Reply<File>().set(Code.CODE_ARGS_INVALID,"Parent or name invalid",null),onFinish);
             return null;
         }
         String path=parent.getPath();
         if (null==path||path.length()<=0){
             Debug.W("Fail create file while path invalid.path="+path);
+            notifyFinish(new Reply<File>().set(Code.CODE_ARGS_INVALID,"Path invalid",null),onFinish);
             return null;
         }
         java.io.File file=new java.io.File(path,name);
         if (file.exists()) {
             Debug.W("Fail create file while already exist.");
+            notifyFinish(new Reply<File>().set(Code.CODE_EXIST,"Already exist",null),onFinish);
             return null;
         }
         try {
             boolean succeed=isDir?file.mkdir():file.createNewFile();
             Reply<File> reply=file.exists()?new Reply<File>().set(Code.CODE_SUCCEED,null,
-                    createLocalFile(file)):new Reply<File>().set(Code.CODE_FAIL,"Fail",null);
+                    createLocalFile(file)).parser((from)->null!=from?new File(from):null)
+                    :new Reply<File>().set(Code.CODE_FAIL,"Fail",null);
+            Debug.D("Finish create file."+succeed+" "+file);
             notifyFinish(reply,onFinish);
             return ()->false;
         }catch (Exception e){
             Debug.W("Exception create file.e="+e);
+            notifyFinish(new Reply<File>().set(Code.CODE_ERROR,"Exception.e="+e,null),onFinish);
             return null;
         }
     }

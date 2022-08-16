@@ -5,6 +5,7 @@ import android.os.Looper;
 
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.MatcherInvoker;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 
 import java.util.List;
@@ -19,9 +20,16 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     private ExecutorService mExecutor;
     private boolean mFullExecuting=false;
     private final Handler mHandler=new Handler(Looper.getMainLooper());
+    private final TaskSaver mTaskSaver;
 
     public TaskExecutor(){
-        mExecutor=new ThreadPoolExecutor(0, 4,
+        this(null);
+    }
+
+    public TaskExecutor(TaskSaver taskSaver){
+        mTaskSaver=taskSaver;
+        final int maxPoolSize=4;
+        ThreadPoolExecutor poolExecutor=new ThreadPoolExecutor(0, maxPoolSize,
                 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), (Runnable r) -> {
             Thread thread = new Thread(r);
             thread.setName("TaskExecutorTask");
@@ -38,6 +46,19 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 }
             }
         });
+        mExecutor=poolExecutor;
+        if (null!=taskSaver){
+            poolExecutor.setMaximumPoolSize(1);
+            execute(new AbstractTask(null){
+                @Override
+                protected Result onExecute() {
+                    taskSaver.load((Task data)-> null!=data&&TaskExecutor.this.
+                            execute(data,true,null)&&false);
+                    poolExecutor.setMaximumPoolSize(maxPoolSize);
+                    return null;
+                }
+            });
+        }
     }
 
     public final boolean execute(Task task){
@@ -45,6 +66,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     public final boolean execute(Task task,OnProgressChange callback){
+        return execute(task,false,callback);
+    }
+
+    private final boolean execute(Task task,boolean insertFirst,OnProgressChange callback){
         if (null==task){
             Debug.E("Fail execute task while task is invalid.");
             return false;
@@ -64,8 +89,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             executeTask=new ExecuteTask(task,callback) {
                 @Override
                 public void run() {
+                    TaskSaver taskSaver=mTaskSaver;
+                    if (!insertFirst&&task instanceof OnTaskSave&&null!=taskSaver&&((OnTaskSave)task).
+                            onTaskSave(TaskExecutor.this)){
+                        taskSaver.save(task);
+                    }
                     setStatus(ExecuteTask.STATUS_EXECUTING);
-                    if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).onExecuteStart(TaskExecutor.this)){
+                    if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).
+                            onExecuteStart(TaskExecutor.this)){
                         mTask.execute(mCallback);
                     }
                     setStatus(ExecuteTask.STATUS_FINISH);
@@ -87,7 +118,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     },-1);
                 }
             }.setStatus(ExecuteTask.STATUS_PENDING);
-            mQueue.add(executeTask);
+            if (insertFirst){
+                mQueue.add(0,executeTask);
+            }else{
+                mQueue.add(executeTask);
+            }
         }
         //
         if (!executeTask.isStatus(ExecuteTask.STATUS_PENDING,ExecuteTask.

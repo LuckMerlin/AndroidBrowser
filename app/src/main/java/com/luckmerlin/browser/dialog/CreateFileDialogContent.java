@@ -17,8 +17,9 @@ public abstract class CreateFileDialogContent extends BaseContent implements OnC
     private Client mClient;
     private File mParent;
 
-    public CreateFileDialogContent(Client client){
+    public CreateFileDialogContent(Client client,File parent){
         mClient=client;
+        mParent=parent;
     }
 
     @Override
@@ -56,9 +57,7 @@ public abstract class CreateFileDialogContent extends BaseContent implements OnC
             return toast(getString(R.string.inputEmpty))&&false;
         }
         Boolean createDir=mCreateDir.get();
-        final String finalInputName=inputName;
-        return null!=client.createFile(mParent, inputName, null != createDir && createDir, (Reply<File> reply)-> {
-            onCreate(reply);
-        });
+        return null!=client.createFile(mParent, inputName, null != createDir && createDir,
+                (Reply<File> reply)->onCreate(reply));
     }
 }

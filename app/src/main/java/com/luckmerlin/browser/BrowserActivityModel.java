@@ -69,7 +69,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mBrowserClient.set(new LocalClient());
 //        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
-        mNotifyText.set("发撒代发撒旦法大大撒");
+        mNotifyText.set("LMBrowser");
 //        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         //
         JSONObject json=new JSONObject();
@@ -107,7 +107,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private Canceler loadFiles(BrowseQuery args, File from, int pageSize,OnFinish<Reply<Folder>> callback){
         Client client=getClient();
-        return null!=client?client.loadFiles(args,from,pageSize,callback):null;
+        if (null==client){
+            return null;
+        }
+        execute(()->{
+            Reply<Folder> reply=client.loadFiles(args,from,pageSize);
+            post(()->notifyFinish(reply,callback));
+        });
+        return ()->false;
     }
 
     private boolean browserPath(String path){
@@ -222,11 +229,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean createFile(){
         Client client=mBrowserClient.get();
-        return null!=showContentDialog(new CreateFileDialogContent(client){
+        return null!=showContentDialog(new CreateFileDialogContent(client,mCurrentFolder.get()){
             @Override
             protected void onCreate(Reply<File> reply) {
                 boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
-                toast(getString(succeed?R.string.succeed:R.string.fail));
+                toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
                 if(succeed){
                     mBrowserAdapter.reset(null);
                 }

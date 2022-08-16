@@ -10,7 +10,17 @@ import com.luckmerlin.core.Matcher;
 import java.util.List;
 
 public class TaskExecutorService extends Service {
-    private ExecutorBinder mExecutorBinder=new ExecutorBinder(new TaskExecutor());
+    private ExecutorBinder mExecutorBinder=new ExecutorBinder(new TaskExecutor(new TaskSaver() {
+        @Override
+        public void load(Matcher<Task> matcher) {
+
+        }
+
+        @Override
+        public void save(Task task) {
+
+        }
+    }));
 
     @Override
     public IBinder onBind(Intent intent) {

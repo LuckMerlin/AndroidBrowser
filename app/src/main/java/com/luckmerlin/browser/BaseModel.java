@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.ViewGroup;
 
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.luckmerlin.http.Http;
@@ -13,9 +14,24 @@ import com.luckmerlin.http.Request;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.LayoutParamsResolver;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+
 public abstract class BaseModel extends BaseContent {
     private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.9:5001");
     private WindowContentDialog mWindowDialog;
+    private static ExecutorService mExecutor= Executors.newCachedThreadPool((Runnable r)-> {
+        Thread thread = new Thread(r);
+        thread.setName("ModelExecutor");
+        return thread;
+    });
+
+    public final <T> void notifyFinish(T data, OnFinish<T> callback){
+        if (null!=callback){
+            callback.onFinish(data);
+        }
+    }
 
     public final <T> Canceler request(Request<T> request){
         return mHttp.request(request);
@@ -27,6 +43,15 @@ public abstract class BaseModel extends BaseContent {
 
     public final Http getHttp() {
         return mHttp;
+    }
+
+    public static boolean execute(Runnable runnable){
+        ExecutorService service=mExecutor;
+        if (null!=service&&null!=runnable){
+            service.execute(runnable);
+            return true;
+        }
+        return false;
     }
 
     public final WindowContentDialog showContentDialog(Content content,LayoutParamsResolver resolver){

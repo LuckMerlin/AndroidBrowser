@@ -109,7 +109,8 @@ public class ConveyorActivityModel extends BaseModel implements
 //                    (new File("/sdcard/Test2")),null);
 //            copyTask.setName("任务名字");
 
-        FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
+        FileCopyTask copyTask=null;
+        copyTask=new FileCopyTask(LocalClient.createLocalFile
 //                    (new File("/sdcard/Test")),LocalClient.createLocalFile
         (new File("/sdcard/TestNew/ddd.mp3")),LocalClient.createLocalFile
                     (new File("/sdcard/TestNew/我们.mp3")),null);
@@ -119,10 +120,10 @@ public class ConveyorActivityModel extends BaseModel implements
             executor.execute(copyTask,null);
 
             for (int i = 0; i < 1; i++) {
-//                FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
-//                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
-//                mConveyorListAdapter.add(copyTask);
-//                executor.execute(copyTask,null);
+                copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
+                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
+                mConveyorListAdapter.add(copyTask);
+                executor.execute(copyTask,null);
             }
             //
 //            TaskGroup group=new TaskGroup(null);
