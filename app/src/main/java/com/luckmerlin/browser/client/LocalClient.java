@@ -94,7 +94,31 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public Canceler createFile(File parent, String name, boolean isDir, OnFinish<Reply<File>> onFinish) {
-        return null;
+        if (null==parent||!parent.isLocalFile()||!parent.isDirectory()||null==name||name.length()<=0||
+                name.contains(java.io.File.separator)){
+            Debug.W("Fail create file while parent or name invalid.parent="+parent+" name="+name);
+            return null;
+        }
+        String path=parent.getPath();
+        if (null==path||path.length()<=0){
+            Debug.W("Fail create file while path invalid.path="+path);
+            return null;
+        }
+        java.io.File file=new java.io.File(path,name);
+        if (file.exists()) {
+            Debug.W("Fail create file while already exist.");
+            return null;
+        }
+        try {
+            boolean succeed=isDir?file.mkdir():file.createNewFile();
+            Reply<File> reply=file.exists()?new Reply<File>().set(Code.CODE_SUCCEED,null,
+                    createLocalFile(file)):new Reply<File>().set(Code.CODE_FAIL,"Fail",null);
+            notifyFinish(reply,onFinish);
+            return ()->false;
+        }catch (Exception e){
+            Debug.W("Exception create file.e="+e);
+            return null;
+        }
     }
 
     @Override

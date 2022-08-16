@@ -81,6 +81,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
         return null!=pageLoader?pageLoader.onPageLoad(args,from,pageSize,callback):null;
     }
 
+    public final boolean reset(OnPageLoadListener<T> callback){
+        return reset(mArgs,callback);
+    }
+
     public final boolean reset(A args,OnPageLoadListener<T> callback){
         return reset(args,mPageSize,callback);
     }

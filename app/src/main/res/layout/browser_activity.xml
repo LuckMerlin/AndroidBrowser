@@ -44,7 +44,7 @@
                 android:layout_width="30dp" android:layout_height="30dp"/>
         </LinearLayout>
         <TextView android:text="@{vm.notifyText??``}" android:singleLine="true" android:textColor="#fff"
-            android:textSize="8sp" android:layout_gravity="left"
+            android:textSize="8sp" android:layout_gravity="center"
             android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         <View android:paddingLeft="5dp" android:paddingRight="5dp"

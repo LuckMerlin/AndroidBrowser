@@ -69,8 +69,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mBrowserClient.set(new LocalClient());
 //        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
+        mNotifyText.set("发撒代发撒旦法大大撒");
 //        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
-        //
         //
         JSONObject json=new JSONObject();
         try {
@@ -210,10 +210,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean showBrowserContextMenu(Context context){
-        WindowContentDialog windowDialog=new WindowContentDialog(context);
         MenuContextDialogContent content=new MenuContextDialogContent().setTitle(getString(R.string.app_name));
-        windowDialog.setContentView(content);
-        return windowDialog.show(new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        return null!=showContentDialog(content,context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
     }
 
@@ -224,7 +222,16 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean createFile(){
         Client client=mBrowserClient.get();
-        return null!=showContentDialog(new CreateFileDialogContent(client),null);
+        return null!=showContentDialog(new CreateFileDialogContent(client){
+            @Override
+            protected void onCreate(Reply<File> reply) {
+                boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
+                toast(getString(succeed?R.string.succeed:R.string.fail));
+                if(succeed){
+                    mBrowserAdapter.reset(null);
+                }
+            }
+        },null);
     }
 
     private boolean setCurrentAsHome(){

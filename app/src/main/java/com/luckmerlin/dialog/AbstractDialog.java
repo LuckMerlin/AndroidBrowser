@@ -26,6 +26,10 @@ public abstract class AbstractDialog implements Dialog{
             Debug.E("Fail set window dialog content view while context or view invalid."+context);
             return false;
         }
+        View current=mRoot;
+        if (null!=current){
+            removeFromParent(current);
+        }
         mRoot=view;
         return true;
     }
