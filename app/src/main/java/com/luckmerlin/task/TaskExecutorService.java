@@ -62,6 +62,7 @@ public class TaskExecutorService extends Service {
             new File(folder).listFiles((File pathname)-> {
                 Parcelable parcelable=readParcelableFile(pathname);
                 if (null!=parcelable&&parcelable instanceof Task){
+                    pathname.delete();
                     matcher.match((Task)parcelable);
                 }
                 return false;

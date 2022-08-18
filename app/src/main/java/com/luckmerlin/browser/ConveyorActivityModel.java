@@ -114,14 +114,14 @@ public class ConveyorActivityModel extends BaseModel implements
         if (null!=executor){
             executor.setListener(this);
             executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.addTaskWithSort(data.getTask()));
-//            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++) {
 //                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
 //                        (new AndroidFileStream(new File("/sdcard/test.png")),
 //                                new AndroidFileStream(new File(
 //                                        "/sdcard/test"+i+".png")),null);
 //                mConveyorListAdapter.add(streamCopyTask);
 //                executor.execute(streamCopyTask,null);
-//            }
+            }
 
 
 //            FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
@@ -137,7 +137,7 @@ public class ConveyorActivityModel extends BaseModel implements
                     (new File("/sdcard/TestNew/我们.mp3")),null);
             copyTask.setName("任务名字");
 //            mConveyorListAdapter.add(copyTask);
-//            executor.execute(copyTask,null);
+            executor.execute(copyTask,null);
             for (int i = 0; i < 1; i++) {
                 copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
                         LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);

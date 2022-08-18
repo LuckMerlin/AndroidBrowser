@@ -51,7 +51,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         mExecutor=poolExecutor;
         if (null!=taskSaver){
             poolExecutor.setMaximumPoolSize(1);
-            execute(new AbstractTask(null){
+            execute(new InnerTask(){
                 @Override
                 protected Result onExecute() {
                     notifyStatusChange(STATUS_START_LOAD_SAVED,null,mListener);
@@ -162,7 +162,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     @Override
     public void match(Matcher<ExecuteTask> matcher) {
-        match(mQueue,matcher);
+        match(mQueue,null!=matcher?(ExecuteTask data)->
+                null!=data&&!isInnerTask(data.mTask)?matcher.match(data):false:null);
     }
 
     public final boolean post(Runnable runnable, int delay){
@@ -216,7 +217,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     private void notifyStatusChange(int status,Task task,Listener listener){
-        if (null!=listener){
+        if (null!=listener&&!isInnerTask(task)){
             if (listener instanceof OnAddRemoveChangeListener&&(status==STATUS_ADD||status==STATUS_REMOVE)){
                 OnAddRemoveChangeListener changeListener=((OnAddRemoveChangeListener)listener);
                 if (isUiThread()){
@@ -225,6 +226,16 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     post(()->changeListener.onAddRemoveChanged(status,task,TaskExecutor.this),0);
                 }
             }
+        }
+    }
+
+    private boolean isInnerTask(Task task){
+        return null!=task&&task instanceof InnerTask;
+    }
+
+    private static abstract class InnerTask extends AbstractTask {
+        public InnerTask() {
+            super(null);
         }
     }
 }
