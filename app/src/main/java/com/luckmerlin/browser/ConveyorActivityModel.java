@@ -137,7 +137,7 @@ public class ConveyorActivityModel extends BaseModel implements
                     (new File("/sdcard/TestNew/我们.mp3")),null);
             copyTask.setName("任务名字");
 //            mConveyorListAdapter.add(copyTask);
-            executor.execute(copyTask,null);
+//            executor.execute(copyTask,null);
             for (int i = 0; i < 1; i++) {
                 copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
                         LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
@@ -169,12 +169,22 @@ public class ConveyorActivityModel extends BaseModel implements
                 if (null==confirm){
                     return toast(R.string.error,0)||true;
                 }
-                return null!=showContentDialog(new ConfirmDialogContent(confirm){
+                return null!=showContentDialog(new ConfirmDialogContent(confirm).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
+                    Executor executor=confirmed&&null!=confirmObj?mExecutor:null;
+                    if (null!=executor){
+                        executor.execute(task,null);
+                    }
+                }),null);
+            case R.layout.item_conveyor_single:
+            case R.layout.item_conveyor_group:
+                return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.
+                        Confirm().setTitle(getString(R.string.delete)).setMessage(getString
+                        (R.string.areYourSureWhich,getText(R.string.delete)))){
                     @Override
                     protected void onConfirmFinish(boolean confirmed, Object confirmObj) {
                         Executor executor=confirmed&&null!=confirmObj?mExecutor:null;
                         if (null!=executor){
-                            executor.execute(task,null);
+
                         }
                     }
                 },null);

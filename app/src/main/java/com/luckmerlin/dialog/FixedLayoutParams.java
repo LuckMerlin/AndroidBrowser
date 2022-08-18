@@ -74,7 +74,6 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         if (null==size){
             return ViewGroup.LayoutParams.MATCH_PARENT;
         }else if(size instanceof Integer){
-//            Debug.D("AAAAAAAA "+size+" "+max);
             if (max>0){
                 if (((Integer)size)>0&&((Integer)size)>max){
                     return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST);

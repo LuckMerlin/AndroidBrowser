@@ -10,9 +10,19 @@ import com.luckmerlin.task.ConfirmResult;
 
 public class ConfirmDialogContent extends BaseContent implements OnClickListener {
     private ConfirmResult.Confirm mConfirm;
+    private OnConfirmFinish mOnConfirmFinish;
+
+    public interface OnConfirmFinish{
+        void onConfirmFinish(boolean confirmed,Object confirmObj);
+    }
 
     public ConfirmDialogContent(ConfirmResult.Confirm confirmResult){
         mConfirm=confirmResult;
+    }
+
+    public final ConfirmDialogContent setOnConfirmFinish(OnConfirmFinish onConfirmFinish){
+            mOnConfirmFinish=onConfirmFinish;
+            return this;
     }
 
     protected void onConfirmFinish(boolean confirmed,Object confirmObj){
@@ -49,6 +59,10 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         }
         Object obj=null!=onConfirm?onConfirm.onConfirm(confirmed):null;
         onConfirmFinish(confirmed,obj);
+        OnConfirmFinish onConfirmFinish=mOnConfirmFinish;
+        if (null!=onConfirmFinish){
+            onConfirmFinish.onConfirmFinish(confirmed,obj);
+        }
         return true;
     }
 

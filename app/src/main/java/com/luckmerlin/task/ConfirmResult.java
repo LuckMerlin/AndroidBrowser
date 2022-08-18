@@ -10,7 +10,7 @@ public abstract class ConfirmResult implements Result {
         Object onConfirm(boolean confirm);
     }
 
-    public class Confirm{
+    public static class Confirm{
         private String mMessage;
         private String mTitle;
         private OnConfirm mOnConfirmFinish;
