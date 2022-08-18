@@ -85,7 +85,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
 //        showBrowserContextMenu(activity);
 //        createFile();
-//        startActivity(ConveyorActivity.class);
+        startActivity(ConveyorActivity.class);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);

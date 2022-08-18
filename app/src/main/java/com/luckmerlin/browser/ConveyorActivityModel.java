@@ -15,11 +15,13 @@ import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
+import com.luckmerlin.task.TaskExecutor;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -27,9 +29,10 @@ import com.merlin.model.OnBackPress;
 import java.io.File;
 
 public class ConveyorActivityModel extends BaseModel implements
-        OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener {
+        OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener,
+        Executor.OnAddRemoveChangeListener {
     private ServiceConnection mServiceConnection;
-    private ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
+    private final ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
     private Executor mExecutor;
 
     @Override
@@ -90,9 +93,27 @@ public class ConveyorActivityModel extends BaseModel implements
         return null;
     }
 
+    @Override
+    public void onAddRemoveChanged(int status, Task task, Executor executor) {
+        switch (status){
+            case Executor.STATUS_ADD:
+                mConveyorListAdapter.addTaskWithSort(task);
+                break;
+            case Executor.STATUS_REMOVE:
+                mConveyorListAdapter.remove(task);
+                break;
+        }
+    }
+
     private void setTaskExecutor(Executor executor){
+        Executor current=mExecutor;
+        if (null!=current){
+            current.setListener(null);
+        }
         mExecutor=executor;
         if (null!=executor){
+            executor.setListener(this);
+            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.addTaskWithSort(data.getTask()));
 //            for (int i = 0; i < 100; i++) {
 //                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
 //                        (new AndroidFileStream(new File("/sdcard/test.png")),
@@ -115,15 +136,13 @@ public class ConveyorActivityModel extends BaseModel implements
         (new File("/sdcard/TestNew/ddd.mp3")),LocalClient.createLocalFile
                     (new File("/sdcard/TestNew/我们.mp3")),null);
             copyTask.setName("任务名字");
-
-            mConveyorListAdapter.add(copyTask);
-            executor.execute(copyTask,null);
-
+//            mConveyorListAdapter.add(copyTask);
+//            executor.execute(copyTask,null);
             for (int i = 0; i < 1; i++) {
                 copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
                         LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
-                mConveyorListAdapter.add(copyTask);
-                executor.execute(copyTask,null);
+//                mConveyorListAdapter.add(copyTask);
+//                executor.execute(copyTask,null);
             }
             //
 //            TaskGroup group=new TaskGroup(null);

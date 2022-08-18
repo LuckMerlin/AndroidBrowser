@@ -43,6 +43,11 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         return super.onCreateViewTypeHolder(viewType, parent);
     }
 
+    public final ConveyorListAdapter addTaskWithSort(Task task){
+        add(task);
+        return this;
+    }
+
     @Override
     protected ViewGroup.LayoutParams onCreateViewHolderLayoutParams(ViewGroup parent, int viewType, RecyclerView.ViewHolder viewHolder) {
         if (viewType==VIEW_TYPE_DATA||viewType==VIEW_TYPE_DATA_GROUP){

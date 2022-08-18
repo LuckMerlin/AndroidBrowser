@@ -26,6 +26,16 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
 
     protected abstract Result onExecute();
 
+    protected final AbstractTask setProgress(Progress progress){
+        mProgress=progress;
+        return this;
+    }
+
+    protected final AbstractTask setResult(Result result){
+        mResult=result;
+        return this;
+    }
+
     @Override
     public final Result execute(OnProgressChange callback) {
         mResult=null;

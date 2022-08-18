@@ -1,6 +1,8 @@
 package com.luckmerlin.browser.task;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.client.LocalClient;
@@ -21,7 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FileCopyTask extends FileTask {
+public final class FileCopyTask extends FileTask implements Parcelable {
     private final File mFromFile;
     private final File mToFile;
     private byte[] mBuffer;
@@ -277,4 +279,47 @@ public class FileCopyTask extends FileTask {
     private interface OnFileProgress{
         void onFileProgressChange(File fromFile,File toFile,Progress progress);
     }
+
+    FileCopyTask(Parcel in) {
+        super(null);
+        Class cls=getClass();
+        setProgress(in.readParcelable(cls.getClassLoader()));
+        setResult(in.readParcelable(cls.getClassLoader()));
+        enableConfirm(in.readByte()==1);
+        setName(in.readString());
+        String file=null;
+        mFromFile=null!=(file=in.readString())&&file.length()>0?new File(file):null;
+        mToFile=null!=(file=in.readString())&&file.length()>0?new File(file):null;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        Progress progress=getProgress();
+        Result result=getResult();
+        File file=null;
+        dest.writeParcelable(null!=progress&&progress instanceof Parcelable?(Parcelable)progress:null ,flags);
+        dest.writeParcelable(null!=result&&result instanceof Parcelable?(Parcelable)result:null ,flags);
+        dest.writeByte(isConfirmEnabled()?(byte) 1:0);
+        dest.writeString(getName());
+        dest.writeString(null!=(file=mFromFile)?file.toString():null);
+        dest.writeString(null!=(file=mToFile)?file.toString():null);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<FileCopyTask> CREATOR = new Creator<FileCopyTask>() {
+        @Override
+        public FileCopyTask createFromParcel(Parcel in) {
+            return new FileCopyTask(in);
+        }
+
+        @Override
+        public FileCopyTask[] newArray(int size) {
+            return new FileCopyTask[size];
+        }
+    };
+
 }

@@ -9,7 +9,7 @@ import com.luckmerlin.json.JsonObject;
 
 import org.json.JSONException;
 
-public class File extends JsonObject{
+public class File extends JsonObject {
 
     public File(){
         super();

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ChangeUpdater extends MatcherInvoker implements ChangeUpdate{
-    private List<OnChangeUpdate> mListeners;
+    private transient List<OnChangeUpdate> mListeners;
 
     @Override
     public boolean addChangeListener(OnChangeUpdate changeUpdate) {
