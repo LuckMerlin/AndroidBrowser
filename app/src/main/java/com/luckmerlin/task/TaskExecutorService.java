@@ -43,8 +43,13 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public boolean execute(Task task, OnProgressChange callback) {
-            return mExecutor.execute(task,callback);
+        public boolean execute(Object task,int option, OnProgressChange callback) {
+            return mExecutor.execute(task,option,callback);
+        }
+
+        @Override
+        public boolean cancel(Object task, int option) {
+            return mExecutor.cancel(task,option);
         }
 
         @Override

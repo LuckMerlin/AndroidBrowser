@@ -2,6 +2,7 @@ package com.luckmerlin.task;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.luckmerlin.core.MatchedCollector;
@@ -60,13 +61,12 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 @Override
                 protected Result onExecute() {
                     notifyStatusChange(STATUS_START_LOAD_SAVED,null,mListener);
-                    taskSaver.load((Task data)-> null!=data&&TaskExecutor.this.
-                            execute(data,true,null)&&false);
+                    taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
                     poolExecutor.setMaximumPoolSize(maxPoolSize);
                     notifyStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListener);
                     return null;
                 }
-            });
+            },Option.NONE);
         }
     }
 
@@ -76,23 +76,27 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return this;
     }
 
-    public final boolean execute(Task task){
-        return execute(task,null);
+    public final boolean execute(Task task,int option){
+        return execute(task,option,null);
     }
 
-    public final boolean execute(Task task,OnProgressChange callback){
-        return execute(task,false,callback);
-    }
-
-    public final boolean remove(Task task,boolean interrupt){
-//        OnTaskAddListener listener=mAddListener;
-//        if (null!=listener){
-//            listener.onTaskAdd(task,fromSaved);
-//        }
+    @Override
+    public boolean execute(Object task,int option, OnProgressChange callback) {
+        if (null==task){
+            return false;
+        }else if (task instanceof Task){
+            return execute((Task) task,option,false,callback);
+        }
         return false;
     }
 
-    private final boolean execute(Task task,boolean fromSaved,OnProgressChange callback){
+    @Override
+    public boolean cancel(Object task, int option) {
+
+        return false;
+    }
+
+    private final boolean execute(Task task,int option,boolean fromSaved,OnProgressChange callback){
         if (null==task){
             Debug.E("Fail execute task while task is invalid.");
             return false;
@@ -113,7 +117,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         final boolean needSave=task instanceof Parcelable &&(!(task instanceof OnTaskSave)||
                 ((OnTaskSave)task).onTaskSave(TaskExecutor.this));
         if (!fromSaved&&needSave){
-            save(task);
+            saveTask(task,option);
         }
         if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
             return false;
@@ -122,7 +126,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         match((ExecuteTask data)-> null!=data&&data.isTask(task)&&null!=(existTask[0]=data));
         ExecuteTask executeTask=existTask[0];
         if (null==executeTask){
-            executeTask=new ExecuteTask(task,fromSaved,callback) {
+            executeTask=new ExecuteTask(task,option,fromSaved,callback) {
                 @Override
                 public void run() {
                     setStatus(STATUS_EXECUTING);
@@ -138,7 +142,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     }
                     notifyStatusChange(STATUS_FINISH,task,mListener);
                     if (needSave){
-                        save(task);
+                        saveTask(task,option);
                     }
                     post(()->{
                         List<ExecuteTask> waitingQueue=mQueue;//Check waiting
@@ -149,7 +153,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                                 break;
                             }else if (null!=(taskRunnable=waitingQueue.get(i))&& taskRunnable.isStatus(STATUS_WAITING)){
                                 Debug.D("Task to execute again."+taskRunnable.mTask);
-                                execute(taskRunnable.mTask,taskRunnable.mFromSaved,taskRunnable.mCallback);
+                                execute(taskRunnable.mTask,taskRunnable.mOption,taskRunnable.mFromSaved,taskRunnable.mCallback);
                             }
                         }
                     },-1);
@@ -179,9 +183,33 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return collector.getFirstMatched();
     }
 
-    private boolean save(Task task){
+    private Task executeWithTaskBytes(byte[] taskBytes){
+        Parcel parcel=Parcel.obtain();
+        parcel.unmarshall(taskBytes,0,taskBytes.length);
+        parcel.setDataPosition(0);
+        int option=parcel.readInt();
+        Parcelable parcelable=parcel.readParcelable(getClass().getClassLoader());
+        parcel.recycle();
+        if (null==parcelable||!(parcelable instanceof Task)){
+            return null;
+        }
+        Task task=(Task)parcelable;
+        return TaskExecutor.this.execute(task,option,null)?task:null;
+    }
+
+    private boolean saveTask(Task task,int option){
         TaskSaver taskSaver=null!=task?mTaskSaver:null;
-        return null!=taskSaver&&taskSaver.save(task);
+        if (null!=taskSaver&&task instanceof Parcelable){
+            Parcel parcel=Parcel.obtain();
+            parcel.setDataPosition(0);
+            parcel.writeInt(option);
+            parcel.writeParcelable((Parcelable)task,0);
+            byte[] bytes=parcel.marshall();
+            boolean succeed=taskSaver.write(task,bytes);
+            parcel.recycle();
+            return succeed;
+        }
+        return false;
     }
 
     @Override
@@ -203,11 +231,13 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     public static abstract class ExecuteTask implements Runnable{
         protected final Task mTask;
         protected final boolean mFromSaved;
+        protected final int mOption;
         protected final OnProgressChange mCallback;
         private int mStatus=STATUS_PENDING;
 
-        protected ExecuteTask(Task task,boolean fromSaved,OnProgressChange callback){
+        protected ExecuteTask(Task task,int option,boolean fromSaved,OnProgressChange callback){
             mTask=task;
+            mOption=option;
             mFromSaved=fromSaved;
             mCallback=callback;
         }
@@ -268,4 +298,5 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             super(null);
         }
     }
+
 }

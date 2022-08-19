@@ -4,6 +4,15 @@ import com.luckmerlin.core.Matcher;
 
 public interface Executor {
 
+    public static interface Option{
+        public final static int NONE=0;
+        public final static int CANCEL=1;
+        public final static int REMOVE=2;
+        public final static int DELETE=REMOVE|CANCEL;
+        public final static int ON_SUCCEED=4;
+        public final static int ON_FINISH=8;
+    }
+
     interface Listener{
 
     }
@@ -22,7 +31,8 @@ public interface Executor {
     public final static int STATUS_ADD=2007;
     public final static int STATUS_REMOVE=2008;
 
-    boolean execute(Task task,OnProgressChange callback);
+    boolean execute(Object task,int option,OnProgressChange callback);
+    boolean cancel(Object task,int option);
     void match(Matcher<TaskExecutor.ExecuteTask> matcher);
     Executor setListener(Listener listener);
 }

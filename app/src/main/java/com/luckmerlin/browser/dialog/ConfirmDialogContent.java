@@ -44,9 +44,9 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         switch (clickId){
             case R.drawable.selector_close:
             case R.string.cancel:
-                return (makeConfirm(false)&&removeFromParent())||true;
+                return ((makeConfirm(false)||true)&&removeFromParent())||true;
             case R.string.confirm:
-                return (makeConfirm(true)&&removeFromParent())||true;
+                return ((makeConfirm(true)||true)&&removeFromParent())||true;
         }
         return false;
     }

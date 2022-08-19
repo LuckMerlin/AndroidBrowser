@@ -56,9 +56,9 @@ public class ConveyorService extends TaskExecutorService {
         }
 
         @Override
-        public void load(Matcher<Task> matcher) {
+        public void load(TaskBytesReader bytesReader) {
             SharedPreferences preferences=mPreferences;
-            if (null==matcher||null==preferences){
+            if (null==bytesReader||null==preferences){
                 return;
             }
             Map<String,?> objectMap=preferences.getAll();
@@ -72,50 +72,27 @@ public class ConveyorService extends TaskExecutorService {
                 if (null==taskId||!taskId.endsWith(POSTFIX)){
                     continue;
                 }
-                if (null==(childObj=objectMap.get(taskId))||!(childObj instanceof String)){
-                    continue;
-                }
-                byte[] bytes=Base64.decode((String)childObj,Base64.URL_SAFE);
-                if (null==bytes||bytes.length<=0){
-                    continue;
-                }
-                Parcel parcel=Parcel.obtain();
-                parcel.unmarshall(bytes,0,bytes.length);
-                parcel.setDataPosition(0);
-                Parcelable parcelable=parcel.readParcelable(getClass().getClassLoader());
-                parcel.recycle();
-                if (null==parcelable||!(parcelable instanceof Task)){
-                    continue;
-                }
+                childObj=objectMap.get(taskId);
+                byte[] bytes=null!=childObj&&childObj instanceof String? Base64.decode((String)childObj,Base64.URL_SAFE):null;
                 editor.remove(taskId);
-                String newId=generateTaskId((Task) parcelable);
-                if (null!=newId&&newId.length()>0){
+                Task task=null; String newId=null;
+                if (null==bytes||bytes.length<=0||null==(task=bytesReader.readTaskBytes(bytes))||
+                        null==(newId=generateTaskId(task))||newId.length()<=0){
+                    Debug.D("Delete saved task while bytes invalid.");
+                }else{
                     editor.putString(newId,(String)childObj);
                 }
                 editor.commit();
-                if (null==matcher.match((Task) parcelable)){
-                    break;
-                }
-
             }
         }
 
         @Override
-        public boolean save(Task task) {
+        public boolean write(Task task, byte[] taskBytes) {
             SharedPreferences preferences=mPreferences;
-            if (null==task||null==preferences||!(task instanceof Parcelable)){
+            if (null==task||null==taskBytes||taskBytes.length<=0||null==preferences){
                 return false;
             }
             Debug.D("Saving tasK."+task);
-            Parcel parcel=Parcel.obtain();
-            parcel.setDataPosition(0);
-            parcel.writeParcelable((Parcelable)task,0);
-            byte[] taskBytes=parcel.marshall();
-            parcel.recycle();
-            if (null==taskBytes||taskBytes.length<=0){
-                Debug.W("Fail save tasK while write bytes invalid."+task);
-                return false;
-            }
             String id=generateTaskId(task);
             if (null==id||id.length()<=0){
                 Debug.W("Fail save tasK while generate task id invalid."+task);

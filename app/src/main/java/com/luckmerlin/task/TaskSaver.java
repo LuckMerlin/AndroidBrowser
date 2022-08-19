@@ -1,8 +1,9 @@
 package com.luckmerlin.task;
 
-import com.luckmerlin.core.Matcher;
-
 public interface TaskSaver {
-    void load(Matcher<Task> matcher);
-    boolean save(Task task);
+    public interface TaskBytesReader{
+        Task readTaskBytes(byte[] bytes);
+    }
+    void load(TaskBytesReader bytesReader);
+    boolean write(Task task, byte[] taskBytes);
 }
