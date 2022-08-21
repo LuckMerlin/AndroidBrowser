@@ -48,8 +48,8 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public boolean cancel(Object task, int option) {
-            return mExecutor.cancel(task,option);
+        public boolean option(Object task, int option) {
+            return mExecutor.option(task,option);
         }
 
         @Override

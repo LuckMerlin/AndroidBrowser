@@ -15,6 +15,7 @@ import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.stream.StreamCopyTask;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskProgress;
 import java.io.FileInputStream;
@@ -160,17 +161,17 @@ public final class FileCopyTask extends FileTask implements Parcelable {
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         File file=mFromFile;
         TaskProgress progress=new TaskProgress().setPosition(0).setTotal(1).setTitle(null!=file?file.getName():null);
         notifyProgress(progress);
-        Result result=copyFile(mFromFile, mToFile, (File fromFile, File toFile, Progress childProgress)->
+        Result result=copyFile(mFromFile, mToFile, runtime,(File fromFile, File toFile, Progress childProgress)->
                 notifyProgress(progress.setSubProgress(childProgress)));
         notifyProgress(progress.setPosition(1));
         return result;
     }
 
-    private Result copyFile(File fromFile,File toFile,OnFileProgress onProgressChange){
+    private Result copyFile(File fromFile,File toFile,Runtime runtime,OnFileProgress onProgressChange){
         final String fromPath=null!=fromFile?fromFile.getPath():null;
         if (null==fromPath||fromPath.length()<=0){
             Debug.W("Fail execute file copy task while from file invalid.");
@@ -212,7 +213,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                             continue;
                         }
                         childResponse=copyFile(child,new File().setHost(child.getHost()).setName(child.getName()).
-                                setSep(child.getSep()).setParent(toPath),onProgressChange);
+                                setSep(child.getSep()).setParent(toPath),runtime,onProgressChange);
                         childResponse=null!=childResponse?childResponse:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
                         if (!(childResponse instanceof Response)||!((Response)childResponse).isSucceed()){
                             if (childResponse instanceof ConfirmResult){
@@ -268,7 +269,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             byte[] buffer=mBuffer;
             buffer=null!=buffer?buffer:(mBuffer=new byte[1024]);
             return new StreamCopyTask(inputStream,outputStream,buffer,null).setName(fromFile.getName()).
-                    execute(null!=onProgressChange?(Task task, Progress progress)->
+                    execute(runtime,null!=onProgressChange?(Task task, Progress progress)->
                             onProgressChange.onFileProgressChange(fromFile,toFile,progress):null);
         }catch (Exception e){
             Debug.W("Exception execute file copy task.e="+e);

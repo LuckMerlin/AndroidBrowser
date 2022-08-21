@@ -32,7 +32,7 @@ public interface Executor {
     public final static int STATUS_REMOVE=2008;
 
     boolean execute(Object task,int option,OnProgressChange callback);
-    boolean cancel(Object task,int option);
+    boolean option(Object task,int option);
     void match(Matcher<TaskExecutor.ExecuteTask> matcher);
     Executor setListener(Listener listener);
 }

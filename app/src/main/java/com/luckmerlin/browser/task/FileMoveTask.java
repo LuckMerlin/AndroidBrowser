@@ -6,6 +6,7 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Runtime;
 
 public class FileMoveTask extends FileTask{
     private final File mFromFile;
@@ -18,7 +19,7 @@ public class FileMoveTask extends FileTask{
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         File fromFile=mFromFile;
         final String fromPath=null!=fromFile?fromFile.getPath():null;
         if (null==fromPath||fromPath.length()<=0){

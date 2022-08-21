@@ -5,6 +5,7 @@ import android.app.Activity;
 import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.AbstractTask;
+import com.luckmerlin.task.Runtime;
 
 public class TestTask extends AbstractTask {
     Activity activity;
@@ -15,7 +16,7 @@ public class TestTask extends AbstractTask {
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         return null;
     }
 //    @Override

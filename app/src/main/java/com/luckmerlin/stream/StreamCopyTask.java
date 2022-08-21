@@ -6,6 +6,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.TaskProgress;
 import com.luckmerlin.utils.Utils;
 
@@ -26,7 +27,7 @@ public class StreamCopyTask extends AbstractTask {
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         OutputStream outputStream=mOutputStream;InputStream inputStream=mInputStream;
         try {
             final boolean[] canceled=new boolean[]{false};

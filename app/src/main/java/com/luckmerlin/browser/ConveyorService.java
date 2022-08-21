@@ -87,6 +87,17 @@ public class ConveyorService extends TaskExecutorService {
         }
 
         @Override
+        public boolean delete(Task task) {
+            SharedPreferences preferences=null!=task?mPreferences:null;
+            if (null==preferences){
+                return false;
+            }
+            Debug.D("Deleting save tasK."+task);
+            String id=generateTaskId(task);
+            return null!=id&&preferences.edit().remove(id).commit();
+        }
+
+        @Override
         public boolean write(Task task, byte[] taskBytes) {
             SharedPreferences preferences=mPreferences;
             if (null==task||null==taskBytes||taskBytes.length<=0||null==preferences){

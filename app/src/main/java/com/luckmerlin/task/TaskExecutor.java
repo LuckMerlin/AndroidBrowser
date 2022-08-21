@@ -4,7 +4,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.MatcherInvoker;
@@ -59,7 +58,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             poolExecutor.setMaximumPoolSize(1);
             execute(new InnerTask(){
                 @Override
-                protected Result onExecute() {
+                public Result execute(Runtime runtime, OnProgressChange callback) {
                     notifyStatusChange(STATUS_START_LOAD_SAVED,null,mListener);
                     taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
                     poolExecutor.setMaximumPoolSize(maxPoolSize);
@@ -91,8 +90,25 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     @Override
-    public boolean cancel(Object task, int option) {
-
+    public boolean option(Object task, int option) {
+        if (null==task){
+            return false;
+        }else if (task instanceof Task){
+            ExecuteTask executeTask=findFirst((Task) task);
+            if (null==executeTask){
+                return false;
+            }else if(!executeTask.setOption(option)){
+                return false;
+            }
+            boolean succeed=true;
+            if (executeTask.isRemoveEnabled()){
+                succeed&=removeFromQueue(executeTask);
+            }
+            if(executeTask.isDeleteEnabled()){
+                succeed&=deleteSaveTask((Task)task);
+            }
+            return succeed;
+        }
         return false;
     }
 
@@ -116,7 +132,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
         final boolean needSave=task instanceof Parcelable &&(!(task instanceof OnTaskSave)||
                 ((OnTaskSave)task).onTaskSave(TaskExecutor.this));
-        if (!fromSaved&&needSave){
+        if (!fromSaved&&needSave&&!Runtime.isDeleteEnabled(option)){
             saveTask(task,option);
         }
         if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
@@ -133,7 +149,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     notifyStatusChange(STATUS_EXECUTING,task,mListener);
                     if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).
                             onExecuteStart(TaskExecutor.this)){
-                        mTask.execute(mCallback);
+                        mTask.execute(this,mCallback);
                     }
                     setStatus(STATUS_FINISH);
                     mFullExecuting=false;
@@ -141,7 +157,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                         //Do nothing
                     }
                     notifyStatusChange(STATUS_FINISH,task,mListener);
-                    if (needSave){
+                    if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
                     }
                     post(()->{
@@ -153,12 +169,13 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                                 break;
                             }else if (null!=(taskRunnable=waitingQueue.get(i))&& taskRunnable.isStatus(STATUS_WAITING)){
                                 Debug.D("Task to execute again."+taskRunnable.mTask);
-                                execute(taskRunnable.mTask,taskRunnable.mOption,taskRunnable.mFromSaved,taskRunnable.mCallback);
+                                execute(taskRunnable.mTask,taskRunnable.getOption(),taskRunnable.mFromSaved,taskRunnable.mCallback);
                             }
                         }
                     },-1);
                 }
-            }.setStatus(STATUS_PENDING);
+            };
+            executeTask.setStatus(STATUS_PENDING);
             if (fromSaved){
                 mQueue.add(0,executeTask);
             }else{
@@ -168,13 +185,23 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
         //
         if (!executeTask.isStatus(STATUS_PENDING, STATUS_INTERRUPTED,STATUS_FINISH,STATUS_WAITING)){
-            Debug.E("Fail execute task while task status is not need execute.status="+executeTask.mStatus);
+            Debug.E("Fail execute task while task status is not need execute.status="+executeTask.getStatus());
             return false;
         }
         Debug.D("Pending execute task."+task);
         notifyStatusChange(STATUS_PENDING,task,mListener);
-        executor.execute(executeTask.setStatus(STATUS_PENDING));
+        executeTask.setStatus(STATUS_PENDING);
+        executor.execute(executeTask);
         return true;
+    }
+
+    private boolean removeFromQueue(ExecuteTask executeTask){
+        List<ExecuteTask> queue=mQueue;
+        return null!=executeTask&&null!=queue&&queue.remove(executeTask);
+    }
+
+    private ExecuteTask findFirst(Task task){
+        return null!=task?findFirst((ExecuteTask data)->null!=data&&data.isTask(task)):null;
     }
 
     private ExecuteTask findFirst(Matcher<ExecuteTask> matcher){
@@ -195,6 +222,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
         Task task=(Task)parcelable;
         return TaskExecutor.this.execute(task,option,null)?task:null;
+    }
+
+    private boolean deleteSaveTask(Task task){
+        TaskSaver taskSaver=null!=task?mTaskSaver:null;
+        return null!=taskSaver&&taskSaver.delete(task);
     }
 
     private boolean saveTask(Task task,int option){
@@ -228,16 +260,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return null!=looper&&null!=uiLooper&&looper==uiLooper;
     }
 
-    public static abstract class ExecuteTask implements Runnable{
+    public static abstract class ExecuteTask extends Runtime implements Runnable{
         protected final Task mTask;
         protected final boolean mFromSaved;
-        protected final int mOption;
         protected final OnProgressChange mCallback;
-        private int mStatus=STATUS_PENDING;
 
         protected ExecuteTask(Task task,int option,boolean fromSaved,OnProgressChange callback){
+            super(option);
             mTask=task;
-            mOption=option;
             mFromSaved=fromSaved;
             mCallback=callback;
         }
@@ -245,26 +275,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         public final boolean isTask(Task task){
             Task current=mTask;
             return null!=current&&null!=task&&current==task;
-        }
-
-        public final boolean isRunning(){
-            return isStatus(STATUS_PENDING,STATUS_EXECUTING);
-        }
-
-        public final boolean isStatus(int... status) {
-            if (null != status) {
-                for (int i = 0; i < status.length; i++) {
-                    if (status[i]==mStatus){
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        protected final ExecuteTask setStatus(int status){
-            mStatus=status;
-            return this;
         }
 
         public final Task getTask() {
@@ -293,9 +303,20 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return null!=task&&task instanceof InnerTask;
     }
 
-    private static abstract class InnerTask extends AbstractTask {
-        public InnerTask() {
-            super(null);
+    private static abstract class InnerTask implements Task {
+        @Override
+        public String getName() {
+            return "Inner task.";
+        }
+
+        @Override
+        public Progress getProgress() {
+            return null;
+        }
+
+        @Override
+        public Result getResult() {
+            return null;
         }
     }
 

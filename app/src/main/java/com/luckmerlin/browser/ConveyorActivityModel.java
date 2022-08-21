@@ -38,7 +38,6 @@ public class ConveyorActivityModel extends BaseModel implements
     @Override
     protected View onCreateContent(Context context) {
         //
-
 //        new File("/sdcard/test2.png").delete();
 //        streamCopyTask.setName("测司法所大发送");
 //        streamCopyTask.setConvertor(new CoderConvertor());
@@ -129,7 +128,6 @@ public class ConveyorActivityModel extends BaseModel implements
 //                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
 //                    (new File("/sdcard/Test2")),null);
 //            copyTask.setName("任务名字");
-
         FileCopyTask copyTask=null;
         copyTask=new FileCopyTask(LocalClient.createLocalFile
 //                    (new File("/sdcard/Test")),LocalClient.createLocalFile
@@ -174,8 +172,10 @@ public class ConveyorActivityModel extends BaseModel implements
                 return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.
                         Confirm().setOnConfirm((boolean confirmed)-> confirmed?obj:null).
                         setTitle(getString(R.string.delete)).setMessage(getString
-                        (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish(
-                        (boolean confirmed, Object confirmObj)-> executeTask(confirmObj)),null);
+                        (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
+                        if (cancelTask(confirmObj, Executor.Option.CANCEL|Executor.Option.DELETE)&&null!=obj&&obj instanceof Task) {
+                            mConveyorListAdapter.remove((Task) obj);
+                        }}),null);
         }
         return false;
     }
@@ -214,9 +214,9 @@ public class ConveyorActivityModel extends BaseModel implements
         }
     }
 
-    private boolean removeTask(Object task){
+    private boolean cancelTask(Object task,int option){
         Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.execute(task, Executor.Option.CANCEL,null);
+        return null!=executor&&executor.option(task, option);
     }
 
     private boolean executeTask(Object task){

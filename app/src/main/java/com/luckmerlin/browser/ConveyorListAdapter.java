@@ -76,7 +76,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             int iconRes;
             ConfirmResult.Confirm confirm=null;
             if (null==result){
-                iconRes=item.isPending()?R.drawable.selector_wait:null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
+                iconRes=null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
             }else if (result instanceof ConfirmResult){
                 iconRes=R.drawable.selector_confirm;
                 confirm=((ConfirmResult)result).make(context);

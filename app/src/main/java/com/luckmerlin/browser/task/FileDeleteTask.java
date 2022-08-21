@@ -10,6 +10,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.TaskProgress;
 
 public class FileDeleteTask extends FileTask {
@@ -22,7 +23,7 @@ public class FileDeleteTask extends FileTask {
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         File file=mFile;
         if (null==file){
             Debug.W("Fail execute file delete task while arg invalid.");

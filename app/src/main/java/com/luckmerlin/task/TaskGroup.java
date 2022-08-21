@@ -20,7 +20,7 @@ public class TaskGroup extends AbstractTask{
     }
 
     @Override
-    protected Result onExecute() {
+    protected Result onExecute(Runtime runtime) {
         while (true){
             Task next= next();
             if (null==next){
@@ -33,7 +33,7 @@ public class TaskGroup extends AbstractTask{
             };
             mQueue.put(next,true);
             mExecuting=next;
-            next.execute(innerProgress);
+            next.execute(runtime,innerProgress);
             mExecuting=null;
             mQueue.put(next,false);
         }

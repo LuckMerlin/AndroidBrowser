@@ -7,12 +7,11 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask extends ChangeUpdater implements Task, OnExecutePending {
+public abstract class AbstractTask extends ChangeUpdater implements Task {
     private String mName;
     private Progress mProgress;
     private OnProgressChange mNotifier;
     private Result mResult;
-    private boolean mPending=false;
     private boolean mCanceled=false;
 
     public AbstractTask(Progress progress){
@@ -24,7 +23,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
         return this;
     }
 
-    protected abstract Result onExecute();
+    protected abstract Result onExecute(Runtime runtime);
 
     protected final AbstractTask setProgress(Progress progress){
         mProgress=progress;
@@ -37,7 +36,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
     }
 
     @Override
-    public final Result execute(OnProgressChange callback) {
+    public Result execute(Runtime runtime, OnProgressChange callback) {
         mResult=null;
         mNotifier=(Task task, Progress progress)-> {
             mProgress=progress;
@@ -46,8 +45,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
                 callback.onProgressChanged(null!=task?task:this,progress);
             }
         };
-        mPending=false;
-        Result result= onExecute();
+        Result result= onExecute(runtime);
         notifyProgress(mProgress);
         mNotifier=null;
         return mResult=result;
@@ -68,12 +66,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
         return mResult;
     }
 
-    @Override
-    public boolean onExecutePending(TaskExecutor executor) {
-        mPending=true;
-        return false;
-    }
-
     public final AbstractTask cancel(boolean cancel){
         mCanceled=cancel;
         return this;
@@ -81,11 +73,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, OnExec
 
     public final boolean isCanceled() {
         return mCanceled;
-    }
-
-    @Override
-    public final boolean isPending() {
-        return mPending;
     }
 
     protected final String getString(Context context,int textId, Object... args){
