@@ -20,6 +20,8 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.ChangeUpdate;
 import com.luckmerlin.core.OnChangeUpdate;
+import com.luckmerlin.debug.Debug;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,11 +88,16 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
 
     public final boolean add(int index,T data){
         if (null!=data){
+            int current=getSize();
             List<T> dataList=mDataList;
             dataList=null!=dataList?dataList:(mDataList=new ArrayList<>());
             int currentSize=0;
             index=index<=0?0:index>(currentSize=dataList.size())?currentSize:index;
             dataList.add(index,data);
+            if (current<=0){
+                notifyDataSetChanged();
+                return true;
+            }
             notifyItemInserted(index);
             return true;
         }
@@ -277,7 +284,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
             }
             return getFixedViewHolder(VIEW_TYPE_HEAD)==null?VIEW_TYPE_DATA:VIEW_TYPE_HEAD;
         }
-        return position==total-1&&getFixedViewHolder(VIEW_TYPE_HEAD)!=null?VIEW_TYPE_TAIL:VIEW_TYPE_DATA;
+        return position==total-1&&getFixedViewHolder(VIEW_TYPE_TAIL)!=null? VIEW_TYPE_TAIL:VIEW_TYPE_DATA;
     }
 
     public final RecyclerView getRecyclerView(){

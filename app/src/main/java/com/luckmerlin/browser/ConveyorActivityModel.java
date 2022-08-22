@@ -112,7 +112,8 @@ public class ConveyorActivityModel extends BaseModel implements
         mExecutor=executor;
         if (null!=executor){
             executor.setListener(this);
-            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.addTaskWithSort(data.getTask()));
+            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.
+                    addTaskWithSort(null!=data?data.getTask():null));
             for (int i = 0; i < 100; i++) {
 //                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
 //                        (new AndroidFileStream(new File("/sdcard/test.png")),
