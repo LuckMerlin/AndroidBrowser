@@ -4,6 +4,7 @@ import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
@@ -119,6 +120,11 @@ public class LocalClient extends AbstractClient {
             notifyFinish(new Reply<File>().set(Code.CODE_ERROR,"Exception.e="+e,null),onFinish);
             return null;
         }
+    }
+
+    @Override
+    public Canceler deleteFile(File file, OnChangeUpdate update, OnFinish<Reply<File>> onFinish) {
+        return null;
     }
 
     @Override

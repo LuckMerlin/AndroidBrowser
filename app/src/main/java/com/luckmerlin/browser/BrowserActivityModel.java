@@ -17,11 +17,14 @@ import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
+import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
+import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.MenuContextDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -31,6 +34,7 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.luckmerlin.object.Parser;
+import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
@@ -97,7 +101,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
 //        showBrowserContextMenu(activity);
 //        createFile();
-        startActivity(ConveyorActivity.class);
+//        startActivity(ConveyorActivity.class);
         //
 //        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
 //        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);
@@ -218,10 +222,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public boolean onLongClick(View view, int clickId, Object obj) {
         if (null!=obj&&obj instanceof File){
-//            File file=(File)obj;
-//            return toast("点击文件 "+file.getName());
-            entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
-            return true;
+            return showFileContextMenu(view,(File)obj);
         }
         return true;
     }
@@ -240,10 +241,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             case R.drawable.selector_cancel:
             case R.string.cancel:
                 return entryMode(null)||true;
+            case R.string.delete:
+                return deleteFile(obj)||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
-                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
+                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).addFile(obj));
             case R.string.setAsHome:
                 return setCurrentAsHome()||true;
             case R.string.conveyor:
@@ -269,9 +272,39 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return false;
     }
 
+    private boolean deleteFile(Object obj){
+        if (null==obj||!(obj instanceof File)){
+            return false;
+        }
+        Client client=mBrowserClient.get();
+        File file=(File)obj;
+        return null!=client&&null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.Confirm().
+                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).
+                        setMessage(file.getName()).setOnConfirm((boolean confirm)-> {
+                    client.deleteFile(file, (Object newData) ->{
+
+                        return false;
+                    }, (Reply<File> data)-> {
+
+                    });
+                    return null;
+                })),
+                new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+    }
+
+    private boolean showFileContextMenu(View view,File file){
+        if (null==view||null==file){
+            return false;
+        }
+        return null!=showContentDialog(new FileContextDialogContent(file),
+                view.getContext(),new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+    }
+
     private boolean showBrowserContextMenu(Context context){
-        MenuContextDialogContent content=new MenuContextDialogContent().setTitle(getString(R.string.app_name));
-        return null!=showContentDialog(content,context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        return null!=showContentDialog(new MenuContextDialogContent().setTitle(getString(R.string.app_name)),
+                context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
     }
 

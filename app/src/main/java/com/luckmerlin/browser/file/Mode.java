@@ -47,6 +47,10 @@ public final class Mode {
         return this;
     }
 
+    public Mode addFile(Object arg){
+        return (null==arg||!(arg instanceof File))?this:add(arg);
+    }
+
     public Mode add(Object arg){
         if (null!=arg){
             ArrayList<Object> args=mArgs;
