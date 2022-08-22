@@ -296,6 +296,15 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     post(()->changeListener.onAddRemoveChanged(status,task,TaskExecutor.this),0);
                 }
             }
+
+            if (listener instanceof OnStatusChangeListener){
+                OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
+                if (isUiThread()){
+                    changeListener.onStatusChanged(status,task,TaskExecutor.this);
+                }else{
+                    post(()->changeListener.onStatusChanged(status,task,TaskExecutor.this),0);
+                }
+            }
         }
     }
 

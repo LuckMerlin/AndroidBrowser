@@ -42,6 +42,24 @@ public abstract class ViewContent implements Content {
                             (null!=iterator&&iterator.onViewIterate(iterate)));
                 }
             });
+            if (this instanceof OnViewAttachedToWindow||this instanceof OnViewDetachedFromWindow){
+                frameLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                    @Override
+                    public void onViewAttachedToWindow(View v) {
+                        if (ViewContent.this instanceof OnViewAttachedToWindow){
+                            ((OnViewAttachedToWindow)ViewContent.this).onViewAttachedToWindow(v);
+                        }
+                    }
+
+                    @Override
+                    public void onViewDetachedFromWindow(View v) {
+                        if (ViewContent.this instanceof OnViewDetachedFromWindow){
+                            ((OnViewDetachedFromWindow)ViewContent.this).onViewDetachedFromWindow(v);
+                        }
+                        frameLayout.removeOnAttachStateChangeListener(this);
+                    }
+                });
+            }
             frameLayout.addView(root,new FrameLayout.LayoutParams(ViewGroup.
                     LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             root=frameLayout;

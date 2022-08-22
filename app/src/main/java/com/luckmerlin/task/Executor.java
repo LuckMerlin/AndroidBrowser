@@ -22,6 +22,10 @@ public interface Executor {
         void onAddRemoveChanged(int status,Task task,Executor executor);
     }
 
+    public interface OnStatusChangeListener extends Listener{
+        void onStatusChanged(int status,Task task,Executor executor);
+    }
+
     public final static int STATUS_PENDING=2000;
     public final static int STATUS_EXECUTING=2001;
     public final static int STATUS_WAITING=2002;

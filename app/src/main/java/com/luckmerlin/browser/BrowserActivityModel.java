@@ -1,8 +1,12 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +27,14 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.luckmerlin.object.Parser;
+import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.Task;
+import com.luckmerlin.view.OnViewAttachedToWindow;
+import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -36,7 +45,8 @@ import org.json.JSONObject;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
-        OnClickListener, OnLongClickListener, OnBackPress {
+        OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
+        OnViewDetachedFromWindow, Executor.OnStatusChangeListener {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
@@ -45,6 +55,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private final ObservableField<String> mSearchInput=new ObservableField<>();
     private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
+    private ServiceConnection mServiceConnection;
+    private IBinder mConveyorBinder;
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
              loadFiles(args, from, pageSize, null!=callback?(Reply<Folder> data)->
@@ -160,6 +172,47 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mBrowserMode.set(mode);
         mBrowserAdapter.setMode(mode);
         return true;
+    }
+
+    @Override
+    public void onViewAttachedToWindow(View v) {
+        Intent intent=new Intent(v.getContext(), ConveyorService.class);
+        bindService(intent, mServiceConnection=new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        Debug.D("EEEE onServiceConnected "+service);
+                        if (null!=service&&service instanceof Executor){
+                            mConveyorBinder=service;
+                            refreshConveyorBinder();
+                        }
+                    }
+
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        Debug.D("EEEE onServiceDisconnected "+name);
+                    }
+                }, Context.BIND_ABOVE_CLIENT|Context.BIND_AUTO_CREATE);
+    }
+
+    private void refreshConveyorBinder(){
+        IBinder conveyorBinder=mConveyorBinder;
+        if (null!=conveyorBinder&&conveyorBinder instanceof Executor){
+            ((Executor)conveyorBinder).setListener(this);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(int status, Task task, Executor executor) {
+        mNotifyText.set(""+status+" "+(null!=task?task.getName():""));
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(View v) {
+        ServiceConnection serviceConnection=mServiceConnection;
+        if (null!=serviceConnection){
+            mServiceConnection=null;
+            unbindService(serviceConnection);
+        }
     }
 
     @Override

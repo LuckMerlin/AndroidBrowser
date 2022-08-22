@@ -22,6 +22,8 @@ import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
+import com.luckmerlin.view.OnViewAttachedToWindow;
+import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
@@ -29,7 +31,7 @@ import com.merlin.model.OnBackPress;
 import java.io.File;
 
 public class ConveyorActivityModel extends BaseModel implements
-        OnActivityCreate, OnActivityDestroy, OnBackPress, OnClickListener,
+        OnViewAttachedToWindow, OnViewDetachedFromWindow, OnBackPress, OnClickListener,
         Executor.OnAddRemoveChangeListener {
     private ServiceConnection mServiceConnection;
     private final ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
@@ -188,27 +190,28 @@ public class ConveyorActivityModel extends BaseModel implements
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState, Activity activity) {
-         Intent intent=new Intent(activity, ConveyorService.class);
-         startService(intent);
-         bindService(intent, mServiceConnection=new ServiceConnection() {
-             @Override
-             public void onServiceConnected(ComponentName name, IBinder service) {
-                 Debug.D("EEEE onServiceConnected "+service);
-                 if (null!=service&&service instanceof Executor){
-                    setTaskExecutor((Executor)service);
-                 }
-             }
+    public void onViewAttachedToWindow(View v) {
+        Intent intent=new Intent(v.getContext(), ConveyorService.class);
+        startService(intent);
+        bindService(intent, mServiceConnection=new ServiceConnection() {
+                    @Override
+                    public void onServiceConnected(ComponentName name, IBinder service) {
+                        Debug.D("EEEE onServiceConnected "+service);
+                        if (null!=service&&service instanceof Executor){
+                            setTaskExecutor((Executor)service);
+                        }
+                    }
 
-             @Override
-             public void onServiceDisconnected(ComponentName name) {
-                 Debug.D("EEEE onServiceDisconnected "+name);
-             }
-         },Context.BIND_ABOVE_CLIENT|Context.BIND_AUTO_CREATE|Context.BIND_IMPORTANT);
+                    @Override
+                    public void onServiceDisconnected(ComponentName name) {
+                        Debug.D("EEEE onServiceDisconnected "+name);
+                    }
+                },
+                Context.BIND_ABOVE_CLIENT|Context.BIND_AUTO_CREATE|Context.BIND_IMPORTANT);
     }
 
     @Override
-    public void onDestroy(Activity activity) {
+    public void onViewDetachedFromWindow(View v) {
         ServiceConnection serviceConnection=mServiceConnection;
         if (null!=serviceConnection){
             mServiceConnection=null;
@@ -216,7 +219,7 @@ public class ConveyorActivityModel extends BaseModel implements
         }
     }
 
-    private boolean cancelTask(Object task,int option){
+    private boolean cancelTask(Object task, int option){
         Executor executor=null!=task?mExecutor:null;
         return null!=executor&&executor.option(task, option);
     }
