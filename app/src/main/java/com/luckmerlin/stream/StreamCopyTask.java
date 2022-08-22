@@ -66,7 +66,7 @@ public class StreamCopyTask extends AbstractTask {
                         if (value!=progress.intValue()){
                             notifyProgress(progress);
                         }
-                        return (canceled[0]=isCanceled())?false:true;
+                        return (canceled[0]=isCancelEnabled())?false:true;
                     })){
                 Debug.D("Fail execute stream copy task while copy fail.openLength="+openLength);
                 return new Response(Code.CODE_FAIL,"Succeed.");

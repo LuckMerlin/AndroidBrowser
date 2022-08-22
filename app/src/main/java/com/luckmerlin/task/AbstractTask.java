@@ -12,7 +12,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
     private Progress mProgress;
     private OnProgressChange mNotifier;
     private Result mResult;
-    private boolean mCanceled=false;
+    private Runtime mRuntime;
 
     public AbstractTask(Progress progress){
         mProgress=progress;
@@ -38,6 +38,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
     @Override
     public Result execute(Runtime runtime, OnProgressChange callback) {
         mResult=null;
+        mRuntime=runtime;
         mNotifier=(Task task, Progress progress)-> {
             mProgress=progress;
             iterateUpdaters((OnChangeUpdate data)-> null!=data&&data.onChangeUpdated(progress));
@@ -48,6 +49,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
         Result result= onExecute(runtime);
         notifyProgress(mProgress);
         mNotifier=null;
+        mRuntime=null;
         return mResult=result;
     }
 
@@ -66,13 +68,21 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
         return mResult;
     }
 
-    public final AbstractTask cancel(boolean cancel){
-        mCanceled=cancel;
+    protected final AbstractTask enableConfirm(Runtime runtime,boolean enable){
+        if (null!=runtime){
+            runtime.enableConfirm(enable);
+        }
         return this;
     }
 
-    public final boolean isCanceled() {
-        return mCanceled;
+    public final boolean isCancelEnabled() {
+        Runtime runtime=mRuntime;
+        return null!=runtime&&runtime.isCancelEnabled();
+    }
+
+    public final boolean isConfirmEnabled() {
+        Runtime runtime=mRuntime;
+        return null!=runtime&&runtime.isConfirmEnabled();
     }
 
     protected final String getString(Context context,int textId, Object... args){

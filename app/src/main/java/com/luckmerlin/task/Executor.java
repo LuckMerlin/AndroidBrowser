@@ -11,6 +11,7 @@ public interface Executor {
         public final static int DELETE=REMOVE|CANCEL;
         public final static int ON_SUCCEED=4;
         public final static int ON_FINISH=8;
+        public final static int CONFIRM=16;
     }
 
     interface Listener{

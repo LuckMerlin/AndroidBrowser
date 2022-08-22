@@ -25,6 +25,14 @@ public class Runtime {
         return mOption;
     }
 
+    public final Runtime enableConfirm(boolean enable){
+        return enableOption(Executor.Option.CONFIRM,enable);
+    }
+
+    public final boolean isConfirmEnabled() {
+        return isOptionEnabled(mOption,Executor.Option.CONFIRM);
+    }
+
     public final boolean isRemoveEnabled() {
         return isOptionEnabled(mOption,Executor.Option.REMOVE);
     }
@@ -37,8 +45,17 @@ public class Runtime {
         return isOptionEnabled(src,Executor.Option.DELETE);
     }
 
-    public final boolean isCanceled() {
+    public final Runtime cancel(boolean cancel) {
+        return enableOption(Executor.Option.CANCEL,cancel);
+    }
+
+    public final boolean isCancelEnabled() {
         return isOptionEnabled(mOption,Executor.Option.CANCEL);
+    }
+
+    private Runtime enableOption(int option,boolean enable){
+        mOption=enable?mOption|option:mOption&~option;
+        return this;
     }
 
     protected static boolean isOptionEnabled(int src,int option){

@@ -260,8 +260,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                         protected Confirm onCreate(Context context) {
                             return new Confirm().setMessage(getString(context, R.string.areYourSureWhich,
                                     getString(context,R.string.replace)+" "+toFile.getName())+
-                                    "\n"+toPath).setOnConfirm((boolean confirm)->
-                                    null!=enableConfirm(!confirm)?FileCopyTask.this:FileCopyTask.this);
+                                    "\n"+toPath).setOnConfirm((boolean confirm)->runtime.enableConfirm(confirm));
                         }
                     };
                 }
@@ -286,7 +285,6 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         Class cls=getClass();
         setProgress(in.readParcelable(cls.getClassLoader()));
         setResult(in.readParcelable(cls.getClassLoader()));
-        enableConfirm(in.readByte()==1);
         setName(in.readString());
         String file=null;
         mFromFile=null!=(file=in.readString())&&file.length()>0?new File(file):null;
@@ -300,7 +298,6 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         File file=null;
         dest.writeParcelable(null!=progress&&progress instanceof Parcelable?(Parcelable)progress:null ,flags);
         dest.writeParcelable(null!=result&&result instanceof Parcelable?(Parcelable)result:null ,flags);
-        dest.writeByte(isConfirmEnabled()?(byte) 1:0);
         dest.writeString(getName());
         dest.writeString(null!=(file=mFromFile)?file.toString():null);
         dest.writeString(null!=(file=mToFile)?file.toString():null);

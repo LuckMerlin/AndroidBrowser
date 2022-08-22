@@ -36,7 +36,7 @@ public class FileDeleteTask extends FileTask {
                     return new ConfirmResult.Confirm(getString(context, R.string.confirmWhich,
                             delete+(getString(context,file.isDirectory()?R.string.folder:R.string.file))
                                     +"["+file.getName()+"]"), (boolean confirm)->
-                            null!=enableConfirm(!confirm)?FileDeleteTask.this:FileDeleteTask.this).setTitle(delete);
+                            enableConfirm(runtime,!confirm)).setTitle(delete);
                 }
             };
         }

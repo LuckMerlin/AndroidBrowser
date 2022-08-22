@@ -133,6 +133,7 @@ public class ConveyorActivityModel extends BaseModel implements
 //                    (new File("/sdcard/Test")),LocalClient.createLocalFile
         (new File("/sdcard/TestNew/ddd.mp3")),LocalClient.createLocalFile
                     (new File("/sdcard/TestNew/我们.mp3")),null);
+//            copyTask.enableConfirm()
             copyTask.setName("任务名字");
 //            mConveyorListAdapter.add(copyTask);
 //            executor.execute(copyTask, Executor.Option.NONE,null);

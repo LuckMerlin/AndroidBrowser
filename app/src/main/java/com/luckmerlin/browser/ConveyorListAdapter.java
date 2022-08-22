@@ -23,6 +23,10 @@ import java.util.List;
 public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
     private final static int VIEW_TYPE_DATA_GROUP=2000;
 
+    public ConveyorListAdapter(){
+        setFixedHolder(VIEW_TYPE_EMPTY,R.layout.item_content_empty);
+    }
+
     @Override
     public int getItemViewType(int position) {
         int viewType=super.getItemViewType(position);
