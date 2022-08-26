@@ -109,11 +109,11 @@ public class ConveyorActivityModel extends BaseModel implements
     private void setTaskExecutor(Executor executor){
         Executor current=mExecutor;
         if (null!=current){
-            current.setListener(null);
+            current.removeListener(this);
         }
         mExecutor=executor;
         if (null!=executor){
-            executor.setListener(this);
+            executor.putListener(this,null);
             executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.
                     addTaskWithSort(null!=data?data.getTask():null));
             for (int i = 0; i < 100; i++) {

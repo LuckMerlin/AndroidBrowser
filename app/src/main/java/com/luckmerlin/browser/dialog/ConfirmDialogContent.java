@@ -15,6 +15,7 @@ import com.luckmerlin.task.ConfirmResult;
 public class ConfirmDialogContent extends BaseContent implements OnClickListener {
     private ConfirmResult.Confirm mConfirm;
     private OnConfirmFinish mOnConfirmFinish;
+    private ObservableField<String> mNotify=new ObservableField<>();
     private final ObservableField<ViewBinding> mConfirmBinding=new ObservableField<>();
 
     public interface OnConfirmFinish{
@@ -34,10 +35,16 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         //Do nothing
     }
 
+    public final ConfirmDialogContent setNotify(String notify){
+        mNotify.set(notify);
+        return this;
+    }
+
     @Override
     protected View onCreateContent(Context context) {
         ConfirmContentDialogBinding binding=inflate(context, R.layout.confirm_content_dialog);
         if (null!=binding){
+            mConfirmBinding.set(ViewBinding.clickId(R.string.confirm));
             binding.setContent(this);
             return binding.getRoot();
         }
@@ -66,15 +73,20 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         onConfirmFinish(confirmed,obj);
         OnConfirmFinish onConfirmFinish=mOnConfirmFinish;
         Object nextObj=null!=onConfirmFinish?onConfirmFinish.onConfirmFinish(confirmed,obj):null;
-        if (null==nextObj||!(nextObj instanceof ViewBinding)){
+        if (null==nextObj){
             return true;
         }
-        mConfirmBinding.set((ViewBinding) nextObj);
+        ViewBinding nextViewBinding=nextObj instanceof ViewBinding?(ViewBinding)nextObj:null;
+        mConfirmBinding.set(nextViewBinding);
         return false;
     }
 
     public final ConfirmResult.Confirm getConfirm() {
         return mConfirm;
+    }
+
+    public final ObservableField<String> getNotify() {
+        return mNotify;
     }
 
     public final ObservableField<ViewBinding> getConfirmBinding() {

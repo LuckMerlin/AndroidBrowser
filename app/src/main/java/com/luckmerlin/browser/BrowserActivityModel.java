@@ -24,6 +24,7 @@ import com.luckmerlin.browser.dialog.MenuContextDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
@@ -34,8 +35,11 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.luckmerlin.object.Parser;
+import com.luckmerlin.stream.Convertor;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
@@ -203,7 +207,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private void refreshConveyorBinder(){
         IBinder conveyorBinder=mConveyorBinder;
         if (null!=conveyorBinder&&conveyorBinder instanceof Executor){
-            ((Executor)conveyorBinder).setListener(this);
+            ((Executor)conveyorBinder).putListener(this,null);
         }
     }
 
@@ -261,6 +265,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return setCurrentAsHome()||true;
             case R.string.conveyor:
                 return startActivity(ConveyorActivity.class)||true;
+            case R.string.refresh:
+                BrowserListAdapter browserListAdapter=mBrowserAdapter;
+                return null!=browserListAdapter&&browserListAdapter.reset(null);
             case R.string.create:
                 return createFile()||true;
             case R.drawable.selector_checkbox:
@@ -288,17 +295,29 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         Client client=mBrowserClient.get();
         File file=(File)obj;
-        return null!=client&&null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.Confirm().
-                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).
-                        setMessage(file.getName()).setOnConfirm((boolean confirm)-> {
-                    client.deleteFile(file, (Object newData) ->{
-
-                        return false;
-                    }, (Reply<File> data)-> {
-
+        ConfirmDialogContent content=new ConfirmDialogContent(new ConfirmResult.Confirm().
+                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).setMessage(file.getName()).
+                setOnConfirm((boolean confirm)-> new FileDeleteTask(file,null)));
+        return null!=client&&null!=showContentDialog(content.setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
+                    if (null==confirmObj||!(confirmObj instanceof FileDeleteTask)||!confirmed){
+                        return null;
+                    }
+                    IBinder binder=mConveyorBinder;
+                    final Executor executor=null!=binder&&binder instanceof Executor?(Executor)binder:null;
+                    if (null==executor){
+                        toast(getString(R.string.error));
+                        return null;
+                    }
+                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
+                        content.setNotify(null!=task?""+task.getProgress():null);
+                    };
+                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> {
+                        executor.removeListener(listener);
                     });
-                    return null;
-                })),
+                    executor.putListener(listener,null);
+                    FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
+                    return executor.execute(deleteTask, Executor.Option.NONE,null);
+                }),
                 new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
     }

@@ -1,5 +1,5 @@
 package com.luckmerlin.task;
 
-public interface OnExecuteFinish {
+public interface OnExecuteFinish extends TaskLifeCycle {
     boolean onExecuteFinish(TaskExecutor executor);
 }

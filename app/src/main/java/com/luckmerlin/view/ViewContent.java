@@ -15,16 +15,37 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
+
+import com.luckmerlin.core.Matcher;
+import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.debug.Debug;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 public abstract class ViewContent implements Content {
     private View mRoot;
+    private List<ViewAttachedListener> mAttachListeners;
 
     protected abstract View onCreateContent(Context context);
 
     protected boolean onIterateEnable(){
         return true;//Default enable
+    }
+
+    public final boolean addOnAttachStateChangeListener(ViewAttachedListener listener){
+        if (null!=mRoot&&null!=listener){
+            List<ViewAttachedListener> attachListeners=mAttachListeners;
+            attachListeners=null!=attachListeners?attachListeners:(mAttachListeners=new ArrayList<>());
+            return !attachListeners.contains(listener)&&attachListeners.add(listener);
+        }
+        return false;
+    }
+
+    public final boolean removeOnAttachStateChangeListener(ViewAttachedListener listener){
+        List<ViewAttachedListener> attachListeners=mAttachListeners;
+        return null!=attachListeners&&null!=listener&&attachListeners.remove(listener);
     }
 
     @Override
@@ -43,12 +64,19 @@ public abstract class ViewContent implements Content {
                 }
             });
             if (this instanceof OnViewAttachedToWindow||this instanceof OnViewDetachedFromWindow){
+                final MatcherInvoker invoker=new MatcherInvoker();
                 frameLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
                     @Override
                     public void onViewAttachedToWindow(View v) {
                         if (ViewContent.this instanceof OnViewAttachedToWindow){
                             ((OnViewAttachedToWindow)ViewContent.this).onViewAttachedToWindow(v);
                         }
+                        invoker.match(mAttachListeners, (ViewAttachedListener data)-> {
+                            if (null!=data&&data instanceof OnViewAttachedToWindow){
+                                ((OnViewAttachedToWindow)data).onViewAttachedToWindow(v);
+                            }
+                            return false;
+                        });
                     }
 
                     @Override
@@ -57,6 +85,12 @@ public abstract class ViewContent implements Content {
                             ((OnViewDetachedFromWindow)ViewContent.this).onViewDetachedFromWindow(v);
                         }
                         frameLayout.removeOnAttachStateChangeListener(this);
+                        invoker.match(mAttachListeners, (ViewAttachedListener data)-> {
+                            if (null!=data&&data instanceof OnViewDetachedFromWindow){
+                                ((OnViewDetachedFromWindow)data).onViewDetachedFromWindow(v);
+                            }
+                            return false;
+                        });
                     }
                 });
             }

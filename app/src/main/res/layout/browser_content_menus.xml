@@ -12,13 +12,14 @@
         android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
         <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
-            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp" android:minLines="2" android:maxLines="2"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxWidth="120dp"/>
 
         <ScrollView android:layout_gravity="center" android:scrollbars="none" android:layout_marginTop="5dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView  binding:bind="@{VB.clickId(R.string.refresh)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.conveyor)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.setAsHome)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.create)}" style="@style/contextMenuTextView" />

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LManager</string>
     <string name="conveyor">Conveyor</string>
+    <string name="refresh">Refresh</string>
     <string name="multiChoose">Multiple</string>
     <string name="goTo">Go</string>
     <string name="terminal">Terminal</string>

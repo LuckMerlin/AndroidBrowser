@@ -2,6 +2,6 @@ package com.luckmerlin.view;
 
 import android.view.View;
 
-public interface OnViewDetachedFromWindow {
+public interface OnViewDetachedFromWindow extends ViewAttachedListener{
     void onViewDetachedFromWindow(View v);
 }

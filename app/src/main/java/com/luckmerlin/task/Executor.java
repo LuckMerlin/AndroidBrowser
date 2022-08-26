@@ -39,5 +39,6 @@ public interface Executor {
     boolean execute(Object task,int option,OnProgressChange callback);
     boolean option(Object task,int option);
     void match(Matcher<TaskExecutor.ExecuteTask> matcher);
-    Executor setListener(Listener listener);
+    Executor putListener(Listener listener,Matcher<Task> matcher);
+    Executor removeListener(Listener listener);
 }

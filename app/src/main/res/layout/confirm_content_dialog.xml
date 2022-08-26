@@ -5,6 +5,7 @@
         <variable name="content" type="com.luckmerlin.browser.dialog.ConfirmDialogContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
     </data>
     <FrameLayout android:background="@drawable/round_corner_gray"
         android:layout_width="match_parent" android:layout_height="match_parent">
@@ -21,9 +22,14 @@
             android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
             android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
+        <TextView android:text="@{content.notify??``}" android:textColor="@color/textNormal"
+            android:textSize="@dimen/textSmall" android:layout_gravity="center_horizontal"
+            android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
         <LinearLayout android:orientation="horizontal" android:layout_gravity="center" android:gravity="center"
             android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView binding:bind="@{content.confirmBinding??VB.clickId(R.string.confirm)}" style="@style/button"
+            <TextView binding:bind="@{content.confirmBinding}" style="@style/button"
+                android:visibility="@{null==content.confirmBinding?View.GONE:View.VISIBLE}"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
             <TextView binding:bind="@{VB.clickId(R.string.cancel)}" style="@style/button"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>

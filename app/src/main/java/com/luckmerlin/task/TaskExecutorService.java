@@ -58,8 +58,13 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public Executor setListener(Listener listener) {
-            return mExecutor.setListener(listener);
+        public Executor putListener(Listener listener, Matcher<Task> matcher) {
+            return mExecutor.putListener(listener,matcher);
+        }
+
+        @Override
+        public Executor removeListener(Listener listener) {
+            return mExecutor.removeListener(listener);
         }
     }
 }

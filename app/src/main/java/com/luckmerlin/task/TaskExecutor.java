@@ -9,7 +9,11 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.SynchronousQueue;
@@ -20,7 +24,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     private final List<ExecuteTask> mQueue=new CopyOnWriteArrayList<>();
     private ExecutorService mExecutor;
     private boolean mFullExecuting=false;
-    private Listener mListener;
+    private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
     private final TaskSaver mTaskSaver;
 
@@ -42,12 +46,12 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 ExecuteTask taskRunnable=(ExecuteTask)r;
                 taskRunnable.setStatus(STATUS_WAITING);
                 Task task=taskRunnable.mTask;
-                notifyStatusChange(STATUS_WAITING,task,mListener);
+                notifyStatusChange(STATUS_WAITING,task,mListeners);
                 if (null!=task&&(task instanceof OnExecuteWaiting)
                     &&((OnExecuteWaiting)task).onExecuteWaiting(TaskExecutor.this)){
                     Debug.D("Task is interrupted."+task);
                     taskRunnable.setStatus(STATUS_INTERRUPTED);
-                    notifyStatusChange(STATUS_INTERRUPTED,task,mListener);
+                    notifyStatusChange(STATUS_INTERRUPTED,task,mListeners);
                 }else {
                     Debug.D("Task is waiting."+task);
                 }
@@ -59,10 +63,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             execute(new InnerTask(){
                 @Override
                 public Result execute(Runtime runtime, OnProgressChange callback) {
-                    notifyStatusChange(STATUS_START_LOAD_SAVED,null,mListener);
+                    notifyStatusChange(STATUS_START_LOAD_SAVED,null,mListeners);
                     taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
                     poolExecutor.setMaximumPoolSize(maxPoolSize);
-                    notifyStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListener);
+                    notifyStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
                     return null;
                 }
             },Option.NONE);
@@ -70,8 +74,20 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     @Override
-    public final Executor setListener(Listener listener) {
-        mListener=listener;
+    public Executor putListener(Listener listener, Matcher<Task> matcher) {
+        Map<Listener,Matcher<Task>> listeners=mListeners;
+        if (null!=listener&&null!=listeners){
+            listeners.put(listener,matcher);
+        }
+        return this;
+    }
+
+    @Override
+    public Executor removeListener(Listener listener) {
+        Map<Listener,Matcher<Task>> listeners=mListeners;
+        if (null!=listener&&null!=listeners){
+            listeners.remove(listener);
+        }
         return this;
     }
 
@@ -142,11 +158,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         match((ExecuteTask data)-> null!=data&&data.isTask(task)&&null!=(existTask[0]=data));
         ExecuteTask executeTask=existTask[0];
         if (null==executeTask){
-            executeTask=new ExecuteTask(task,option,fromSaved,callback) {
+            executeTask=new ExecuteTask(task, option, fromSaved,callback) {
                 @Override
                 public void run() {
                     setStatus(STATUS_EXECUTING);
-                    notifyStatusChange(STATUS_EXECUTING,task,mListener);
+                    notifyStatusChange(STATUS_EXECUTING,task,mListeners);
                     if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).
                             onExecuteStart(TaskExecutor.this)){
                         mTask.execute(this,mCallback);
@@ -156,7 +172,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     if (task instanceof OnExecuteFinish&&((OnExecuteFinish)task).onExecuteFinish(TaskExecutor.this)){
                         //Do nothing
                     }
-                    notifyStatusChange(STATUS_FINISH,task,mListener);
+                    notifyStatusChange(STATUS_FINISH,task,mListeners);
+                    if (null!=callback&&callback instanceof OnExecuteFinish){
+                        post(()->((OnExecuteFinish)callback).onExecuteFinish(TaskExecutor.this),-1);
+                    }
                     if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
                     }
@@ -181,7 +200,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             }else{
                 mQueue.add(executeTask);
             }
-            notifyStatusChange(STATUS_ADD,task,mListener);
+            notifyStatusChange(STATUS_ADD,task,mListeners);
         }
         //
         if (!executeTask.isStatus(STATUS_PENDING, STATUS_INTERRUPTED,STATUS_FINISH,STATUS_WAITING)){
@@ -189,7 +208,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             return false;
         }
         Debug.D("Pending execute task."+task);
-        notifyStatusChange(STATUS_PENDING,task,mListener);
+        notifyStatusChange(STATUS_PENDING,task,mListeners);
         executeTask.setStatus(STATUS_PENDING);
         executor.execute(executeTask);
         return true;
@@ -286,11 +305,15 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
     }
 
+    private void notifyStatusChange(int status,Task task,Map<Listener,Matcher<Task>> listeners){
+
+    }
+
     private void notifyStatusChange(int status,Task task,Listener listener){
         if (null!=listener&&!isInnerTask(task)){
             if (listener instanceof OnAddRemoveChangeListener&&(status==STATUS_ADD||status==STATUS_REMOVE)){
                 OnAddRemoveChangeListener changeListener=((OnAddRemoveChangeListener)listener);
-                if (isUiThread()){
+                if (!(listener instanceof UiListener)||isUiThread()){
                     changeListener.onAddRemoveChanged(status,task,TaskExecutor.this);
                 }else{
                     post(()->changeListener.onAddRemoveChanged(status,task,TaskExecutor.this),0);
@@ -299,7 +322,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
             if (listener instanceof OnStatusChangeListener){
                 OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
-                if (isUiThread()){
+                if (!(listener instanceof UiListener)||isUiThread()){
                     changeListener.onStatusChanged(status,task,TaskExecutor.this);
                 }else{
                     post(()->changeListener.onStatusChanged(status,task,TaskExecutor.this),0);
