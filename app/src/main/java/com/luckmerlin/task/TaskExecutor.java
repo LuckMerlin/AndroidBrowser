@@ -13,6 +13,7 @@ import com.luckmerlin.debug.Debug;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -77,7 +78,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     public Executor putListener(Listener listener, Matcher<Task> matcher) {
         Map<Listener,Matcher<Task>> listeners=mListeners;
         if (null!=listener&&null!=listeners){
-            listeners.put(listener,matcher);
+            listeners.put(listener,null!=matcher?matcher:(Task data)-> true);
         }
         return this;
     }
@@ -173,9 +174,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                         //Do nothing
                     }
                     notifyStatusChange(STATUS_FINISH,task,mListeners);
-                    if (null!=callback&&callback instanceof OnExecuteFinish){
-                        post(()->((OnExecuteFinish)callback).onExecuteFinish(TaskExecutor.this),-1);
-                    }
                     if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
                     }
@@ -306,28 +304,27 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     private void notifyStatusChange(int status,Task task,Map<Listener,Matcher<Task>> listeners){
-
+        Set<Listener> set=null!=listeners&&!isInnerTask(task)?listeners.keySet():null;
+        if (null!=set){
+            Matcher<Task> matcher=null;Boolean matched=null;
+            for (Listener listener:set) {
+                if (null!=(matcher=listeners.get(listener))&&null!=(matched=matcher.match(task))&&matched){
+                    notifyStatusChange(status,task,listener);
+                }
+            }
+        }
     }
 
     private void notifyStatusChange(int status,Task task,Listener listener){
-        if (null!=listener&&!isInnerTask(task)){
-            if (listener instanceof OnAddRemoveChangeListener&&(status==STATUS_ADD||status==STATUS_REMOVE)){
-                OnAddRemoveChangeListener changeListener=((OnAddRemoveChangeListener)listener);
-                if (!(listener instanceof UiListener)||isUiThread()){
-                    changeListener.onAddRemoveChanged(status,task,TaskExecutor.this);
-                }else{
-                    post(()->changeListener.onAddRemoveChanged(status,task,TaskExecutor.this),0);
-                }
-            }
-
-            if (listener instanceof OnStatusChangeListener){
-                OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
-                if (!(listener instanceof UiListener)||isUiThread()){
-                    changeListener.onStatusChanged(status,task,TaskExecutor.this);
-                }else{
-                    post(()->changeListener.onStatusChanged(status,task,TaskExecutor.this),0);
-                }
-            }
+        if (null==listener){
+            return;
+        }else if (listener instanceof UiListener&&!isUiThread()){
+            post(()->notifyStatusChange(status,task,listener),-1);
+            return;
+        }
+        if (listener instanceof OnStatusChangeListener){
+            OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
+            changeListener.onStatusChanged(status,task,TaskExecutor.this);
         }
     }
 

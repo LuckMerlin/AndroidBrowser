@@ -18,10 +18,6 @@ public interface Executor {
 
     }
 
-    public interface OnAddRemoveChangeListener extends Listener{
-        void onAddRemoveChanged(int status,Task task,Executor executor);
-    }
-
     public interface OnStatusChangeListener extends Listener{
         void onStatusChanged(int status,Task task,Executor executor);
     }

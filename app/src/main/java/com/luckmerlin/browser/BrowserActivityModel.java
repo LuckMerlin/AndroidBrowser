@@ -25,6 +25,7 @@ import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FileDeleteTask;
+import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
@@ -308,14 +309,18 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(getString(R.string.error));
                         return null;
                     }
-                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
-                        content.setNotify(null!=task?""+task.getProgress():null);
-                    };
-                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> {
-                        executor.removeListener(listener);
-                    });
-                    executor.putListener(listener,null);
                     FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
+                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
+                        Progress progress=null!=task?task.getProgress():null;
+
+//                        post(()->content.setNotify(null!=task?""+task.getProgress():null));
+                        if (status==Executor.STATUS_FINISH&&null!=task&&task==deleteTask){
+                            post(()->content.removeFromParent());
+                        }
+                    };
+                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->
+                            executor.removeListener(listener));
+                    executor.putListener(listener,(Task data) ->null!=data&&data==deleteTask);
                     return executor.execute(deleteTask, Executor.Option.NONE,null);
                 }),
                 new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,

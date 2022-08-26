@@ -32,7 +32,7 @@ import java.io.File;
 
 public class ConveyorActivityModel extends BaseModel implements
         OnViewAttachedToWindow, OnViewDetachedFromWindow, OnBackPress, OnClickListener,
-        Executor.OnAddRemoveChangeListener {
+        Executor.OnStatusChangeListener {
     private ServiceConnection mServiceConnection;
     private final ConveyorListAdapter mConveyorListAdapter=new ConveyorListAdapter();
     private Executor mExecutor;
@@ -95,7 +95,7 @@ public class ConveyorActivityModel extends BaseModel implements
     }
 
     @Override
-    public void onAddRemoveChanged(int status, Task task, Executor executor) {
+    public void onStatusChanged(int status, Task task, Executor executor) {
         switch (status){
             case Executor.STATUS_ADD:
                 mConveyorListAdapter.addTaskWithSort(task);
