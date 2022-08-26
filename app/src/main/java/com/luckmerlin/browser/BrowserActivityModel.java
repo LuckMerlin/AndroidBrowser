@@ -170,7 +170,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public boolean entryMode(Mode mode){
         Mode current=mBrowserMode.get();
-        if ((null==current&&null==mode)||(null!=current&&null!=mode&&current==mode)){
+        if(null==current&&null==mode){
+            return true;
+        }else if (null!=current&&null!=mode&&current==mode){
             return true;
         }
         mBrowserMode.set(mode);
@@ -247,6 +249,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
                 return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).addFile(obj));
+            case R.string.copy:
+                return entryMode(new Mode(Mode.MODE_COPY).addFile(obj));
+            case R.string.move:
+                return entryMode(new Mode(Mode.MODE_MOVE).addFile(obj));
+            case R.string.download:
+                return entryMode(new Mode(Mode.MODE_DOWNLOAD).addFile(obj));
+            case R.string.upload:
+                return entryMode(new Mode(Mode.MODE_UPLOAD).addFile(obj));
             case R.string.setAsHome:
                 return setCurrentAsHome()||true;
             case R.string.conveyor:

@@ -23,6 +23,7 @@
                 <TextView  binding:bind="@{VB.clickId(R.string.copy,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.move,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.delete,content.file)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(content.file.localFile?R.string.upload:R.string.download,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.setAsHome,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.multiChoose,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.attr,content.file)}" style="@style/contextMenuTextView" />

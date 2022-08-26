@@ -23,7 +23,7 @@
 
         <LinearLayout android:orientation="horizontal" android:layout_gravity="center" android:gravity="center"
             android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView binding:bind="@{VB.clickId(R.string.confirm)}" style="@style/button"
+            <TextView binding:bind="@{content.confirmBinding??VB.clickId(R.string.confirm)}" style="@style/button"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
             <TextView binding:bind="@{VB.clickId(R.string.cancel)}" style="@style/button"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>

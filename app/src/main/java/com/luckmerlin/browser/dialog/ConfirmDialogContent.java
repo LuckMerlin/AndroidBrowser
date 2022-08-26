@@ -2,6 +2,10 @@ package com.luckmerlin.browser.dialog;
 
 import android.content.Context;
 import android.view.View;
+
+import androidx.databinding.ObservableField;
+
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.ConfirmContentDialogBinding;
@@ -11,9 +15,10 @@ import com.luckmerlin.task.ConfirmResult;
 public class ConfirmDialogContent extends BaseContent implements OnClickListener {
     private ConfirmResult.Confirm mConfirm;
     private OnConfirmFinish mOnConfirmFinish;
+    private final ObservableField<ViewBinding> mConfirmBinding=new ObservableField<>();
 
     public interface OnConfirmFinish{
-        void onConfirmFinish(boolean confirmed,Object confirmObj);
+        Object onConfirmFinish(boolean confirmed,Object confirmObj);
     }
 
     public ConfirmDialogContent(ConfirmResult.Confirm confirmResult){
@@ -44,9 +49,9 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         switch (clickId){
             case R.drawable.selector_close:
             case R.string.cancel:
-                return ((makeConfirm(false)||true)&&removeFromParent())||true;
+                return (makeConfirm(false)&&removeFromParent())||true;
             case R.string.confirm:
-                return ((makeConfirm(true)||true)&&removeFromParent())||true;
+                return (makeConfirm(true)&&removeFromParent())||true;
         }
         return false;
     }
@@ -55,18 +60,24 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         ConfirmResult.Confirm confirm=mConfirm;
         ConfirmResult.OnConfirm onConfirm=null!=confirm?confirm.getOnConfirm():null;
         if (null==onConfirm){
-            return false;
+            return true;
         }
         Object obj=null!=onConfirm?onConfirm.onConfirm(confirmed):null;
         onConfirmFinish(confirmed,obj);
         OnConfirmFinish onConfirmFinish=mOnConfirmFinish;
-        if (null!=onConfirmFinish){
-            onConfirmFinish.onConfirmFinish(confirmed,obj);
+        Object nextObj=null!=onConfirmFinish?onConfirmFinish.onConfirmFinish(confirmed,obj):null;
+        if (null==nextObj||!(nextObj instanceof ViewBinding)){
+            return true;
         }
-        return true;
+        mConfirmBinding.set((ViewBinding) nextObj);
+        return false;
     }
 
     public final ConfirmResult.Confirm getConfirm() {
         return mConfirm;
+    }
+
+    public final ObservableField<ViewBinding> getConfirmBinding() {
+        return mConfirmBinding;
     }
 }
