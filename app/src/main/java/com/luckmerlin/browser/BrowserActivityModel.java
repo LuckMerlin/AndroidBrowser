@@ -190,7 +190,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     return toast(getString(R.string.inputEmpty))||true;
                 }else if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&&
                         null!=group.add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&& (size=group.getSize())>0){
-                    startTask(size==1?group.find(null):group);
+                    startTask(size==1?group.find(null):group, Executor.Option.NONE,null);
                 }
                 entryMode(null,null,null);//Entry normal mode again
             }
@@ -202,8 +202,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return true;
     }
 
-    private boolean startTask(){
-        return false;
+    private boolean startTask(Task task,int option,OnProgressChange change){
+        IBinder binder=mConveyorBinder;
+        if (null==binder||!(binder instanceof Executor)){
+            return false;
+        }
+        return ((Executor)binder).execute(task,option,change);
     }
 
     @Override
