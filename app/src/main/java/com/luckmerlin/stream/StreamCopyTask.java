@@ -7,7 +7,6 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
-import com.luckmerlin.task.TaskProgress;
 import com.luckmerlin.utils.Utils;
 
 public class StreamCopyTask extends AbstractTask {
@@ -36,7 +35,7 @@ public class StreamCopyTask extends AbstractTask {
                 return new Response(Code.CODE_ERROR,"Open output stream fail");
             }
             final long openLength=outputStream.getOpenLength();
-            final TaskProgress progress=new TaskProgress();
+            final Progress progress=new Progress();
             notifyProgress(progress);
             Debug.D("Opened copy task output stream.openLength="+openLength);
             inputStream=mInputStream;

@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
+import com.luckmerlin.browser.client.LocalClient;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
@@ -11,7 +13,6 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
-import com.luckmerlin.task.TaskProgress;
 
 public class FileDeleteTask extends FileTask {
     private File mFile;
@@ -66,15 +67,18 @@ public class FileDeleteTask extends FileTask {
         return new Response(Code.CODE_SUCCEED,null);
     }
 
-    private boolean doDeleteAndroidFile(java.io.File file,TaskProgress progress){
+    private boolean doDeleteAndroidFile(java.io.File file,Progress progress){
         if (null==file||!file.exists()){
             return false;
         }
+        File fileObj=LocalClient.createLocalFile(file);
+        DoingFiles doingFiles=new DoingFiles().setFrom(fileObj).setTo(fileObj);
+        progress=null!=progress?progress:new Progress().setTitle(file.getName()).
+                setTotal(1).setPosition(0).setData(doingFiles);
+        notifyProgress(progress);
         if (file.isDirectory()){
             java.io.File[] files=file.listFiles();
             int length=null!=files?files.length:-1;
-            notifyProgress(progress=null!=progress?progress:new TaskProgress().setTitle(file.getName())
-                    .setTotal(length).setPosition(0));
             for (int i = 0; i < length; i++) {
                 if (!doDeleteAndroidFile(files[i],progress)){
                     return false;
@@ -82,8 +86,9 @@ public class FileDeleteTask extends FileTask {
                 notifyProgress(progress.setPosition(i+1));
             }
         }
-        notifyProgress(null!=progress?progress:new TaskProgress().setTitle(file.getName())
-                .setTotal(1).setPosition(1));
-        return file.delete();
+        file.delete();
+        boolean notExist=!file.exists();
+        notifyProgress(progress.setPosition(notExist?1:0));
+        return notExist;
     }
 }

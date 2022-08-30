@@ -55,6 +55,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return false;
     }
 
+    public boolean isCurrentFolder(String path){
+        if (null==path||path.length()<=0){
+            return false;
+        }
+        BrowseQuery current=getCurrent();
+        String folderPath=null!=current?current.mFolderPath:null;
+        return null!=folderPath&&path.startsWith(folderPath);
+    }
+
     public final boolean setMode(Mode mode){
         mMode=mode;
         notifyAttachedItemChanged();

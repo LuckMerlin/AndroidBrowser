@@ -17,7 +17,7 @@ import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskProgress;
+
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -163,7 +163,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
     @Override
     protected Result onExecute(Runtime runtime) {
         File file=mFromFile;
-        TaskProgress progress=new TaskProgress().setPosition(0).setTotal(1).setTitle(null!=file?file.getName():null);
+        Progress progress=new Progress().setPosition(0).setTotal(1).setTitle(null!=file?file.getName():null);
         notifyProgress(progress);
         Result result=copyFile(mFromFile, mToFile, runtime,(File fromFile, File toFile, Progress childProgress)->
                 notifyProgress(progress.setSubProgress(childProgress)));
@@ -185,7 +185,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         OutputStream outputStream=null;InputStream inputStream=null;
         try {
             if (null!=onProgressChange){
-                onProgressChange.onFileProgressChange(fromFile,toFile,new TaskProgress().setTitle(fromFile.getName()));
+                onProgressChange.onFileProgressChange(fromFile,toFile,new Progress().setTitle(fromFile.getName()));
             }
             if (fromFile.isDirectory()){//Is folder
                 Response<File> response=createFolder(toFile);

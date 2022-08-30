@@ -77,6 +77,11 @@ public abstract class BaseModel extends BaseContent {
 
     }
 
+    public final boolean isDialogShowing(){
+        WindowContentDialog dialog=mWindowDialog;
+        return null!=dialog&&dialog.isShowing();
+    }
+
     public final boolean dismissDialog(){
         WindowContentDialog dialog=mWindowDialog;
         return null!=dialog&&dialog.dismiss();

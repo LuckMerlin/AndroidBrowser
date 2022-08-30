@@ -114,7 +114,9 @@ public class File extends JsonObject {
         if (null==obj){
             return false;
         }else if (obj instanceof File){
-            return ((File)obj).isPatchEquals(getPath());
+            return isPatchEquals(((File)obj).getPath());
+        }else if (obj instanceof String){
+            return isPatchEquals((String)obj);
         }
         return super.equals(obj);
     }

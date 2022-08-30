@@ -21,6 +21,7 @@ import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.MenuContextDialogContent;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
@@ -312,14 +313,24 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
                     final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
                         Progress progress=null!=task?task.getProgress():null;
-
-//                        post(()->content.setNotify(null!=task?""+task.getProgress():null));
+                        Object progressObj=null!=progress?progress.getData():null;
+                        if (null!=progressObj&&progressObj instanceof DoingFiles){
+                            DoingFiles doingFiles=(DoingFiles)progressObj;
+                            post(()->{
+                                content.setNotify(doingFiles.getTitle());
+                                BrowserListAdapter browserAdapter=mBrowserAdapter;
+                                File fromFile;
+                                if (null!=browserAdapter&&null!=(fromFile=doingFiles.getFrom())&&browserAdapter.
+                                        isCurrentFolder(fromFile.getPath())){
+                                    mBrowserAdapter.remove(fromFile);
+                                }
+                            });
+                        }
                         if (status==Executor.STATUS_FINISH&&null!=task&&task==deleteTask){
                             post(()->content.removeFromParent());
                         }
                     };
-                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->
-                            executor.removeListener(listener));
+                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> executor.removeListener(listener));
                     executor.putListener(listener,(Task data) ->null!=data&&data==deleteTask);
                     return executor.execute(deleteTask, Executor.Option.NONE,null);
                 }),
