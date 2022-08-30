@@ -66,4 +66,5 @@
     <string name="transporterNotBind">Conveyor not prepared</string>
     <string name="noneTargetFolder">None target folder</string>
     <string name="notActionHere">Not access for action here</string>
+    <string name="canNotOperateHere">Can not operate here.</string>
 </resources>

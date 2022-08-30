@@ -7,6 +7,7 @@ import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.file.File;
+import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -28,6 +29,10 @@ public final class FileCopyTask extends FileTask implements Parcelable {
     private final File mFromFile;
     private final File mToFile;
     private byte[] mBuffer;
+
+    public FileCopyTask(File fromFile, Folder toFolder, Progress progress) {
+        this(fromFile,null!=toFolder&&null!=fromFile?toFolder.childFile(fromFile.getName()):null,progress);
+    }
 
     public FileCopyTask(File fromFile,File toFile,Progress progress) {
         super(progress);

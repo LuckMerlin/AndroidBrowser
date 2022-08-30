@@ -25,7 +25,9 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
+import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
@@ -43,6 +45,7 @@ import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
+import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.merlin.adapter.ListAdapter;
@@ -52,6 +55,8 @@ import com.merlin.model.OnBackPress;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
@@ -132,10 +137,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if (null==client){
             return null;
         }
-        execute(()->{
-            Reply<Folder> reply=client.loadFiles(args,from,pageSize);
-            post(()->notifyFinish(reply,callback));
-        });
+        execute(()->post(()->notifyFinish(client.loadFiles(args,from,pageSize),callback)));
         return ()->false;
     }
 
@@ -174,16 +176,34 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
     }
 
-    public boolean entryMode(Mode mode){
+    public boolean entryMode(Integer modeInt,Object obj,ModeFileTaskCreator creator){
         Mode current=mBrowserMode.get();
-        if(null==current&&null==mode){
+        if(null==current&&null==modeInt){
             return true;
-        }else if (null!=current&&null!=mode&&current==mode){
+        }else if (null!=current&&null!=modeInt&&current.isMode(modeInt)){
+            if (null!=creator){
+                TaskGroup group=new TaskGroup();
+                Client client=mBrowserClient.get();
+                Folder currentFolder=mCurrentFolder.get();
+                List args=current.getArgs();int size=0;
+                if (null==args||args.size()<=0){
+                    return toast(getString(R.string.inputEmpty))||true;
+                }else if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&&
+                        null!=group.add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&& (size=group.getSize())>0){
+                    startTask(size==1?group.find(null):group);
+                }
+                entryMode(null,null,null);//Entry normal mode again
+            }
             return true;
         }
+        Mode mode=null!=modeInt?new Mode(modeInt).add(obj):null;
         mBrowserMode.set(mode);
         mBrowserAdapter.setMode(mode);
         return true;
+    }
+
+    private boolean startTask(){
+        return false;
     }
 
     @Override
@@ -248,21 +268,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return browserBack()||true;
             case R.drawable.selector_cancel:
             case R.string.cancel:
-                return entryMode(null)||true;
+                return entryMode(null,null,null)||true;
             case R.string.delete:
                 return deleteFile(obj)||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
-                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).addFile(obj));
-            case R.string.copy:
-                return entryMode(new Mode(Mode.MODE_COPY).addFile(obj));
-            case R.string.move:
-                return entryMode(new Mode(Mode.MODE_MOVE).addFile(obj));
-            case R.string.download:
-                return entryMode(new Mode(Mode.MODE_DOWNLOAD).addFile(obj));
-            case R.string.upload:
-                return entryMode(new Mode(Mode.MODE_UPLOAD).addFile(obj));
+                return entryMode(Mode.MODE_MULTI_CHOOSE,obj,null);
             case R.string.setAsHome:
                 return setCurrentAsHome()||true;
             case R.string.conveyor:
@@ -280,6 +292,38 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return null!=mode&&mode.enableAll(!mode.isAllEnabled())&&mBrowserAdapter.setMode(mode);
             case R.string.exit:
                 return finishActivity()||true;
+            case R.string.copy:
+                return entryMode(Mode.MODE_COPY, obj, (Mode copyMode,Client client,File file,Folder folder)-> {
+                    if (null==copyMode||null==folder||folder.isChild(file,false)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return null;
+                    }
+                    return new FileCopyTask(file,folder,null);
+                });
+            case R.string.move:
+                return entryMode(Mode.MODE_MOVE, obj, (Mode moveMode,Client client,File file, Folder folder)-> {
+                    if (null==moveMode||null==folder||folder.isChild(file,false)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return null;
+                    }
+                    return new FileMoveTask(file,folder,null);
+                });
+            case R.string.download:
+                return entryMode(Mode.MODE_DOWNLOAD, obj, (Mode downloadMode,Client client,File file, Folder folder)-> {
+                    if (null==downloadMode||null==folder||folder.isChild(file,false)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return null;
+                    }
+                    return new FileCopyTask(file,folder,null);
+                });
+            case R.string.upload:
+                return entryMode(Mode.MODE_UPLOAD, obj, (Mode uploadMode,Client client,File file, Folder folder)-> {
+                    if (null==uploadMode||null==folder||folder.isChild(file,false)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return null;
+                    }
+                    return new FileCopyTask(file,folder,null);
+                });
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -413,5 +457,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public final ObservableField<Mode> getBrowserMode() {
         return mBrowserMode;
+    }
+
+    private interface ModeFileTaskCreator{
+        Task onCreateTask(Mode mode,Client client,File file,Folder folder);
     }
 }

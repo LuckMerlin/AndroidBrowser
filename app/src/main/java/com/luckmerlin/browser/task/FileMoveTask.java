@@ -2,6 +2,7 @@ package com.luckmerlin.browser.task;
 
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.File;
+import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -11,6 +12,10 @@ import com.luckmerlin.task.Runtime;
 public class FileMoveTask extends FileTask{
     private final File mFromFile;
     private final File mToFile;
+
+    public FileMoveTask(File fromFile,Folder toFolder,Progress progress) {
+        this(fromFile,null!=toFolder&&null!=fromFile?toFolder.childFile(fromFile.getName()):null,progress);
+    }
 
     public FileMoveTask(File fromFile,File toFile,Progress progress) {
         super(progress);

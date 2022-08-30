@@ -49,6 +49,10 @@ public class File extends JsonObject {
         return mime;
     }
 
+    public File childFile(String childName){
+        return null!=childName&&childName.length()>0?new File(this).setParent(getPath()).setName(childName):null;
+    }
+
     public File setMime(String mime){
         return putSafe(this,Label.LABEL_MIME,mime);
     }
@@ -95,6 +99,22 @@ public class File extends JsonObject {
 
     public File setSep(String sep){
         return putSafe(this,Label.LABEL_SEP,sep);
+    }
+
+    public final boolean isChild(Object pathObj,boolean parent){
+        if (null==pathObj){
+            return false;
+        }else if (pathObj instanceof File){
+            return isChild(((File)pathObj).getPath(),parent);
+        }else if (!(pathObj instanceof String)){
+            return false;
+        }
+        String path=(String)pathObj;
+        if (path.length()<=0){
+            return false;
+        }
+        String current=parent?getParent():getPath();
+        return null!=current&&path.startsWith(current);
     }
 
     public String getPath(){

@@ -15,6 +15,10 @@ public class TaskGroup extends AbstractTask{
     private final Map<Task,Boolean> mQueue=new HashMap<>();
     private Task mExecuting;
 
+    public TaskGroup() {
+        this(null);
+    }
+
     public TaskGroup(Progress progress) {
         super(progress);
     }

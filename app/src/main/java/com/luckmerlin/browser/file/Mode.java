@@ -1,6 +1,7 @@
 package com.luckmerlin.browser.file;
 
 import com.luckmerlin.browser.R;
+import com.luckmerlin.core.Matcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,6 @@ public final class Mode {
         return false;
     }
 
-
     public Mode remove(Object arg){
         ArrayList<Object> args=null!=arg?mArgs:null;
         if (null!=args){
@@ -62,6 +62,22 @@ public final class Mode {
             }
         }
         return this;
+    }
+
+    public boolean checkArgs(Matcher<Object> matcher){
+        ArrayList<Object> args=mArgs;
+        if (null!=args&&null!=matcher){
+            synchronized (args){
+                Boolean matched=null;
+                for (Object child:args) {
+                    if (null==(matched=matcher.match(child))||!matched){
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public Mode cleanArgs(){
