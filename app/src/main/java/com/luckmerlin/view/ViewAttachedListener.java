@@ -1,4 +1,4 @@
 package com.luckmerlin.view;
 
-public interface ViewAttachedListener {
+public interface ViewAttachedListener{
 }

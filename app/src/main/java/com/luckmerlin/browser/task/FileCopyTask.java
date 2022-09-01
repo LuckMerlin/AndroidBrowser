@@ -265,7 +265,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                         protected Confirm onCreate(Context context) {
                             return new Confirm().setMessage(getString(context, R.string.areYourSureWhich,
                                     getString(context,R.string.replace)+" "+toFile.getName())+
-                                    "\n"+toPath).setOnConfirm((boolean confirm)->runtime.enableConfirm(confirm));
+                                    "\n"+toPath).setOnConfirm((boolean confirm)->null!=runtime.enableConfirm(confirm)?null:null);
                         }
                     };
                 }

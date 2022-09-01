@@ -85,9 +85,13 @@ public abstract class ViewContent implements Content {
                             ((OnViewDetachedFromWindow)ViewContent.this).onViewDetachedFromWindow(v);
                         }
                         frameLayout.removeOnAttachStateChangeListener(this);
-                        invoker.match(mAttachListeners, (ViewAttachedListener data)-> {
+                        List<ViewAttachedListener> listeners=mAttachListeners;
+                        invoker.match(listeners, (ViewAttachedListener data)-> {
                             if (null!=data&&data instanceof OnViewDetachedFromWindow){
                                 ((OnViewDetachedFromWindow)data).onViewDetachedFromWindow(v);
+                                if (data instanceof AutoRemove){
+                                   post(()->listeners.remove(data));
+                                }
                             }
                             return false;
                         });

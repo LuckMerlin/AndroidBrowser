@@ -1,6 +1,6 @@
 package com.luckmerlin.task;
 
-public class Runtime {
+public abstract class Runtime {
     private int mOption;
     private int mStatus=Executor.STATUS_PENDING;
 
@@ -21,13 +21,15 @@ public class Runtime {
         return false;
     }
 
-    protected int getOption() {
+    public int getOption() {
         return mOption;
     }
 
     public final Runtime enableConfirm(boolean enable){
         return enableOption(Executor.Option.CONFIRM,enable);
     }
+
+    public abstract Executor getExecutor();
 
     public final boolean isConfirmEnabled() {
         return isOptionEnabled(mOption,Executor.Option.CONFIRM);

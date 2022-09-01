@@ -1,13 +1,15 @@
 package com.luckmerlin.task;
 
 import android.content.Context;
+
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.core.Result;
 
 public abstract class ConfirmResult implements Result {
     private Confirm mConfirm;
 
     public interface OnConfirm{
-        Object onConfirm(boolean confirm);
+        ViewBinding onConfirm(boolean confirm);
     }
 
     public static class Confirm{

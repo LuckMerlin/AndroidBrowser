@@ -174,7 +174,7 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
                 return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.
-                        Confirm().setOnConfirm((boolean confirmed)-> confirmed?obj:null).
+                        Confirm().setOnConfirm((boolean confirmed)-> confirmed?null:null).
                         setTitle(getString(R.string.delete)).setMessage(getString
                         (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
                             if (cancelTask(confirmObj, Executor.Option.CANCEL|Executor.Option.DELETE)&&null!=obj&&obj instanceof Task) {

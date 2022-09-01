@@ -159,7 +159,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         match((ExecuteTask data)-> null!=data&&data.isTask(task)&&null!=(existTask[0]=data));
         ExecuteTask executeTask=existTask[0];
         if (null==executeTask){
-            executeTask=new ExecuteTask(task, option, fromSaved,callback) {
+            executeTask=new ExecuteTask(this,task, option, fromSaved,callback) {
                 @Override
                 public void run() {
                     setStatus(STATUS_EXECUTING);
@@ -281,12 +281,19 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         protected final Task mTask;
         protected final boolean mFromSaved;
         protected final OnProgressChange mCallback;
+        protected final Executor mExecutor;
 
-        protected ExecuteTask(Task task,int option,boolean fromSaved,OnProgressChange callback){
+        protected ExecuteTask(Executor executor,Task task,int option,boolean fromSaved,OnProgressChange callback){
             super(option);
+            mExecutor=executor;
             mTask=task;
             mFromSaved=fromSaved;
             mCallback=callback;
+        }
+
+        @Override
+        public Executor getExecutor() {
+            return mExecutor;
         }
 
         public final boolean isTask(Task task){

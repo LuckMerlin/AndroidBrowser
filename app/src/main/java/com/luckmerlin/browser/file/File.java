@@ -39,6 +39,13 @@ public class File extends JsonObject {
         return putSafe(this,Label.LABEL_NAME,name);
     }
 
+    public boolean isHostEquals(String host){
+        String current=getHost();
+        current=null!=current?current.trim():null;
+        host=null!=host?host.trim():null;
+        return (null==host&&null==current)||(null!=host&&null!=current&&current.equals(host));
+    }
+
     public String getMime(){
         String mime=optString(Label.LABEL_MIME,null);
         if (!isDirectory()&&(null==mime||mime.length()<=0)){

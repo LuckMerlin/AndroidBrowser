@@ -21,6 +21,7 @@ import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.MenuContextDialogContent;
+import com.luckmerlin.browser.dialog.TaskDialogContent;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -28,6 +29,7 @@ import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
+import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
@@ -48,6 +50,7 @@ import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
+import com.luckmerlin.view.ViewAttachedListener;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.model.OnActivityCreate;
@@ -71,7 +74,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private ServiceConnection mServiceConnection;
-    private IBinder mConveyorBinder;
+    private BrowserExecutor mExecutor;
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
              loadFiles(args, from, pageSize, null!=callback?(Reply<Folder> data)->
@@ -92,44 +95,16 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPageLoadedListener(this);
         mPathSpanClick.setOnClickListener(this);
-//        mBrowserClient.set(new NasClient(getHttp()));
-        mBrowserClient.set(new LocalClient());
-//        mNotifyText.set("");
         mContentAdapter.set(mBrowserAdapter);
+//        mBrowserClient.set(new NasClient(getHttp()));
+//        mBrowserClient.set(new LocalClient());
+//        mNotifyText.set("");
         mNotifyText.set("LMBrowser");
 //        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         //
-        JSONObject json=new JSONObject();
-        try {
-            json.put("code",1002);
-            json.put("msg",1000);
-            json.put("data",1000);
-            json.put("mMedias","我爱");
-            json.put("price","99.9991");
-            json.put("data","99.9991");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 //        showBrowserContextMenu(activity);
 //        createFile();
 //        startActivity(ConveyorActivity.class);
-        //
-//        Reply<TypeWrapper<DDD>> input=new Reply<TypeWrapper<DDD>>();
-//        Object reply=new JsonIterator().applySafe(new TypeToken<Reply>(){}.getType(),json);
-//        Debug.D("结果 "+" "+reply);
-//        Debug.D("结2 "+input.getData().getCount());
-//        request(new Request<Reply<Folder>>().onParse((String text, Http http, Response res)->
-//                new Reply<Folder>(text).parser((Object from)-> null!=from?new Folder(from):null)).
-//                onFinish((Reply<Folder> data, Response response)-> {
-//            Debug.D("CVVVVVVVV "+data.getData().getChildren());
-//        }).url("/file/browser/").
-//                header(Label.LABEL_BROWSER_FOLDER,"./").
-//                header(Label.LABEL_FROM_INDEX,0).
-//                header(Label.LABEL_PAGE_SIZE,10).
-//                header(Label.LABEL_ORDER_BY,"size").
-//                post());
-        //
-//        ddd(new HttpParser<Activity>());
     }
 
     private Canceler loadFiles(BrowseQuery args, File from, int pageSize,OnFinish<Reply<Folder>> callback){
@@ -148,6 +123,38 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
         return null!=adapter&&adapter.reset(new BrowseQuery(path,searchInput),null);
+    }
+
+    private boolean selectNextClient(){
+        Client client=getClient();
+        BrowserExecutor executor=mExecutor;
+        if (null==client&&null!=executor){
+            final Client[] clients=new Client[2];
+            executor.client((Client data)-> {
+                    if (null!=data){
+                        clients[0]=null==clients[0]?data:clients[0];
+                        if (clients[1]!=null){
+                            clients[0]=data;
+                            clients[1]=null;
+                            return null;
+                        }
+                        clients[1]=null==client?data:client==data?data:clients[1];
+                    }
+                    return false;
+            });
+            return null!=clients[0]&&selectClient(clients[0]);
+        }
+        return false;
+    }
+
+    private boolean selectClient(Client client){
+        Client current=getClient();
+        if ((null==current&&null==client)||(null!=current&&null!=client&&current==client)){
+            return false;
+        }
+        mBrowserClient.set(client);
+        mBrowserAdapter.reset(null);
+        return true;
     }
 
     @Override
@@ -203,11 +210,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean startTask(Task task,int option,OnProgressChange change){
-        IBinder binder=mConveyorBinder;
-        if (null==binder||!(binder instanceof Executor)){
+        Executor executor=mExecutor;
+        if (null==executor){
             return false;
         }
-        return ((Executor)binder).execute(task,option,change);
+        return executor.execute(task,option,change);
     }
 
     @Override
@@ -217,8 +224,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     @Override
                     public void onServiceConnected(ComponentName name, IBinder service) {
                         Debug.D("EEEE onServiceConnected "+service);
-                        if (null!=service&&service instanceof Executor){
-                            mConveyorBinder=service;
+                        if (null!=service&&service instanceof BrowserExecutor){
+                            mExecutor=(BrowserExecutor) service;
                             refreshConveyorBinder();
                         }
                     }
@@ -231,9 +238,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private void refreshConveyorBinder(){
-        IBinder conveyorBinder=mConveyorBinder;
-        if (null!=conveyorBinder&&conveyorBinder instanceof Executor){
-            ((Executor)conveyorBinder).putListener(this,null);
+        BrowserExecutor conveyorBinder=mExecutor;
+        if (null!=conveyorBinder){
+           conveyorBinder.putListener(this,null);
+           selectNextClient();
         }
     }
 
@@ -340,49 +348,65 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean deleteFile(Object obj){
-        if (null==obj||!(obj instanceof File)){
+        Executor executor=mExecutor;
+        if (null==executor||null==obj||!(obj instanceof File)){
             return false;
         }
-        Client client=mBrowserClient.get();
+//        Client client=mBrowserClient.get();
         File file=(File)obj;
-        ConfirmDialogContent content=new ConfirmDialogContent(new ConfirmResult.Confirm().
-                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).setMessage(file.getName()).
-                setOnConfirm((boolean confirm)-> new FileDeleteTask(file,null)));
-        return null!=client&&null!=showContentDialog(content.setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
-                    if (null==confirmObj||!(confirmObj instanceof FileDeleteTask)||!confirmed){
-                        return null;
-                    }
-                    IBinder binder=mConveyorBinder;
-                    final Executor executor=null!=binder&&binder instanceof Executor?(Executor)binder:null;
-                    if (null==executor){
-                        toast(getString(R.string.error));
-                        return null;
-                    }
-                    FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
-                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
-                        Progress progress=null!=task?task.getProgress():null;
-                        Object progressObj=null!=progress?progress.getData():null;
-                        if (null!=progressObj&&progressObj instanceof DoingFiles){
-                            DoingFiles doingFiles=(DoingFiles)progressObj;
-                            post(()->{
-                                content.setNotify(doingFiles.getTitle());
-                                BrowserListAdapter browserAdapter=mBrowserAdapter;
-                                File fromFile;
-                                if (null!=browserAdapter&&null!=(fromFile=doingFiles.getFrom())&&browserAdapter.
-                                        isCurrentFolder(fromFile.getPath())){
-                                    mBrowserAdapter.remove(fromFile);
-                                }
-                            });
-                        }
-                        if (status==Executor.STATUS_FINISH&&null!=task&&task==deleteTask){
-                            post(()->content.removeFromParent());
-                        }
-                    };
-                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> executor.removeListener(listener));
-                    executor.putListener(listener,(Task data) ->null!=data&&data==deleteTask);
-                    return executor.execute(deleteTask, Executor.Option.NONE,null);
-                }),
-                new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        FileDeleteTask deleteTask=new FileDeleteTask(file,null);
+        showTaskDialog(deleteTask);
+        return executor.execute(deleteTask, Executor.Option.CONFIRM,null);
+//        ConfirmDialogContent content=new ConfirmDialogContent(new ConfirmResult.Confirm().
+//                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).setMessage(file.getName()).
+//                setOnConfirm((boolean confirm)-> new FileDeleteTask(file,null)));
+//        return null!=client&&null!=showContentDialog(content.setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
+//                    if (null==confirmObj||!(confirmObj instanceof FileDeleteTask)||!confirmed){
+//                        return null;
+//                    }
+//                    IBinder binder=mConveyorBinder;
+//                    final Executor executor=null!=binder&&binder instanceof Executor?(Executor)binder:null;
+//                    if (null==executor){
+//                        toast(getString(R.string.error));
+//                        return null;
+//                    }
+//                    FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
+//                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
+//                        Progress progress=null!=task?task.getProgress():null;
+//                        Object progressObj=null!=progress?progress.getData():null;
+//                        if (null!=progressObj&&progressObj instanceof DoingFiles){
+//                            DoingFiles doingFiles=(DoingFiles)progressObj;
+//                            post(()->{
+//                                content.setNotify(doingFiles.getTitle());
+//                                BrowserListAdapter browserAdapter=mBrowserAdapter;
+//                                File fromFile;
+//                                if (null!=browserAdapter&&null!=(fromFile=doingFiles.getFrom())&&browserAdapter.
+//                                        isCurrentFolder(fromFile.getPath())){
+//                                    mBrowserAdapter.remove(fromFile);
+//                                }
+//                            });
+//                        }
+//                        if (status==Executor.STATUS_FINISH&&null!=task&&task==deleteTask){
+//                            post(()->content.removeFromParent());
+//                        }
+//                    };
+//                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> executor.removeListener(listener));
+//                    executor.putListener(listener,(Task data) ->null!=data&&data==deleteTask);
+//                    return executor.execute(deleteTask, Executor.Option.NONE,null);
+//                }),
+//                new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+    }
+
+    private boolean showTaskDialog(Task task){
+        Executor executor=mExecutor;
+        if (null==executor|null==task){
+            return false;
+        }
+        TaskDialogContent content=new TaskDialogContent();
+        executor.putListener(content, (Task data)-> null!=data&&data.equals(task));
+        content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
+        return null!=showContentDialog(content, new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
     }
 
@@ -426,9 +450,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if (null==client||null==folder){
             return false;
         }
-        return null!=client.setHome(folder,(Reply<File> data)->
-                toast(getString(null!=data&&data.isSucceed()?R.string.whichSucceed:
-                    R.string.whichFailed,getString(R.string.setAsHome))));
+        return null!=client.setHome(folder,(Reply<File> data)-> toast(getString(null!=data&&data.isSucceed()
+                ?R.string.whichSucceed: R.string.whichFailed,getString(R.string.setAsHome))));
     }
 
     private Client getClient(){

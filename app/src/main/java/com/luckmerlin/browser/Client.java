@@ -9,6 +9,7 @@ import com.luckmerlin.core.OnFinish;
 
 public interface Client {
     String getName();
+    String getHost();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Canceler createFile(File parent,String name,boolean isDir, OnFinish<Reply<File>> onFinish);
     Canceler deleteFile(File file,OnChangeUpdate update, OnFinish<Reply<File>> onFinish);
