@@ -13,6 +13,7 @@ public final class Mode {
     public final static int MODE_UPLOAD=R.string.upload;
     public final static int MODE_MOVE=R.string.move;
     public final static int MODE_COPY=R.string.copy;
+    public final static int MODE_DELETE=R.string.delete;
     private ArrayList mArgs;
     private final int mMode;
     private Map<String,String> mExtra;

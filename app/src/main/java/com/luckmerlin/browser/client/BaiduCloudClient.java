@@ -1,6 +1,7 @@
 package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.BrowseQuery;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.http.MHttp;
@@ -8,6 +9,7 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
+import com.luckmerlin.core.Response;
 import com.luckmerlin.http.Http;
 
 public class BaiduCloudClient extends AbstractClient{
@@ -22,6 +24,11 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
+    public String getHost() {
+        return "baidu";
+    }
+
+    @Override
     public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
         return null;
     }
@@ -32,7 +39,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Canceler deleteFile(File file, OnChangeUpdate update, OnFinish<Reply<File>> onFinish) {
+    public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
         return null;
     }
 

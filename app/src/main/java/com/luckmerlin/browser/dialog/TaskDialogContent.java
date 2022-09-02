@@ -5,23 +5,51 @@ import android.view.View;
 import androidx.databinding.ObservableField;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.BaseContent;
+import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.TaskContentDialogBinding;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 
-public class TaskDialogContent extends BaseContent implements OnClickListener, Executor.OnStatusChangeListener {
+public class TaskDialogContent extends BaseContent implements OnClickListener,
+        Executor.OnStatusChangeListener, OnProgressChange {
     private ObservableField<String> mNotify=new ObservableField<>();
     private ObservableField<String> mTitle=new ObservableField<>();
     private ObservableField<String> mMessage=new ObservableField<>();
+    private boolean mAutoDismiss;
     private final ObservableField<ViewBinding> mConfirmBinding=new ObservableField<>();
     private final ObservableField<ConfirmResult.Confirm> mConfirm=new ObservableField<>();
 
     public final TaskDialogContent setNotify(String notify){
+        if (!isUiThread()){
+            post(()->setNotify(notify));
+            return this;
+        }
         mNotify.set(notify);
+        return this;
+    }
+
+    public final TaskDialogContent setTitle(String title){
+        if (!isUiThread()){
+            post(()->setTitle(title));
+            return this;
+        }
+        mTitle.set(title);
+        return this;
+    }
+
+    public final TaskDialogContent setMessage(String message){
+        if (!isUiThread()){
+            post(()->setMessage(message));
+            return this;
+        }
+        mMessage.set(message);
         return this;
     }
 
@@ -42,18 +70,31 @@ public class TaskDialogContent extends BaseContent implements OnClickListener, E
             case R.string.cancel:
                 return removeFromParent()||true;
             case R.string.confirm:
-                return (makeConfirm(true)&&removeFromParent())||true;
+                return makeConfirm(true)||true;
         }
         return false;
     }
 
     @Override
+    public void onProgressChanged(Task task, Progress progress) {
+//        setMessage(progress.getTitle());
+    }
+
+    @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
+        setConfirm(null);//Clean
         switch (status){
             case Executor.STATUS_FINISH:
                 Result result=null!=task?task.getResult():null;
-                ConfirmResult.Confirm confirm=null!=result&&result instanceof ConfirmResult?((ConfirmResult)result).make(getContext()):null;
-                setConfirm(confirm);
+                result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
+                if (result instanceof ConfirmResult){
+                    setConfirm(((ConfirmResult)result).make(getContext()));
+                    return;
+                }else if (mAutoDismiss){
+                    post(()->removeFromParent());//Auto dismiss
+                    return;
+                }
+                setNotify(getString(result.isSucceed()?R.string.succeed:R.string.fail));
                 break;
         }
     }

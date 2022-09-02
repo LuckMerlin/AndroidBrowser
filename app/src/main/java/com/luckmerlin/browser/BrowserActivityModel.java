@@ -64,7 +64,7 @@ import java.util.List;
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
-        OnViewDetachedFromWindow, Executor.OnStatusChangeListener {
+        OnViewDetachedFromWindow, Executor.OnStatusChangeListener,OnProgressChange {
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
@@ -158,6 +158,22 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     @Override
+    public void onProgressChanged(Task task, Progress progress) {
+        Object object=null!=progress?progress.getData():null;
+        if (null!=object&&object instanceof DoingFiles){
+            DoingFiles files=(DoingFiles)object;
+            if (files.isFinish()&&files.isDoingMode(Mode.MODE_DELETE)){
+                File fromFile=files.getFrom();
+                BrowserListAdapter browserListAdapter=mBrowserAdapter;
+                if (null!=fromFile&&null!=browserListAdapter&&browserListAdapter.
+                        isCurrentFolder(fromFile.getPath())){
+                    post(()->browserListAdapter.remove(fromFile));
+                }
+            }
+        }
+    }
+
+    @Override
     public final boolean onBackPressed() {
         return browserBack();
     }
@@ -211,10 +227,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean startTask(Task task,int option,OnProgressChange change){
         Executor executor=mExecutor;
-        if (null==executor){
-            return false;
-        }
-        return executor.execute(task,option,change);
+        return null!=executor&&executor.execute(task,option,change);
     }
 
     @Override
@@ -240,7 +253,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private void refreshConveyorBinder(){
         BrowserExecutor conveyorBinder=mExecutor;
         if (null!=conveyorBinder){
-           conveyorBinder.putListener(this,null);
+           conveyorBinder.putListener(this,null,false);
            selectNextClient();
         }
     }
@@ -282,7 +295,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             case R.string.cancel:
                 return entryMode(null,null,null)||true;
             case R.string.delete:
-                return deleteFile(obj)||true;
+                return deleteFile(obj,true)||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
@@ -347,64 +360,26 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return false;
     }
 
-    private boolean deleteFile(Object obj){
+    private boolean deleteFile(Object obj,boolean showDialog){
         Executor executor=mExecutor;
         if (null==executor||null==obj||!(obj instanceof File)){
             return false;
         }
-//        Client client=mBrowserClient.get();
         File file=(File)obj;
         FileDeleteTask deleteTask=new FileDeleteTask(file,null);
-        showTaskDialog(deleteTask);
-        return executor.execute(deleteTask, Executor.Option.CONFIRM,null);
-//        ConfirmDialogContent content=new ConfirmDialogContent(new ConfirmResult.Confirm().
-//                setTitle(getString(R.string.confirmWhich,getString(R.string.delete))).setMessage(file.getName()).
-//                setOnConfirm((boolean confirm)-> new FileDeleteTask(file,null)));
-//        return null!=client&&null!=showContentDialog(content.setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
-//                    if (null==confirmObj||!(confirmObj instanceof FileDeleteTask)||!confirmed){
-//                        return null;
-//                    }
-//                    IBinder binder=mConveyorBinder;
-//                    final Executor executor=null!=binder&&binder instanceof Executor?(Executor)binder:null;
-//                    if (null==executor){
-//                        toast(getString(R.string.error));
-//                        return null;
-//                    }
-//                    FileDeleteTask deleteTask=(FileDeleteTask)confirmObj;
-//                    final Executor.OnStatusChangeListener listener=(int status, Task task, Executor executor1)-> {
-//                        Progress progress=null!=task?task.getProgress():null;
-//                        Object progressObj=null!=progress?progress.getData():null;
-//                        if (null!=progressObj&&progressObj instanceof DoingFiles){
-//                            DoingFiles doingFiles=(DoingFiles)progressObj;
-//                            post(()->{
-//                                content.setNotify(doingFiles.getTitle());
-//                                BrowserListAdapter browserAdapter=mBrowserAdapter;
-//                                File fromFile;
-//                                if (null!=browserAdapter&&null!=(fromFile=doingFiles.getFrom())&&browserAdapter.
-//                                        isCurrentFolder(fromFile.getPath())){
-//                                    mBrowserAdapter.remove(fromFile);
-//                                }
-//                            });
-//                        }
-//                        if (status==Executor.STATUS_FINISH&&null!=task&&task==deleteTask){
-//                            post(()->content.removeFromParent());
-//                        }
-//                    };
-//                    content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)-> executor.removeListener(listener));
-//                    executor.putListener(listener,(Task data) ->null!=data&&data==deleteTask);
-//                    return executor.execute(deleteTask, Executor.Option.NONE,null);
-//                }),
-//                new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+        return executor.execute(deleteTask, Executor.Option.CONFIRM,null)
+                &&showDialog&& showTaskDialog(deleteTask,
+                new TaskDialogContent().setTitle(getString(R.string.delete)));
     }
 
-    private boolean showTaskDialog(Task task){
+    private boolean showTaskDialog(Task task,TaskDialogContent dialogContent){
         Executor executor=mExecutor;
         if (null==executor|null==task){
             return false;
         }
-        TaskDialogContent content=new TaskDialogContent();
-        executor.putListener(content, (Task data)-> null!=data&&data.equals(task));
+        final TaskDialogContent content=null!=dialogContent?dialogContent:new TaskDialogContent();
+        content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
+                executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
         return null!=showContentDialog(content, new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));

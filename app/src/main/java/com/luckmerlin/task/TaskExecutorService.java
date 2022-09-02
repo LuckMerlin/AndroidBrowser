@@ -74,8 +74,8 @@ public class TaskExecutorService extends Service {
         }
 
         @Override
-        public Executor putListener(Listener listener, Matcher<Task> matcher) {
-            return mExecutor.putListener(listener,matcher);
+        public Executor putListener(Listener listener, Matcher<Task> matcher,boolean notify) {
+            return mExecutor.putListener(listener,matcher,notify);
         }
 
         @Override

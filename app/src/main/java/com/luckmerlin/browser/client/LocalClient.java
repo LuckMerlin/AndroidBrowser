@@ -2,12 +2,15 @@ package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
+import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.object.Parser;
 
@@ -24,6 +27,11 @@ public class LocalClient extends AbstractClient {
     @Override
     public String getName() {
         return "Local";
+    }
+
+    @Override
+    public String getHost() {
+        return null;
     }
 
     @Override
@@ -123,8 +131,17 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Canceler deleteFile(File file, OnChangeUpdate update, OnFinish<Reply<File>> onFinish) {
-        return null;
+    public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
+        if (null==file||!file.isLocalFile()){
+            Debug.D("Fail delete local client file while file arg invalid.");
+            return new Response<File>().set(Code.CODE_ARGS_INVALID,"File invalid.",file);
+        }
+        String path=file.getPath();
+        if (null==path||path.length()<=0){
+            Debug.D("Fail delete local client file while file path invalid.");
+            return new Response<File>().set(Code.CODE_ARGS_INVALID,"File path invalid.",file);
+        }
+        return deleteAndroidFile(new java.io.File(path),update);
     }
 
     @Override
@@ -145,5 +162,56 @@ public class LocalClient extends AbstractClient {
         parent=null!=parent?parent: java.io.File.separator;
         return new File().setTotal(total).setLength(file.length()).setSep(java.io.File.separator).
                 setModifyTime(file.lastModified()).setParent(parent).setName(file.getName());
+    }
+
+    private Response<File> deleteAndroidFile(java.io.File file, OnChangeUpdate<DoingFiles> update){
+        if (null==file){
+            Debug.W("Fail delete android file while path invalid.");
+            return new Response(Code.CODE_ARGS_INVALID,"Path invalid.");
+        }else if (!file.exists()){
+            Debug.W("Fail delete android file while path not exist.");
+            return new Response(Code.CODE_NOT_EXIST,"Path not exist.");
+        }
+        Debug.D("Deleting android file."+file);
+        Response response=doDeleteAndroidFile(file,update);
+        if (null!=response&&!response.isSucceed()){
+            Debug.D("Fail delete android file."+file);
+            return response;
+        }else if (file.exists()){
+            Debug.D("Fail delete android file."+file);
+            return new Response(Code.CODE_FAIL,"Fail delete.");
+        }
+        Debug.D("Succeed delete android file."+file);
+        return new Response(Code.CODE_SUCCEED,null);
+    }
+
+    private Response doDeleteAndroidFile(java.io.File file, OnChangeUpdate<DoingFiles> update){
+        if (null==file||!file.exists()){
+            Debug.D("Fail delete android file."+file);
+            return new Response(Code.CODE_ARGS_INVALID,"File not exist or invalid.");
+        }
+        File fileObj=LocalClient.createLocalFile(file);
+        DoingFiles doingFiles=new DoingFiles().setFrom(fileObj).setTo(fileObj).
+                setProgress(0).setDoingMode(Mode.MODE_DELETE);
+        if (notifyDoingFile(doingFiles,update)){
+            Debug.D("Fail delete android file while canceled.");
+            return new Response(Code.CODE_CANCEL,"Canceled");
+        }
+        if (file.isDirectory()){
+            java.io.File[] files=file.listFiles();
+            int length=null!=files?files.length:-1;
+            Response response=null;
+            for (int i = 0; i < length; i++) {
+                response=null==(response=doDeleteAndroidFile(files[i],update))?
+                        new Response(Code.CODE_UNKNOWN,"Unknown error."):response;
+                if (!response.isSucceed()){
+                    return response;
+                }
+            }
+        }
+//        file.delete();
+        boolean notExist=!file.exists();
+        notifyDoingFile(doingFiles.setProgress(notExist?1:0),update);
+        return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }
 }

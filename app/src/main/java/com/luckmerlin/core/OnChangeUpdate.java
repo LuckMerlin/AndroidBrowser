@@ -1,5 +1,5 @@
 package com.luckmerlin.core;
 
-public interface OnChangeUpdate {
-    boolean onChangeUpdated(Object newData);
+public interface OnChangeUpdate<T> {
+    boolean onChangeUpdated(T newData);
 }

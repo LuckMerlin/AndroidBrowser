@@ -75,10 +75,21 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     @Override
-    public Executor putListener(Listener listener, Matcher<Task> matcher) {
-        Map<Listener,Matcher<Task>> listeners=mListeners;
-        if (null!=listener&&null!=listeners){
-            listeners.put(listener,null!=matcher?matcher:(Task data)-> true);
+    public Executor putListener(Listener listener, Matcher<Task> matcher,boolean notify) {
+        if (null!=listener){
+            Map<Listener,Matcher<Task>> listeners=mListeners;
+            if (null!=listeners){
+                listeners.put(listener,null!=matcher?matcher:(Task data)-> true);
+            }
+            if (notify&&listener instanceof OnStatusChangeListener){
+                match(mQueue,(ExecuteTask data)-> {
+                        Boolean matched=null!=matcher&&null!=data?matcher.match(data.mTask):null;
+                        if (null!=matched&&matched){
+                            notifyStatusChange(data.getStatus(),data.mTask,(OnStatusChangeListener)listener);
+                        }
+                        return matched;
+                });
+            }
         }
         return this;
     }
@@ -166,7 +177,18 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     notifyStatusChange(STATUS_EXECUTING,task,mListeners);
                     if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).
                             onExecuteStart(TaskExecutor.this)){
-                        mTask.execute(this,mCallback);
+                        OnProgressChange progressChange=mCallback;
+                        mTask.execute(this, (Task task, Progress progress)-> {
+                            iterateListener(task,(Listener data)->{
+                                if (null!=data&&data instanceof OnProgressChange){
+                                    ((OnProgressChange)data).onProgressChanged(task,progress);
+                                }
+                                return false;
+                            });
+                            if (null!=progressChange){
+                                progressChange.onProgressChanged(task,progress);
+                            }
+                        });
                     }
                     setStatus(STATUS_FINISH);
                     mFullExecuting=false;
@@ -315,24 +337,44 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         if (null!=set){
             Matcher<Task> matcher=null;Boolean matched=null;
             for (Listener listener:set) {
-                if (null!=(matcher=listeners.get(listener))&&null!=(matched=matcher.match(task))&&matched){
-                    notifyStatusChange(status,task,listener);
+                if (null!=listener&&listener instanceof OnStatusChangeListener&&null!=
+                        (matcher=listeners.get(listener))&&null!=
+                        (matched=matcher.match(task))&&matched){
+                    notifyStatusChange(status,task,(OnStatusChangeListener)listener);
                 }
             }
         }
     }
 
-    private void notifyStatusChange(int status,Task task,Listener listener){
+    private void iterateListener(Task task,Matcher<Listener> listenerMatcher){
+        if (null==listenerMatcher){
+            return;
+        }
+        Map<Listener,Matcher<Task>> listeners=mListeners;
+        Set<Listener> set=null!=listeners&&!isInnerTask(task)?listeners.keySet():null;
+        if (null==set) {
+            return;
+        }
+        Matcher<Task> matcher = null;
+        Boolean matched = null;
+        for (Listener listener : set) {
+            if (null!=(matcher=listeners.get(listener))&&null!=(matched=matcher.match(task))&&matched){
+                if (null==listenerMatcher.match(listener)) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private void notifyStatusChange(int status,Task task,OnStatusChangeListener listener){
         if (null==listener){
             return;
         }else if (listener instanceof UiListener&&!isUiThread()){
             post(()->notifyStatusChange(status,task,listener),-1);
             return;
         }
-        if (listener instanceof OnStatusChangeListener){
-            OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
-            changeListener.onStatusChanged(status,task,TaskExecutor.this);
-        }
+        OnStatusChangeListener changeListener=((OnStatusChangeListener)listener);
+        changeListener.onStatusChanged(status,task,TaskExecutor.this);
     }
 
     private boolean isInnerTask(Task task){

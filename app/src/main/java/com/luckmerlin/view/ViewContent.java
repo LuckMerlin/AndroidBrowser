@@ -35,7 +35,7 @@ public abstract class ViewContent implements Content {
     }
 
     public final boolean addOnAttachStateChangeListener(ViewAttachedListener listener){
-        if (null!=mRoot&&null!=listener){
+        if (null!=listener){
             List<ViewAttachedListener> attachListeners=mAttachListeners;
             attachListeners=null!=attachListeners?attachListeners:(mAttachListeners=new ArrayList<>());
             return !attachListeners.contains(listener)&&attachListeners.add(listener);
@@ -63,41 +63,39 @@ public abstract class ViewContent implements Content {
                             (null!=iterator&&iterator.onViewIterate(iterate)));
                 }
             });
-            if (this instanceof OnViewAttachedToWindow||this instanceof OnViewDetachedFromWindow){
-                final MatcherInvoker invoker=new MatcherInvoker();
-                frameLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
-                    @Override
-                    public void onViewAttachedToWindow(View v) {
-                        if (ViewContent.this instanceof OnViewAttachedToWindow){
-                            ((OnViewAttachedToWindow)ViewContent.this).onViewAttachedToWindow(v);
-                        }
-                        invoker.match(mAttachListeners, (ViewAttachedListener data)-> {
-                            if (null!=data&&data instanceof OnViewAttachedToWindow){
-                                ((OnViewAttachedToWindow)data).onViewAttachedToWindow(v);
-                            }
-                            return false;
-                        });
+            final MatcherInvoker invoker=new MatcherInvoker();
+            frameLayout.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(View v) {
+                    if (ViewContent.this instanceof OnViewAttachedToWindow){
+                        ((OnViewAttachedToWindow)ViewContent.this).onViewAttachedToWindow(v);
                     }
+                    invoker.match(mAttachListeners, (ViewAttachedListener data)-> {
+                        if (null!=data&&data instanceof OnViewAttachedToWindow){
+                            ((OnViewAttachedToWindow)data).onViewAttachedToWindow(v);
+                        }
+                        return false;
+                    });
+                }
 
-                    @Override
-                    public void onViewDetachedFromWindow(View v) {
-                        if (ViewContent.this instanceof OnViewDetachedFromWindow){
-                            ((OnViewDetachedFromWindow)ViewContent.this).onViewDetachedFromWindow(v);
-                        }
-                        frameLayout.removeOnAttachStateChangeListener(this);
-                        List<ViewAttachedListener> listeners=mAttachListeners;
-                        invoker.match(listeners, (ViewAttachedListener data)-> {
-                            if (null!=data&&data instanceof OnViewDetachedFromWindow){
-                                ((OnViewDetachedFromWindow)data).onViewDetachedFromWindow(v);
-                                if (data instanceof AutoRemove){
-                                   post(()->listeners.remove(data));
-                                }
-                            }
-                            return false;
-                        });
+                @Override
+                public void onViewDetachedFromWindow(View v) {
+                    if (ViewContent.this instanceof OnViewDetachedFromWindow){
+                        ((OnViewDetachedFromWindow)ViewContent.this).onViewDetachedFromWindow(v);
                     }
-                });
-            }
+                    frameLayout.removeOnAttachStateChangeListener(this);
+                    List<ViewAttachedListener> listeners=mAttachListeners;
+                    invoker.match(listeners, (ViewAttachedListener data)-> {
+                        if (null!=data&&data instanceof OnViewDetachedFromWindow){
+                            ((OnViewDetachedFromWindow)data).onViewDetachedFromWindow(v);
+                            if (data instanceof AutoRemove){
+                                post(()->listeners.remove(data));
+                            }
+                        }
+                        return false;
+                    });
+                }
+            });
             frameLayout.addView(root,new FrameLayout.LayoutParams(ViewGroup.
                     LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             root=frameLayout;
