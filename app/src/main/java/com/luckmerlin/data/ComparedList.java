@@ -26,19 +26,18 @@ public class ComparedList<T>{
             List<T> list=mList;
             list=null!=list?list:(mList=new ArrayList<>());
             Comparator<T> comparator=mComparator;
-            if (null==comparator){
-                list.add(child);
-                return this;
-            }
-            int size=list.size();T childData=null;
-            for (int i = 0; i < size; i++) {
-                if (null==(childData=list.get(i))){
-                    continue;
-                }else if (comparator.compare(child,childData)<=0){
-                    list.add(i,child);
-                    break;
+            if (null!=comparator){
+                int size=list.size();T childData=null;
+                for (int i = 0; i < size; i++) {
+                    if (null==(childData=list.get(i))){
+                        continue;
+                    }else if (comparator.compare(child,childData)<=0){
+                        list.add(i,child);
+                        return this;
+                    }
                 }
             }
+            list.add(child);
         }
         return this;
     }

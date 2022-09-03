@@ -146,6 +146,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
         loadingPage=mLoadingPage=new LoadingPage<A,T>(args,from,pageSize,callback){
             @Override
             public void onPageLoad(boolean succeed, Page page) {
+                if (!isUiThread()){
+                    postIfPossible(()->onPageLoad(succeed,page),0);
+                    return;
+                }
                 boolean currentLoadFinish=false;
                 LoadingPage<A,T> loadingPage=mLoadingPage;
                 if (null!=loadingPage&&loadingPage==this){

@@ -39,6 +39,21 @@ public class File extends JsonObject {
         return optLong(Label.LABEL_TOTAL);
     }
 
+    public File getParentFile(){
+        String parentPath=getParent();
+        String sep=getSep();
+        if (null==parentPath||parentPath.length()<=0||null==sep||sep.length()<=0){
+            return null;
+        }
+        int index=parentPath.lastIndexOf(sep);
+        if (index<0||index+1>=parentPath.length()){
+            return new File(this).setParent(parentPath).setName("");
+        }
+        String parent=index<=0?sep:parentPath.substring(0,index);
+        String name=parentPath.substring(index+1);
+        return new File(this).setParent(parent).setName(name);
+    }
+
     public File setAvailableVolume(long children){
         return putSafe(this,Label.LABEL_AVAILABLE,children);
     }

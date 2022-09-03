@@ -78,7 +78,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private BrowserExecutor mExecutor;
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
             ((BrowseQuery args, int fromIndex,File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
-             loadFiles(args,fromIndex, pageSize, null!=callback?(Response<Folder> reply)->
+             loadFiles(args,fromIndex+1, pageSize, null!=callback?(Response<Folder> reply)->
              callback.onPageLoad(null!=reply&&reply.isSucceed(),reply.getData()) :null)?()->false:()->false);
 
     @Override
@@ -113,7 +113,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             notifyFinish(new Response<Folder>().set(Code.CODE_FAIL,"None client.",null),callback);
             return false;
         }
-        return execute(()->notifyFinish(client.listFiles(args.mFolder,from,pageSize,null),callback));
+        return execute(()->notifyFinish(client.listFiles(null!=args?args.mFolder:null,from,pageSize,null),callback));
     }
 
     private boolean browserPath(File file){
@@ -281,7 +281,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public boolean browserBack(){
         Folder folder=mCurrentFolder.get();
-        return null!=folder&&browserPath(folder);
+        return null!=folder&&browserPath(folder.getParentFile());
     }
 
     @Override

@@ -98,10 +98,8 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
-        if (start<0||size<=0){
-            Debug.W("Can't load client while query start or size invalid.");
-            return new Response<Folder>().setCode(Code.CODE_ARGS_INVALID).setMsg("Query start or size invalid.");
-        }
+        size=size<=0?10:size;
+        start=start<=0?0:start;
         String pathValue=null!=folder?folder.getPath():null;
         String browserPath=null!=pathValue&&pathValue.length()>0?pathValue:mRootPath;
         final java.io.File browserFile=null!=browserPath&&browserPath.length()>0?new java.io.File(browserPath):null;
@@ -144,7 +142,7 @@ public class LocalClient extends AbstractClient {
         long total=null!=fileList?fileList.size():0;
         Folder queryFiles=new Folder(createLocalFile(browserFile)).setTotal(total).setFrom(start);
         queryFiles.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
-        List<File> subFiles=total>0&&start<total?fileList.subList((int)start,size):null;
+        List<File> subFiles=total>0&&start<total?fileList.subList((int)start,Math.min((int)(start+size),(int)total)):null;
         return new Response<Folder>().set(Code.CODE_SUCCEED,"Succeed.", queryFiles.setChildren(subFiles));
     }
 
