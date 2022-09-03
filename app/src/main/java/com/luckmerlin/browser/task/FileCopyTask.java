@@ -8,8 +8,10 @@ import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.client.LocalClient;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -17,6 +19,7 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.stream.StreamCopyTask;
 import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
@@ -41,58 +44,6 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         mFromFile=fromFile;
         mToFile=toFile;
     }
-
-//    private Response<File> createFolder(Client client,File file) throws Exception {
-//        String path=null!=file?file.getPath():null;
-//        if (null==path){
-//            Debug.W("Fail create folder while file path invalid.");
-//            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
-//        }
-//        if (file.isLocalFile()){
-//            java.io.File androidFile=new java.io.File(path);
-//            if (androidFile.exists()){
-//                if (!androidFile.isDirectory()){
-//                    Debug.W("Fail create folder while file already exist but not directory."+path);
-//                    return new Response(Code.CODE_ERROR,"File already exist but not directory");
-//                }
-//            }else if (androidFile.mkdirs()){
-//                Debug.D("Created android folder."+path);
-//            }
-//            File newFolder=androidFile.exists()? LocalClient.createLocalFile(androidFile):null;
-//            if (null==newFolder){
-//                Debug.W("Fail create android folder."+path);
-//                return new Response(Code.CODE_ERROR,"File create android folder."+path);
-//            }
-//            return new Response(Code.CODE_SUCCEED,"Succeed.",newFolder);
-//        }
-//        return null;
-//    }
-
-//    private Response<List<File>> listFiles(Client client,File file){
-//        String path=null!=file?file.getPath():null;
-//        if (null==path){
-//            Debug.W("Fail list files while file path invalid.");
-//            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
-//        }
-//        if (file.isLocalFile()){
-//            java.io.File androidFile=new java.io.File(path);
-//            List<File> files=new ArrayList<>();
-//            Response<List<File>> response=new Response<List<File>>().set(Code.CODE_SUCCEED,null,files);
-//            java.io.File[] localFiles=androidFile.listFiles();
-//            if (null!=localFiles&&localFiles.length>0){
-//                for (java.io.File child:localFiles) {
-//                    File createFile=LocalClient.createLocalFile(child);
-//                    if (null==createFile){
-//                        Debug.W("Fail list files while child path create invalid."+child);
-//                        return new Response(Code.CODE_ARGS_INVALID,"Child path create invalid."+child);
-//                    }
-//                    files.add(createFile);
-//                }
-//            }
-//            return response;
-//        }
-//        return null;
-//    }
 
     private Response<OutputStream> openOutputStream(File file) throws Exception{
         String path=null!=file?file.getPath():null;
@@ -171,18 +122,22 @@ public final class FileCopyTask extends FileTask implements Parcelable {
     protected Result onExecute(Runtime runtime) {
         File fromFile=mFromFile;
         File toFile=mToFile;
-        Progress progress=new Progress().setPosition(0).setTotal(1).setTitle(null!=fromFile?fromFile.getName():null);
-        notifyProgress(progress);
+        if (null==fromFile||null==toFile){
+            Debug.W("Fail execute file copy task while arg invalid.");
+            return new Response(Code.CODE_ARGS_INVALID,"Copy arg invalid.");
+        }
         Client fromClient=getFileClient(fromFile);
         Client toClient=getFileClient(toFile);
-        Result result=copyFile(fromFile,fromClient, toFile,toClient, runtime,(File fromFile1, File toFile1, Progress childProgress)->
-                notifyProgress(progress.setSubProgress(childProgress)));
-        notifyProgress(progress.setPosition(1));
-        return result;
+        if (null==fromClient||null==toClient){
+            Debug.W("Fail execute file copy task while from client or to client invalid.");
+            return new Response(Code.CODE_FAIL,"From client or to client invalid.");
+        }
+        return copyFile(fromFile, fromClient, toFile, toClient, runtime,
+                (Task task, Progress progress)-> notifyProgress(FileCopyTask.this,progress));
     }
 
-    private Result copyFile(File fromFile,Client fromClient,File toFile,Client toClient,
-                            Runtime runtime,OnFileProgress onProgressChange){
+    private Result copyFile(File fromFile, Client fromClient, File toFile, Client toClient,
+                            Runtime runtime, OnProgressChange onFileProgress){
         final String fromPath=null!=fromFile?fromFile.getPath():null;
         if (null==fromPath||fromPath.length()<=0){
             Debug.W("Fail execute file copy task while from file invalid.");
@@ -197,11 +152,11 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             Debug.W("Fail copy file while from client or to client invalid.fromClient="+fromClient);
             return new Response<File>().set(Code.CODE_FAIL, "From client or to client invalid.");
         }
+        final DoingFiles doingFiles=new DoingFiles().setDoingMode(Mode.MODE_COPY).setFrom(fromFile).setTo(toFile);
+        final Progress progress=new Progress().setTitle(fromFile.getName()).setData(doingFiles);
         OutputStream outputStream=null;InputStream inputStream=null;
         try {
-            if (null!=onProgressChange){
-                onProgressChange.onFileProgressChange(fromFile,toFile,new Progress().setTitle(fromFile.getName()));
-            }
+            notifyProgressChange(progress,onFileProgress);
             if (fromFile.isDirectory()){//Is folder
                 Response<File> response=toClient.createFile(null,toFile.getName(),true);
                 response=null!=response?response:new Response<File>().set(Code.CODE_FAIL, "Create folder fail."+toFile.getPath(),null);
@@ -237,7 +192,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                             continue;
                         }
                         childCopyResult=copyFile(child,fromClient,new File().setHost(child.getHost()).setName(child.getName()).
-                        setSep(child.getSep()).setParent(toPath),toClient,runtime,onProgressChange);
+                        setSep(child.getSep()).setParent(toPath),toClient,runtime,onFileProgress);
                         childCopyResult=null!=childCopyResult?childCopyResult:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
                         if (childCopyResult instanceof ConfirmResult){
                             Debug.W("Children copy need confirm.path="+fromPath);
@@ -291,16 +246,18 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             byte[] buffer=mBuffer;
             buffer=null!=buffer?buffer:(mBuffer=new byte[1024]);
             return new StreamCopyTask(inputStream,outputStream,buffer,null).setName(fromFile.getName()).
-                    execute(runtime,null!=onProgressChange?(Task task, Progress progress)->
-                            onProgressChange.onFileProgressChange(fromFile,toFile,progress):null);
+                    execute(runtime,null!=onFileProgress?(Task task, Progress progress1)-> onFileProgress.onProgressChanged(task,
+                            null==progress1?progress:progress.setPosition(progress1.getPosition()).setTotal(progress1.getTotal())):null);
         }catch (Exception e){
             Debug.W("Exception execute file copy task.e="+e);
             return new Response(Code.CODE_ERROR,"Exception execute file copy task.fromPath="+fromPath+" toPath="+toPath);
         }
     }
 
-    private interface OnFileProgress{
-        void onFileProgressChange(File fromFile,File toFile,Progress progress);
+    private void notifyProgressChange(Progress progress,OnProgressChange callback){
+        if (null!=callback){
+            callback.onProgressChanged(this,progress);
+        }
     }
 
     FileCopyTask(Parcel in) {

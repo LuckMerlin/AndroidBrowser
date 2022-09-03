@@ -43,6 +43,16 @@ public class File extends JsonObject {
         return generateFile(getParent());
     }
 
+    public String getExtension(){
+        if (isDirectory()){
+            return null;
+        }
+        String name=getName();
+        int index=null!=name?name.lastIndexOf("."):-1;
+        name=index>=0?name.substring(index):null;
+        return null!=name&&name.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(name):null;
+    }
+
     public File generateFile(String path){
         String sep=getSep();
         if (null==path||path.length()<=0||null==sep||sep.length()<=0){

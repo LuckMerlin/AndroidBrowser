@@ -12,6 +12,7 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
@@ -28,6 +29,7 @@ public class TaskDialogContent extends BaseContent implements OnClickListener,
     private final ObservableField<ConfirmResult.Confirm> mConfirm=new ObservableField<>();
     private final ObservableField<DoingFiles> mDoingFiles=new ObservableField<>();
     private final ObservableField<Result> mResult=new ObservableField<>();
+    private final ObservableField<Integer> mTaskProgress=new ObservableField<>();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -55,6 +57,7 @@ public class TaskDialogContent extends BaseContent implements OnClickListener,
     @Override
     public void onProgressChanged(Task task, Progress progress) {
         if (null!=progress){
+            mTaskProgress.set(progress.intValue());
             Object object=progress.getData();
             if (null!=object&&object instanceof DoingFiles){
                 mDoingFiles.set((DoingFiles) object);
@@ -156,5 +159,9 @@ public class TaskDialogContent extends BaseContent implements OnClickListener,
 
     public ObservableField<Result> getResult() {
         return mResult;
+    }
+
+    public ObservableField<Integer> getTaskProgress() {
+        return mTaskProgress;
     }
 }

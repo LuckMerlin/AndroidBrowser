@@ -28,7 +28,7 @@
             android:textSize="@dimen/textSmall" android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <include layout="@layout/doing_files" android:layout_gravity="center" binding:doingFiles="@{content.doingFiles}"
+        <include layout="@layout/doing_files" android:layout_gravity="center" binding:content="@{content}"
             android:visibility="@{content.doingFiles==null?View.GONE:View.VISIBLE}"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

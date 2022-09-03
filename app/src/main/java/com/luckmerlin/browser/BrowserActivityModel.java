@@ -201,21 +201,23 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if(null==current&&null==modeInt){
             return true;
         }else if (null!=current&&null!=modeInt&&current.isMode(modeInt)){
-            if (null!=creator){
-                TaskGroup group=new TaskGroup();
-                Client client=mBrowserClient.get();
-                Folder currentFolder=mCurrentFolder.get();
-                List args=current.getArgs();int size=0;
-                if (null==args||args.size()<=0){
-                    return toast(getString(R.string.inputEmpty))||true;
-                }else if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&&
-                        null!=group.add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&& (size=group.getSize())>0){
-                    Task task=size==1?group.find(null):group;
-                    startTask(task, Executor.Option.NONE,null);
-                    showTaskDialog(task,null);
-                }
-                entryMode(null,null,null);//Entry normal mode again
+            if (null==creator){
+                return true;
             }
+            List args=current.getArgs();
+            if (null==args||args.size()<=0){
+                return true;
+            }
+            Client client=mBrowserClient.get();
+            Folder currentFolder=mCurrentFolder.get();
+            TaskGroup group=new TaskGroup();int size=0;
+            if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&& null!=group.
+                    add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&&(size=group.getSize())>0){
+                Task task=size==1?group.find(null):group;
+                startTask(task, Executor.Option.NONE,null);
+                showTaskDialog(task,null);
+            }
+            entryMode(null,null,null);//Entry normal mode again
             return true;
         }
         Mode mode=null!=modeInt?new Mode(modeInt).add(obj):null;
@@ -321,7 +323,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileCopyTask(file,folder,null);
+                    return new FileCopyTask(file,folder,null).setName(getString(R.string.copy));
                 });
             case R.string.move:
                 return entryMode(Mode.MODE_MOVE, obj, (Mode moveMode,Client client,File file, Folder folder)-> {
@@ -329,7 +331,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileMoveTask(file,folder,null);
+                    return new FileMoveTask(file,folder,null).setName(getString(R.string.move));
                 });
             case R.string.download:
                 return entryMode(Mode.MODE_DOWNLOAD, obj, (Mode downloadMode,Client client,File file, Folder folder)-> {
@@ -337,7 +339,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileCopyTask(file,folder,null);
+                    return new FileCopyTask(file,folder,null).setName(getString(R.string.download));
                 });
             case R.string.upload:
                 return entryMode(Mode.MODE_UPLOAD, obj, (Mode uploadMode,Client client,File file, Folder folder)-> {
@@ -345,7 +347,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileCopyTask(file,folder,null);
+                    return new FileCopyTask(file,folder,null).setName(getString(R.string.upload));
                 });
         }
         if (null!=obj&&obj instanceof File){
@@ -375,6 +377,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return false;
         }
         final TaskDialogContent content=null!=dialogContent?dialogContent:new TaskDialogContent();
+        content.setTitle(task.getName());
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));

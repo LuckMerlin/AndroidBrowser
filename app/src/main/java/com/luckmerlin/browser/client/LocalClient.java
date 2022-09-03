@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.client;
 
+import android.webkit.MimeTypeMap;
+
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.file.DoingFiles;
@@ -198,15 +200,16 @@ public class LocalClient extends AbstractClient {
         if (null==file){
             return null;
         }
+        String parent=file.getParent();
+        parent=null!=parent?parent: java.io.File.separator;
+        File localFile=new File().setLength(file.length()).setSep(java.io.File.separator).
+                setModifyTime(file.lastModified()).setParent(parent).setName(file.getName());
         long total=-1;
         if (file.isDirectory()){
             java.io.File[] files=file.listFiles();
             total=null!=files?files.length:0;
         }
-        String parent=file.getParent();
-        parent=null!=parent?parent: java.io.File.separator;
-        return new File().setTotal(total).setLength(file.length()).setSep(java.io.File.separator).
-                setModifyTime(file.lastModified()).setParent(parent).setName(file.getName());
+        return localFile.setTotal(total);
     }
 
     private Response<File> deleteAndroidFile(java.io.File file, OnChangeUpdate<DoingFiles> update){
