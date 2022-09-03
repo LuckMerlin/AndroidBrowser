@@ -192,7 +192,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public void onPathSpanClick(File path, int start, int end, String value) {
         if (null!=value&&value.length()>0){
-//            browserPath(value);
+            browserPath(path.generateFile(value));
         }
     }
 

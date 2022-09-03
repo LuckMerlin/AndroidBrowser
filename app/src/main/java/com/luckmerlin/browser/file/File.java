@@ -40,17 +40,20 @@ public class File extends JsonObject {
     }
 
     public File getParentFile(){
-        String parentPath=getParent();
+        return generateFile(getParent());
+    }
+
+    public File generateFile(String path){
         String sep=getSep();
-        if (null==parentPath||parentPath.length()<=0||null==sep||sep.length()<=0){
+        if (null==path||path.length()<=0||null==sep||sep.length()<=0){
             return null;
         }
-        int index=parentPath.lastIndexOf(sep);
-        if (index<0||index+1>=parentPath.length()){
-            return new File(this).setParent(parentPath).setName("");
+        int index=path.lastIndexOf(sep);
+        if (index<0||index+1>=path.length()){
+            return new File(this).setParent(path).setName("");
         }
-        String parent=index<=0?sep:parentPath.substring(0,index);
-        String name=parentPath.substring(index+1);
+        String parent=index<=0?sep:path.substring(0,index);
+        String name=path.substring(index+1);
         return new File(this).setParent(parent).setName(name);
     }
 
