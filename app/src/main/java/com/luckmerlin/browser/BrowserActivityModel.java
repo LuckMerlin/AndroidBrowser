@@ -37,6 +37,7 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
+import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.WindowContentDialog;
@@ -76,10 +77,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
-            ((BrowseQuery args, File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
-             loadFiles(args, from, pageSize, null!=callback?(Reply<Folder> data)->
-             callback.onPageLoad(null!=data&&data.isSucceed(),null!=data?data.
-                     parser((Object child)->null!=child?new Folder(child):null).getData():null) :null));
+            ((BrowseQuery args, int fromIndex,File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
+             loadFiles(args,fromIndex, pageSize, null!=callback?(Response<Folder> reply)->
+             callback.onPageLoad(null!=reply&&reply.isSucceed(),reply.getData()) :null)?()->false:()->false);
 
     @Override
     protected View onCreateContent(Context context) {
@@ -107,22 +107,19 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        startActivity(ConveyorActivity.class);
     }
 
-    private Canceler loadFiles(BrowseQuery args, File from, int pageSize,OnFinish<Reply<Folder>> callback){
+    private boolean loadFiles(BrowseQuery args, int from, int pageSize,OnFinish<Response<Folder>> callback){
         Client client=getClient();
         if (null==client){
-            return null;
-        }
-        execute(()->post(()->notifyFinish(client.loadFiles(args,from,pageSize),callback)));
-        return ()->false;
-    }
-
-    private boolean browserPath(String path){
-        if (null==path||path.length()<=0){
+            notifyFinish(new Response<Folder>().set(Code.CODE_FAIL,"None client.",null),callback);
             return false;
         }
+        return execute(()->notifyFinish(client.listFiles(args.mFolder,from,pageSize,null),callback));
+    }
+
+    private boolean browserPath(File file){
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
-        return null!=adapter&&adapter.reset(new BrowseQuery(path,searchInput),null);
+        return null!=file&&null!=adapter&&adapter.reset(new BrowseQuery(file,searchInput),null);
     }
 
     private boolean selectNextClient(){
@@ -195,7 +192,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public void onPathSpanClick(File path, int start, int end, String value) {
         if (null!=value&&value.length()>0){
-            browserPath(value);
+//            browserPath(value);
         }
     }
 
@@ -213,7 +210,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     return toast(getString(R.string.inputEmpty))||true;
                 }else if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&&
                         null!=group.add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&& (size=group.getSize())>0){
-                    startTask(size==1?group.find(null):group, Executor.Option.NONE,null);
+                    Task task=size==1?group.find(null):group;
+                    startTask(task, Executor.Option.NONE,null);
+                    showTaskDialog(task,null);
                 }
                 entryMode(null,null,null);//Entry normal mode again
             }
@@ -282,8 +281,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public boolean browserBack(){
         Folder folder=mCurrentFolder.get();
-        String parent=null!=folder?folder.getParent():null;
-        return null!=parent&&parent.length()>0&&browserPath(parent);
+        return null!=folder&&browserPath(folder);
     }
 
     @Override
@@ -353,7 +351,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
             if (file.isDirectory()){
-                return browserPath(file.getPath());
+                return browserPath(file);
             }
             return toast("点击文件 "+file.getName());
         }
@@ -408,7 +406,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         Client client=mBrowserClient.get();
         return null!=showContentDialog(new CreateFileDialogContent(client,mCurrentFolder.get()){
             @Override
-            protected void onCreate(Reply<File> reply) {
+            protected void onCreate(Response<File> reply) {
                 boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
                 toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
                 if(succeed){

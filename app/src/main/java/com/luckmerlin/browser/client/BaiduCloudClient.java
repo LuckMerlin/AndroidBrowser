@@ -34,7 +34,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Canceler createFile(File parent, String name, boolean isDir, OnFinish<Reply<File>> onFinish) {
+    public Response<File> createFile(File parent, String name, boolean isDir) {
         return null;
     }
 
@@ -44,7 +44,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize) {
+    public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
         return null;
     }
 }

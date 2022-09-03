@@ -60,7 +60,8 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             return false;
         }
         BrowseQuery current=getCurrent();
-        String folderPath=null!=current?current.mFolderPath:null;
+        File file=null!=current?current.mFolder:null;
+        String folderPath=null!=file?file.getPath():null;
         return null!=folderPath&&path.startsWith(folderPath);
     }
 

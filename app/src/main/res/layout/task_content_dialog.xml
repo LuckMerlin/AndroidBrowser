@@ -41,8 +41,7 @@
                 style="@style/button" android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
         </LinearLayout>
     </LinearLayout>
-    <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
-        android:layout_gravity="right|top"
+    <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp" android:layout_gravity="right|top"
         android:layout_width="40dp" android:layout_height="40dp"/>
     </FrameLayout>
 </layout>

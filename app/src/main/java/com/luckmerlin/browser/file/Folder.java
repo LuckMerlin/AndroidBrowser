@@ -1,59 +1,62 @@
 package com.luckmerlin.browser.file;
 
-import com.luckmerlin.browser.Label;
-import com.luckmerlin.json.JsonArray;
 import com.merlin.adapter.PageListAdapter;
-import org.json.JSONException;
-
 import java.util.List;
 
 public class Folder extends File implements PageListAdapter.Page<File> {
+    private long mFrom;
+    private long mTotal;
+    private List<File> mFiles;
 
-    public Folder(){
-        super();
+    public Folder(File file){
+        super(file);
     }
 
-    public Folder(Object json)   {
-        super(json);
+    public Folder setChildren(List<File> files){
+        mFiles=files;
+        return this;
     }
 
-    public JsonArray getChildrenArray(){
-        return optJsonArray(Label.LABEL_CHILDREN);
+    public Folder setFrom(long from) {
+        this.mFrom = from;
+        return this;
     }
 
-    public Folder setChildren(Object children){
-        return setArraySafe(this,Label.LABEL_CHILDREN,children);
+    public Folder setTotal(long total) {
+        this.mTotal = total;
+        return this;
     }
 
-    public final long getAvailableVolume(){
-        return optLong(Label.LABEL_AVAILABLE);
+    public long getFrom() {
+        return mFrom;
     }
 
-    public final long getTotalVolume(){
-        return optLong(Label.LABEL_TOTAL);
+    public long getEnd(){
+        long from=mFrom;
+        List<File> files=mFiles;
+        return from>=0?from+(null!=files?files.size():0):-1;
     }
 
-    public Folder setAvailableVolume(long children){
-        return putSafe(this,Label.LABEL_AVAILABLE,children);
+    public int getSize(){
+        List<File> files=mFiles;
+        return null!=files?files.size():0;
     }
 
-    public Folder setTotalVolume(long children){
-        return putSafe(this,Label.LABEL_TOTAL,children);
+    public long getTotal() {
+        return mTotal;
+    }
+
+    public boolean isQueryFinish(){
+        return getEnd()>=mTotal;
     }
 
     public final boolean isEmpty(){
-        JsonArray array=getChildrenArray();
-        return null==array||array.length()<=0;
+        List<File> files=mFiles;
+        return null==files||files.size()<=0;
     }
 
     public List<File> getChildren(){
-        JsonArray array=getChildrenArray();
-        try {
-            return null!=array?array.getList((Object from)-> null!=from?new File(from):null):null;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return mFiles;
     }
 
     @Override

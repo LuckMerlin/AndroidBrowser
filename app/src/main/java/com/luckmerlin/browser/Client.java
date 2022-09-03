@@ -9,11 +9,20 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface Client {
+
+    public class Filter{
+        public String mName;
+    }
+
     String getName();
     String getHost();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
-    Canceler createFile(File parent,String name,boolean isDir, OnFinish<Reply<File>> onFinish);
+    Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update);
-    Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize);
+    Response<Folder> listFiles(File folder,long start,int size,Filter filter);
+//    Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize);
 }

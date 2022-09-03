@@ -3,6 +3,8 @@ package com.luckmerlin.browser.task;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.client.LocalClient;
@@ -40,57 +42,57 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         mToFile=toFile;
     }
 
-    private Response<File> createFolder(File file) throws Exception {
-        String path=null!=file?file.getPath():null;
-        if (null==path){
-            Debug.W("Fail create folder while file path invalid.");
-            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
-        }
-        if (file.isLocalFile()){
-            java.io.File androidFile=new java.io.File(path);
-            if (androidFile.exists()){
-                if (!androidFile.isDirectory()){
-                    Debug.W("Fail create folder while file already exist but not directory."+path);
-                    return new Response(Code.CODE_ERROR,"File already exist but not directory");
-                }
-            }else if (androidFile.mkdirs()){
-                Debug.D("Created android folder."+path);
-            }
-            File newFolder=androidFile.exists()? LocalClient.createLocalFile(androidFile):null;
-            if (null==newFolder){
-                Debug.W("Fail create android folder."+path);
-                return new Response(Code.CODE_ERROR,"File create android folder."+path);
-            }
-            return new Response(Code.CODE_SUCCEED,"Succeed.",newFolder);
-        }
-        return null;
-    }
+//    private Response<File> createFolder(Client client,File file) throws Exception {
+//        String path=null!=file?file.getPath():null;
+//        if (null==path){
+//            Debug.W("Fail create folder while file path invalid.");
+//            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
+//        }
+//        if (file.isLocalFile()){
+//            java.io.File androidFile=new java.io.File(path);
+//            if (androidFile.exists()){
+//                if (!androidFile.isDirectory()){
+//                    Debug.W("Fail create folder while file already exist but not directory."+path);
+//                    return new Response(Code.CODE_ERROR,"File already exist but not directory");
+//                }
+//            }else if (androidFile.mkdirs()){
+//                Debug.D("Created android folder."+path);
+//            }
+//            File newFolder=androidFile.exists()? LocalClient.createLocalFile(androidFile):null;
+//            if (null==newFolder){
+//                Debug.W("Fail create android folder."+path);
+//                return new Response(Code.CODE_ERROR,"File create android folder."+path);
+//            }
+//            return new Response(Code.CODE_SUCCEED,"Succeed.",newFolder);
+//        }
+//        return null;
+//    }
 
-    private Response<List<File>> listFiles(File file){
-        String path=null!=file?file.getPath():null;
-        if (null==path){
-            Debug.W("Fail list files while file path invalid.");
-            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
-        }
-        if (file.isLocalFile()){
-            java.io.File androidFile=new java.io.File(path);
-            List<File> files=new ArrayList<>();
-            Response<List<File>> response=new Response<List<File>>().set(Code.CODE_SUCCEED,null,files);
-            java.io.File[] localFiles=androidFile.listFiles();
-            if (null!=localFiles&&localFiles.length>0){
-                for (java.io.File child:localFiles) {
-                    File createFile=LocalClient.createLocalFile(child);
-                    if (null==createFile){
-                        Debug.W("Fail list files while child path create invalid."+child);
-                        return new Response(Code.CODE_ARGS_INVALID,"Child path create invalid."+child);
-                    }
-                    files.add(createFile);
-                }
-            }
-            return response;
-        }
-        return null;
-    }
+//    private Response<List<File>> listFiles(Client client,File file){
+//        String path=null!=file?file.getPath():null;
+//        if (null==path){
+//            Debug.W("Fail list files while file path invalid.");
+//            return new Response(Code.CODE_ARGS_INVALID,"File path invalid");
+//        }
+//        if (file.isLocalFile()){
+//            java.io.File androidFile=new java.io.File(path);
+//            List<File> files=new ArrayList<>();
+//            Response<List<File>> response=new Response<List<File>>().set(Code.CODE_SUCCEED,null,files);
+//            java.io.File[] localFiles=androidFile.listFiles();
+//            if (null!=localFiles&&localFiles.length>0){
+//                for (java.io.File child:localFiles) {
+//                    File createFile=LocalClient.createLocalFile(child);
+//                    if (null==createFile){
+//                        Debug.W("Fail list files while child path create invalid."+child);
+//                        return new Response(Code.CODE_ARGS_INVALID,"Child path create invalid."+child);
+//                    }
+//                    files.add(createFile);
+//                }
+//            }
+//            return response;
+//        }
+//        return null;
+//    }
 
     private Response<OutputStream> openOutputStream(File file) throws Exception{
         String path=null!=file?file.getPath():null;
@@ -167,16 +169,20 @@ public final class FileCopyTask extends FileTask implements Parcelable {
 
     @Override
     protected Result onExecute(Runtime runtime) {
-        File file=mFromFile;
-        Progress progress=new Progress().setPosition(0).setTotal(1).setTitle(null!=file?file.getName():null);
+        File fromFile=mFromFile;
+        File toFile=mToFile;
+        Progress progress=new Progress().setPosition(0).setTotal(1).setTitle(null!=fromFile?fromFile.getName():null);
         notifyProgress(progress);
-        Result result=copyFile(mFromFile, mToFile, runtime,(File fromFile, File toFile, Progress childProgress)->
+        Client fromClient=getFileClient(fromFile);
+        Client toClient=getFileClient(toFile);
+        Result result=copyFile(fromFile,fromClient, toFile,toClient, runtime,(File fromFile1, File toFile1, Progress childProgress)->
                 notifyProgress(progress.setSubProgress(childProgress)));
         notifyProgress(progress.setPosition(1));
         return result;
     }
 
-    private Result copyFile(File fromFile,File toFile,Runtime runtime,OnFileProgress onProgressChange){
+    private Result copyFile(File fromFile,Client fromClient,File toFile,Client toClient,
+                            Runtime runtime,OnFileProgress onProgressChange){
         final String fromPath=null!=fromFile?fromFile.getPath():null;
         if (null==fromPath||fromPath.length()<=0){
             Debug.W("Fail execute file copy task while from file invalid.");
@@ -187,50 +193,62 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             Debug.W("Fail execute file copy task while to file invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"To file invalid");
         }
+        if (null==fromClient||null==toClient){
+            Debug.W("Fail copy file while from client or to client invalid.fromClient="+fromClient);
+            return new Response<File>().set(Code.CODE_FAIL, "From client or to client invalid.");
+        }
         OutputStream outputStream=null;InputStream inputStream=null;
         try {
             if (null!=onProgressChange){
                 onProgressChange.onFileProgressChange(fromFile,toFile,new Progress().setTitle(fromFile.getName()));
             }
             if (fromFile.isDirectory()){//Is folder
-                Response<File> response=createFolder(toFile);
-                response=null!=response?response:new Response<File>().set(Code.CODE_FAIL,
-                        "Create folder fail."+toFile.getPath(),null);
+                Response<File> response=toClient.createFile(null,toFile.getName(),true);
+                response=null!=response?response:new Response<File>().set(Code.CODE_FAIL, "Create folder fail."+toFile.getPath(),null);
                 if (null!=response&&!response.isSucceed()){
                     Debug.W("Fail execute file copy task while create directory fail.");
                     return response;
                 }
                 //Create folder succeed
-                Response<List<File>> listFilesResponse=listFiles(fromFile);
-                if (null==listFilesResponse){
-                    Debug.W("Fail copy file while list directory fail.path="+fromPath);
-                    return new Response<File>().set(Code.CODE_FAIL, "List directory fail."+fromPath);
-                }else if (!listFilesResponse.isSucceed()){
-                    Debug.W("Fail copy file while list directory fail."+listFilesResponse.getMessage()+".path="+fromPath);
-                    return new Response<File>().set(listFilesResponse.getCode(Code.CODE_FAIL), listFilesResponse.getMessage());
-                }
-                List<File> files=listFilesResponse.getData();
-                //List files
-                Result childResponse=new Response<>(Code.CODE_SUCCEED,"Empty",response.getData());
-                if (null!=files&&files.size()>0){
+                Result childCopyResult=null;long startIndex=0;
+                while (true){
+                    Response<Folder> listFilesResponse=fromClient.listFiles(fromFile,startIndex,1000,null);
+                    if (null==listFilesResponse){
+                        Debug.W("Fail copy file while list directory fail.path="+fromPath);
+                        return new Response<File>().set(Code.CODE_FAIL, "List directory fail."+fromPath);
+                    }else if (!listFilesResponse.isSucceed()){
+                        Debug.W("Fail copy file while list directory fail."+listFilesResponse.getMessage()+".path="+fromPath);
+                        return new Response<File>().set(listFilesResponse.getCode(Code.CODE_FAIL), listFilesResponse.getMessage());
+                    }
+                    Folder queryFiles=listFilesResponse.getData();
+                    List<File> files=null!=queryFiles?queryFiles.getChildren():null;
+                    if (null==files||files.size()<=0){
+                        childCopyResult=new Response<>(Code.CODE_SUCCEED,"Empty",response.getData());
+                        break;//Empty folder
+                    }
+                    long end=queryFiles.getEnd();
+                    if (end<0){
+                        childCopyResult=new Response<>(Code.CODE_FAIL,"End index invalid",null);
+                        break;//End index invalid
+                    }
+                    startIndex=end;//End is next start index.
                     for (File child:files) {
                         if (null==child){
                             continue;
                         }
-                        childResponse=copyFile(child,new File().setHost(child.getHost()).setName(child.getName()).
-                                setSep(child.getSep()).setParent(toPath),runtime,onProgressChange);
-                        childResponse=null!=childResponse?childResponse:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
-                        if (!(childResponse instanceof Response)||!((Response)childResponse).isSucceed()){
-                            if (childResponse instanceof ConfirmResult){
-                                Debug.W("Children copy need confirm.path="+fromPath);
-                            }else{
-                                Debug.W("Fail copy file while children copy fail.path="+fromPath);
-                            }
+                        childCopyResult=copyFile(child,fromClient,new File().setHost(child.getHost()).setName(child.getName()).
+                        setSep(child.getSep()).setParent(toPath),toClient,runtime,onProgressChange);
+                        childCopyResult=null!=childCopyResult?childCopyResult:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
+                        if (childCopyResult instanceof ConfirmResult){
+                            Debug.W("Children copy need confirm.path="+fromPath);
+                            break;
+                        }else if (!childCopyResult.isSucceed()){
+                            Debug.W("Fail copy file while children copy fail.path="+fromPath);
                             break;
                         }
                     }
                 }
-                return childResponse;
+                return childCopyResult;
             }
             Debug.D("To open file copy output stream."+toPath);
             Response<OutputStream> childOutputResponse=openOutputStream(toFile);

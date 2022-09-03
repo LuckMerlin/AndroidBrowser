@@ -10,6 +10,7 @@ import com.luckmerlin.browser.databinding.CreateFileContentDialogBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.core.Response;
 
 public abstract class CreateFileDialogContent extends BaseContent implements OnClickListener {
     public final ObservableField<Boolean> mCreateDir=new ObservableField<>();
@@ -44,7 +45,7 @@ public abstract class CreateFileDialogContent extends BaseContent implements OnC
         return false;
     }
 
-    protected abstract void onCreate(Reply<File> reply);
+    protected abstract void onCreate(Response<File> reply);
 
     private final boolean create(){
         Client client=mClient;
@@ -57,7 +58,7 @@ public abstract class CreateFileDialogContent extends BaseContent implements OnC
             return toast(getString(R.string.inputEmpty))&&false;
         }
         Boolean createDir=mCreateDir.get();
-        return null!=client.createFile(mParent, inputName, null != createDir && createDir,
-                (Reply<File> reply)->onCreate(reply));
+        onCreate(client.createFile(mParent, inputName, null != createDir && createDir));
+        return true;
     }
 }

@@ -31,6 +31,22 @@ public class File extends JsonObject {
         return getHost()==null;
     }
 
+    public final long getAvailableVolume(){
+        return optLong(Label.LABEL_AVAILABLE);
+    }
+
+    public final long getTotalVolume(){
+        return optLong(Label.LABEL_TOTAL);
+    }
+
+    public File setAvailableVolume(long children){
+        return putSafe(this,Label.LABEL_AVAILABLE,children);
+    }
+
+    public File setTotalVolume(long children){
+        return putSafe(this,Label.LABEL_TOTAL,children);
+    }
+
     public String getName() {
         return optString(Label.LABEL_NAME,null);
     }

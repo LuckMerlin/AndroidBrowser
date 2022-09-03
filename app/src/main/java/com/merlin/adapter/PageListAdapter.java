@@ -78,7 +78,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
 
     protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback){
         PageLoader pageLoader=mPageLoader;
-        return null!=pageLoader?pageLoader.onPageLoad(args,from,pageSize,callback):null;
+        return null!=pageLoader?pageLoader.onPageLoad(args,indexPosition(from),from,pageSize,callback):null;
     }
 
     public final boolean reset(OnPageLoadListener<T> callback){
@@ -254,6 +254,6 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public interface PageLoader<A,T>{
-        Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback);
+        Canceler onPageLoad(A args,int fromIndex, T from, int pageSize, OnPageLoadListener<T> callback);
     }
 }
