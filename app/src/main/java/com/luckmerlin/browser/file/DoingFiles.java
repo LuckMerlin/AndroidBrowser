@@ -29,6 +29,12 @@ public final class DoingFiles {
         return mProgress;
     }
 
+    public boolean isFromToEquals(){
+        File from=mFrom;
+        File to=mTo;
+        return (null==from&&null==to)||(null!=from&&null!=to&&from.equals(to));
+    }
+
     public DoingFiles setDoingMode(Integer mode){
         mMode=mode;
         return this;

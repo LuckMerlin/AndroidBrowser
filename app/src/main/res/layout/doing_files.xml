@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="doingFiles" type="com.luckmerlin.browser.file.DoingFiles" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
+    </data>
+    <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+
+        <TextView android:text="@{doingFiles.from.name??``}" android:textColor="@color/textTitle"
+            android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView android:text="@{`⬇︎`}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
+            android:visibility="@{doingFiles.fromToEquals?View.GONE:View.VISIBLE}"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <TextView android:text="@{doingFiles.to.name??``}" android:textColor="@color/textTitle"
+            android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal"
+            android:visibility="@{doingFiles.fromToEquals?View.GONE:View.VISIBLE}"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</layout>

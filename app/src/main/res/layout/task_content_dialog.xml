@@ -19,20 +19,26 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <TextView android:text="@{null!=content.confirm?content.confirm.message:content.message??``}" android:textColor="@color/textNormal"
+            android:visibility="@{content.confirm.message.length()+content.message.length()&lt;1?View.GONE:View.VISIBLE}"
             android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <TextView android:text="@{content.notify??``}" android:textColor="@color/textNormal"
+            android:visibility="@{content.notify.length()&lt;1?View.GONE:View.VISIBLE}"
             android:textSize="@dimen/textSmall" android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+        <include layout="@layout/doing_files" android:layout_gravity="center" binding:doingFiles="@{content.doingFiles}"
+            android:visibility="@{content.doingFiles==null?View.GONE:View.VISIBLE}"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <LinearLayout android:orientation="horizontal" android:layout_gravity="center" android:gravity="center"
-            android:layout_width="match_parent" android:layout_height="wrap_content">
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
             <TextView binding:bind="@{null!=content.confirm?VB.clickId(R.string.confirm):null}" style="@style/button"
                 android:visibility="@{null==content.confirm?View.GONE:View.VISIBLE}"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
-            <TextView binding:bind="@{VB.clickId(R.string.cancel)}" style="@style/button"
-                android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
+            <TextView binding:bind="@{VB.clickId(content.result.succeed?R.string.succeed:R.string.cancel)}"
+                style="@style/button" android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
         </LinearLayout>
     </LinearLayout>
     <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"

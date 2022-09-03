@@ -367,9 +367,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         File file=(File)obj;
         FileDeleteTask deleteTask=new FileDeleteTask(file,null);
-        return executor.execute(deleteTask, Executor.Option.CONFIRM,null)
-                &&showDialog&& showTaskDialog(deleteTask,
-                new TaskDialogContent().setTitle(getString(R.string.delete)));
+        return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
+                showTaskDialog(deleteTask, new TaskDialogContent().setTitle(getString(R.string.delete)));
     }
 
     private boolean showTaskDialog(Task task,TaskDialogContent dialogContent){
