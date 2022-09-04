@@ -184,7 +184,7 @@ public class ConveyorActivityModel extends BaseModel implements
                         Confirm().setOnConfirm((boolean confirmed)-> confirmed?null:null).
                         setTitle(getString(R.string.delete)).setMessage(getString
                         (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
-                            if (cancelTask(confirmObj, Executor.Option.CANCEL|Executor.Option.DELETE)&&null!=obj&&obj instanceof Task) {
+                            if (cancelTask(obj, Executor.Option.DELETE)&&null!=obj&&obj instanceof Task) {
                                 mConveyorListAdapter.remove((Task) obj);
                             }
                             return null;

@@ -23,7 +23,6 @@
         android:paddingLeft="15dp" android:paddingRight="5dp" android:background="#33000000"
         android:layout_width="match_parent" android:layout_height="match_parent">
         <LinearLayout android:orientation="horizontal" android:gravity="center_vertical"
-            android:alpha="@{selectEnable?0.6f:1f}"
             android:layout_width="match_parent" android:layout_height="match_parent">
 
             <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
@@ -56,14 +55,16 @@
                     android:layout_width="match_parent" android:layout_height="2dp"/>
             </LinearLayout>
 
-            <ImageView binding:bind="@{iconBinding}"
-                android:visibility="@{selectEnable?View.INVISIBLE:View.VISIBLE}"
-                android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp" />
+            <FrameLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageView binding:bind="@{iconBinding}" android:layout_gravity="center"
+                    android:visibility="@{selectEnable?View.INVISIBLE:View.VISIBLE}"
+                    android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp" />
 
-            <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,task)}"
-                android:button="@drawable/selector_checkbox" android:checked="@{selected}"
-                android:visibility="@{selectEnable?View.VISIBLE:View.INVISIBLE}"
-                android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp"/>
+                <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,task)}" android:layout_gravity="center"
+                    android:button="@drawable/selector_checkbox" android:checked="@{selected}"
+                    android:visibility="@{selectEnable?View.VISIBLE:View.INVISIBLE}"
+                    android:layout_width="60dp" android:layout_height="60dp" android:padding="10dp"/>
+            </FrameLayout>
         </LinearLayout>
     </FrameLayout>
 </layout>
