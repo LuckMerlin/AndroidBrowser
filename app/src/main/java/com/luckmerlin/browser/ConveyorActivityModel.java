@@ -1,31 +1,30 @@
 package com.luckmerlin.browser;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
+
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
+import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
+import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
-import com.merlin.model.OnActivityCreate;
-import com.merlin.model.OnActivityDestroy;
 import com.merlin.model.OnBackPress;
 
 import java.io.File;
@@ -164,6 +163,14 @@ public class ConveyorActivityModel extends BaseModel implements
         switch (clickId){
             case R.drawable.selector_back:
                 return onBackPressed();
+            case R.string.multiChoose:
+                return mConveyorListAdapter.enableMultiSelect(true)||true;
+            case R.drawable.selector_cancel:
+                return mConveyorListAdapter.enableMultiSelect(false)||true;
+            case R.drawable.selector_menu:
+                return showMenusDialog()||true;
+            case R.drawable.selector_checkbox:
+                return mConveyorListAdapter.toggleSelect(obj)||true;
             case R.drawable.selector_confirm:
                 Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
                 Result result=null!=task?task.getResult():null;
@@ -184,6 +191,11 @@ public class ConveyorActivityModel extends BaseModel implements
                         }),null);
         }
         return false;
+    }
+
+    private boolean showMenusDialog(){
+        return null!=showContentDialog(new TaskMenuContextDialogContent().setTitle
+                (getString(R.string.app_name)), getContext(),new FixedLayoutParams().dialog());
     }
 
     @Override

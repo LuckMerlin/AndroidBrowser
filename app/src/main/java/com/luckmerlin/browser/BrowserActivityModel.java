@@ -13,20 +13,16 @@ import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
-import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
-import com.luckmerlin.browser.dialog.MenuContextDialogContent;
+import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.TaskDialogContent;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
@@ -36,7 +32,6 @@ import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.core.MatchedCollector;
-import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -93,7 +88,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         //
 //        showBrowserContextMenu(activity);
 //        createFile();
-//        startActivity(ConveyorActivity.class);
+        startActivity(ConveyorActivity.class);
         showFolderFilesChangeAlert("eeee");
     }
 
@@ -428,7 +423,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean showBrowserContextMenu(Context context){
-        return null!=showContentDialog(new MenuContextDialogContent().setTitle(getString(R.string.app_name)),
+        return null!=showContentDialog(new BrowserMenuContextDialogContent().setTitle(getString(R.string.app_name)),
                 context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
     }

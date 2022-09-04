@@ -42,6 +42,14 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         return this;
     }
 
+    public FixedLayoutParams dialog(){
+        mWidth=ViewGroup.LayoutParams.WRAP_CONTENT;
+        mHeight=ViewGroup.LayoutParams.WRAP_CONTENT;
+        mGravity=Gravity.CENTER;
+        mMaxHeight=0.5f;
+        return this;
+    }
+
     @Override
     public void onResolveLayoutParams(Context context,ViewGroup.LayoutParams params) {
         if (null!=params){

@@ -6,25 +6,68 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import androidx.databinding.DataBindingUtil;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
+import com.luckmerlin.browser.file.File;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
 import com.merlin.adapter.PageListAdapter;
 import com.merlin.adapter.Query;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
     private final static int VIEW_TYPE_DATA_GROUP=2000;
+    private final ObservableField<Boolean> mMultiChooseEnabled=new ObservableField<>(false);
+    private List<Task> mSelectedList;
 
     public ConveyorListAdapter(){
         setFixedHolder(VIEW_TYPE_EMPTY,R.layout.item_content_empty);
+    }
+
+    public boolean toggleMultiSelect(){
+        Boolean enable=mMultiChooseEnabled.get();
+        return enableMultiSelect(!(null!=enable&&enable));
+    }
+
+    public boolean enableMultiSelect(boolean enable){
+        Boolean current=mMultiChooseEnabled.get();
+        if (enable!=(null!=current&&current)){
+            mMultiChooseEnabled.set(enable);
+            notifyAttachedItemChanged();
+            return true;
+        }
+        return true;
+    }
+
+    public boolean toggleSelect(Object obj){
+        List<Task> select=mSelectedList;
+        return null!=obj&&null!=select&&select.contains(obj)?unSelect(select):select(select);
+    }
+
+    public boolean unSelect(Object obj){
+        List<Task> select=mSelectedList;
+        return null!=obj&&obj instanceof Task&&null!=select&&select.remove(obj)&&notifyFirstItemChanged(obj);
+    }
+
+    public boolean select(Object obj){
+        if (null!=obj&&obj instanceof Task){
+            List<Task> select=mSelectedList;
+            select=null!=select?select:(mSelectedList=new ArrayList<>());
+            if (!select.contains(obj)){
+                select.add((Task) obj);
+                return notifyFirstItemChanged(select);
+            }
+        }
+        return false;
     }
 
     @Override
@@ -87,19 +130,31 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             }else{
                 iconRes=null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
             }
+            List<Task> selectList=mSelectedList;
+            Boolean selectEnabled=mMultiChooseEnabled.get();
+            selectEnabled=null!=selectEnabled&&selectEnabled;
+            boolean selected=selectEnabled&&null!=item&&null!=selectList&&selectList.contains(item);
             if (binding instanceof ItemConveyorGroupBinding){
                 ItemConveyorGroupBinding groupBinding=(ItemConveyorGroupBinding)binding;
                 groupBinding.setPosition(position);
                 groupBinding.setConfirm(confirm);
+                groupBinding.setSelected(selected);
+                groupBinding.setSelectEnable(selectEnabled);
                 groupBinding.setIconBinding(ViewBinding.clickId(iconRes,item));
                 groupBinding.setTask(item instanceof TaskGroup?(TaskGroup)item:null);
             }else if (binding instanceof ItemConveyorSingleBinding){
                 ItemConveyorSingleBinding singleBinding=(ItemConveyorSingleBinding)binding;
                 singleBinding.setPosition(position);
+                singleBinding.setSelected(selected);
+                singleBinding.setSelectEnable(selectEnabled);
                 singleBinding.setIconBinding(ViewBinding.clickId(iconRes,item));
                 singleBinding.setConfirm(confirm);
                 singleBinding.setTask(item);
             }
         }
+    }
+
+    public ObservableField<Boolean> getMultiChooseEnabled() {
+        return mMultiChooseEnabled;
     }
 }

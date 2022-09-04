@@ -10,10 +10,10 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.view.ViewContent;
 
-public class MenuContextDialogContent extends ViewContent implements OnClickListener {
+public class BrowserMenuContextDialogContent extends ViewContent implements OnClickListener {
     private final ObservableField<String> mTitle=new ObservableField<>();
 
-    public MenuContextDialogContent setTitle(String title){
+    public BrowserMenuContextDialogContent setTitle(String title){
         mTitle.set(title);
         return this;
     }

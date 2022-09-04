@@ -86,25 +86,31 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return add(Integer.MAX_VALUE,data);
     }
 
-    public final boolean add(int index,T data){
+    public final boolean add(final int index,T data){
         if (null!=data){
+            if (!isUiThread()){
+                return postIfPossible(()->add(index,data),0);
+            }
             int current=getSize();
             List<T> dataList=mDataList;
             dataList=null!=dataList?dataList:(mDataList=new ArrayList<>());
             int currentSize=0;
-            index=index<=0?0:index>(currentSize=dataList.size())?currentSize:index;
-            dataList.add(index,data);
+            int finalIndex=index<=0?0:index>(currentSize=dataList.size())?currentSize:index;
+            dataList.add(finalIndex,data);
             if (current<=0){
                 notifyDataSetChanged();
                 return true;
             }
-            notifyItemInserted(index);
+            notifyItemInserted(finalIndex);
             return true;
         }
         return false;
     }
 
     public final boolean remove(T data){
+        if (!isUiThread()){
+            return postIfPossible(()->remove(data),0);
+        }
         List<T> dataList=null!=data?mDataList:null;
         if (null!=dataList){
             int index=dataList.indexOf(data);
