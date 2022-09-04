@@ -2,7 +2,6 @@ package com.luckmerlin.browser.client;
 
 import android.graphics.drawable.Drawable;
 import android.view.View;
-
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;

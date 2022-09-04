@@ -14,6 +14,7 @@
     <string name="createFolder">Create Folder</string>
     <string name="createFile">Create File</string>
     <string name="create">Create</string>
+    <string name="contentChanged">Content changed</string>
     <string name="exit">Exit</string>
     <string name="attr">Attribute</string>
     <string name="cancel">Cancel</string>

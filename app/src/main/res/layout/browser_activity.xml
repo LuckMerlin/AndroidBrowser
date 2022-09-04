@@ -47,32 +47,47 @@
             android:textSize="8sp" android:layout_gravity="center"
             android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <View android:paddingLeft="5dp" android:paddingRight="5dp"
-            android:layout_marginTop="1dp" android:layout_marginBottom="1dp"
+        <View android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_marginTop="1dp" android:layout_marginBottom="1dp"
             style="@style/horizontalDividerLine"/>
-        <HorizontalScrollView android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_marginLeft="5dp"
-            android:visibility="@{null==vm.browserAdapter.currentFolder?View.INVISIBLE:View.VISIBLE}" android:scrollbars="none"
-            android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView android:text="@{vm.browserAdapter.currentPath??``}" android:layout_width="wrap_content"
-                android:movementMethod="@{LinkMovementMethod.getInstance()}" android:textColor="@color/textTitleSub"
-                android:singleLine="true" android:textSize="@dimen/textSmall" android:layout_height="wrap_content" />
-        </HorizontalScrollView>
-        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-            <FrameLayout android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp">
-                <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:paddingLeft="8dp" android:paddingRight="8dp"
-                    android:layout_width="match_parent" android:layout_height="match_parent">
-                    <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent" android:overScrollMode="always"
-                        android:adapter="@{vm.browserAdapter}" android:layout_height="match_parent"/>
-                </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-                <ProgressBar android:visibility="@{vm.browserAdapter.pageLoading?View.VISIBLE:View.INVISIBLE}"
-                    style="@android:style/Widget.ProgressBar.Large" android:layout_gravity="center"
-                    android:layout_width="50dp" android:layout_height="50dp"/>
-            </FrameLayout>
-            <LinearLayout android:visibility="@{vm.browserMode.isMode(Mode.MODE_COPY,Mode.MODE_UPLOAD,Mode.MODE_MOVE,Mode.MODE_DOWNLOAD)?View.VISIBLE:View.GONE}"
-                android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
-                android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView binding:bind="@{VB.clickId(vm.browserMode.mode)}" style="@style/browserBottomTextView"/>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                <HorizontalScrollView android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_marginLeft="5dp"
+                    android:visibility="@{null==vm.browserAdapter.currentFolder?View.INVISIBLE:View.VISIBLE}" android:scrollbars="none"
+                    android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <TextView android:text="@{vm.browserAdapter.currentPath??``}" android:layout_width="wrap_content"
+                        android:movementMethod="@{LinkMovementMethod.getInstance()}" android:textColor="@color/textTitleSub"
+                        android:singleLine="true" android:textSize="@dimen/textSmall" android:layout_height="wrap_content" />
+                </HorizontalScrollView>
+
+                <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+                    <FrameLayout android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp">
+                        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout android:paddingLeft="8dp" android:paddingRight="8dp"
+                            android:layout_width="match_parent" android:layout_height="match_parent">
+                            <androidx.recyclerview.widget.RecyclerView android:layout_width="match_parent" android:overScrollMode="always"
+                                android:adapter="@{vm.browserAdapter}" android:layout_height="match_parent"/>
+                        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+                        <ProgressBar android:visibility="@{vm.browserAdapter.pageLoading?View.VISIBLE:View.INVISIBLE}"
+                            style="@android:style/Widget.ProgressBar.Large" android:layout_gravity="center"
+                            android:layout_width="50dp" android:layout_height="50dp"/>
+                    </FrameLayout>
+                    <LinearLayout android:visibility="@{vm.browserMode.isMode(Mode.MODE_COPY,Mode.MODE_UPLOAD,Mode.MODE_MOVE,Mode.MODE_DOWNLOAD)?View.VISIBLE:View.GONE}"
+                        android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
+                        android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView binding:bind="@{VB.clickId(vm.browserMode.mode)}" style="@style/browserBottomTextView"/>
+                    </LinearLayout>
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+            <FrameLayout android:layout_width="match_parent" android:paddingLeft="2dp" android:paddingRight="2dp"
+                android:visibility="@{vm.alertText.message.length()>0?View.VISIBLE:View.GONE}"
+                android:background="@{vm.alertText.background}" android:layout_height="wrap_content" android:layout_gravity="top">
+                <TextView android:text="@{vm.alertText.message??``}" android:layout_gravity="center" android:gravity="center"
+                    android:paddingLeft="5dp" android:paddingRight="5dp" android:textSize="10sp"
+                    android:background="@{vm.alertText.messageBackground}"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close,vm.alertText)}"
+                    android:layout_gravity="right|top" android:padding="1dp"
+                    android:layout_width="20dp" android:layout_height="20dp"/>
+            </FrameLayout>
+        </FrameLayout>
     </LinearLayout>
 </layout>

@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,7 @@ import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
@@ -45,13 +48,11 @@ import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
-import com.luckmerlin.view.Content;
+import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
 import com.merlin.adapter.ListAdapter;
-import com.merlin.adapter.PageListAdapter;
-import com.merlin.model.ContentActivity;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 import java.util.List;
@@ -61,6 +62,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         OnViewDetachedFromWindow, Executor.OnStatusChangeListener,OnProgressChange {
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
+    private final ObservableField<AlertText> mAlertText=new ObservableField<>();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
     private final ObservableField<Integer> mClientCount=new ObservableField<>();
     private final ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
@@ -91,6 +93,20 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        showBrowserContextMenu(activity);
 //        createFile();
 //        startActivity(ConveyorActivity.class);
+        showFolderFilesChangeAlert("eeee");
+    }
+
+    public void showFolderFilesChangeAlert(String name){
+        SpannableStringBuilder builder=new SpannableStringBuilder();
+        name=null!=name&&name.length()>5?name.substring(0,5)+"...":name;
+        name=null!=name?name+" ":" ";
+        boolean nameEmpty=null==name||name.length()<=0;
+        String value=""+getString(R.string.contentChanged);
+        builder.append(name).append(nameEmpty?value:value.toLowerCase()).append(".");
+        int index=builder.length();
+        builder.append((" "+getText(R.string.refresh)).toLowerCase());
+        builder.setSpan(new ClickableSpan((View widget)->mBrowserAdapter.reset(null)),index,builder.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
+        showAlertText(new AlertText().setMessage(builder),0);
     }
 
     private boolean browserPath(File file){
@@ -245,6 +261,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return null!=field?field.get():null;
     }
 
+    private void showAlertText(AlertText alertText,int timeout){
+        mAlertText.set(alertText);
+        CharSequence msg=null!=alertText?alertText.getMessage():null;
+        if (null!=msg&&msg.length()>0&&(timeout=timeout>10000?10000:timeout)>0){
+            post(()->showAlertText(null,0),timeout);
+        }
+    }
+
     public boolean browserBack(){
         Folder folder=getCurrentFolder();
         return null!=folder&&browserPath(folder.getParentFile());
@@ -255,6 +279,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         switch (clickId){
             case R.drawable.selector_back:
                 return browserBack()||true;
+            case R.drawable.selector_close:
+                if (null!=obj&&obj instanceof AlertText){
+                    showAlertText(null,0);
+                }
+                return true;
             case R.drawable.selector_cancel:
             case R.string.cancel:
                 return entryMode(null,null,null)||true;
@@ -447,6 +476,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public final ObservableField<Mode> getBrowserMode() {
         return mBrowserMode;
+    }
+
+    public ObservableField<AlertText> getAlertText() {
+        return mAlertText;
     }
 
     private interface ModeFileTaskCreator{
