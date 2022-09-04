@@ -49,67 +49,6 @@ public class LocalClient extends AbstractClient {
         return null;
     }
 
-//    @Override
-//    public Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize) {
-//        String pathValue=null!=query?query.mFolderPath:null;
-//        String browserPath=null!=pathValue&&pathValue.length()>0?pathValue:mRootPath;
-//        final java.io.File browserFile=null!=browserPath&&browserPath.length()>0?new java.io.File(browserPath):null;
-//        final Reply<Folder> reply=new Reply<>();
-//        if (null==browserFile){
-//            Debug.W("Can't load client while query file invalid."+browserPath);
-//            return reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file invalid.");
-//        }else if (!browserFile.exists()){
-//            Debug.W("Can't load client while query file not exist."+browserPath);
-//            return reply.setCode(Code.CODE_NOT_EXIST).setMessage("Query file not exist.");
-//        }else if (!browserFile.isDirectory()){
-//            Debug.W("Can't load client while query file not directory.");
-//            return reply.setCode(Code.CODE_ARGS_INVALID).setMessage("Query file not directory.");
-//        }
-//        String filterName=null!=query?query.mSearchInput:null;
-//        Debug.D("Loading local client.name="+filterName+" from="+(null!=from?from.getName():"")+" path="+browserPath);
-//        final List<File> files=new ArrayList<>();
-//        browserFile.listFiles((java.io.File file)-> {
-//            if (null==file){
-//                return false;
-//            }
-//            String fileName=file.getName();
-//            if (null!=filterName&&filterName.length()>0&&(null==fileName||!fileName.contains(filterName))){
-//                return false;
-//            }
-//            File child=createLocalFile(file);
-//           if (null!=child){
-//               files.add(child);
-//           }
-//            return false;
-//        });
-//        Folder folder= new Folder(createLocalFile(browserFile));
-//        folder.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
-//        //
-//        final Comparator<File> comparator=(File file1, File file2)-> {
-//            boolean directory1=file1.isDirectory();
-//            boolean directory2=file2.isDirectory();
-//            if (directory1&&directory2){
-//                String file1Name=null!=file1?file1.getName():null;
-//                String file2Name=null!=file2?file2.getName():null;
-//                file1Name=null!=file1Name?file1Name:"";
-//                file2Name=null!=file2Name?file2Name:"";
-//                return file1Name.compareTo(file2Name);
-//            }
-//            return directory1?-1:directory2?1:0;
-//        };
-//        Collections.sort(files,comparator);
-//        //
-//        if (null!=from){
-//            int index=(files.indexOf(from)+1);
-//            int length=files.size();
-//            folder.setChildren(index>=0&&index<length?files.subList(index,length):null);
-//        }else{
-//            folder.setChildren(files);
-//        }
-//        Debug.D("Finish load local client.name="+filterName+" from="+(null!=from?from.getName():"")+" path="+browserPath);
-//        return reply.setCode(Code.CODE_SUCCEED).setMessage("Succeed").setData(folder);
-//    }
-
     @Override
     public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
         size=size<=0?10:size;

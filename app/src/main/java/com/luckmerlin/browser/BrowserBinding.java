@@ -29,7 +29,7 @@ public final class BrowserBinding implements ImageFetcher {
                    String mime=file.getMime();
                    defResId=null!=mime?mResIdMap.get(mime):null;
                    String extension=null;
-                   if (null==defResId&&null!=(extension=file.getExtension())&&null!=(extension=extension.toLowerCase())){
+                   if (null==defResId&&null!=(extension=file.getExtension(false))&&null!=(extension=extension.toLowerCase())){
                        defResId=mResIdMap.get(extension);
                        if (null==defResId&&null!=mime&&mime.equals("audio/x-mpeg")&&extension.equals(".mp3")){
                            defResId=R.drawable.hidisk_icon_mp3;
@@ -52,11 +52,8 @@ public final class BrowserBinding implements ImageFetcher {
         String mime=file.getMime();
         defResId=null!=mime?mResIdMap.get(mime):null;
         String extension=null;
-        if (null==defResId&&null!=(extension=file.getExtension())&&null!=(extension=extension.toLowerCase())){
+        if (null==defResId&&null!=(extension=file.getExtension(true))&&null!=(extension=extension.toLowerCase())){
             defResId=mResIdMap.get(extension);
-            if (null==defResId&&null!=mime&&mime.equals("audio/x-mpeg")&&extension.equals(".mp3")){
-                defResId=R.drawable.hidisk_icon_mp3;
-            }
         }
         return null!=defResId?defResId:R.drawable.hidisk_icon_unknown;
     }
@@ -82,7 +79,8 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("video/mp4",R.drawable.hidisk_icon_mp4);
         mResIdMap.put("video/mpeg",R.drawable.hidisk_icon_mpeg);
         mResIdMap.put("application/pdf",R.drawable.hidisk_icon_pdf);
-        mResIdMap.put(".log",R.drawable.hidisk_icon_log);
+        mResIdMap.put("log",R.drawable.hidisk_icon_log);
+        mResIdMap.put(".mp3",R.drawable.hidisk_icon_mp3);
     }
 
     public static BrowserBinding instance(){

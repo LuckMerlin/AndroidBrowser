@@ -53,12 +53,13 @@ public class File extends JsonObject {
         return putSafe(this,"thumb",thumb);
     }
 
-    public String getExtension(){
+    public String getExtension(boolean include){
         if (isDirectory()){
             return null;
         }
         String name=getName();
-        return null!=name?MimeTypeMap.getFileExtensionFromUrl(name):null;
+        int index=null!=name&&name.length()>0?name.lastIndexOf("."):-1;
+        return index>0&&(include?index:++index)<name.length()?name.substring(index):null;
     }
 
     public File generateFile(String path){
@@ -101,7 +102,7 @@ public class File extends JsonObject {
     public String getMime(){
         String mime=optString(Label.LABEL_MIME,null);
         if (!isDirectory()&&(null==mime||mime.length()<=0)){
-            mime=getExtension();
+            mime=getExtension(false);
             mime=null!=mime&&mime.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(mime):null;
         }
         return mime;
