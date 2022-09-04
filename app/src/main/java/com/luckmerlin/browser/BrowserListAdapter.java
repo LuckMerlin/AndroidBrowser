@@ -126,6 +126,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         if ((null==current&&null==client)||(null!=current&&null!=client&&current==client)){
             return false;
         }
+        clean();
         mBrowserClient.set(client);
         reset(null);
         return true;

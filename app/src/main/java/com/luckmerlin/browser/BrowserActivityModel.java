@@ -10,13 +10,15 @@ import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
-
 import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
+import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
@@ -31,35 +33,27 @@ import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
-import com.luckmerlin.core.Canceler;
-import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
-import com.luckmerlin.dialog.WindowContentDialog;
-import com.luckmerlin.object.Parser;
-import com.luckmerlin.stream.Convertor;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
+import com.luckmerlin.view.Content;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
-import com.luckmerlin.view.ViewAttachedListener;
+import com.luckmerlin.view.ViewIterator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.adapter.PageListAdapter;
+import com.merlin.model.ContentActivity;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.List;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
@@ -71,7 +65,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
     private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
-    private ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
+    private final ObservableField<Integer> mClientCount=new ObservableField<>();
+    private final ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
@@ -114,18 +109,24 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         BrowserExecutor executor=mExecutor;
         if (null==client&&null!=executor){
             final Client[] clients=new Client[2];
+            final int[] count=new int[]{0};
             executor.client((Client data)-> {
                     if (null!=data){
+                        count[0]+=1;
+                        if (clients[1]==null&&clients[0]!=null){
+                            return false;
+                        }
                         clients[0]=null==clients[0]?data:clients[0];
                         if (clients[1]!=null){
                             clients[0]=data;
                             clients[1]=null;
-                            return null;
+                            return false;
                         }
                         clients[1]=null==client?data:client==data?data:clients[1];
                     }
                     return false;
             });
+            mClientCount.set(count[0]);
             return null!=clients[0]&&mBrowserAdapter.setClient(clients[0]);
         }
         return false;
@@ -217,7 +218,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         Debug.D("EEEE onServiceConnected "+service);
                         if (null!=service&&service instanceof BrowserExecutor){
                             mExecutor=(BrowserExecutor) service;
-                            refreshConveyorBinder();
+                            refreshBrowserBinder();
                         }
                     }
 
@@ -228,7 +229,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 }, Context.BIND_ABOVE_CLIENT|Context.BIND_AUTO_CREATE);
     }
 
-    private void refreshConveyorBinder(){
+    private void refreshBrowserBinder(){
         BrowserExecutor conveyorBinder=mExecutor;
         if (null!=conveyorBinder){
            conveyorBinder.putListener(this,null,false);
@@ -279,6 +280,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return entryMode(Mode.MODE_MULTI_CHOOSE,obj,null);
             case R.string.setAsHome:
                 return setCurrentAsHome()||true;
+            case R.layout.item_client_name:
+                return selectClients(view,null!=obj&&obj instanceof Client?(Client)obj:null)||true;
             case R.string.conveyor:
                 return startActivity(ConveyorActivity.class)||true;
             case R.string.refresh:
@@ -335,6 +338,40 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return toast("点击文件 "+file.getName());
         }
         return false;
+    }
+
+    private boolean selectClients(View view,Client client){
+        BrowserExecutor executor=mExecutor;
+        if (null==view||null==executor){
+            return false;
+        }
+        Context context=view.getContext();
+        LinearLayout linearLayout=new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.setBackgroundResource(R.drawable.round_corner_black);
+        final PopupWindow popupWindow=new PopupWindow(getContext());
+        executor.client(new MatchedCollector<Client>(-1){
+            @Override
+            protected Boolean onMatch(Client data) {
+                if (null!=data&&(null==client||!data.equals(client))){
+                    ItemClientNameBinding binding=inflate(context,R.layout.item_client_name);
+                    if (null!=binding){
+                        binding.setClient(data);
+                        binding.setListener((OnClickListener)(View view, int clickId, int count, Object obj)-> {
+                            mBrowserAdapter.setClient(client);
+                            popupWindow.dismiss();
+                            return true;
+                        });
+                        linearLayout.addView(binding.getRoot());
+                    }
+                }
+                return false;
+            }});
+        if (linearLayout.getChildCount()<=0){
+            return false;
+        }
+        popupWindow.setContentView((Context context1, ViewIterator iterator)-> linearLayout);
+        return popupWindow.showAsDropDown(view,0,0,Gravity.CENTER);
     }
 
     private boolean deleteFile(Object obj,boolean showDialog){
@@ -406,7 +443,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 ?R.string.whichSucceed: R.string.whichFailed,getString(R.string.setAsHome))));
     }
 
-
     public ObservableField<ListAdapter> getContentAdapter() {
         return mContentAdapter;
     }
@@ -421,6 +457,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public ObservableField<CharSequence> getCurrentPath() {
         return mCurrentPath;
+    }
+
+    public ObservableField<Integer> getClientCount() {
+        return mClientCount;
     }
 
     public ObservableField<String> getNotifyText() {

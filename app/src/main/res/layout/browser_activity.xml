@@ -19,11 +19,11 @@
 
             <ImageView binding:bind="@{VB.create(R.drawable.selector_back)}"
                 android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
-                android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
+                android:layout_marginLeft="5dp" android:layout_marginRight="5dp"/>
 
             <LinearLayout android:orientation="vertical" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content">
                 <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                    <TextView android:textSize="10sp"
+                    <TextView android:text="@{``+vm.clientCount}" android:textSize="10sp"
                         style="@style/titleNormalTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <include binding:client="@{vm.browserAdapter.browserClient}" layout="@layout/item_client_name"/>
                     <TextView android:text="@{` (`+((null==vm.browserAdapter.currentSelectSize||(vm.browserAdapter.currentSelectSize&lt;0))?``:``+vm.browserAdapter.currentSelectSize+`/`)+vm.currentFolder.total+')'}"

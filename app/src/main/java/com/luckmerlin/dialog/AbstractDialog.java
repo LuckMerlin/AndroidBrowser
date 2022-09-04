@@ -9,36 +9,17 @@ import com.luckmerlin.view.Content;
 import com.luckmerlin.view.LayoutParamsResolver;
 import com.luckmerlin.view.ViewIterate;
 
-public abstract class AbstractDialog implements Dialog{
-    private View mRoot;
-    private Context mContext;
+public abstract class AbstractDialog extends AbstractWindow implements Dialog{
 
     public AbstractDialog(Context context){
-        mContext=context;
-    }
-
-    @Override
-    public boolean setContentView(Content content) {
-        Context context=mContext;
-        View view=null!=context&&null!=content?content.onCreateContentView(context,(ViewIterate iterate)->
-                null!=iterate&&iterate.iterate(AbstractDialog.this)):null;
-        if (null==context||null==view||(view.getParent()!=null)){
-            Debug.E("Fail set window dialog content view while context or view invalid."+context);
-            return false;
-        }
-        View current=mRoot;
-        if (null!=current){
-            removeFromParent(current);
-        }
-        mRoot=view;
-        return true;
+        super(context);
     }
 
     protected abstract boolean onShow(View view,LayoutParamsResolver resolver);
 
     @Override
     public final boolean show(LayoutParamsResolver resolver) {
-        View root = mRoot;
+        View root = getRoot();
         Context context = null != root ? root.getContext() : null;
         if (null == context) {
             return false;
@@ -46,31 +27,5 @@ public abstract class AbstractDialog implements Dialog{
             return false;
         }
         return onShow(root,resolver);
-    }
-
-    @Override
-    public boolean dismiss() {
-        return removeFromParent(mRoot);
-    }
-
-    @Override
-    public boolean isShowing() {
-        View root=mRoot;
-        return null!=root&&root.getParent()!=null&&root.getVisibility()==View.VISIBLE;
-    }
-
-    protected final void resolveLayoutParams(Context context,ViewGroup.LayoutParams params,LayoutParamsResolver resolver){
-        if (null!=resolver){
-            resolver.onResolveLayoutParams(context,params);
-        }
-    }
-
-    private boolean removeFromParent(View view){
-        ViewParent parent=null!=view?view.getParent():null;
-        if (null!=parent&&parent instanceof ViewGroup){
-            ((ViewGroup)parent).removeView(view);
-            return true;
-        }
-        return false;
     }
 }

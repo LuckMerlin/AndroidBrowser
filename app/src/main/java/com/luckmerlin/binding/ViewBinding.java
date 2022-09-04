@@ -11,6 +11,8 @@ import android.view.ViewParent;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.luckmerlin.click.Listener;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.view.ViewIterate;
@@ -25,9 +27,15 @@ public class ViewBinding extends ObjectBinding {
     private boolean mAutoFill=true;
     private OnViewBinding mOnViewBinding;
     private ImageFetcher mImage;
+    private Listener mListener;
 
     public ViewBinding(Object object) {
         setObject(object);
+    }
+
+    public ViewBinding setListener(Listener listener){
+        mListener=listener;
+        return this;
     }
 
     public ViewBinding enableLongClick(boolean enable){
@@ -114,10 +122,10 @@ public class ViewBinding extends ObjectBinding {
                 final int clickId=viewBinding.mClickId;
                 final Object object=viewBinding.getObject();
                 view.setOnClickListener((View v)->dispatchClick2View(v,v,
-                        clickId==View.NO_ID?v.getId():clickId,1,object));
+                        clickId==View.NO_ID?v.getId():clickId,1,object, viewBinding.mListener));
                 if (viewBinding.mEnableLongClick){
                     view.setOnLongClickListener((View v)-> dispatchLongClick2View(v,v,
-                            clickId==View.NO_ID?v.getId():clickId,object));
+                            clickId==View.NO_ID?v.getId():clickId,object, viewBinding.mListener));
                 }
             }
         }
@@ -151,12 +159,12 @@ public class ViewBinding extends ObjectBinding {
             return ViewBinding.getResource(context,resId);
         }
 
-        public final boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj){
-            return ViewBinding.dispatchLongClick2View(view,root,clickId,obj);
+        public final boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj,Listener listener){
+            return ViewBinding.dispatchLongClick2View(view,root,clickId,obj,listener);
         }
 
-        public final boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
-            return ViewBinding.dispatchClick2View(view,root,clickId,count,obj);
+        public final boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj,Listener listener){
+            return ViewBinding.dispatchClick2View(view,root,clickId,count,obj,listener);
         }
     }
 
@@ -201,22 +209,24 @@ public class ViewBinding extends ObjectBinding {
         return null;
     }
 
-    private static boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj){
+    private static boolean dispatchLongClick2View(View view,final View root,final int clickId,Object obj,Listener listener){
         return iterate(view, (Object child)-> child instanceof OnLongClickListener&&
-                ((OnLongClickListener)child).onLongClick(root,clickId,obj),null);
+                ((OnLongClickListener)child).onLongClick(root,clickId,obj),null,listener);
     }
 
-    private static boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj){
+    private static boolean dispatchClick2View(View view,final View root,final int clickId,int count,Object obj,Listener listener){
         return iterate(view, (Object child)-> child instanceof OnClickListener&&
-                ((OnClickListener)child).onClick(root,clickId,count,obj),null);
+                ((OnClickListener)child).onClick(root,clickId,count,obj),null,listener);
     }
 
-    private static boolean iterate(Object obj, ViewIterate iterator, Set<Object> iterated){
+    private static boolean iterate(Object obj, ViewIterate iterator, Set<Object> iterated,Listener listener){
         if (null==obj||null==iterator){
             return false;
         }
         iterated=null!=iterated?iterated:new HashSet<>();
-        if (makeIterate(obj,iterator,iterated)){
+        if (null!=listener&&makeIterate(listener,iterator,iterated)){
+            return true;
+        }else if (makeIterate(obj,iterator,iterated)){
             return true;
         }
         if (obj instanceof View){
@@ -227,7 +237,7 @@ public class ViewBinding extends ObjectBinding {
             }
             ViewParent parent=view.getParent();
             if (null!=parent&&parent instanceof View) {
-                return iterate((View) parent, iterator, iterated);
+                return iterate((View) parent, iterator, iterated,null);
             }else if (null!=context){
                 context=null!=context&&context instanceof ContextWrapper?((ContextWrapper)context).getBaseContext():context;
                 if (context instanceof Activity){

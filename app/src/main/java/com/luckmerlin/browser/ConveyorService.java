@@ -7,33 +7,41 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Base64;
 
+import com.luckmerlin.browser.client.LocalClient;
+import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.CodeResult;
-import com.luckmerlin.core.Section;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
-import com.luckmerlin.task.TaskExecutorService;
-import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.task.TaskSaver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ConveyorService extends TaskExecutorService {
+public class ConveyorService extends Service {
+    private ExecutorBinder mExecutorBinder;
+
     @Override
     public void onCreate() {
         super.onCreate();
         Debug.D("EEEE onCreate "+this);
+        List<Client> clients=new ArrayList<>();
+        clients.add(new LocalClient());
+        clients.add(new NasClient("http://192.168.0.5:5000","NAS"));
+        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
+        BrowserTaskExecutor executor=new BrowserTaskExecutor(taskSaver,clients);
+        mExecutorBinder=new ExecutorBinder(executor);
     }
 
     @Override
-    protected TaskSaver onCreateTaskSaver() {
-        return new ConveyorTaskSaver(getApplication());
+    public IBinder onBind(Intent intent) {
+        return mExecutorBinder;
     }
 
     @Override
@@ -121,4 +129,56 @@ public class ConveyorService extends TaskExecutorService {
         }
     }
 
+    private static class BrowserTaskExecutor extends TaskExecutor implements BrowserExecutor{
+        private List<Client> mClients;
+
+        public BrowserTaskExecutor(TaskSaver taskSaver,List<Client> clients){
+            super(taskSaver);
+            mClients=clients;
+        }
+
+        @Override
+        public boolean client(Matcher<Client> matcher) {
+            return match(mClients,matcher);
+        }
+    }
+
+    public static class ExecutorBinder extends Binder implements BrowserExecutor {
+        protected final BrowserTaskExecutor mExecutor;
+
+        public ExecutorBinder(BrowserTaskExecutor executor){
+            mExecutor=executor;
+        }
+
+        @Override
+        public boolean client(Matcher<Client> matcher) {
+            BrowserTaskExecutor executor=mExecutor;
+            return null!=executor&&executor.client(matcher);
+        }
+
+        @Override
+        public boolean execute(Object task,int option, OnProgressChange callback) {
+            return mExecutor.execute(task,option,callback);
+        }
+
+        @Override
+        public boolean option(Object task, int option) {
+            return mExecutor.option(task,option);
+        }
+
+        @Override
+        public  void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
+            mExecutor.match(matcher);
+        }
+
+        @Override
+        public Executor putListener(Listener listener, Matcher<Task> matcher, boolean notify) {
+            return mExecutor.putListener(listener,matcher,notify);
+        }
+
+        @Override
+        public Executor removeListener(Listener listener) {
+            return mExecutor.removeListener(listener);
+        }
+    }
 }

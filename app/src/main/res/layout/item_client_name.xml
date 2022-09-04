@@ -3,9 +3,12 @@
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
         <variable name="client" type="com.luckmerlin.browser.Client" />
+        <variable name="listener" type="com.luckmerlin.click.Listener" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
     </data>
 
-    <TextView android:id="@+id/fileBrowser_clientNameTV" android:text="@{client.name??``}"
-        android:textSize="@dimen/textTitle" android:padding="5dp"
+    <TextView binding:bind="@{VB.clickId(R.layout.item_client_name,client).setListener(listener)}"
+        android:text="@{client.name??``}" android:textSize="@dimen/textTitle"
         android:minWidth="40dp" android:textStyle="bold" style="@style/titleNormalTextView"/>
 </layout>
