@@ -133,6 +133,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
         //Do nothing
     }
 
+    protected void onPageLoadFinish(boolean succeed,Page<T> page){
+        //Do nothing
+    }
+
     private boolean load(int fromIndex,T from,int pageSize,OnPageLoadListener<T> callback){
         pageSize=pageSize==0?10:pageSize > 0 ? pageSize : -pageSize;
         LoadingPage<A,T> loadingPage=mLoadingPage;
@@ -159,6 +163,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
                     onPageLoadingChange(false);
                 }
                 super.onPageLoad(succeed, page);
+                PageListAdapter.this.onPageLoadFinish(succeed,page);
                 OnPageLoadListener<T> onPageLoad=mOnPageLoadedListener;
                 if (currentLoadFinish&&null!=onPageLoad){
                     onPageLoad.onPageLoad(succeed,page);

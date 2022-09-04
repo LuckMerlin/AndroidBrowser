@@ -56,18 +56,14 @@ import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 import java.util.List;
 
-public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
-        PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
+public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
         OnViewDetachedFromWindow, Executor.OnStatusChangeListener,OnProgressChange {
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
-    private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
-    private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
     private final ObservableField<Integer> mClientCount=new ObservableField<>();
     private final ObservableField<Mode> mBrowserMode=new ObservableField<Mode>();
-    private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
@@ -84,8 +80,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
-        mBrowserAdapter.setOnPageLoadedListener(this);
-        mPathSpanClick.setOnClickListener(this);
+        mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
 //        mBrowserClient.set(new NasClient(getHttp()));
 //        mBrowserClient.set(new LocalClient());
@@ -154,20 +149,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     @Override
-    public void onPageLoad(boolean succeed, PageListAdapter.Page<File> page) {
-        if (succeed){
-            if (null!=page&&page instanceof Folder){
-                Folder folder=(Folder)page;
-                mCurrentFolder.set(folder);
-                mCurrentPath.set(mPathSpanClick.generate(folder));
-                if (mBrowserAdapter.getSize()>0&&folder.isEmpty()){
-                    toast(R.string.noMoreData,500);
-                }
-            }
-        }
-    }
-
-    @Override
     public void onPathSpanClick(File path, int start, int end, String value) {
         if (null!=value&&value.length()>0){
             browserPath(path.generateFile(value));
@@ -187,7 +168,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return true;
             }
             Client client=mBrowserAdapter.getClient();
-            Folder currentFolder=mCurrentFolder.get();
+            Folder currentFolder=getCurrentFolder();
             TaskGroup group=new TaskGroup();int size=0;
             if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&& null!=group.
                     add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&&(size=group.getSize())>0){
@@ -259,8 +240,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return true;
     }
 
+    private Folder getCurrentFolder(){
+        ObservableField<Folder> field=mBrowserAdapter.getCurrentFolder();
+        return null!=field?field.get():null;
+    }
+
     public boolean browserBack(){
-        Folder folder=mCurrentFolder.get();
+        Folder folder=getCurrentFolder();
         return null!=folder&&browserPath(folder.getParentFile());
     }
 
@@ -358,7 +344,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     if (null!=binding){
                         binding.setClient(data);
                         binding.setListener((OnClickListener)(View view, int clickId, int count, Object obj)-> {
-                            mBrowserAdapter.setClient(client);
+                            mBrowserAdapter.setClient(data);
                             popupWindow.dismiss();
                             return true;
                         });
@@ -421,7 +407,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean createFile(){
         Client client=mBrowserAdapter.getClient();
-        return null!=showContentDialog(new CreateFileDialogContent(client,mCurrentFolder.get()){
+        return null!=showContentDialog(new CreateFileDialogContent(client,getCurrentFolder()){
             @Override
             protected void onCreate(Response<File> reply) {
                 boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
@@ -435,7 +421,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean setCurrentAsHome(){
         Client client=mBrowserAdapter.getClient();
-        Folder folder=mCurrentFolder.get();
+        Folder folder=getCurrentFolder();
         if (null==client||null==folder){
             return false;
         }
@@ -449,14 +435,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     public BrowserListAdapter getBrowserAdapter() {
         return mBrowserAdapter;
-    }
-
-    public ObservableField<Folder> getCurrentFolder() {
-        return mCurrentFolder;
-    }
-
-    public ObservableField<CharSequence> getCurrentPath() {
-        return mCurrentPath;
     }
 
     public ObservableField<Integer> getClientCount() {

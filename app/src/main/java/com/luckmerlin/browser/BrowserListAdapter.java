@@ -38,7 +38,10 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();
     private ObservableField<Boolean> mPageLoading=new ObservableField<Boolean>();
     private ObservableField<Client> mBrowserClient=new ObservableField<>();
+    private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
     private final Map<RecyclerView.ViewHolder,Canceler> mThumbLoading=new HashMap<>();
+    private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
+    private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private Mode mMode;
     private Executor mExecutor;
 
@@ -96,6 +99,26 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return mCurrentSelectSize;
     }
 
+    public BrowserListAdapter setOnPathSpanClick(PathSpanClick.OnPathSpanClick listener){
+        mPathSpanClick.setOnClickListener(listener);
+        return this;
+    }
+
+    @Override
+    protected void onPageLoadFinish(boolean succeed, Page<File> page) {
+        super.onPageLoadFinish(succeed, page);
+        if (succeed){
+            if (null!=page&&page instanceof Folder){
+                Folder folder=(Folder)page;
+                mCurrentFolder.set(folder);
+                mCurrentPath.set(mPathSpanClick.generate(folder));
+                if (getSize()>0&&folder.isEmpty()){
+//                    toast(R.string.noMoreData,500);
+                }
+            }
+        }
+    }
+
     public final boolean setFolder(BrowseQuery folder){
         return setFolder(folder,false);
     }
@@ -127,6 +150,8 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             return false;
         }
         clean();
+        mCurrentPath.set(null);
+        mCurrentFolder.set(null);
         mBrowserClient.set(client);
         reset(null);
         return true;
@@ -264,5 +289,13 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public ObservableField<Boolean> getPageLoading() {
         return mPageLoading;
+    }
+
+    public ObservableField<Folder> getCurrentFolder() {
+        return mCurrentFolder;
+    }
+
+    public ObservableField<CharSequence> getCurrentPath() {
+        return mCurrentPath;
     }
 }
