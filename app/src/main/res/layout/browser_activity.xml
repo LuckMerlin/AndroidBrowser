@@ -83,6 +83,7 @@
                 <TextView android:text="@{vm.alertText.message??``}" android:layout_gravity="center" android:gravity="center"
                     android:paddingLeft="5dp" android:paddingRight="5dp" android:textSize="10sp"
                     android:background="@{vm.alertText.messageBackground}"
+                    android:movementMethod="@{vm.alertText.movementMethod}"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close,vm.alertText)}"
                     android:layout_gravity="right|top" android:padding="1dp"

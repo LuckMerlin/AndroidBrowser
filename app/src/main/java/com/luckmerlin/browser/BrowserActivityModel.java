@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -105,8 +106,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         builder.append(name).append(nameEmpty?value:value.toLowerCase()).append(".");
         int index=builder.length();
         builder.append((" "+getText(R.string.refresh)).toLowerCase());
-        builder.setSpan(new ClickableSpan((View widget)->mBrowserAdapter.reset(null)),index,builder.length(), Spannable.SPAN_EXCLUSIVE_INCLUSIVE);
-        showAlertText(new AlertText().setMessage(builder),0);
+        builder.setSpan(new ClickableSpan((View widget)->{
+            mBrowserAdapter.reset(null);
+            showAlertText(null,0);
+        }),index,builder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        showAlertText(new AlertText().setMessage(builder).setMovementMethod(LinkMovementMethod.getInstance()),0);
     }
 
     private boolean browserPath(File file){
