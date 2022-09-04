@@ -134,6 +134,14 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return false;
     }
 
+    public boolean removeIfInFolder(File file){
+        return null!=file&&isCurrentFolder(file.getPath())&&remove(file);
+    }
+
+    public boolean isCurrentFolder(File file){
+        return null!=file&&isCurrentFolder(file.getPath());
+    }
+
     public boolean isCurrentFolder(String path){
         if (null==path||path.length()<=0){
             return false;

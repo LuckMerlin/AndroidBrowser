@@ -7,12 +7,24 @@ import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnInitialOption;
 import com.luckmerlin.task.Progress;
 
-public abstract class FileTask extends AbstractTask{
+public abstract class FileTask extends AbstractTask implements OnInitialOption {
+    private boolean mDeleteSucceedEnable;
 
     public FileTask(Progress progress) {
         super(progress);
+    }
+
+    public final FileTask enableDeleteSucceed(boolean enable){
+        mDeleteSucceedEnable=enable;
+        return this;
+    }
+
+    @Override
+    public Integer onInitOption(int option, boolean fromSaved) {
+        return mDeleteSucceedEnable?option|Executor.Option.DELETE_SUCCEED:option;
     }
 
     public final Client getFileClient(File file){

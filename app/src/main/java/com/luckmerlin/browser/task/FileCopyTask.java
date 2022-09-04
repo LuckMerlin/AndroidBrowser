@@ -19,6 +19,7 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.stream.StreamCopyTask;
 import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.OnInitialOption;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;

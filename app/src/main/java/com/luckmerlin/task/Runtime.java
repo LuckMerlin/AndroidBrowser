@@ -43,6 +43,10 @@ public abstract class Runtime {
         return isOptionEnabled(mOption,Executor.Option.DELETE);
     }
 
+    public final boolean isDeleteSucceedEnabled(){
+        return isOptionEnabled(mOption,Executor.Option.DELETE_SUCCEED);
+
+    }
     protected static final boolean isDeleteEnabled(int src) {
         return isOptionEnabled(src,Executor.Option.DELETE);
     }

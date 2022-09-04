@@ -55,7 +55,7 @@ import java.util.List;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
-        OnViewDetachedFromWindow, Executor.OnStatusChangeListener,OnProgressChange {
+        OnViewDetachedFromWindow, Executor.OnStatusChangeListener {
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
     private final ObservableField<AlertText> mAlertText=new ObservableField<>();
@@ -88,11 +88,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         //
 //        showBrowserContextMenu(activity);
 //        createFile();
-        startActivity(ConveyorActivity.class);
-        showFolderFilesChangeAlert("eeee");
+//        startActivity(ConveyorActivity.class);
+//        showFolderFilesChangeAlert("eeee");
     }
 
-    public void showFolderFilesChangeAlert(String name){
+    private boolean showFolderFilesChangeAlert(String name){
         SpannableStringBuilder builder=new SpannableStringBuilder();
         name=null!=name&&name.length()>5?name.substring(0,5)+"...":name;
         name=null!=name?name+" ":" ";
@@ -105,7 +105,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             mBrowserAdapter.reset(null);
             showAlertText(null,0);
         }),index,builder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        showAlertText(new AlertText().setMessage(builder).setMovementMethod(LinkMovementMethod.getInstance()),0);
+       return showAlertText(new AlertText().setMessage(builder).setMovementMethod(LinkMovementMethod.getInstance()),0);
     }
 
     private boolean browserPath(File file){
@@ -142,21 +142,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return false;
     }
 
-    @Override
-    public void onProgressChanged(Task task, Progress progress) {
-        Object object=null!=progress?progress.getData():null;
-        if (null!=object&&object instanceof DoingFiles){
-            DoingFiles files=(DoingFiles)object;
-            if (files.isFinish()&&files.isDoingMode(Mode.MODE_DELETE)){
-                File fromFile=files.getFrom();
-                BrowserListAdapter browserListAdapter=mBrowserAdapter;
-                if (null!=fromFile&&null!=browserListAdapter&&browserListAdapter.
-                        isCurrentFolder(fromFile.getPath())){
-                    post(()->browserListAdapter.remove(fromFile));
-                }
-            }
-        }
-    }
 
     @Override
     public final boolean onBackPressed() {
@@ -236,6 +221,32 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
         mNotifyText.set(""+status+" "+(null!=task?task.getName():""));
+        switch (status){
+            case Executor.STATUS_FINISH:
+                Progress progress=null!=task?task.getProgress():null;
+                Object object=null!=progress?progress.getData():null;
+                if (null!=object&&object instanceof DoingFiles){
+                    checkDoingFileSucceed((DoingFiles)object);
+                }
+                break;
+        }
+    }
+
+    private boolean checkDoingFileSucceed(DoingFiles files){
+        BrowserListAdapter browserListAdapter=mBrowserAdapter;
+        if (null==files||!files.isFinish()||null==browserListAdapter){
+            return false;
+        }
+        if (files.isDoingMode(Mode.MODE_DELETE)){
+            return browserListAdapter.removeIfInFolder(files.getFrom());
+        }else if (files.isDoingMode(Mode.MODE_MOVE)){
+            return browserListAdapter.removeIfInFolder(files.getFrom());
+        }else if (files.isDoingMode(Mode.MODE_COPY)){
+            File toFile=files.getTo();
+            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&
+                    showFolderFilesChangeAlert(toFile.getName());
+        }
+        return false;
     }
 
     @Override
@@ -260,12 +271,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return null!=field?field.get():null;
     }
 
-    private void showAlertText(AlertText alertText,int timeout){
+    private boolean showAlertText(AlertText alertText,int timeout){
         mAlertText.set(alertText);
         CharSequence msg=null!=alertText?alertText.getMessage():null;
         if (null!=msg&&msg.length()>0&&(timeout=timeout>10000?10000:timeout)>0){
-            post(()->showAlertText(null,0),timeout);
+            return post(()->showAlertText(null,0),timeout);
         }
+        return true;
     }
 
     public boolean browserBack(){
@@ -317,7 +329,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileCopyTask(file,folder,null).setName(getString(R.string.copy));
+                    return new FileCopyTask(file,folder,null).enableDeleteSucceed(true).setName(getString(R.string.copy));
                 });
             case R.string.move:
                 return entryMode(Mode.MODE_MOVE, obj, (Mode moveMode,Client client,File file, Folder folder)-> {
@@ -325,7 +337,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileMoveTask(file,folder,null).setName(getString(R.string.move));
+                    return new FileMoveTask(file,folder,null).enableDeleteSucceed(true).setName(getString(R.string.move));
                 });
             case R.string.download:
                 return entryMode(Mode.MODE_DOWNLOAD, obj, (Mode downloadMode,Client client,File file, Folder folder)-> {

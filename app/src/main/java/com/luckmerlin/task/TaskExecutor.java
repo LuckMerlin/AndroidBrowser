@@ -140,7 +140,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return false;
     }
 
-    private final boolean execute(Task task,int option,boolean fromSaved,OnProgressChange callback){
+    private final boolean execute(Task task,int optionArg,boolean fromSaved,OnProgressChange callback){
         if (null==task){
             Debug.E("Fail execute task while task is invalid.");
             return false;
@@ -158,6 +158,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Debug.E("Fail execute task while executor is invalid.");
             return false;
         }
+        Integer initOption=task instanceof OnInitialOption?((OnInitialOption)task).onInitOption(optionArg,fromSaved):null;
+        final int option=null!=initOption?initOption:optionArg;
         final boolean needSave=task instanceof Parcelable &&(!(task instanceof OnTaskSave)||
                 ((OnTaskSave)task).onTaskSave(TaskExecutor.this));
         if (!fromSaved&&needSave&&!Runtime.isDeleteEnabled(option)){
@@ -175,8 +177,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 public void run() {
                     setStatus(STATUS_EXECUTING);
                     notifyStatusChange(STATUS_EXECUTING,task,mListeners);
-                    if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).
-                            onExecuteStart(TaskExecutor.this)){
+                    if (!(task instanceof OnExecuteStart)||!((OnExecuteStart)task).onExecuteStart(TaskExecutor.this)){
                         OnProgressChange progressChange=mCallback;
                         mTask.execute(this, (Task task, Progress progress)-> {
                             iterateListener(task,(Listener data)->{
@@ -196,7 +197,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                         //Do nothing
                     }
                     notifyStatusChange(STATUS_FINISH,task,mListeners);
-                    if (needSave&&!isDeleteEnabled()){
+                    Progress progress=null;
+                    if (isDeleteSucceedEnabled()&&null!=(progress=task.getProgress())&&progress.isSucceed()){
+                        deleteSaveTask(task);
+                    }else if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
                     }
                     post(()->{
