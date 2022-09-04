@@ -21,9 +21,7 @@ public final class FileDefaultThumb {
                 iconId = R.drawable.hidisk_icon_html;
             } else if (mime.endsWith("audio/amr")) {
                 iconId = R.drawable.hidisk_icon_music_amr;
-            } else if (mime.endsWith("application/xml")) {
-                iconId = R.drawable.hidisk_icon_xml;
-            } else if (mime.endsWith("audio/flac")) {
+            }else if (mime.endsWith("audio/flac")) {
                 iconId = R.drawable.hidisk_icon_music_flac;
             } else if (mime.endsWith("audio/mp4")) {
                 iconId = R.drawable.hidisk_icon_music_m4a;

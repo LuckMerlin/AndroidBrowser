@@ -48,9 +48,10 @@ public class File extends JsonObject {
             return null;
         }
         String name=getName();
-        int index=null!=name?name.lastIndexOf("."):-1;
-        name=index>=0?name.substring(index):null;
-        return null!=name&&name.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(name):null;
+//        int index=null!=name?name.lastIndexOf("."):-1;
+//        name=index>=0?name.substring(index):null;
+//        return null!=name&&name.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(name):null;
+        return null!=name?MimeTypeMap.getFileExtensionFromUrl(name):null;
     }
 
     public File generateFile(String path){
@@ -93,8 +94,7 @@ public class File extends JsonObject {
     public String getMime(){
         String mime=optString(Label.LABEL_MIME,null);
         if (!isDirectory()&&(null==mime||mime.length()<=0)){
-            mime=getName();
-            mime= null!=mime&&mime.length()>0?MimeTypeMap.getFileExtensionFromUrl(mime):null;
+            mime=getExtension();
             mime=null!=mime&&mime.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(mime):null;
         }
         return mime;
