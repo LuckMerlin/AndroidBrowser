@@ -345,14 +345,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return null;
     }
 
-    protected void onItemAttachChanged(boolean attach,RecyclerView.ViewHolder holder){
-        //Do nothing
-    }
-
-    private final Map<RecyclerView.ViewHolder,Canceler> mDirtyChecking=new HashMap<>();
+//    private final Map<RecyclerView.ViewHolder,Canceler> mDirtyChecking=new HashMap<>();
 
     @Override
-    public final void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
+    public void onViewAttachedToWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewAttachedToWindow(holder);
         //
         Map<T,OnChangeUpdate> attachViewHolders=mAttachViewHolders;
@@ -366,16 +362,15 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
             attachViewHolders.put(data,onChangeUpdate);
         }
         //
-        Map<RecyclerView.ViewHolder, Canceler> dirtyChecking=mDirtyChecking;
-        DirtyDataChecker<T> checker=mDirtyDataChecker;
-        Canceler canceler=null;
-        if (null!=dirtyChecking&&null!=checker&&null!=(canceler=checker.checkDataDirty(holder, this, (T newData)-> {
-            dirtyChecking.remove(holder);
-        }))){
-            dirtyChecking.put(holder,canceler);
-        }
+//        Map<RecyclerView.ViewHolder, Canceler> dirtyChecking=mDirtyChecking;
+//        DirtyDataChecker<T> checker=mDirtyDataChecker;
+//        Canceler canceler=null;
+//        if (null!=dirtyChecking&&null!=checker&&null!=(canceler=checker.checkDataDirty(holder, this, (T newData)-> {
+//            dirtyChecking.remove(holder);
+//        }))){
+//            dirtyChecking.put(holder,canceler);
+//        }
         //
-        onItemAttachChanged(true,holder);
         OnItemAttachChange attachChange=mOnItemAttachChange;
         if (null!=attachChange){
             attachChange.onItemAttachChanged(true,holder,this);
@@ -383,7 +378,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     @Override
-    public final void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
         super.onViewDetachedFromWindow(holder);
         Map<T,OnChangeUpdate> attachViewHolders=mAttachViewHolders;
         T data=null!=attachViewHolders?getItem(holder.getAdapterPosition()):null;
@@ -393,12 +388,11 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
                 ((ChangeUpdate)data).removeChangeListener(callback);
             }
         }
-        Map<RecyclerView.ViewHolder,Canceler> dirtyChecking=null!=holder?mDirtyChecking:null;
-        Canceler canceler=null!=dirtyChecking?dirtyChecking.remove(holder):null;
-        if (null!=canceler){
-            canceler.cancel();
-        }
-        onItemAttachChanged(false,holder);
+//        Map<RecyclerView.ViewHolder,Canceler> dirtyChecking=null!=holder?mDirtyChecking:null;
+//        Canceler canceler=null!=dirtyChecking?dirtyChecking.remove(holder):null;
+//        if (null!=canceler){
+//            canceler.cancel();
+//        }
         OnItemAttachChange attachChange=mOnItemAttachChange;
         if (null!=attachChange){
             attachChange.onItemAttachChanged(false,holder,this);

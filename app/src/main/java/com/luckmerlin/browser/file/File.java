@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.file;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.Nullable;
@@ -43,14 +45,19 @@ public class File extends JsonObject {
         return generateFile(getParent());
     }
 
+    public String getThumb(){
+        return optString("thumb",null);
+    }
+
+    public File setThumb(String thumb){
+        return putSafe(this,"thumb",thumb);
+    }
+
     public String getExtension(){
         if (isDirectory()){
             return null;
         }
         String name=getName();
-//        int index=null!=name?name.lastIndexOf("."):-1;
-//        name=index>=0?name.substring(index):null;
-//        return null!=name&&name.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(name):null;
         return null!=name?MimeTypeMap.getFileExtensionFromUrl(name):null;
     }
 
@@ -178,6 +185,21 @@ public class File extends JsonObject {
     public boolean isPatchEquals(String path){
         String currentPath=getPath();
         return (null==path&&null==currentPath)||(null!=currentPath&&null!=path&&currentPath.equals(path));
+    }
+
+    public interface Type{
+        public final static String VIDEO="image/";
+        public final static String IMAGE="image/";
+        public final static String AUDIO="audio/";
+        public final static String APK="application/vnd.android";
+    }
+
+    public boolean isType(String type){
+        return isType(getMime(),type);
+    }
+
+    public static boolean isType(String mime,String type){
+        return null!=mime&&null!=type&&mime.startsWith(type);
     }
 
     @Override

@@ -1,18 +1,11 @@
 package com.luckmerlin.browser;
 
 import android.view.View;
-
-import androidx.databinding.ViewDataBinding;
-
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ImageFetcher;
 import com.luckmerlin.binding.ViewBinding;
-import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
 import com.luckmerlin.browser.file.File;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Task;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +42,25 @@ public final class BrowserBinding implements ImageFetcher {
        }
     }
 
+    public int getThumbResId(File file){
+        if (null==file){
+            return R.drawable.hidisk_icon_unknown;
+        }else if (file.isDirectory()){
+            return R.drawable.hidisk_icon_folder;
+        }
+        Integer defResId=null;
+        String mime=file.getMime();
+        defResId=null!=mime?mResIdMap.get(mime):null;
+        String extension=null;
+        if (null==defResId&&null!=(extension=file.getExtension())&&null!=(extension=extension.toLowerCase())){
+            defResId=mResIdMap.get(extension);
+            if (null==defResId&&null!=mime&&mime.equals("audio/x-mpeg")&&extension.equals(".mp3")){
+                defResId=R.drawable.hidisk_icon_mp3;
+            }
+        }
+        return null!=defResId?defResId:R.drawable.hidisk_icon_unknown;
+    }
+
     private BrowserBinding(){
         mResIdMap.put("application/x-7z-compressed",R.drawable.hidisk_icon_7z);
         mResIdMap.put("application/zip",R.drawable.hidisk_icon_zip);
@@ -58,6 +70,7 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("text/javascript",R.drawable.hidisk_icon_js);
         mResIdMap.put("text/plain",R.drawable.hidisk_icon_text);
         mResIdMap.put("application/msword",R.drawable.hidisk_icon_doc);
+        mResIdMap.put("application/vnd.android",R.drawable.hidisk_icon_apk);
         mResIdMap.put("image/gif",R.drawable.hidisk_icon_gif);
         mResIdMap.put("image/jpeg",R.drawable.hidisk_icon_jpg);
         mResIdMap.put("image/png",R.drawable.hidisk_icon_png);

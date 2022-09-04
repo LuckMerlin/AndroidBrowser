@@ -1,8 +1,12 @@
 package com.luckmerlin.browser;
 
+import android.graphics.drawable.Drawable;
+import android.view.View;
+
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
@@ -24,5 +28,6 @@ public interface Client {
     Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update);
     Response<Folder> listFiles(File folder,long start,int size,Filter filter);
+    Drawable loadThumb(View root, File file, Canceled canceled);
 //    Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize);
 }

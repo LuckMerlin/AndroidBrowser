@@ -76,9 +76,9 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
                 refreshLayout.setRefreshing(false):null);
     }
 
-    protected Canceler onPageLoad(A args, T from, int pageSize, OnPageLoadListener<T> callback){
+    protected Canceler onPageLoad(A args,int fromIndex, T from, int pageSize, OnPageLoadListener<T> callback){
         PageLoader pageLoader=mPageLoader;
-        return null!=pageLoader?pageLoader.onPageLoad(args,indexPosition(from),from,pageSize,callback):null;
+        return null!=pageLoader?pageLoader.onPageLoad(args,fromIndex,from,pageSize,callback):null;
     }
 
     public final boolean reset(OnPageLoadListener<T> callback){
@@ -92,7 +92,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     public final boolean reset(A args,int pageSize,OnPageLoadListener<T> callback){
         mLoadingPage=null;
         mArgs=null!=args?args:mArgs;
-        return load(null, pageSize, (boolean succeed, Page<T> page)-> {
+        return load(0,null, pageSize, (boolean succeed, Page<T> page)-> {
                 if (succeed){
                     setData(null!=page?page.getPageData():null);
                 }
@@ -107,7 +107,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean loadPre(int pageSize, OnPageLoadListener<T> callback){
-        return load(getFirst(),pageSize==0?10:pageSize>0?-pageSize:pageSize,(boolean succeed, Page<T> page)-> {
+        return load(0,getItem(0),pageSize==0?10:pageSize>0?-pageSize:pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(0,null!=page?page.getPageData():null);
             }
@@ -118,7 +118,8 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean loadNext(int pageSize,OnPageLoadListener<T> callback){
-        return load(getLatest(), pageSize,(boolean succeed, Page<T> page)-> {
+        int index=getSize()-1;
+        return load(index,getItem(index), pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(Integer.MAX_VALUE,null!=page?page.getPageData():null);
             }
@@ -132,7 +133,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
         //Do nothing
     }
 
-    private boolean load(T from,int pageSize,OnPageLoadListener<T> callback){
+    private boolean load(int fromIndex,T from,int pageSize,OnPageLoadListener<T> callback){
         pageSize=pageSize==0?10:pageSize > 0 ? pageSize : -pageSize;
         LoadingPage<A,T> loadingPage=mLoadingPage;
         if (null!=loadingPage){
@@ -164,7 +165,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
                 }
             }
         };
-        loadingPage.canceler(onPageLoad(args,from,pageSize,loadingPage));
+        loadingPage.canceler(onPageLoad(args,fromIndex,from,pageSize,loadingPage));
         if (null==loadingPage.mCanceler){//No canceler,means fail
             loadingPage.onPageLoad(false,null);
             return false;

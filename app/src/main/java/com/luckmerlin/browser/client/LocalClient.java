@@ -1,13 +1,25 @@
 package com.luckmerlin.browser.client;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.ThumbnailUtils;
+import android.os.Build;
+import android.os.CancellationSignal;
+import android.provider.MediaStore;
+import android.view.View;
 import android.webkit.MimeTypeMap;
 
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
@@ -149,6 +161,32 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public Drawable loadThumb(View view, File file, Canceled canceled) {
+        Context context=null!=view?view.getContext():null;
+        String mime=null;String path=null;
+        if (null==file||null==canceled||null==context||file.isDirectory()){
+            return null;
+        }else if (null==(mime=file.getMime())||null==(path=file.getPath())){
+            return null;
+        }else if (File.isType(mime, File.Type.IMAGE)){
+            Bitmap bitmap=Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q?ThumbnailUtils.createImageThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND):null;
+            bitmap=null!=bitmap?bitmap:loadFileBitmap(path,60,60);
+            return null!=bitmap?new BitmapDrawable(bitmap):null;
+        }else if (File.isType(mime,File.Type.AUDIO)){
+            Bitmap bitmap=Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q?ThumbnailUtils.
+                    createAudioThumbnail(path, MediaStore.Images.Thumbnails.MINI_KIND):null;
+            return null!=bitmap?new BitmapDrawable(bitmap):null;
+        }else if (File.isType(mime,File.Type.VIDEO)){
+            Bitmap bitmap=Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q?ThumbnailUtils.
+                    createVideoThumbnail(path, MediaStore.Video.Thumbnails.MINI_KIND):null;
+            return null!=bitmap?new BitmapDrawable(bitmap):null;
+        }else if (File.isType(mime,File.Type.APK)){
+
+        }
+        return null;
+    }
+
+    @Override
     public Response<File> createFile(File parent, String name, boolean isDir) {
         if (null==parent||!parent.isLocalFile()||!parent.isDirectory()||null==name||name.length()<=0||
                 name.contains(java.io.File.separator)){
@@ -261,5 +299,49 @@ public class LocalClient extends AbstractClient {
         boolean notExist=!file.exists();
         notifyDoingFile(doingFiles.setProgress(notExist?1:0),update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
+    }
+
+    private Bitmap loadFileBitmap(String filePath,int with,int height){
+        if (null==filePath||filePath.length()<=0){
+            return null;
+        }else if (with<=0||height<=0){
+            return null;
+        }
+        try {
+            BitmapFactory.Options options=new BitmapFactory.Options();
+            options.inJustDecodeBounds=true;
+            BitmapFactory.decodeFile(filePath,options);
+            int minSideLength=Math.min(with,height);
+            //
+            int maxNumOfPixels=with*height;
+            double w=options.outWidth;
+            double h=options.outHeight;
+            int lowerBound=maxNumOfPixels<=0?1:(int)Math.ceil(Math.sqrt(w*h/maxNumOfPixels));
+            int upperBound=minSideLength<=0?128:(int)Math.min(Math.floor(w/minSideLength),Math.floor(h/minSideLength));
+            int initialSize=upperBound;
+            if (upperBound<lowerBound){
+                initialSize=lowerBound;
+            }else if (maxNumOfPixels<=0&&minSideLength<=0){
+                initialSize= 1;
+            }else if (minSideLength<=0){
+                initialSize=lowerBound;
+            }
+            int inSampleSize;
+            if (initialSize<=8){
+                inSampleSize=1;
+                while (inSampleSize<initialSize){
+                    inSampleSize<<=1;
+                }
+            }else{
+                inSampleSize=(initialSize+7)/8*8;
+            }
+            options.inSampleSize=inSampleSize;
+            options.inJustDecodeBounds=false;
+            options.inInputShareable=true;
+            options.inPurgeable=true;
+            return BitmapFactory.decodeFile(filePath,options);
+        }catch (Exception e){
+            return null;
+        }
     }
 }

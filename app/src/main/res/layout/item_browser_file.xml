@@ -5,6 +5,7 @@
     <data>
         <variable name="path" type="com.luckmerlin.browser.file.File" />
         <variable name="selected" type="boolean" />
+        <variable name="thumb" type="android.graphics.drawable.Drawable" />
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
@@ -22,8 +23,8 @@
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
-            <ImageView binding:bind="@{VB.create(path).img(BB.instance)}"
-                android:layout_width="50dp" android:layout_height="50dp"/>
+<!--        <ImageView binding:bind="@{VB.create(path).img(BB.instance)}"-->
+            <ImageView android:imageDrawable="@{thumb}" android:layout_width="50dp" android:layout_height="50dp"/>
         </FrameLayout>
 
         <FrameLayout android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content">

@@ -66,7 +66,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         PageListAdapter.OnPageLoadListener<File>, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
         OnViewDetachedFromWindow, Executor.OnStatusChangeListener,OnProgressChange {
-    private ObservableField<Client> mBrowserClient=new ObservableField<>();
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
     private ObservableField<Folder> mCurrentFolder=new ObservableField<>();
@@ -76,10 +75,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
-    private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter
-            ((BrowseQuery args, int fromIndex,File from, int pageSize, PageListAdapter.OnPageLoadListener<File> callback)->
-             loadFiles(args,fromIndex+1, pageSize, null!=callback?(Response<Folder> reply)->
-             callback.onPageLoad(null!=reply&&reply.isSucceed(),reply.getData()) :null)?()->false:()->false);
+    private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -107,15 +103,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        startActivity(ConveyorActivity.class);
     }
 
-    private boolean loadFiles(BrowseQuery args, int from, int pageSize,OnFinish<Response<Folder>> callback){
-        Client client=getClient();
-        if (null==client){
-            notifyFinish(new Response<Folder>().set(Code.CODE_FAIL,"None client.",null),callback);
-            return false;
-        }
-        return execute(()->notifyFinish(client.listFiles(null!=args?args.mFolder:null,from,pageSize,null),callback));
-    }
-
     private boolean browserPath(File file){
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
@@ -123,7 +110,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean selectNextClient(){
-        Client client=getClient();
+        Client client=mBrowserAdapter.getClient();
         BrowserExecutor executor=mExecutor;
         if (null==client&&null!=executor){
             final Client[] clients=new Client[2];
@@ -139,19 +126,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     }
                     return false;
             });
-            return null!=clients[0]&&selectClient(clients[0]);
+            return null!=clients[0]&&mBrowserAdapter.setClient(clients[0]);
         }
         return false;
-    }
-
-    private boolean selectClient(Client client){
-        Client current=getClient();
-        if ((null==current&&null==client)||(null!=current&&null!=client&&current==client)){
-            return false;
-        }
-        mBrowserClient.set(client);
-        mBrowserAdapter.reset(null);
-        return true;
     }
 
     @Override
@@ -208,7 +185,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             if (null==args||args.size()<=0){
                 return true;
             }
-            Client client=mBrowserClient.get();
+            Client client=mBrowserAdapter.getClient();
             Folder currentFolder=mCurrentFolder.get();
             TaskGroup group=new TaskGroup();int size=0;
             if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&& null!=group.
@@ -406,7 +383,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean createFile(){
-        Client client=mBrowserClient.get();
+        Client client=mBrowserAdapter.getClient();
         return null!=showContentDialog(new CreateFileDialogContent(client,mCurrentFolder.get()){
             @Override
             protected void onCreate(Response<File> reply) {
@@ -420,7 +397,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean setCurrentAsHome(){
-        Client client=mBrowserClient.get();
+        Client client=mBrowserAdapter.getClient();
         Folder folder=mCurrentFolder.get();
         if (null==client||null==folder){
             return false;
@@ -429,13 +406,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 ?R.string.whichSucceed: R.string.whichFailed,getString(R.string.setAsHome))));
     }
 
-    private Client getClient(){
-        return mBrowserClient.get();
-    }
-
-    public ObservableField<Client> getBrowserClient() {
-        return mBrowserClient;
-    }
 
     public ObservableField<ListAdapter> getContentAdapter() {
         return mContentAdapter;

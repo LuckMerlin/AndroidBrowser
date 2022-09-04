@@ -25,10 +25,10 @@
                 <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
                     <TextView android:textSize="10sp"
                         style="@style/titleNormalTextView" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                    <include binding:client="@{vm.browserClient}" layout="@layout/item_client_name"/>
+                    <include binding:client="@{vm.browserAdapter.browserClient}" layout="@layout/item_client_name"/>
                     <TextView android:text="@{` (`+((null==vm.browserAdapter.currentSelectSize||(vm.browserAdapter.currentSelectSize&lt;0))?``:``+vm.browserAdapter.currentSelectSize+`/`)+vm.currentFolder.total+')'}"
                         style="@style/titleNormalTextView" android:textStyle="bold"
-                        android:visibility="@{(null==vm.browserClient&amp;&amp;null==vm.currentFolder)?View.GONE:View.VISIBLE}"
+                        android:visibility="@{(null==vm.browserAdapter.browserClient&amp;&amp;null==vm.currentFolder)?View.GONE:View.VISIBLE}"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:orientation="horizontal" android:layout_height="wrap_content">
@@ -36,7 +36,7 @@
                         android:layout_marginRight="5dp" android:layout_width="10dp" android:layout_height="10dp"/>
                     <TextView android:text='@{""+FileSize.formatSizeText(vm.currentFolder.availableVolume)+"/"+FileSize.formatSizeText(vm.currentFolder.totalVolume)}'
                         style="@style/titleSubNormalTextView" android:layout_width="wrap_content"
-                        android:visibility="@{null==vm.browserClient?View.GONE:View.VISIBLE}" android:singleLine="true" android:layout_height="wrap_content"/>
+                        android:visibility="@{null==vm.browserAdapter.browserClient?View.GONE:View.VISIBLE}" android:singleLine="true" android:layout_height="wrap_content"/>
                     <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
                 </LinearLayout>
             </LinearLayout>
