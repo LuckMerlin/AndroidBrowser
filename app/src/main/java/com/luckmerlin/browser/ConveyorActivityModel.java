@@ -99,7 +99,7 @@ public class ConveyorActivityModel extends BaseModel implements
             case Executor.STATUS_ADD:
                 mConveyorListAdapter.addTaskWithSort(task);
                 break;
-            case Executor.STATUS_REMOVE:
+            case Executor.STATUS_DELETE:
                 mConveyorListAdapter.remove(task);
                 break;
         }

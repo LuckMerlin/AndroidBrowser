@@ -3,7 +3,7 @@ package com.luckmerlin.browser.file;
 public final class DoingFiles {
     private File mFrom;
     private File mTo;
-    private float mProgress;
+    private int mProgress;
     private Integer mMode;
 
     public DoingFiles setFrom(File file){
@@ -16,16 +16,16 @@ public final class DoingFiles {
         return this;
     }
 
-    public DoingFiles setProgress(float progress) {
+    public DoingFiles setProgress(int progress) {
         this.mProgress = progress;
         return this;
     }
 
     public boolean isFinish(){
-        return mProgress ==1;
+        return mProgress ==100;
     }
 
-    public float getProgress() {
+    public int getProgress() {
         return mProgress;
     }
 

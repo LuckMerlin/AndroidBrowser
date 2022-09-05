@@ -129,11 +129,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 return false;
             }
             boolean succeed=true;
-            if (executeTask.isRemoveEnabled()){
-                succeed&=removeFromQueue(executeTask);
-            }
             if(executeTask.isDeleteEnabled()){
-                succeed&=deleteSaveTask((Task)task);
+                succeed&=deleteSaveTask(findFirst((Task)task));
             }
             return succeed;
         }
@@ -199,7 +196,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     notifyStatusChange(STATUS_FINISH,task,mListeners);
                     Progress progress=null;
                     if (isDeleteSucceedEnabled()&&null!=(progress=task.getProgress())&&progress.isSucceed()){
-                        deleteSaveTask(task);
+                        deleteSaveTask(this);
                     }else if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
                     }
@@ -267,9 +264,15 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return TaskExecutor.this.execute(task,option,null)?task:null;
     }
 
-    private boolean deleteSaveTask(Task task){
-        TaskSaver taskSaver=null!=task?mTaskSaver:null;
-        return null!=taskSaver&&taskSaver.delete(task);
+    private boolean deleteSaveTask(ExecuteTask executeTask){
+        if (null==executeTask){
+            return false;
+        }
+        removeFromQueue(executeTask);
+        TaskSaver taskSaver=mTaskSaver;
+        boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
+        notifyStatusChange(STATUS_DELETE,executeTask.mTask,mListeners);
+        return succeed;
     }
 
     private boolean saveTask(Task task,int option){

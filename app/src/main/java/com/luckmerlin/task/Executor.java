@@ -7,12 +7,11 @@ public interface Executor {
     public static interface Option{
         public final static int NONE=0;
         public final static int CANCEL=1;
-        public final static int REMOVE=2;
-        public final static int DELETE=REMOVE|CANCEL;
+        public final static int DELETE=2;
         public final static int ON_SUCCEED=4;
         public final static int ON_FINISH=8;
         public final static int CONFIRM=16;
-        public final static int DELETE_SUCCEED=32|DELETE;
+        public final static int DELETE_SUCCEED=32|DELETE&~CANCEL;
     }
 
     interface Listener{
@@ -31,7 +30,7 @@ public interface Executor {
     public final static int STATUS_START_LOAD_SAVED=2005;
     public final static int STATUS_FINISH_LOAD_SAVED=2006;
     public final static int STATUS_ADD=2007;
-    public final static int STATUS_REMOVE=2008;
+    public final static int STATUS_DELETE=2008;
 
     boolean execute(Object task,int option,OnProgressChange callback);
     boolean option(Object task,int option);

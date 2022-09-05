@@ -236,7 +236,7 @@ public class LocalClient extends AbstractClient {
         }
         file.delete();
         boolean notExist=!file.exists();
-        notifyDoingFile(doingFiles.setProgress(notExist?1:0),update);
+        notifyDoingFile(doingFiles.setProgress(notExist?100:0),update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }
 

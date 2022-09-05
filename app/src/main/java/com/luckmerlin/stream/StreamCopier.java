@@ -28,6 +28,7 @@ public class StreamCopier {
             if (null==progressChange||progressChange.onProgressChange(outputStream.getTotal(),total,speed)){
                 continue;
             }
+            Debug.D("Canceled copy stream.");
             return false;
         }
         long outTotal=outputStream.getTotal();

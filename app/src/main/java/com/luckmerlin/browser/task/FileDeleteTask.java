@@ -52,9 +52,13 @@ public class FileDeleteTask extends FileTask {
         }
         Progress progress=new Progress().setTotal(1).setPosition(0);
         notifyProgress(progress);
-        return client.deleteFile(file, (DoingFiles newData)->{
+        Response response= client.deleteFile(file, (DoingFiles newData)->{
                 notifyProgress(progress.setData(newData));
                 return isCancelEnabled();
         });
+        if (null!=response&&response.isSucceed()){
+            notifyProgress(progress.setPosition(1));
+        }
+        return response;
     }
 }

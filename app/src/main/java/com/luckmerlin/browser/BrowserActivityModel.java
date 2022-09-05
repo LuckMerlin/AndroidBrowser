@@ -94,7 +94,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean showFolderFilesChangeAlert(String name){
         SpannableStringBuilder builder=new SpannableStringBuilder();
-        name=null!=name&&name.length()>5?name.substring(0,5)+"...":name;
+        final int maxTitle=10;
+        name=null!=name&&name.length()>maxTitle?name.substring(0,maxTitle)+"...":name;
         name=null!=name?name+" ":" ";
         boolean nameEmpty=null==name||name.length()<=0;
         String value=""+getString(R.string.contentChanged);
@@ -141,7 +142,6 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         return false;
     }
-
 
     @Override
     public final boolean onBackPressed() {
@@ -407,6 +407,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         File file=(File)obj;
         FileDeleteTask deleteTask=new FileDeleteTask(file,null);
+        deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
         return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
                 showTaskDialog(deleteTask, new TaskDialogContent().setTitle(getString(R.string.delete)));
     }

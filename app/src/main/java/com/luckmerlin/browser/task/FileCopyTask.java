@@ -247,8 +247,13 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             byte[] buffer=mBuffer;
             buffer=null!=buffer?buffer:(mBuffer=new byte[1024]);
             return new StreamCopyTask(inputStream,outputStream,buffer,null).setName(fromFile.getName()).
-                    execute(runtime,null!=onFileProgress?(Task task, Progress progress1)-> onFileProgress.onProgressChanged(task,
-                            null==progress1?progress:progress.setPosition(progress1.getPosition()).setTotal(progress1.getTotal())):null);
+                    execute(runtime,null!=onFileProgress?(Task task, Progress progress1)-> {
+                        if (null!=progress1){
+                            progress.setPosition(progress1.getPosition()).setTotal(progress1.getTotal());
+                            doingFiles.setProgress(progress.intValue());
+                        }
+                        onFileProgress.onProgressChanged(task, progress);
+                    }:null);
         }catch (Exception e){
             Debug.W("Exception execute file copy task.e="+e);
             return new Response(Code.CODE_ERROR,"Exception execute file copy task.fromPath="+fromPath+" toPath="+toPath);
