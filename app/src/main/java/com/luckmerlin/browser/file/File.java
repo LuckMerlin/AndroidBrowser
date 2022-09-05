@@ -161,10 +161,14 @@ public class File extends JsonObject {
     }
 
     public final boolean isChild(Object pathObj,boolean parent){
+        return isChild(pathObj,parent,false);
+    }
+
+    public final boolean isChild(Object pathObj,boolean parent,boolean recursion){
         if (null==pathObj){
             return false;
         }else if (pathObj instanceof File){
-            return isChild(((File)pathObj).getPath(),parent);
+            return isChild(((File)pathObj).getPath(),parent,recursion);
         }else if (!(pathObj instanceof String)){
             return false;
         }
@@ -173,7 +177,7 @@ public class File extends JsonObject {
             return false;
         }
         String current=parent?getParent():getPath();
-        return null!=current&&path.startsWith(current);
+        return null!=current&&(recursion?path.startsWith(current):path.equals(current));
     }
 
     public String getPath(){

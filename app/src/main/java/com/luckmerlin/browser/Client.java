@@ -29,5 +29,4 @@ public interface Client {
     Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update);
     Response<Folder> listFiles(File folder,long start,int size,Filter filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
-//    Reply<Folder> loadFiles(BrowseQuery query, File from, int pageSize);
 }

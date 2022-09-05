@@ -239,9 +239,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         if (files.isDoingMode(Mode.MODE_DELETE)){
             return browserListAdapter.removeIfInFolder(files.getFrom());
-        }else if (files.isDoingMode(Mode.MODE_MOVE)){
-            return browserListAdapter.removeIfInFolder(files.getFrom());
-        }else if (files.isDoingMode(Mode.MODE_COPY)){
+        }
+        if (files.isDoingMode(Mode.MODE_MOVE)){
+            browserListAdapter.removeIfInFolder(files.getFrom());
+        }
+        if (files.isDoingMode(Mode.MODE_COPY)||files.isDoingMode(Mode.MODE_MOVE)){
             File toFile=files.getTo();
             return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&null!=(toFile=toFile.getParentFile())&&
                     showFolderFilesChangeAlert(toFile.getName());

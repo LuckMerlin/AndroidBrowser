@@ -2,11 +2,13 @@ package com.luckmerlin.browser;
 
 import android.content.Context;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.dialog.FixedLayoutParams;
+import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.dialog.WindowContentDialog;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.browser.http.MHttp;
@@ -21,6 +23,8 @@ import java.util.concurrent.ThreadFactory;
 public abstract class BaseModel extends BaseContent {
     private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.9:5001");
     private WindowContentDialog mWindowDialog;
+    private PopupWindow mPopupWindow;
+
     private static ExecutorService mExecutor= Executors.newCachedThreadPool((Runnable r)-> {
         Thread thread = new Thread(r);
         thread.setName("ModelExecutor");
