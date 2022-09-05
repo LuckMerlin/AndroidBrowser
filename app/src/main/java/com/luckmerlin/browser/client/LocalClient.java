@@ -7,14 +7,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.Build;
-import android.os.CancellationSignal;
 import android.provider.MediaStore;
 import android.view.View;
-import android.webkit.MimeTypeMap;
-
-import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
-import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -27,13 +22,6 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.data.ComparedList;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.object.Parser;
-
-import org.json.JSONException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class LocalClient extends AbstractClient {
@@ -127,8 +115,7 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public Response<File> createFile(File parent, String name, boolean isDir) {
-        if (null==parent||!parent.isLocalFile()||!parent.isDirectory()||null==name||name.length()<=0||
-                name.contains(java.io.File.separator)){
+        if (null==parent||!parent.isLocalFile()||null==name||name.length()<=0|| name.contains(java.io.File.separator)){
             Debug.W("Fail create file while parent or name invalid.parent="+parent+" name="+name);
             return new Response<File>().set(Code.CODE_ARGS_INVALID,"Parent or name invalid",null);
         }
@@ -140,9 +127,15 @@ public class LocalClient extends AbstractClient {
         java.io.File file=new java.io.File(path,name);
         if (file.exists()) {
             Debug.W("Fail create file while already exist.");
-            return new Response<File>().set(Code.CODE_EXIST,"Already exist",null);
+            boolean currentIsFile=file.isFile();
+            boolean succeed=(isDir&&!currentIsFile)||(!isDir&&currentIsFile);
+            return new Response<File>().set(succeed? Code.CODE_ALREADY:Code.CODE_EXIST, "Already exist",succeed?createLocalFile(file):null);
         }
         try {
+            java.io.File parentFile=file.getParentFile();
+            if (null!=parentFile&&!parentFile.exists()){
+                parentFile.mkdirs();
+            }
             boolean succeed=isDir?file.mkdir():file.createNewFile();
             Response<File> reply=file.exists()?new Response<File>().set(Code.CODE_SUCCEED,null,
                     createLocalFile(file)) :new Response<File>().set(Code.CODE_FAIL,"Fail",null);

@@ -159,7 +159,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         try {
             notifyProgressChange(progress,onFileProgress);
             if (fromFile.isDirectory()){//Is folder
-                Response<File> response=toClient.createFile(null,toFile.getName(),true);
+                Response<File> response=toClient.createFile(toFile.getParentFile(),fromFile.getName(),true);
                 response=null!=response?response:new Response<File>().set(Code.CODE_FAIL, "Create folder fail."+toFile.getPath(),null);
                 if (null!=response&&!response.isSucceed()){
                     Debug.W("Fail execute file copy task while create directory fail.");
