@@ -243,7 +243,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return browserListAdapter.removeIfInFolder(files.getFrom());
         }else if (files.isDoingMode(Mode.MODE_COPY)){
             File toFile=files.getTo();
-            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&
+            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&null!=(toFile=toFile.getParentFile())&&
                     showFolderFilesChangeAlert(toFile.getName());
         }
         return false;
