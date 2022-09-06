@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
+import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
@@ -32,6 +33,7 @@ import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.core.MatchedCollector;
+import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -52,6 +54,8 @@ import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
@@ -450,16 +454,27 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     private boolean createFile(){
         Client client=mBrowserAdapter.getClient();
-        return null!=showContentDialog(new CreateFileDialogContent(client,getCurrentFolder()){
+        if (null==client){
+            return toast(getString(R.string.fail))&&false;
+        }
+        return null!=showContentDialog(new CreateFileDialogContent(getCurrentFolder()) {
             @Override
-            protected void onCreate(Response<File> reply) {
-                boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
-                toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
-                if(succeed){
-                    mBrowserAdapter.reset(null);
+            protected boolean onCreate(File parent, String name, boolean createDir) {
+                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
+                    boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
+                    post(()->{
+                        toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
+                        if(succeed){
+                            mBrowserAdapter.reset(null);
+                        }
+                    });
+                };
+                if (client instanceof LocalClient){
+                    callback.onFinish(client.createFile(parent,name,createDir));
+                    return true;
                 }
-            }
-        },null);
+                return execute(()-> callback.onFinish(client.createFile(parent,name,createDir)));
+            }},null);
     }
 
     private boolean setCurrentAsHome(){

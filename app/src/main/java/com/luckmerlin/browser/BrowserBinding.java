@@ -75,6 +75,7 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("application/msword",R.drawable.hidisk_icon_doc);
         mResIdMap.put("application/vnd.android",R.drawable.hidisk_icon_apk);
         mResIdMap.put("application/x-bittorrent",R.drawable.hidisk_icon_torrent);
+        mResIdMap.put("application/rar",R.drawable.hidisk_icon_rar);
         mResIdMap.put("image/gif",R.drawable.hidisk_icon_gif);
         mResIdMap.put("image/jpeg",R.drawable.hidisk_icon_jpg);
         mResIdMap.put("image/png",R.drawable.hidisk_icon_png);
@@ -89,6 +90,15 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("log",R.drawable.hidisk_icon_log);
         mResIdMap.put("video",R.drawable.hidisk_icon_video);
         mResIdMap.put(".mp3",R.drawable.hidisk_icon_mp3);
+        mResIdMap.put(".js",R.drawable.hidisk_icon_javascript);
+        mResIdMap.put(".java",R.drawable.hidisk_icon_java);
+        mResIdMap.put(".ts",R.drawable.hidisk_icon_typescript);
+        mResIdMap.put(".cs",R.drawable.hidisk_icon_csharp);
+        mResIdMap.put(".py",R.drawable.hidisk_icon_python);
+        mResIdMap.put(".gradle",R.drawable.hidisk_icon_gradle);
+        mResIdMap.put(".bat",R.drawable.hidisk_icon_bat);
+        mResIdMap.put(".json",R.drawable.hidisk_icon_json);
+        mResIdMap.put(".ignore",R.drawable.hidisk_icon_git);
     }
 
     public static BrowserBinding instance(){

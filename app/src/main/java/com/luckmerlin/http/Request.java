@@ -1,7 +1,11 @@
 package com.luckmerlin.http;
 
+import com.luckmerlin.debug.Debug;
+
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 
 public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     public final static String METHOD_POST="post";
@@ -83,6 +87,22 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     public final String header(String key){
         Headers headers=null!=key?mHeaders:null;
         return null!=headers?headers.get(key):null;
+    }
+
+    public final Request<T> headerWithValueEncode(String key,String value){
+        return headerWithValueEncode(key,value,null);
+    }
+
+    public final Request<T> headerWithValueEncode(String key,String value,String encode){
+        if (null!=value&&value.length()>0){
+            try {
+                value=URLEncoder.encode(value,null!=encode&&encode.length()>0?encode:"UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                Debug.E("Fail header with value encode.e="+e);
+                e.printStackTrace();
+            }
+        }
+        return header(key,value);
     }
 
     public final Request<T> header(String key,Object value){

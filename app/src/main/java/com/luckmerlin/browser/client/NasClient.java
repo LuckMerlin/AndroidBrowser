@@ -19,6 +19,7 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.TextParser;
+import com.luckmerlin.object.Parser;
 
 import org.json.JSONObject;
 
@@ -52,7 +53,11 @@ public class NasClient extends AbstractClient{
 
     @Override
     public Response<File> createFile(File parent, String name, boolean isDir) {
-        return mHttp.call(new Request<Response<File>>().url("/createFile").header(Label.LABEL_NAME,name).post());
+        return mHttp.call(new Request<Response<File>>().url("/file/create").
+                headerWithValueEncode(Label.LABEL_PARENT,null!=parent?parent.getPath():null).
+                headerWithValueEncode(Label.LABEL_NAME,name).header(Label.LABEL_FOLDER,isDir).
+                setOnTextParse(new MResponse<>((Object from)-> null!=from&&from instanceof
+                        JSONObject? new File((JSONObject) from):null)).post());
     }
 
     @Override
