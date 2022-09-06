@@ -12,14 +12,23 @@ import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public interface Client {
 
-    public class Filter{
-        public String mName;
+    public class Filter extends JsonObject {
+
+        public String getName(){
+            return optString(Label.LABEL_NAME);
+        }
+
+        public Filter setName(String name){
+            return putSafe(this,Label.LABEL_NAME,name);
+        }
+
     }
 
     String getName();

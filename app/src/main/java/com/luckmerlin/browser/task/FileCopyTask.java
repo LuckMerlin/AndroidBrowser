@@ -15,6 +15,8 @@ import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.json.Json;
+import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.stream.StreamCopyTask;
@@ -273,8 +275,8 @@ public final class FileCopyTask extends FileTask implements Parcelable {
         setResult(in.readParcelable(cls.getClassLoader()));
         setName(in.readString());
         String file=null;
-        mFromFile=null!=(file=in.readString())&&file.length()>0?new File(file):null;
-        mToFile=null!=(file=in.readString())&&file.length()>0?new File(file):null;
+        mFromFile=null!=(file=in.readString())&&file.length()>0?new File(JsonObject.makeJson(file)):null;
+        mToFile=null!=(file=in.readString())&&file.length()>0?new File(JsonObject.makeJson(file)):null;
     }
 
     @Override

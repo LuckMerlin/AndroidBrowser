@@ -28,7 +28,7 @@ public class JsonArray {
         return mArray.length();
     }
 
-    public final <T> List<T> getList(Parser<Object,T> parser) throws JSONException {
+    public final <T> List<T> getList(Parser<Object,T> parser) {
         JSONArray array=null!=parser?mArray:null;
         int length=null!=array?array.length():-1;
         if (length>0){

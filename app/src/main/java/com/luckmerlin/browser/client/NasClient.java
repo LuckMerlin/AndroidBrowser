@@ -2,19 +2,30 @@ package com.luckmerlin.browser.client;
 
 import android.graphics.drawable.Drawable;
 import android.view.View;
+
+import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.http.MHttp;
+import com.luckmerlin.browser.http.MResponse;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.Http;
+import com.luckmerlin.http.Request;
+import com.luckmerlin.http.TextParser;
+
+import org.json.JSONObject;
 
 public class NasClient extends AbstractClient{
     private final String mHost;
     private String mName;
+    private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.10:5001");
 
     public NasClient(String host,String name){
         mHost=host;
@@ -38,7 +49,7 @@ public class NasClient extends AbstractClient{
 
     @Override
     public Response<File> createFile(File parent, String name, boolean isDir) {
-        return null;
+        return mHttp.call(new Request<Response<File>>().url("/createFile").header(Label.LABEL_NAME,name).post());
     }
 
     @Override
@@ -47,8 +58,13 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
-        return null;
+    public Response<Folder> listFiles(File folder, long start, int size, Filter filter){
+        return mHttp.call(new Request<Response<Folder>>().url("/file/browser").
+                header(Label.LABEL_BROWSER_FOLDER,null!=folder?folder.getPath():null).header(Label.LABEL_FROM,start).
+                header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).
+                setOnTextParse(new MResponse<Folder>((Object data)->
+                        null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null)).post()
+        );
     }
 
     @Override

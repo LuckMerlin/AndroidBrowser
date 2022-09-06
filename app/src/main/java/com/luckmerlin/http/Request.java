@@ -1,8 +1,5 @@
 package com.luckmerlin.http;
 
-import com.luckmerlin.browser.http.HttpHeaders;
-import com.luckmerlin.debug.Debug;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -69,7 +66,7 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     }
 
     public final Request<T> on(OnHttpParse<T> parse, OnHttpFinish<T> finish){
-        onParse(parse).onFinish(finish);
+        setOnParse(parse).setOnFinish(finish);
         return this;
     }
 
@@ -106,23 +103,23 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
         return this;
     }
 
-    public final Request<T> onResponse(OnResponse onResponse){
+    public final Request<T> setOnResponse(OnResponse onResponse){
         mOnResponse=onResponse;
         return this;
     }
 
-    public final Request<T> onFinish(OnHttpFinish<T> onFinish){
+    public final Request<T> setOnFinish(OnHttpFinish<T> onFinish){
         mOnFinish=onFinish;
         return this;
     }
 
-    public final Request<T> onParse(OnHttpParse<T> onHttpParse){
+    public final Request<T> setOnParse(OnHttpParse<T> onHttpParse){
         mOnHttpParse=onHttpParse;
         return this;
     }
 
-    public final Request<T> onParse(TextParser.OnTextParse<T> onTextParse){
-        return onParse(null!=onTextParse?new TextParser<>(onTextParse):null);
+    public final Request<T> setOnTextParse(TextParser.OnTextParse<T> onTextParse){
+        return setOnParse(null!=onTextParse?new TextParser<>(onTextParse):null);
     }
 
     public Body body() {

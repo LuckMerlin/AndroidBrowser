@@ -33,12 +33,7 @@ public class JsonObject extends JSONObject{
 
     public <T> T opt(String key, Parser<Object,T> parser){
         Object json= null!=parser?opt(key):null;
-        try {
-            return null!=json?parser.onParse(json):null;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return null!=json?parser.onParse(json):null;
     }
 
     public JsonArray optJsonArray(String key){
@@ -48,12 +43,7 @@ public class JsonObject extends JSONObject{
 
     public <T> List<T> optList(String key, Parser<Object,T> parser){
         JSONArray array= null!=key&&null!=parser?optJSONArray(key):null;
-        try {
-            return null!=array?new JsonArray(array).getList(parser):null;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return null!=array?new JsonArray(array).getList(parser):null;
     }
 
     public final <T extends JsonObject> T setArraySafe(T json,String key,Object obj){
@@ -117,7 +107,7 @@ public class JsonObject extends JSONObject{
         return this;
     }
 
-    private static JSONObject makeJson(Object json){
+    public static JSONObject makeJson(Object json){
         if (null==json){
             return null;
         }else if (json instanceof String){

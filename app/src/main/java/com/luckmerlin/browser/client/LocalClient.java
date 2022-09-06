@@ -54,7 +54,7 @@ public class LocalClient extends AbstractClient {
             Debug.W("Can't load client while query file not directory.");
             return new Response<Folder>().setCode(Code.CODE_ARGS_INVALID).setMsg("Query file not directory.");
         }
-        String filterName=null!=filter?filter.mName:null;
+        String filterName=null!=filter?filter.getName():null;
         Debug.D("Loading local client.name="+filterName+" from="+start+" path="+browserPath);
         final ComparedList<File> files=new ComparedList<>((File file1, File file2)-> {
             boolean directory1=file1.isDirectory();

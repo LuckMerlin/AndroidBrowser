@@ -1,15 +1,11 @@
 package com.luckmerlin.browser.file;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
-
 import androidx.annotation.Nullable;
-
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonObject;
 
-import org.json.JSONException;
+import org.json.JSONObject;
 
 public class File extends JsonObject {
 
@@ -17,7 +13,7 @@ public class File extends JsonObject {
         super();
     }
 
-    public File(Object json){
+    public File(JSONObject json){
         super(json);
     }
 

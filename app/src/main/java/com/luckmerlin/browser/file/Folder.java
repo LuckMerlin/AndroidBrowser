@@ -1,12 +1,26 @@
 package com.luckmerlin.browser.file;
 
+import com.luckmerlin.browser.Label;
+import com.luckmerlin.json.JsonArray;
+import com.luckmerlin.object.Parser;
 import com.merlin.adapter.PageListAdapter;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
 
 public class Folder extends File implements PageListAdapter.Page<File> {
     private long mFrom;
     private long mTotal;
     private List<File> mFiles;
+
+    public Folder(JSONObject jsonObject){
+        super(jsonObject);
+        JSONArray jsonArray=null!=jsonObject?jsonObject.optJSONArray(Label.LABEL_CHILDREN):null;
+        setChildren(null!=jsonArray?new JsonArray(jsonArray).getList((Object from)->
+                null!=from&&from instanceof JSONObject?new File((JSONObject)from ):null):null);
+    }
 
     public Folder(File file){
         super(file);
