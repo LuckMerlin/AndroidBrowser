@@ -50,7 +50,13 @@ public final class BrowserBinding implements ImageFetcher {
         }
         Integer defResId=null;
         String mime=file.getMime();
-        defResId=null!=mime?mResIdMap.get(mime):null;
+        if (null!=mime&&mime.length()>0){
+            defResId=mResIdMap.get(mime);
+            String[] types;
+            if (null==defResId&&null!=(types=mime.split("/"))&&types.length==2&& null!=types[0]){
+                defResId=mResIdMap.get(types[0]);
+            }
+        }
         String extension=null;
         if (null==defResId&&null!=(extension=file.getExtension(true))&&null!=(extension=extension.toLowerCase())){
             defResId=mResIdMap.get(extension);
@@ -68,6 +74,7 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("text/plain",R.drawable.hidisk_icon_text);
         mResIdMap.put("application/msword",R.drawable.hidisk_icon_doc);
         mResIdMap.put("application/vnd.android",R.drawable.hidisk_icon_apk);
+        mResIdMap.put("application/x-bittorrent",R.drawable.hidisk_icon_torrent);
         mResIdMap.put("image/gif",R.drawable.hidisk_icon_gif);
         mResIdMap.put("image/jpeg",R.drawable.hidisk_icon_jpg);
         mResIdMap.put("image/png",R.drawable.hidisk_icon_png);
@@ -80,6 +87,7 @@ public final class BrowserBinding implements ImageFetcher {
         mResIdMap.put("video/mpeg",R.drawable.hidisk_icon_mpeg);
         mResIdMap.put("application/pdf",R.drawable.hidisk_icon_pdf);
         mResIdMap.put("log",R.drawable.hidisk_icon_log);
+        mResIdMap.put("video",R.drawable.hidisk_icon_video);
         mResIdMap.put(".mp3",R.drawable.hidisk_icon_mp3);
     }
 

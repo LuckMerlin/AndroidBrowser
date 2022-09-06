@@ -22,6 +22,9 @@ import com.luckmerlin.http.TextParser;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 public class NasClient extends AbstractClient{
     private final String mHost;
     private String mName;
@@ -59,12 +62,18 @@ public class NasClient extends AbstractClient{
 
     @Override
     public Response<Folder> listFiles(File folder, long start, int size, Filter filter){
+        String folderPath=null!=folder?folder.getPath():null;
+        try {
+            folderPath=null!=folder? URLEncoder.encode(folderPath,"UTF-8") :null;
+        } catch (UnsupportedEncodingException e) {
+            Debug.E("Exception list files while encode path.e="+e);
+            e.printStackTrace();
+        }
         return mHttp.call(new Request<Response<Folder>>().url("/file/browser").
-                header(Label.LABEL_BROWSER_FOLDER,null!=folder?folder.getPath():null).header(Label.LABEL_FROM,start).
+                header(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
                 header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).
                 setOnTextParse(new MResponse<Folder>((Object data)->
-                        null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null)).post()
-        );
+                        null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null)).post());
     }
 
     @Override
