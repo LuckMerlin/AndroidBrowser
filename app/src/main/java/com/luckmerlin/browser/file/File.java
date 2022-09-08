@@ -7,6 +7,8 @@ import com.luckmerlin.json.JsonObject;
 
 import org.json.JSONObject;
 
+import java.util.logging.Handler;
+
 public class File extends JsonObject {
 
     public File(){
@@ -18,7 +20,9 @@ public class File extends JsonObject {
     }
 
     public String getHost() {
-        return optString(Label.LABEL_HOST,null);
+        String host= optString(Label.LABEL_HOST,null);
+        host=null!=host?host.trim():null;
+        return null!=host&&host.length()>0&&Character.isDigit(host.charAt(0))?"http://"+host:host;
     }
 
     public File setHost(String host){

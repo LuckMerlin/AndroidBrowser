@@ -4,14 +4,16 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.json.Json;
 import com.luckmerlin.object.ObjectCreator;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 public abstract class Http {
     private final static String STRING_NAME=String.class.getName();
     private final static String CHAR_NAME=CharSequence.class.getName();
-    private final static String RESPONSE_NAME=Response.class.getName();
+    private final static String RESPONSE_NAME= Answer.class.getName();
     private final static String BYTES_NAME=byte[].class.getName();
     private String mBaseUrl;
     private Handler mUiHandler;
@@ -34,7 +36,7 @@ public abstract class Http {
         String url=null!=request?request.url():null;
         String method=null!=request?request.method():null;
         method=null!=method?method:Request.METHOD_GET;
-        Response response=onCall(method,(null!=baseUrl?baseUrl:"")+(null!=url?url:""),request);
+        Answer response=onCall(method,(null!=baseUrl?baseUrl:"")+(null!=url?url:""),request);
         OnHttpFinish<T> onRequestFinish=null;
         OnHttpParse<T> onRequestParse=null;
         T data=null;
@@ -89,15 +91,15 @@ public abstract class Http {
         return false;
     }
 
-    protected abstract Response onCall(String method,String url,Request request);
+    protected abstract Answer onCall(String method, String url, Request request);
 
-    protected <T> T onParse(Request<T> request,Response response){
+    protected <T> T onParse(Request<T> request, Answer response){
         Class<T> cls=null!=request?request.getExpectType():null;
         final String clsName=null!=cls?cls.getName():null;
         if (null==response||null==clsName){
             return null;
         }
-        ResponseBody body=response.getResponseBody();
+        AnswerBody body=response.getResponseBody();
         String bodyText=null!=body?body.getTextSafe(null!=request?request.charset():null,null):null;
         if (clsName.equals(STRING_NAME)||clsName.equals(CHAR_NAME)){
             return (T)bodyText;
@@ -114,8 +116,23 @@ public abstract class Http {
         return data;
     }
 
-    protected <T> void OnRequestFinish(T data,Response response){
+    protected <T> void OnRequestFinish(T data, Answer response){
         //Do nothing
+    }
+
+
+    protected final void closes(Closeable... closeables) {
+        if (null!=closeables){
+            for (Closeable child:closeables) {
+                if (null!=child){
+                    try {
+                        child.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     public final boolean post(Runnable runnable){

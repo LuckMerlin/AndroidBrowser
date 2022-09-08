@@ -1,10 +1,10 @@
 package com.luckmerlin.browser.http;
 
+import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.Headers;
-import com.luckmerlin.http.Response;
-import com.luckmerlin.http.ResponseBody;
+import com.luckmerlin.http.AnswerBody;
 
-public class HttpResponse extends Response {
+public class HttpResponse extends Answer {
     private final okhttp3.Response mResponse;
 
     protected HttpResponse(okhttp3.Response response){
@@ -18,7 +18,7 @@ public class HttpResponse extends Response {
     }
 
     @Override
-    public ResponseBody getResponseBody() {
+    public AnswerBody getResponseBody() {
         okhttp3.Response response=mResponse;
         okhttp3.ResponseBody body=null!=response?response.body():null;
         return null!=body?new HttpResponseBody(body):null;

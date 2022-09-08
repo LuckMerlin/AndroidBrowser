@@ -35,12 +35,12 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     }
 
     @Override
-    public void onFinish(T data, Response response) {
+    public void onFinish(T data, Answer response) {
         //Do nothing
     }
 
     @Override
-    public T onParse(Http http, Response response) {
+    public T onParse(Http http, Answer response) {
         return null;
     }
 
@@ -65,7 +65,7 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     }
 
     @Override
-    public void onResponse(Response response) {
+    public void onResponse(Answer response) {
         //Do nothing
     }
 

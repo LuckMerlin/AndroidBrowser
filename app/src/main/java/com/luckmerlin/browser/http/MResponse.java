@@ -3,6 +3,7 @@ package com.luckmerlin.browser.http;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.TextParser;
 import com.luckmerlin.json.JsonObject;
@@ -25,7 +26,7 @@ public class MResponse<T> implements TextParser.OnTextParse<Response<T>>{
     }
 
     @Override
-    public final Response<T> onTextParse(String text, Http http, com.luckmerlin.http.Response res) {
+    public final Response<T> onTextParse(String text, Http http, Answer res) {
         JsonObject jsonObject=null!=text&&text.length()>0?new JsonObject(text):null;
         if (null==jsonObject){
             return null;

@@ -1,11 +1,10 @@
 package com.luckmerlin.browser.http;
 
-import com.luckmerlin.http.ContentType;
-import com.luckmerlin.http.ResponseBody;
+import com.luckmerlin.http.AnswerBody;
 
 import java.io.InputStream;
 
-public class HttpResponseBody extends ResponseBody {
+public class HttpResponseBody extends AnswerBody {
     private okhttp3.ResponseBody mBody;
 
     protected HttpResponseBody(okhttp3.ResponseBody body){
@@ -13,7 +12,7 @@ public class HttpResponseBody extends ResponseBody {
     }
 
     @Override
-    public ContentType getContentType() {
+    public String getContentType() {
         return null;
     }
 

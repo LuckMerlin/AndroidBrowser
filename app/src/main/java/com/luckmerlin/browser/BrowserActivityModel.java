@@ -83,11 +83,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
+        mNotifyText.set("LMBrowser");
         mContentAdapter.set(mBrowserAdapter);
 //        mBrowserClient.set(new NasClient(getHttp()));
 //        mBrowserClient.set(new LocalClient());
 //        mNotifyText.set("");
-        mNotifyText.set("LMBrowser");
 //        entryMode(new Mode(Mode.MODE_MULTI_CHOOSE));
         //
 //        showBrowserContextMenu(activity);
@@ -462,7 +462,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             protected boolean onCreate(File parent, String name, boolean createDir) {
                 final OnFinish<Response<File>> callback=(Response<File> reply)-> {
                     boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
-                    post(()->{
+                    BrowserActivityModel.this.post(()->{
                         toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
                         if(succeed){
                             mBrowserAdapter.reset(null);

@@ -1,6 +1,6 @@
 package com.luckmerlin.http;
 
-public abstract class Response {
+public abstract class Answer {
 
     public final boolean isSuccessful(){
         int code=getCode();
@@ -11,7 +11,7 @@ public abstract class Response {
 
     public abstract int getCode();
 
-    public abstract ResponseBody getResponseBody();
+    public abstract AnswerBody getResponseBody();
 
     public abstract String getMessage();
 

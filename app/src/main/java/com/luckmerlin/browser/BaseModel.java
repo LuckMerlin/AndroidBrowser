@@ -5,6 +5,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.dialog.FixedLayoutParams;
@@ -21,7 +22,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public abstract class BaseModel extends BaseContent {
-    private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.9:5001");
+    private final Http mHttp=new JavaHttp().setBaseUrl("http://192.168.0.9:5001");
     private WindowContentDialog mWindowDialog;
     private PopupWindow mPopupWindow;
 

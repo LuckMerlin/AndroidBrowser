@@ -2,13 +2,14 @@ package com.luckmerlin.http;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-public abstract class ResponseBody {
+public abstract class AnswerBody {
     public abstract long getContentLength();
-    public abstract ContentType getContentType();
+    public abstract String getContentType();
 
     public abstract InputStream getStream();
 

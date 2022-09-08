@@ -4,8 +4,24 @@ import android.app.Activity;
 
 import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
+import com.luckmerlin.stream.URLConnectionStream;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Runtime;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+
+import okhttp3.CacheControl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okio.BufferedSource;
 
 public class TestTask extends AbstractTask {
     Activity activity;
@@ -17,6 +33,56 @@ public class TestTask extends AbstractTask {
 
     @Override
     protected Result onExecute(Runtime runtime) {
+        try {
+            HttpURLConnection connection= (HttpURLConnection) new URL("http://192.168.0.10:5001/file/test").openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream inputStream=connection.getInputStream();
+            byte[] buffer=new byte[1024];
+            int length=0;
+            Debug.D("EEEEA  "+inputStream);
+            while ((length=inputStream.read(buffer))>=0){
+                    Debug.D("EEEE  "+new String(buffer,0,length));
+            }
+        } catch (IOException e) {
+            Debug.D("EEEEA  "+e);
+            e.printStackTrace();
+        }
+//        OkHttpClient.Builder builder=new OkHttpClient.Builder();
+//        OkHttpClient client=null!=builder?builder.build():null;
+//        Request request=new Request.Builder().method("get",null).
+//                url("http://192.168.0.10:5001/file/test").
+//        cacheControl(CacheControl.FORCE_NETWORK).build();
+//        try {
+//            Answer response= client.newCall(request).execute();
+//            BufferedSource bufferedSource=response.body().source();
+//            if (null!=bufferedSource){
+//                byte[] buffer=new byte[1024];
+//                int length=0;
+//                Debug.D("EEEE  "+bufferedSource);
+//                while ((length=bufferedSource.read(buffer))>=0){
+//                        Debug.D("EEEE  "+length);
+//                }
+//
+//
+////                BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
+////                Debug.D(" InputStreamReader="+r);
+////                String line = "";
+////                while (true) {
+////                    try {
+////                        if ((line = r.readLine()) == null){
+////                            break;
+////                        }
+////                        Debug.D(" "+line);
+////                    } catch (IOException e) {
+////                        e.printStackTrace();
+////                    }
+////                }
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return null;
     }
 //    @Override

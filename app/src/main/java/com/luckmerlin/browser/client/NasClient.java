@@ -7,6 +7,7 @@ import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.http.MHttp;
 import com.luckmerlin.browser.http.MResponse;
 import com.luckmerlin.core.Canceled;
@@ -16,23 +17,25 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Request;
-import com.luckmerlin.http.TextParser;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.http.AnswerBody;
 
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class NasClient extends AbstractClient{
-    private final String mHost;
     private String mName;
-    private final Http mHttp=new MHttp().setBaseUrl("http://192.168.0.10:5001");
+    private final String mHost;
+    private final Http mHttp;
 
     public NasClient(String host,String name){
-        mHost=host;
+        mHttp=new JavaHttp().setBaseUrl(mHost=host);
         mName=name;
     }
 
@@ -56,29 +59,44 @@ public class NasClient extends AbstractClient{
         return mHttp.call(new Request<Response<File>>().url("/file/create").
                 headerWithValueEncode(Label.LABEL_PARENT,null!=parent?parent.getPath():null).
                 headerWithValueEncode(Label.LABEL_NAME,name).header(Label.LABEL_FOLDER,isDir).
-                setOnTextParse(new MResponse<>((Object from)-> null!=from&&from instanceof
-                        JSONObject? new File((JSONObject) from):null)).post());
+                setOnTextParse(new MResponse<>((Object from)->null!=from&&from instanceof JSONObject? new File((JSONObject) from):null)).post());
     }
 
     @Override
     public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
-        return null;
+        String filePath=null!=file?file.getPath():null;
+        return mHttp.call(new Request<Response<File>>().url("/file/delete").
+                headerWithValueEncode(Label.LABEL_PATH,filePath).setOnResponse((Answer response)-> {
+                    AnswerBody body=null!=response?response.getResponseBody():null;
+                    if (null==body){
+                        return;
+                    }
+                    InputStream inputStream=body.getStream();
+                    Debug.D(" inputStream="+inputStream);
+                    if (null!=inputStream){
+                        try {
+                            byte[] buffer=new byte[1024];
+                            int length=0;
+                            Debug.D("EEEEA  "+inputStream);
+                            while ((length=inputStream.read(buffer))>=0){
+                                Debug.D("EEEE  "+new String(buffer,0,length));
+                            }
+                        }catch (Exception e){
+
+                        }
+                    }
+                    body.close();
+                }).post());
     }
 
     @Override
     public Response<Folder> listFiles(File folder, long start, int size, Filter filter){
         String folderPath=null!=folder?folder.getPath():null;
-        try {
-            folderPath=null!=folder? URLEncoder.encode(folderPath,"UTF-8") :null;
-        } catch (UnsupportedEncodingException e) {
-            Debug.E("Exception list files while encode path.e="+e);
-            e.printStackTrace();
-        }
         return mHttp.call(new Request<Response<Folder>>().url("/file/browser").
-                header(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
+                headerWithValueEncode(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
                 header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).
                 setOnTextParse(new MResponse<Folder>((Object data)->
-                        null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null)).post());
+                null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null)).post());
     }
 
     @Override

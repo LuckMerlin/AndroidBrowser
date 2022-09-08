@@ -10,7 +10,7 @@
 //import com.luckmerlin.core.Canceler;
 //import com.luckmerlin.http.Http;
 //import com.luckmerlin.http.Request;
-//import com.luckmerlin.http.Response;
+//import com.luckmerlin.http.Answer;
 //import com.merlin.adapter.PageListAdapter;
 //
 //public class NasClient implements Client {
@@ -40,9 +40,9 @@
 //        Http http=mHttp;
 //        String folderPath=null!=query?query.mFolderPath:null;
 //        folderPath=null!=folderPath?folderPath:"./";
-//        return null==callback||null==http?null:http.request(new Request<Reply<Folder>>().onParse((String text, Http http2, Response res)->
+//        return null==callback||null==http?null:http.request(new Request<Reply<Folder>>().onParse((String text, Http http2, Answer res)->
 //                        new Reply<Folder>(text).parser((Object fromObj)-> null!=fromObj?new Folder(fromObj):null)).
-//                    onFinish((Reply<Folder> data, Response response)-> {
+//                    onFinish((Reply<Folder> data, Answer response)-> {
 //                    Folder resultFolder=null!=data&&data.isSucceed()?data.getData():null;
 //                    if (null==resultFolder){
 //                        callback.onPageLoad(false,null);

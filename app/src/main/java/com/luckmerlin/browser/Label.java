@@ -21,6 +21,7 @@ public interface Label {
     String LABEL_PARENT = "parent";
     String LABEL_CHILDREN = "children";
     String LABEL_FOLDER = "folder";
+    String LABEL_PATH = "path";
     String LABEL_SEP= "sep";
     String LABEL_AVAILABLE= "available";
     String LABEL_TOTAL= "total";

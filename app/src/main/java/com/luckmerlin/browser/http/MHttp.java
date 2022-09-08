@@ -1,9 +1,10 @@
 package com.luckmerlin.browser.http;
 
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.Headers;
 import com.luckmerlin.http.Http;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -25,16 +26,15 @@ public class MHttp extends Http {
     }
 
     @Override
-    protected com.luckmerlin.http.Response onCall(String method,String url, com.luckmerlin.http.Request request) {
+    protected Answer onCall(String method, String url, com.luckmerlin.http.Request request) {
         if (null==request){
             return null;
         }
         RequestBody requestBody=RequestBody.create(new byte[0]);
         Headers headers=null!=request?request.headers():null;
-        Map<String,String> ddd=null!=headers?headers.map():null;
-        okhttp3.Headers okHttpHeaders=okhttp3.Headers.of(null!=ddd?ddd:new HashMap<>(0));
+        okhttp3.Headers okHttpHeaders=okhttp3.Headers.of(null!=headers?headers:new HashMap<>(0));
         method=(null!=method?method: com.luckmerlin.http.Request.METHOD_GET).toUpperCase();
-        Debug.D(method+" "+url);
+        Debug.D("[OkHttp] "+method+" "+url);
         Call call=newCall(new Request.Builder().method(method,requestBody).
                 headers(okHttpHeaders).url(url).build());
         try {
