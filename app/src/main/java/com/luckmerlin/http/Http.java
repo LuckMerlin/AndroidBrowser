@@ -41,19 +41,23 @@ public abstract class Http {
         OnHttpParse<T> onRequestParse=null;
         T data=null;
         if (null!=request){
-            OnResponse onRequestResponse=request.onResponse();
+            OnAnswerReceived onRequestResponse=request.getOnAnswerReceived();
             if (null!=onRequestResponse){
-                onRequestResponse.onResponse(response);
+                onRequestResponse.onAnswerReceived(response);
             }
             onRequestParse=request.onHttpParse();
             onRequestFinish=request.onFinish();
-            request.onResponse(response);
+            request.onAnswerReceived(response);
             data=request.onParse(this,response);
         }
         data=null==data&&null!=onRequestParse?onRequestParse.onParse(this,response):data;
         ResponseParser responseParser=mResponseParser;
         data=null==data&&null!=responseParser?responseParser.parse(request,response,this):data;
         data=null!=data?data:onParse(request,response);
+        AnswerBody answerBody=null!=response?response.getAnswerBody():null;//Auto close http
+        if (null!=answerBody&&answerBody.isAutoClose()) {
+            answerBody.close();
+        }
         //
         final T finalData=data;
         final OnHttpFinish<T> finalOnRequestFinish=onRequestFinish;
@@ -99,7 +103,7 @@ public abstract class Http {
         if (null==response||null==clsName){
             return null;
         }
-        AnswerBody body=response.getResponseBody();
+        AnswerBody body=response.getAnswerBody();
         String bodyText=null!=body?body.getTextSafe(null!=request?request.charset():null,null):null;
         if (clsName.equals(STRING_NAME)||clsName.equals(CHAR_NAME)){
             return (T)bodyText;

@@ -35,6 +35,11 @@ public class JavaHttp extends Http {
         Closeable finish=null;
         try {
             final HttpURLConnection finalConnection=connection= (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestProperty("Charset","UTF-8");
+            connection.setRequestProperty("Accept-Encoding","deflate");
+//            connection.setRequestProperty("Connection", "Keep-Alive");
+//            connection.setRequestProperty("Content-Type", "text/plain; charset=utf-8");
+//            connection.setRequestProperty("Content-Type", "multipart/form-data;boundary="+boundary);
             final Closeable finialFinish=finish=()-> {
                 if (null!=finalConnection){
                     finalConnection.disconnect();
@@ -66,12 +71,20 @@ public class JavaHttp extends Http {
             final Headers responseHeaders=new Headers();
             if (null!=responseHeaderMap){
                 String childKey=null;List<String> childValue=null;
+                StringBuffer buffer=new StringBuffer();
                 for (Map.Entry<String,List<String>> child:responseHeaderMap.entrySet()) {
+                    Debug.D("SDFSDFASD "+child.getKey()+" "+child.getValue());
                     if (null==(childKey=child.getKey())){
                         continue;
+                    }else if (null!=(childValue=child.getValue())){
+                        buffer.delete(0,buffer.length());
+                        for (String child1:childValue){
+                            if (null!=child1){
+                                buffer.append(child1);
+                            }
+                        }
+                        responseHeaders.add(childKey,buffer.toString());
                     }
-                    childValue=child.getValue();
-                    responseHeaders.add(childKey,childValue);
                 }
             }
             final InputStream finalInputStream=connection.getInputStream();
@@ -107,7 +120,7 @@ public class JavaHttp extends Http {
                 }
 
                 @Override
-                public AnswerBody getResponseBody() {
+                public AnswerBody getAnswerBody() {
                     return new AnswerBody() {
                         @Override
                         public long getContentLength() {

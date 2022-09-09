@@ -18,7 +18,7 @@ public class HttpResponse extends Answer {
     }
 
     @Override
-    public AnswerBody getResponseBody() {
+    public AnswerBody getAnswerBody() {
         okhttp3.Response response=mResponse;
         okhttp3.ResponseBody body=null!=response?response.body():null;
         return null!=body?new HttpResponseBody(body):null;

@@ -11,7 +11,7 @@ public abstract class Answer {
 
     public abstract int getCode();
 
-    public abstract AnswerBody getResponseBody();
+    public abstract AnswerBody getAnswerBody();
 
     public abstract String getMessage();
 

@@ -8,12 +8,25 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 public abstract class AnswerBody {
+    private boolean mAutoClose=true;//Default true to auto close
     public abstract long getContentLength();
     public abstract String getContentType();
 
     public abstract InputStream getStream();
 
-    public final byte[] getBytesSafe(int max,byte[] def){
+    public boolean autoClose(boolean enable){
+        if (mAutoClose!=enable){
+            mAutoClose=enable;
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAutoClose() {
+        return mAutoClose;
+    }
+
+    public final byte[] getBytesSafe(int max, byte[] def){
         try {
             return getBytes(max);
         } catch (Exception e) {

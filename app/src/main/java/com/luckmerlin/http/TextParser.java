@@ -27,7 +27,7 @@ public class TextParser<T> implements OnHttpParse<T>{
 
     @Override
     public T onParse(Http http, Answer response) {
-        AnswerBody responseBody=null!=response?response.getResponseBody():null;
+        AnswerBody responseBody=null!=response?response.getAnswerBody():null;
         String text=null!=responseBody?responseBody.getTextSafe("utf-8",null):null;
         return null!=text&&text.length()>0?onTextParse(text,http,response):null;
     }

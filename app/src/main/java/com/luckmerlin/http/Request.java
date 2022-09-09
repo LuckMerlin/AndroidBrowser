@@ -7,14 +7,14 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 
-public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
+public class Request<T> implements OnHttpFinish<T>, OnAnswerReceived,OnHttpParse<T>{
     public final static String METHOD_POST="post";
     public final static String METHOD_GET="get";
     private String mMethod;
     private String mUrl;
     private Headers mHeaders;
     private Body mBody;
-    private OnResponse mOnResponse;
+    private OnAnswerReceived mOnResponse;
     private OnHttpFinish<T> mOnFinish;
     private OnHttpParse<T> mOnHttpParse;
     private String mBaseUrl;
@@ -65,7 +65,7 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
     }
 
     @Override
-    public void onResponse(Answer response) {
+    public void onAnswerReceived(Answer answer) {
         //Do nothing
     }
 
@@ -123,7 +123,7 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
         return this;
     }
 
-    public final Request<T> setOnResponse(OnResponse onResponse){
+    public final Request<T> setOnResponse(OnAnswerReceived onResponse){
         mOnResponse=onResponse;
         return this;
     }
@@ -158,7 +158,7 @@ public class Request<T> implements OnHttpFinish<T>,OnResponse,OnHttpParse<T>{
         return mOnHttpParse;
     }
 
-    public OnResponse onResponse() {
+    public OnAnswerReceived getOnAnswerReceived() {
         return mOnResponse;
     }
 

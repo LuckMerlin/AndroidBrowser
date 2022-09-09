@@ -7,6 +7,7 @@ import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
+import com.luckmerlin.browser.http.ChunkResponseParser;
 import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.http.MHttp;
 import com.luckmerlin.browser.http.MResponse;
@@ -66,27 +67,8 @@ public class NasClient extends AbstractClient{
     public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
         String filePath=null!=file?file.getPath():null;
         return mHttp.call(new Request<Response<File>>().url("/file/delete").
-                headerWithValueEncode(Label.LABEL_PATH,filePath).setOnResponse((Answer response)-> {
-                    AnswerBody body=null!=response?response.getResponseBody():null;
-                    if (null==body){
-                        return;
-                    }
-                    InputStream inputStream=body.getStream();
-                    Debug.D(" inputStream="+inputStream);
-                    if (null!=inputStream){
-                        try {
-                            byte[] buffer=new byte[1024];
-                            int length=0;
-                            Debug.D("EEEEA  "+inputStream);
-                            while ((length=inputStream.read(buffer))>=0){
-                                Debug.D("EEEE  "+new String(buffer,0,length));
-                            }
-                        }catch (Exception e){
-
-                        }
-                    }
-                    body.close();
-                }).post());
+                headerWithValueEncode(Label.LABEL_PATH,filePath).setOnResponse
+                        (new ChunkResponseParser<Response<File>>()).post());
     }
 
     @Override
