@@ -23,16 +23,19 @@ class CloudFileChunkParser extends ChunkParser<Void,Response<File>>{
     protected Response<File> onChunkParseFinish(int code1, byte[] thunk, byte[] flag, Http http) {
         try {
             JSONObject jsonObject=parseAsJson(thunk);
+            if (null==jsonObject){
+                return new Response<>(code1,"Chunk json invalid.",null);
+            }
             int code=jsonObject.getInt(Label.LABEL_CODE);
             String msg=jsonObject.optString(Label.LABEL_MSG,null);
             Object data=jsonObject.opt(Label.LABEL_DATA);
             if (null==data||!(data instanceof JSONObject)){
-                return null;
+                return new Response<>(code,msg,null);
             }
             return new Response<File>().set(code,msg,new File((JSONObject)data));
         }catch (Exception e){
             Debug.E("Exception parser chunk parse finish.e="+e);
-            return null;
+            return new Response<>(code1,"Chunk json parse exception."+e,null);
         }
     }
 
@@ -44,6 +47,9 @@ class CloudFileChunkParser extends ChunkParser<Void,Response<File>>{
                 return null;
             }
             JSONObject jsonObject=parseAsJson(thunk);
+            if (null==jsonObject){
+                return null;
+            }
             int code=jsonObject.getInt(Label.LABEL_CODE);
             String msg=jsonObject.optString(Label.LABEL_MSG,null);
             Object data=jsonObject.opt(Label.LABEL_DATA);

@@ -60,8 +60,7 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
             while ((length=inputStream.read(buffer))>=0){
                 if (length>0){
                     chunkFinder.write(buffer,0,length);
-                    byte[] chunk=chunkFinder.checkChunk();
-                    onChunkUpdate(Code.CODE_CHANGE,chunk,thunkFlag,http);
+                    onChunkUpdate(Code.CODE_CHANGE,chunkFinder.checkChunk(),thunkFlag,http);
                 }
             }
         }catch (Exception e){
