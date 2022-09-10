@@ -56,7 +56,7 @@ public class NasClient extends AbstractClient{
     @Override
     public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
         String filePath=null!=file?file.getPath():null;
-        return mHttp.call(new Request<Response<File>>().url("/file/test").
+        return mHttp.call(new Request<Response<File>>().url("/file/delete").
                 headerWithValueEncode(Label.LABEL_PATH,filePath).
                 setOnParse(new CloudFileChunkParser(Mode.MODE_DELETE,update)).post());
     }

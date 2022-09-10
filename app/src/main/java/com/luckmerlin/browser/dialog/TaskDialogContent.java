@@ -45,6 +45,7 @@ public class TaskDialogContent extends BaseContent implements OnClickListener,
     public boolean onClick(View view, int clickId, int count, Object obj) {
         switch (clickId){
             case R.drawable.selector_close:
+            case R.string.close:
             case R.string.succeed:
             case R.string.cancel:
                 return removeFromParent()||true;

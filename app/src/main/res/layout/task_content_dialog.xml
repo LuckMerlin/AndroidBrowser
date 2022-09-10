@@ -37,7 +37,7 @@
             <TextView binding:bind="@{null!=content.confirm?VB.clickId(R.string.confirm):null}" style="@style/button"
                 android:visibility="@{null==content.confirm?View.GONE:View.VISIBLE}"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
-            <TextView binding:bind="@{VB.clickId(content.result.succeed?R.string.succeed:R.string.cancel)}"
+            <TextView binding:bind="@{VB.clickId(content.result==null?R.string.cancel:content.result.succeed?R.string.succeed:R.string.close)}"
                 style="@style/button" android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>
         </LinearLayout>
     </LinearLayout>
