@@ -29,6 +29,8 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.http.ChunkParser;
+import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
@@ -41,6 +43,7 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
+import com.luckmerlin.http.Request;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -54,8 +57,6 @@ import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
@@ -84,7 +85,16 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
         mNotifyText.set("LMBrowser");
-        mContentAdapter.set(mBrowserAdapter);
+//        mContentAdapter.set(mBrowserAdapter);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+//                new JavaHttp().setBaseUrl("http://192.168.0.10:5001").
+//                        call(new Request<>().url("/file/test").
+//                                setOnResponse(new ChunkParser()).post());
+            }
+        }).start();
 //        mBrowserClient.set(new NasClient(getHttp()));
 //        mBrowserClient.set(new LocalClient());
 //        mNotifyText.set("");

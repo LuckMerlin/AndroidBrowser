@@ -41,13 +41,9 @@ public abstract class Http {
         OnHttpParse<T> onRequestParse=null;
         T data=null;
         if (null!=request){
-            OnAnswerReceived onRequestResponse=request.getOnAnswerReceived();
-            if (null!=onRequestResponse){
-                onRequestResponse.onAnswerReceived(response);
-            }
-            onRequestParse=request.onHttpParse();
-            onRequestFinish=request.onFinish();
-            request.onAnswerReceived(response);
+            onRequestParse=request.getOnHttpParse();
+            onRequestFinish=request.getOnFinish();
+            request.onParse(Http.this,response);
             data=request.onParse(this,response);
         }
         data=null==data&&null!=onRequestParse?onRequestParse.onParse(this,response):data;

@@ -1,15 +1,29 @@
 package com.luckmerlin.task;
 
+import android.os.Handler;
+import android.os.Looper;
+
 public abstract class Runtime {
     private int mOption;
     private int mStatus=Executor.STATUS_PENDING;
+    private Handler mHandler;
 
-    protected Runtime(int option){
+    protected Runtime(int option,Handler handler){
         mOption=option;
+        mHandler=handler;
     }
 
     protected final Runtime setStatus(int status){
         mStatus=status;
+        return this;
+    }
+
+    public final Runtime post(Runnable runnable,int delay){
+        if (null!=runnable){
+            Handler handler=mHandler;
+            handler=null!=handler?handler:(mHandler=new Handler(Looper.getMainLooper()));
+            handler.postDelayed(runnable,delay<=0?0:delay);
+        }
         return this;
     }
 

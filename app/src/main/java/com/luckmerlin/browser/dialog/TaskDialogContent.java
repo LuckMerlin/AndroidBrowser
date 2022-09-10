@@ -61,6 +61,7 @@ public class TaskDialogContent extends BaseContent implements OnClickListener,
             Object object=progress.getData();
             if (null!=object&&object instanceof DoingFiles){
                 mDoingFiles.set((DoingFiles) object);
+                mDoingFiles.notifyChange();
             }
         }
     }

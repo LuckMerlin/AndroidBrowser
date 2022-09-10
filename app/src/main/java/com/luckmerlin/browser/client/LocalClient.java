@@ -148,7 +148,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
+    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
         if (null==file||!file.isLocalFile()){
             Debug.D("Fail delete local client file while file arg invalid.");
             return new Response<File>().set(Code.CODE_ARGS_INVALID,"File invalid.",file);
@@ -182,7 +182,7 @@ public class LocalClient extends AbstractClient {
         return localFile.setTotal(total);
     }
 
-    private Response<File> deleteAndroidFile(java.io.File file, OnChangeUpdate<DoingFiles> update){
+    private Response<File> deleteAndroidFile(java.io.File file,OnFileDoingUpdate update){
         if (null==file){
             Debug.W("Fail delete android file while path invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"Path invalid.");
@@ -203,15 +203,13 @@ public class LocalClient extends AbstractClient {
         return new Response(Code.CODE_SUCCEED,null);
     }
 
-    private Response doDeleteAndroidFile(java.io.File file, OnChangeUpdate<DoingFiles> update){
+    private Response doDeleteAndroidFile(java.io.File file, OnFileDoingUpdate update){
         if (null==file||!file.exists()){
             Debug.D("Fail delete android file."+file);
             return new Response(Code.CODE_ARGS_INVALID,"File not exist or invalid.");
         }
         File fileObj=LocalClient.createLocalFile(file);
-        DoingFiles doingFiles=new DoingFiles().setFrom(fileObj).setTo(fileObj).
-                setProgress(0).setDoingMode(Mode.MODE_DELETE);
-        if (notifyDoingFile(doingFiles,update)){
+        if (notifyDoingFile(Mode.MODE_DELETE,0,"Start delete.", fileObj,fileObj,update)){
             Debug.D("Fail delete android file while canceled.");
             return new Response(Code.CODE_CANCEL,"Canceled");
         }
@@ -229,7 +227,7 @@ public class LocalClient extends AbstractClient {
         }
         file.delete();
         boolean notExist=!file.exists();
-        notifyDoingFile(doingFiles.setProgress(notExist?100:0),update);
+        notifyDoingFile(Mode.MODE_DELETE,notExist?100:0,"Finish delete.", fileObj,fileObj,update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }
 

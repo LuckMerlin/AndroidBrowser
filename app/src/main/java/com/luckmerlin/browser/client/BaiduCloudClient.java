@@ -3,14 +3,11 @@ package com.luckmerlin.browser.client;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.luckmerlin.browser.BrowseQuery;
-import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.http.MHttp;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
@@ -48,7 +45,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update) {
+    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
         return null;
     }
 

@@ -73,7 +73,6 @@ public class JavaHttp extends Http {
                 String childKey=null;List<String> childValue=null;
                 StringBuffer buffer=new StringBuffer();
                 for (Map.Entry<String,List<String>> child:responseHeaderMap.entrySet()) {
-                    Debug.D("SDFSDFASD "+child.getKey()+" "+child.getValue());
                     if (null==(childKey=child.getKey())){
                         continue;
                     }else if (null!=(childValue=child.getValue())){

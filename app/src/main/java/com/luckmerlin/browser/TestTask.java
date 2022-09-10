@@ -33,22 +33,23 @@ public class TestTask extends AbstractTask {
 
     @Override
     protected Result onExecute(Runtime runtime) {
-        try {
-            HttpURLConnection connection= (HttpURLConnection) new URL("http://192.168.0.10:5001/file/test").openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoInput(true);
-            connection.connect();
-            InputStream inputStream=connection.getInputStream();
-            byte[] buffer=new byte[1024];
-            int length=0;
-            Debug.D("EEEEA  "+inputStream);
-            while ((length=inputStream.read(buffer))>=0){
-                    Debug.D("EEEE  "+new String(buffer,0,length));
-            }
-        } catch (IOException e) {
-            Debug.D("EEEEA  "+e);
-            e.printStackTrace();
-        }
+
+//        try {
+//            HttpURLConnection connection= (HttpURLConnection) new URL("http://192.168.0.10:5001/file/test").openConnection();
+//            connection.setRequestMethod("POST");
+//            connection.setDoInput(true);
+//            connection.connect();
+//            InputStream inputStream=connection.getInputStream();
+//            byte[] buffer=new byte[1024];
+//            int length=0;
+//            Debug.D("EEEEA  "+inputStream);
+//            while ((length=inputStream.read(buffer))>=0){
+//                    Debug.D("EEEE  "+new String(buffer,0,length));
+//            }
+//        } catch (IOException e) {
+//            Debug.D("EEEEA  "+e);
+//            e.printStackTrace();
+//        }
 //        OkHttpClient.Builder builder=new OkHttpClient.Builder();
 //        OkHttpClient client=null!=builder?builder.build():null;
 //        Request request=new Request.Builder().method("get",null).

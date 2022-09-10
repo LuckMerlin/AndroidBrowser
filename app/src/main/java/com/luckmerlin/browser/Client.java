@@ -3,19 +3,15 @@ package com.luckmerlin.browser;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
-import com.luckmerlin.browser.file.DoingFiles;
+import com.luckmerlin.browser.client.OnFileDoingUpdate;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.core.Canceled;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.json.JsonObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public interface Client {
 
@@ -35,7 +31,7 @@ public interface Client {
     String getHost();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);
-    Response<File> deleteFile(File file, OnChangeUpdate<DoingFiles> update);
+    Response<File> deleteFile(File file, OnFileDoingUpdate update);
     Response<Folder> listFiles(File folder,long start,int size,Filter filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
 }

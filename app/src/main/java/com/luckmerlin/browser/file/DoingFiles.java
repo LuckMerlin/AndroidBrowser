@@ -16,6 +16,11 @@ public final class DoingFiles {
         return this;
     }
 
+    public DoingFiles setSucceed(boolean succeed) {
+        mProgress=succeed?100:0;
+        return this;
+    }
+
     public DoingFiles setProgress(int progress) {
         this.mProgress = progress;
         return this;

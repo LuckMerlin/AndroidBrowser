@@ -11,4 +11,6 @@ public interface Code {
     int CODE_CANCEL=-105;
     int CODE_ALREADY=-106;
     int CODE_EXIST=-107;
+    int CODE_CHANGE=-108;
+    int CODE_FINISH=-109;
 }

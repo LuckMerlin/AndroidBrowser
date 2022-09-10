@@ -7,16 +7,15 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 
-public class Request<T> implements OnHttpFinish<T>, OnAnswerReceived,OnHttpParse<T>{
+public class Request<T> implements OnHttpFinish<T>,OnHttpParse<T>{
     public final static String METHOD_POST="post";
     public final static String METHOD_GET="get";
     private String mMethod;
     private String mUrl;
     private Headers mHeaders;
     private Body mBody;
-    private OnAnswerReceived mOnResponse;
-    private OnHttpFinish<T> mOnFinish;
     private OnHttpParse<T> mOnHttpParse;
+    private OnHttpFinish<T> mOnFinish;
     private String mBaseUrl;
     private Object mType;
     private String mCharset;
@@ -62,11 +61,6 @@ public class Request<T> implements OnHttpFinish<T>, OnAnswerReceived,OnHttpParse
             mType=null!=type&&type instanceof Class?type:false;
         }
         return null!=mType&&mType instanceof Class?(Class<T>)mType:null;
-    }
-
-    @Override
-    public void onAnswerReceived(Answer answer) {
-        //Do nothing
     }
 
     public final Request<T> on(OnHttpParse<T> parse, OnHttpFinish<T> finish){
@@ -123,11 +117,6 @@ public class Request<T> implements OnHttpFinish<T>, OnAnswerReceived,OnHttpParse
         return this;
     }
 
-    public final Request<T> setOnResponse(OnAnswerReceived onResponse){
-        mOnResponse=onResponse;
-        return this;
-    }
-
     public final Request<T> setOnFinish(OnHttpFinish<T> onFinish){
         mOnFinish=onFinish;
         return this;
@@ -150,16 +139,12 @@ public class Request<T> implements OnHttpFinish<T>, OnAnswerReceived,OnHttpParse
         return mHeaders;
     }
 
-    public OnHttpFinish<T> onFinish() {
+    public OnHttpFinish<T> getOnFinish() {
         return mOnFinish;
     }
 
-    public OnHttpParse<T> onHttpParse() {
+    public OnHttpParse<T> getOnHttpParse() {
         return mOnHttpParse;
-    }
-
-    public OnAnswerReceived getOnAnswerReceived() {
-        return mOnResponse;
     }
 
     public final Request<T> post(){
