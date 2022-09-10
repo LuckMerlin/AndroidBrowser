@@ -13,4 +13,8 @@ public interface Code {
     int CODE_EXIST=-107;
     int CODE_CHANGE=-108;
     int CODE_FINISH=-109;
+    int CODE_NONE_PERMISSION= -110;
+    int CODE_OUT_OF_BOUNDS= -111;
+    int CODE_SKIP=-112;
+    int CODE_INTERRUPT=-113;
 }

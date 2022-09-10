@@ -55,6 +55,7 @@ public class FileDeleteTask extends FileTask {
         DoingFiles doingFiles=new DoingFiles();
         progress.setData(doingFiles);
         Response response= client.deleteFile(file,(int mode,int pro, String msg, File from, File to)-> {
+            doingFiles.setProgress(pro).setDoingMode(mode).setFrom(from).setTo(to);
             runtime.post(()->{
                 doingFiles.setProgress(pro).setDoingMode(mode).setFrom(from).setTo(to);
                 notifyProgress(progress);
