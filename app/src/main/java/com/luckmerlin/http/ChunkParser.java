@@ -15,12 +15,6 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
         byte[] onResolveChunkFlag(Answer answer);
     }
 
-    public interface OnChunkParse<T>{
-        T onChunkParse(int code,byte[] thunk,byte[] flag,Http http);
-    }
-
-    protected abstract P onChunkUpdate(int code,byte[] thunk,byte[] flag,Http http);
-
     protected abstract R onChunkParseFinish(int code,byte[] thunk,byte[] flag,Http http);
 
     public ChunkParser(){
@@ -30,6 +24,8 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
     public ChunkParser(ChunkFlagResolver resolver){
         mChunkFlagResolver=resolver;
     }
+
+    protected abstract R onReadChunk(ChunkFinder chunkFinder, byte[] chunkFlag,Answer answer,Http http)throws Exception;
 
     @Override
     public R onParse(Http http, Answer answer) {
@@ -41,15 +37,9 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
         if (null==encoding||!encoding.equals(Headers.CHUNKED)){
             return onChunkParseFinish(Code.CODE_FAIL,null,null,http);
         }
-        AnswerBody answerBody=answer.getAnswerBody();
-        InputStream inputStream=null!=answerBody?answerBody.getStream():null;
-        if (null==inputStream){
-            return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,null,http);
-        }
         ChunkFlagResolver resolver=mChunkFlagResolver;
         ChunkFinder chunkFinder=null; byte[] thunkFlag=null;
         try {
-            byte[] buffer=new byte[1024];int length=0;
             thunkFlag=null!=resolver?resolver.onResolveChunkFlag(answer):null;
             if (null==thunkFlag||thunkFlag.length<=0){
                 String thunkFlagString=headers.get("trunkFlag");
@@ -57,24 +47,20 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
                 Debug.D("Use http response head chunk flag to read chunk."+thunkFlagString);
             }
             chunkFinder=new ChunkFinder(thunkFlag);
-            while ((length=inputStream.read(buffer))>=0){
-                if (length>0){
-                    chunkFinder.write(buffer,0,length);
-                    onChunkUpdate(Code.CODE_CHANGE,chunkFinder.checkChunk(),thunkFlag,http);
-                }
-            }
+            return onReadChunk(chunkFinder,null!=thunkFlag&&thunkFlag.length>0?
+                    Arrays.copyOf(thunkFlag,thunkFlag.length):null,answer,http);
         }catch (Exception e){
             Debug.E("Exception parse http thunk.e="+e,e);
             e.printStackTrace();
             if (e instanceof EOFException){
-                return onChunkParseFinish(Code.CODE_CANCEL,chunkFinder.toByteArray(),thunkFlag,http);
+                return onChunkParseFinish(Code.CODE_CANCEL,null!=chunkFinder? chunkFinder.toByteArray():null,thunkFlag,http);
             }
         }
-        return onChunkParseFinish(Code.CODE_FINISH,chunkFinder.toByteArray(),thunkFlag,http);
+        return onChunkParseFinish(Code.CODE_FINISH,null!=chunkFinder?chunkFinder.toByteArray():null,thunkFlag,http);
     }
 
-    private static class ChunkFinder extends ByteArrayOutputStream{
-        private final byte[] mFlag;
+    protected static class ChunkFinder extends ByteArrayOutputStream{
+        protected final byte[] mFlag;
         private int mLastCheckedIndex=0;
 
         protected ChunkFinder(byte[] flag){

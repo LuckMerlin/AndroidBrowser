@@ -12,6 +12,8 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.json.JsonObject;
+import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.OutputStream;
 
 public interface Client {
 
@@ -34,4 +36,6 @@ public interface Client {
     Response<File> deleteFile(File file, OnFileDoingUpdate update);
     Response<Folder> listFiles(File folder,long start,int size,Filter filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
+    Response<InputStream> openInputStream(long openLength, File file);
+    Response<OutputStream> openOutputStream(File file);
 }

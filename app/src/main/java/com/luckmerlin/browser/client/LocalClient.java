@@ -22,6 +22,14 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.data.ComparedList;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.OutputStream;
+import com.luckmerlin.utils.Utils;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 public class LocalClient extends AbstractClient {
@@ -159,6 +167,88 @@ public class LocalClient extends AbstractClient {
             return new Response<File>().set(Code.CODE_ARGS_INVALID,"File path invalid.",file);
         }
         return deleteAndroidFile(new java.io.File(path),update);
+    }
+
+    @Override
+    public Response<OutputStream> openOutputStream(File file) {
+        String path=null;
+        if (null==file||file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
+            Debug.W("Fail open file output stream while file invalid.");
+            return new Response(Code.CODE_ARGS_INVALID, "File invalid");
+        }
+        java.io.File androidFile = new java.io.File(path);
+        if (androidFile.isDirectory()) {
+            Debug.W("Fail open file output stream while file is android directory.");
+            return new Response(Code.CODE_ARGS_INVALID, "File is android directory");
+        }
+        OutputStream outputStream =null;
+        try{
+            FileOutputStream fileOutputStream = new FileOutputStream(androidFile, true);
+            outputStream = new OutputStream(androidFile.length(), null) {
+                @Override
+                public void close() throws IOException {
+                    fileOutputStream.close();
+                }
+
+                @Override
+                protected void onWrite(int b) throws IOException {
+                    fileOutputStream.write(b);
+                }
+            };
+            outputStream.setTitle(androidFile.getName());
+            return new Response<OutputStream>().set(Code.CODE_SUCCEED, "Succeed.", outputStream);
+        }catch (Exception e){
+            Utils.closeStream(outputStream);
+            e.printStackTrace();
+            return new Response<OutputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
+        }
+    }
+
+    @Override
+    public Response<InputStream> openInputStream(long openLength, File file) {
+        String path=null;
+        if (null==file||file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
+            Debug.W("Fail open file input stream while file invalid.");
+            return new Response(Code.CODE_ARGS_INVALID, "File invalid");
+        }
+        java.io.File androidFile = new java.io.File(path);
+        if (androidFile.isDirectory()) {
+            Debug.W("Fail open file input stream while file is android directory.");
+            return new Response(Code.CODE_ARGS_INVALID, "File is android directory");
+        }
+        InputStream inputStream=null;
+        try {
+            final FileInputStream fileInputStream = new FileInputStream(androidFile);
+            if (openLength<0){
+                Debug.W("Fail open file input stream while file open length invalid.");
+                return new Response(Code.CODE_ARGS_INVALID,"File open length invalid");
+            }else if (openLength>0){
+                Debug.D("Open file input stream with skip."+openLength);
+                fileInputStream.skip(openLength);
+            }
+            inputStream=new InputStream(openLength,null){
+                @Override
+                public void close() throws IOException {
+                    fileInputStream.close();
+                }
+
+                @Override
+                public long length() {
+                    return androidFile.length();
+                }
+
+                @Override
+                protected int onRead() throws IOException {
+                    return fileInputStream.read();
+                }
+            };
+            inputStream.setTitle(androidFile.getName());
+            return new Response<InputStream>().set(Code.CODE_SUCCEED,"Succeed.",inputStream);
+        } catch (Exception e) {
+            Utils.closeStream(inputStream);
+            e.printStackTrace();
+            return new Response<InputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
+        }
     }
 
     @Override

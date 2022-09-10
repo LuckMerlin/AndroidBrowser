@@ -5,16 +5,20 @@ import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.Answer;
+import com.luckmerlin.http.AnswerBody;
 import com.luckmerlin.http.ChunkParser;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.json.JsonObject;
 import org.json.JSONObject;
 
-class CloudFileChunkParser extends ChunkParser<Void,Response<File>>{
+import java.io.InputStream;
+
+class FileChunkParser extends ChunkParser<Void,Response<File>>{
     private final OnFileDoingUpdate mOnFileChunkChange;
     private final int mMode;
 
-    public CloudFileChunkParser(int mode,OnFileDoingUpdate chunkChange){
+    public FileChunkParser(int mode, OnFileDoingUpdate chunkChange){
         mMode=mode;
         mOnFileChunkChange=chunkChange;
     }
@@ -40,7 +44,26 @@ class CloudFileChunkParser extends ChunkParser<Void,Response<File>>{
     }
 
     @Override
-    protected Void onChunkUpdate(int code1, byte[] thunk, byte[] flag, Http http) {
+    protected Response<File> onReadChunk(ChunkFinder chunkFinder, byte[] chunkFlag, Answer answer, Http http) throws Exception {
+        AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+        java.io.InputStream inputStream=null!=answerBody?answerBody.getStream():null;
+        if (null==chunkFinder){
+            return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
+        }
+        if (null==inputStream){
+            return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
+        }
+        byte[] buffer=new byte[1024];int length=0;
+        while ((length=inputStream.read(buffer))>=0){
+            if (length>0){
+                chunkFinder.write(buffer,0,length);
+                onChunkUpdate(chunkFinder.checkChunk());
+            }
+        }
+        return onChunkParseFinish(Code.CODE_SUCCEED,chunkFinder.toByteArray(),chunkFlag,http);
+    }
+
+    private Void onChunkUpdate(byte[] thunk) {
         try {
             OnFileDoingUpdate onFileChunkChange=mOnFileChunkChange;
             if (null==onFileChunkChange){
@@ -72,7 +95,7 @@ class CloudFileChunkParser extends ChunkParser<Void,Response<File>>{
         return null;
     }
 
-    private JSONObject parseAsJson(byte[] thunk){
+    protected final JSONObject parseAsJson(byte[] thunk){
         String fromJson=null!=thunk&&thunk.length>0?new String(thunk):null;
         return null!=fromJson? JsonObject.makeJson(fromJson):null;
     }

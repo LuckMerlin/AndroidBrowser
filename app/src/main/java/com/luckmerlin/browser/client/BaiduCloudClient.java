@@ -12,6 +12,8 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.http.Http;
+import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.OutputStream;
 
 public class BaiduCloudClient extends AbstractClient{
     private Http mHttp=new MHttp().setBaseUrl("/rest/2.0/xpan/nas?method=uinfo");
@@ -46,6 +48,16 @@ public class BaiduCloudClient extends AbstractClient{
 
     @Override
     public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
+        return null;
+    }
+
+    @Override
+    public Response<OutputStream> openOutputStream(File file) {
+        return null;
+    }
+
+    @Override
+    public Response<InputStream> openInputStream(long openLength, File file) {
         return null;
     }
 

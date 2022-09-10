@@ -7,7 +7,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
 
-public class Request<T> implements OnHttpFinish<T>,OnHttpParse<T>{
+public class Request<T>{
     public final static String METHOD_POST="post";
     public final static String METHOD_GET="get";
     private String mMethod;
@@ -33,13 +33,11 @@ public class Request<T> implements OnHttpFinish<T>,OnHttpParse<T>{
         return this;
     }
 
-    @Override
-    public void onFinish(T data, Answer response) {
+    protected void onFinish(T data, Answer response) {
         //Do nothing
     }
 
-    @Override
-    public T onParse(Http http, Answer response) {
+    protected T onParse(Http http, Answer response) {
         return null;
     }
 

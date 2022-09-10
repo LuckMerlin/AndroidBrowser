@@ -3,6 +3,7 @@ package com.luckmerlin.browser.client;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -14,8 +15,12 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.ChunkParser;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Request;
+import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.OutputStream;
 
 import org.json.JSONObject;
 
@@ -58,7 +63,7 @@ public class NasClient extends AbstractClient{
         String filePath=null!=file?file.getPath():null;
         return mHttp.call(new Request<Response<File>>().url("/file/delete").
                 headerWithValueEncode(Label.LABEL_PATH,filePath).
-                setOnParse(new CloudFileChunkParser(Mode.MODE_DELETE,update)).post());
+                setOnParse(new FileChunkParser(Mode.MODE_DELETE,update)).post());
     }
 
     @Override
@@ -73,6 +78,25 @@ public class NasClient extends AbstractClient{
 
     @Override
     public Drawable loadThumb(View root, File file, Canceled canceled) {
+        return null;
+    }
+
+    @Override
+    public Response<InputStream> openInputStream(long openLength, File file) {
+        Http http=mHttp;
+        if (null==http){
+            Debug.E("Fail open nas file input stream while none http.");
+            return new Response<>(Code.CODE_ERROR,"None http.",null);
+        }
+        EncryptFileChunkParser parser=new EncryptFileChunkParser();
+        return http.call(new Request<Response<InputStream>>().header(Label.LABEL_FROM,openLength).
+                headerWithValueEncode(Label.LABEL_PATH,null!=file?file.getPath():null).post().
+                setOnParse(parser));
+    }
+
+    @Override
+    public Response<OutputStream> openOutputStream(File file) {
+
         return null;
     }
 }
