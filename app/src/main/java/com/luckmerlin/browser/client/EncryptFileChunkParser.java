@@ -11,8 +11,9 @@ import com.luckmerlin.http.Http;
 import com.luckmerlin.stream.InputStream;
 import java.io.IOException;
 
-public class EncryptFileChunkParser extends ChunkParser<Void, Response<InputStream>> {
-    private static final String CUSTOM_RANGE_KEY="MerlinRange";
+public class EncryptFileChunkParser extends AbstractChunkParser<Void, Response<InputStream>> {
+    private static final String CUSTOM_RANGE_START_KEY="MerlinRangeStart";
+    private static final String CUSTOM_CONTENT_LENGTH_KEY="MerlinContentLength";
 
     @Override
     protected Response<InputStream> onChunkParseFinish(int code, byte[] thunk, byte[] flag, Http http) {
@@ -32,18 +33,20 @@ public class EncryptFileChunkParser extends ChunkParser<Void, Response<InputStre
             Debug.E("Fail read file chunk while input stream invalid.");
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
         }
-        long contentLength=answerBody.getContentLength();
-        if (contentLength<0){
-            Debug.E("Fail read file chunk while content length invalid.");
-            return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
-        }
         Headers headers=null!=answer?answer.getHeaders():null;
         if (null==headers){
             Debug.E("Fail read file chunk while http headers invalid.");
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
         }
+        long contentLength=answerBody.getContentLength();
+        final long finalContentLength=contentLength<0?headers.
+                getLong(CUSTOM_CONTENT_LENGTH_KEY,-1):contentLength;
+        if (finalContentLength<0){
+            Debug.E("Fail read file chunk while content length invalid.");
+            return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
+        }
         long rangeStart=headers.getContentRangeStart(-1);
-        rangeStart=rangeStart>=0?rangeStart:headers.getLong(CUSTOM_RANGE_KEY,-1);
+        rangeStart=rangeStart>=0?rangeStart:headers.getLong(CUSTOM_RANGE_START_KEY,-1);
         if (rangeStart<0){
             Debug.E("Fail read file chunk while range start invalid."+rangeStart);
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
@@ -56,9 +59,11 @@ public class EncryptFileChunkParser extends ChunkParser<Void, Response<InputStre
                 while ((length=inputStream.read(buffer))>=0){
                     if (length>0){
                         chunkFinder.write(buffer,0,length);
+                        Debug.D("SFDSAFDSADFA length="+length+" "+new String(chunkFlag));
                         if (null==(chunk=chunkFinder.checkChunk())){
                             continue;//Circle to again to until read one chunk
                         }
+                        Debug.D("SFDSAFDSADFA "+chunk);
                         break;//We just need read one chunk each time
                     }
                 }
@@ -75,7 +80,7 @@ public class EncryptFileChunkParser extends ChunkParser<Void, Response<InputStre
 
                     @Override
                     public long length() {
-                        return contentLength;
+                        return finalContentLength;
                     }
 
                     @Override

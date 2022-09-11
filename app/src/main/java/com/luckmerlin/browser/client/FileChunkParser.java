@@ -8,13 +8,14 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.AnswerBody;
 import com.luckmerlin.http.ChunkParser;
+import com.luckmerlin.http.Headers;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.json.JsonObject;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 
-class FileChunkParser extends ChunkParser<Void,Response<File>>{
+class FileChunkParser extends AbstractChunkParser<Void,Response<File>>{
     private final OnFileDoingUpdate mOnFileChunkChange;
     private final int mMode;
 

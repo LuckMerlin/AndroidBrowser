@@ -59,4 +59,13 @@ public class Response<T> implements CodeResult<T> {
     public final T getData() {
         return mData;
     }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "mCode=" + mCode +
+                ", mMsg='" + mMsg + '\'' +
+                ", mData=" + mData +
+                '}';
+    }
 }

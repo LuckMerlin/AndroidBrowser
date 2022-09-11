@@ -90,8 +90,8 @@ public class NasClient extends AbstractClient{
         }
         EncryptFileChunkParser parser=new EncryptFileChunkParser();
         return http.call(new Request<Response<InputStream>>().header(Label.LABEL_FROM,openLength).
-                headerWithValueEncode(Label.LABEL_PATH,null!=file?file.getPath():null).post().
-                setOnParse(parser));
+                headerWithValueEncode(Label.LABEL_PATH,null!=file?file.getPath():null).
+                url("/file/inputStream").post().setOnParse(parser));
     }
 
     @Override

@@ -172,8 +172,8 @@ public class LocalClient extends AbstractClient {
     @Override
     public Response<OutputStream> openOutputStream(File file) {
         String path=null;
-        if (null==file||file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
-            Debug.W("Fail open file output stream while file invalid.");
+        if (null==file||!file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
+            Debug.W("Fail open file output stream while file invalid.file="+file);
             return new Response(Code.CODE_ARGS_INVALID, "File invalid");
         }
         java.io.File androidFile = new java.io.File(path);
@@ -207,7 +207,7 @@ public class LocalClient extends AbstractClient {
     @Override
     public Response<InputStream> openInputStream(long openLength, File file) {
         String path=null;
-        if (null==file||file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
+        if (null==file||!file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
             Debug.W("Fail open file input stream while file invalid.");
             return new Response(Code.CODE_ARGS_INVALID, "File invalid");
         }

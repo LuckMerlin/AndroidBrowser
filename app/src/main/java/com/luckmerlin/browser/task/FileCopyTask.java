@@ -139,10 +139,10 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             Response<OutputStream> childOutputResponse=toClient.openOutputStream(toFile);
             outputStream=null!=childOutputResponse?childOutputResponse.getData():null;
             if (null==outputStream){
-                Debug.W("Fail execute file copy task while open output stream fail.");
+                Debug.W("Fail execute file copy task while open output stream fail."+childOutputResponse);
                 return new Response(Code.CODE_FAIL,"Open output stream fail");
             }else if (!childOutputResponse.isSucceed()){
-                Debug.W("Fail execute file copy task while open output stream fail.");
+                Debug.W("Fail execute file copy task while open output stream fail."+childOutputResponse);
                 return new Response(childOutputResponse.getCode(Code.CODE_FAIL),childOutputResponse.getMessage());
             }
             Debug.D("Succeed open file copy output stream."+toPath);
@@ -152,10 +152,10 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             Response<InputStream> childInputResponse=fromClient.openInputStream(outputOpenLength,fromFile);
             inputStream=null!=childInputResponse?childInputResponse.getData():null;
             if (null==inputStream){
-                Debug.W("Fail execute file copy task while open input stream fail.");
+                Debug.W("Fail execute file copy task while open input stream null.");
                 return new Response(Code.CODE_FAIL,"Open input stream fail");
             }else if (!childInputResponse.isSucceed()){
-                Debug.W("Fail execute file copy task while open input stream fail.");
+                Debug.W("Fail execute file copy task while open input stream fail."+inputStream);
                 return new Response(childInputResponse.getCode(Code.CODE_FAIL),childInputResponse.getMessage());
             }
             if (outputOpenLength>0){

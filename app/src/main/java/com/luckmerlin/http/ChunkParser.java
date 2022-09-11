@@ -27,14 +27,20 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
 
     protected abstract R onReadChunk(ChunkFinder chunkFinder, byte[] chunkFlag,Answer answer,Http http)throws Exception;
 
+    protected byte[] onResolveChunkFlag(Answer answer,Http http){
+        return null;
+    }
+
     @Override
     public R onParse(Http http, Answer answer) {
         if (null==answer){
+            Debug.E("Fail parse while http answer null.");
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,null,http);
         }
         final Headers headers=answer.getHeaders();
         String encoding=null!=headers?headers.getTransferEncoding():null;
         if (null==encoding||!encoding.equals(Headers.CHUNKED)){
+            Debug.E("Fail parse while http transfer encoding NOT chunked."+encoding);
             return onChunkParseFinish(Code.CODE_FAIL,null,null,http);
         }
         ChunkFlagResolver resolver=mChunkFlagResolver;
@@ -42,9 +48,8 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
         try {
             thunkFlag=null!=resolver?resolver.onResolveChunkFlag(answer):null;
             if (null==thunkFlag||thunkFlag.length<=0){
-                String thunkFlagString=headers.get("trunkFlag");
-                thunkFlag=null!=thunkFlagString&&thunkFlagString.length()>0?thunkFlagString.getBytes():thunkFlag;
-                Debug.D("Use http response head chunk flag to read chunk."+thunkFlagString);
+                thunkFlag=onResolveChunkFlag(answer,http);
+                Debug.D("Use http response head chunk flag to read chunk."+thunkFlag);
             }
             chunkFinder=new ChunkFinder(thunkFlag);
             return onReadChunk(chunkFinder,null!=thunkFlag&&thunkFlag.length>0?
