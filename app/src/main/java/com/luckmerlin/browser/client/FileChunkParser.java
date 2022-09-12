@@ -47,7 +47,7 @@ class FileChunkParser extends AbstractChunkParser<Void,Response<File>>{
     @Override
     protected Response<File> onReadChunk(ChunkFinder chunkFinder, byte[] chunkFlag, Answer answer, Http http) throws Exception {
         AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
-        java.io.InputStream inputStream=null!=answerBody?answerBody.getStream():null;
+        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
         if (null==chunkFinder){
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);
         }

@@ -1,6 +1,7 @@
 package com.luckmerlin.http;
 
 public class TextParser<T> implements OnHttpParse<T>{
+
     public interface OnTextParse<T>{
         T onTextParse(String text, Http http, Answer res);
     }
@@ -12,15 +13,15 @@ public class TextParser<T> implements OnHttpParse<T>{
     }
 
     public TextParser(OnTextParse<T> parser){
-        mParser=parser;
+       setOnTextParser(parser);
     }
 
-    public TextParser<T> parser(OnTextParse<T> parser){
+    public TextParser<T> setOnTextParser(OnTextParse<T> parser){
         mParser=parser;
         return this;
     }
 
-    public T onTextParse(String text, Http http, Answer response){
+    protected T onTextParse(String text, Http http, Answer response){
         OnTextParse<T> parser=mParser;
         return null!=parser?parser.onTextParse(text,http,response):null;
     }

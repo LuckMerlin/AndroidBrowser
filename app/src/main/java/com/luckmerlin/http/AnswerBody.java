@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 public abstract class AnswerBody {
@@ -12,7 +13,7 @@ public abstract class AnswerBody {
     public abstract long getContentLength();
     public abstract String getContentType();
 
-    public abstract InputStream getStream();
+    public abstract InputStream getInputStream();
 
     public boolean autoClose(boolean enable){
         if (mAutoClose!=enable){
@@ -35,7 +36,7 @@ public abstract class AnswerBody {
     }
 
     public final byte[] getBytes(int max) throws Exception{
-        InputStream inputStream=getStream();
+        InputStream inputStream=getInputStream();
         if (null==inputStream){
             return null;
         }
@@ -58,7 +59,7 @@ public abstract class AnswerBody {
     }
 
     public final String getText(String charsetName) throws IOException {
-        InputStream inputStream=getStream();
+        InputStream inputStream=getInputStream();
         BufferedInputStream bufferedInputStream=null!=inputStream?new BufferedInputStream(inputStream):null;
         if (null==bufferedInputStream){
             return null;
@@ -70,6 +71,4 @@ public abstract class AnswerBody {
         }
         return byteArrayOutputStream.toString(null!=charsetName&&charsetName.length()>0?charsetName:"utf-8");
     }
-
-    public abstract boolean close();
 }

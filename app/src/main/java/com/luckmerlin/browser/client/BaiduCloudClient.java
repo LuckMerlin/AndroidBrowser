@@ -5,7 +5,7 @@ import android.view.View;
 
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
-import com.luckmerlin.browser.http.MHttp;
+import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
@@ -16,7 +16,7 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 
 public class BaiduCloudClient extends AbstractClient{
-    private Http mHttp=new MHttp().setBaseUrl("/rest/2.0/xpan/nas?method=uinfo");
+    private Http mHttp=new JavaHttp().setBaseUrl("/rest/2.0/xpan/nas?method=uinfo");
 //    AppKey    ABKpPtUXRypVyPAEqmrI25zhx1FnZgkF
 //    SecretKey    Dwof0Ukm8hyfnlIVNr03O92Sd66Io49H
 //    SignKey  Ff$GEC2zh*-Jvn!Yct!FRat2wiQU4*=y

@@ -31,6 +31,15 @@ public class Response<T> implements CodeResult<T> {
         return this;
     }
 
+    public final boolean isAnyCode(int ...codes){
+        for (int child:codes) {
+            if (child==mCode){
+                return true;
+            }
+        }
+        return false;
+    }
+
     public final Response<T> setData(T data) {
         this.mData = data;
         return this;

@@ -1,5 +1,7 @@
 package com.luckmerlin.http;
 
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,5 +62,16 @@ public  class Headers extends HashMap<String,String>{
             super.remove(name);
         }
         return this;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder=new StringBuilder();
+        builder.append("[---Headers---]"+this);
+        for (Map.Entry<String,String> child:entrySet()) {
+            builder.append(child.getKey()+"="+child.getValue()+"\n");
+        }
+        builder.append("[---Headers---]"+this);
+        return builder.toString();
     }
 }

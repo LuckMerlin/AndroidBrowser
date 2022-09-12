@@ -9,7 +9,7 @@ import com.luckmerlin.http.TextParser;
 import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.object.Parser;
 
-public class MResponse<T> implements TextParser.OnTextParse<Response<T>>{
+public class MResponse<T> extends TextParser<Response<T>>{
     private Parser<Object,T> mDataParser;
 
     public MResponse(){

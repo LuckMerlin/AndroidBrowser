@@ -1,124 +1,76 @@
 package com.luckmerlin.http;
 
-import android.os.Handler;
-import android.os.Looper;
-
-import com.luckmerlin.core.Canceler;
-import com.luckmerlin.json.Json;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.object.ObjectCreator;
-
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public abstract class Http {
-    private final static String STRING_NAME=String.class.getName();
-    private final static String CHAR_NAME=CharSequence.class.getName();
-    private final static String RESPONSE_NAME= Answer.class.getName();
-    private final static String BYTES_NAME=byte[].class.getName();
     private String mBaseUrl;
-    private Handler mUiHandler;
-    private ObjectCreator mCreator;
-    private ResponseParser mResponseParser;
 
     public final Http setBaseUrl(String url){
        mBaseUrl=url;
        return this;
     }
 
-    public final Http setResponseParser(ResponseParser parser){
-        mResponseParser=parser;
-        return this;
-    }
+    protected abstract Connection onConnect(String method, String url, Request request);
 
-    public final <T> T call(Request<T> request){
-        String baseUrl=null!=request?request.baseUrl():null;
+    public final Connection connect(Request call){
+        String baseUrl=null!=call?call.baseUrl():null;
         baseUrl=null!=baseUrl?baseUrl:mBaseUrl;
-        String url=null!=request?request.url():null;
-        String method=null!=request?request.method():null;
-        method=null!=method?method:Request.METHOD_GET;
-        Answer response=onCall(method,(null!=baseUrl?baseUrl:"")+(null!=url?url:""),request);
-        OnHttpFinish<T> onRequestFinish=null;
-        OnHttpParse<T> onRequestParse=null;
-        T data=null;
-        if (null!=request){
-            onRequestFinish=request.getOnFinish();
-            onRequestParse=request.getOnHttpParse();
-            data=request.onParse(this,response);
-        }
-        data=null==data&&null!=onRequestParse?onRequestParse.onParse(this,response):data;
-        ResponseParser responseParser=mResponseParser;
-        data=null==data&&null!=responseParser?responseParser.parse(request,response,this):data;
-        data=null!=data?data:onParse(request,response);
-        AnswerBody answerBody=null!=response?response.getAnswerBody():null;//Auto close http
-        if (null!=answerBody&&answerBody.isAutoClose()) {
-            answerBody.close();
-        }
-        //
-        final T finalData=data;
-        final OnHttpFinish<T> finalOnRequestFinish=onRequestFinish;
-        post(()->{
-            request.onFinish(finalData,response);
-            OnRequestFinish(finalData,response);
-            if (null!=finalOnRequestFinish){
-                finalOnRequestFinish.onFinish(finalData,response);
-            }
-        });
-        return data;
+        String url=null!=call?call.url():null;
+        String method=null!=call?call.method():null;
+        method=null!=method?method: Request.METHOD_GET;
+        return onConnect(method,(null!=baseUrl?baseUrl:"")+(null!=url?url:""),call);
     }
 
-    public final <T> Canceler request(Request<T> request){
-        if (null==request){
+    public final <T> T call(Request request,OnHttpParse<T> parser){
+        return call(request,null,parser);
+    }
+
+    public final <T> T call(Request request,InputStream input,OnHttpParse<T> parser){
+        Connection connection=connect(request);
+        if (null==connection){
+            Debug.E("Fail call http connection while connect fail.");
             return null;
         }
-        final boolean[] executed=new boolean[]{false};
-        Canceler canceler=null;
-        return onSyncExecute(()-> {
-            if (!executed[0]){
-                executed[0]=true;
-                call(request);
-            }
-        })?canceler=()-> {
-            return false;
-        }:null;
+        return call(connection,input,parser);
     }
 
-    protected boolean onSyncExecute(Runnable runnable){
-        if (null!=runnable){
-            new Thread(runnable).start();
-            return true;
-        }
-        return false;
-    }
-
-    protected abstract Answer onCall(String method, String url, Request request);
-
-    protected <T> T onParse(Request<T> request, Answer response){
-        Class<T> cls=null!=request?request.getExpectType():null;
-        final String clsName=null!=cls?cls.getName():null;
-        if (null==response||null==clsName){
+    public final <T> T call(Connection connection, InputStream input,OnHttpParse<T> parser){
+        Requested requested=null!=connection?connection.getRequested():null;
+        if (null==requested){
+            Debug.E("Fail call http connection while requested invalid.");
             return null;
         }
-        AnswerBody body=response.getAnswerBody();
-        String bodyText=null!=body?body.getTextSafe(null!=request?request.charset():null,null):null;
-        if (clsName.equals(STRING_NAME)||clsName.equals(CHAR_NAME)){
-            return (T)bodyText;
-        }else  if (clsName.equals(RESPONSE_NAME)){
-            return (T)response;
-        }else  if (clsName.equals(BYTES_NAME)){
-            return (T)bodyText.getBytes();
+        try {
+            //Try write data into stream
+            if (null!=input){
+                OutputStream outputStream=requested.getOutputStream();
+                if (null==outputStream){
+                    Debug.E("Fail call http connection while output stream invalid.");
+                    return null;
+                }
+                int read=0;byte[] buffer=new byte[1024];
+                while ((read=input.read(buffer))>=0){
+                    if (read>0){
+                        outputStream.write(buffer,0,read);
+                    }
+                }
+                Debug.D("Written data into http connection.");
+            }
+            //Try parse answer
+            return null!=parser?parser.onParse(Http.this,requested.getAnswer()):null;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Debug.E("Exception call http connection.e="+e,e);
+            return null;
+        }finally {
+           closes(connection);
         }
-        ObjectCreator creator=mCreator;
-        T data=(null!=creator?creator:(mCreator=new ObjectCreator())).createObject(cls);
-        if (null!=data&&data instanceof Json){
-           data=((Json)data).apply(bodyText)?data:null;
-        }
-        return data;
     }
-
-    protected <T> void OnRequestFinish(T data, Answer response){
-        //Do nothing
-    }
-
 
     protected final void closes(Closeable... closeables) {
         if (null!=closeables){
@@ -132,15 +84,5 @@ public abstract class Http {
                 }
             }
         }
-    }
-
-    public final boolean post(Runnable runnable){
-        return post(0,runnable);
-    }
-
-    public final boolean post(long delay,Runnable runnable){
-        Handler handler=mUiHandler;
-        return null!=runnable&&(null!=handler?handler:(mUiHandler=new Handler(Looper.getMainLooper()))).
-                postDelayed(runnable,delay<=0?0:delay);
     }
 }

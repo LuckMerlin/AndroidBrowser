@@ -23,18 +23,8 @@ public class HttpResponseBody extends AnswerBody {
     }
 
     @Override
-    public InputStream getStream() {
+    public InputStream getInputStream() {
         okhttp3.ResponseBody body=mBody;
         return null!=body?body.byteStream():null;
-    }
-
-    @Override
-    public boolean close() {
-        okhttp3.ResponseBody body=mBody;
-        if (null!=body){
-            body.close();
-            return true;
-        }
-        return false;
     }
 }

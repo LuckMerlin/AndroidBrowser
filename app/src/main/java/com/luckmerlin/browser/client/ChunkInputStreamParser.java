@@ -11,7 +11,7 @@ import com.luckmerlin.http.Http;
 import com.luckmerlin.stream.InputStream;
 import java.io.IOException;
 
-public class EncryptFileChunkParser extends AbstractChunkParser<Void, Response<InputStream>> {
+public class ChunkInputStreamParser extends AbstractChunkParser<Void, Response<InputStream>> {
     private static final String CUSTOM_RANGE_START_KEY="MerlinRangeStart";
     private static final String CUSTOM_CONTENT_LENGTH_KEY="MerlinContentLength";
 
@@ -24,7 +24,7 @@ public class EncryptFileChunkParser extends AbstractChunkParser<Void, Response<I
     protected Response<InputStream> onReadChunk(ChunkParser.
             ChunkFinder chunkFinder, byte[] chunkFlag, Answer answer, Http http) throws Exception {
         AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
-        java.io.InputStream inputStream=null!=answerBody?answerBody.getStream():null;
+        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
         if (null==chunkFinder){
             Debug.E("Fail read file chunk while chunk finder invalid.");
             return onChunkParseFinish(Code.CODE_ARGS_INVALID,null,chunkFlag,http);

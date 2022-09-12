@@ -29,8 +29,6 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.http.ChunkParser;
-import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
@@ -43,9 +41,6 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
-import com.luckmerlin.http.Request;
-import com.luckmerlin.json.Json;
-import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -239,17 +234,16 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //                new JavaHttp().setBaseUrl("http://192.168.0.10:5001").
 //                        call(new Request<>().url("/file/test").
 //                                setOnResponse(new ChunkParser()).post());
-//                    File cloudFile=new File(JsonObject.makeJson("{\"name\":\"app.py\",\"sep\":\"/\",\"parent\":\"/Volumes/Work/Workspace/Browser\"," +
-//                            "\"length\":153,\"host\":\"192.168.0.10:5001\",\"size\":-1," +
-//                            "\"access\":3,\"accessTime\":1655824299000,\"changeTime\":" +
-//                            "1573995575000,\"modifyTime\":1573995575000}"));
-//                    File localFile=new File(JsonObject.makeJson("{\"length\":4096,\"sep\":\"/" +
-//                            "\",\"modifyTime\":1661484199000,\"parent\":\"/sdcard\",\"name\":\"Movies\",\"size\":0}"));
-                    File cloudFile=new File().setHost("192.168.0.10:5001").setSep("/").
-                            setParent("/Volumes/Work/Workspace/Browser").setName("app.py");
-                    File localFile=LocalClient.createLocalFile(new java.io.File
+//                  File fromFile=new File().setHost("192.168.0.10:5001").setSep("/").
+//                            setParent("/Volumes/Work/Workspace/Browser").setName("app.py");
+//                    File toFile=LocalClient.createLocalFile(new java.io.File
+//                            ("/sdcard/Movies/lin.py"));
+
+                    File toFile=new File().setHost("192.168.0.10:5001").setSep("/").
+                            setParent("/Volumes/Work/Workspace/MerlinNodeServer/Common").setName("app.py1");
+                    File fromFile=LocalClient.createLocalFile(new java.io.File
                             ("/sdcard/Movies/lin.py"));
-                    new FileCopyTask(cloudFile,localFile,null).execute(new Runtime(0,null) {
+                    new FileCopyTask(fromFile,toFile,null).execute(new Runtime(0,null) {
                         @Override
                         public Executor getExecutor() {
                             return conveyorBinder;
