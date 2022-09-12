@@ -4,6 +4,7 @@ import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.json.Json;
 import com.luckmerlin.json.JsonObject;
 
 import org.json.JSONObject;
@@ -18,6 +19,15 @@ public class File extends JsonObject {
 
     public File(JSONObject json){
         super(json);
+    }
+
+    public static File fromJson(Object json){
+        if (null==json){
+            return null;
+        }else if(json instanceof JSONObject){
+            return new File((JSONObject)json);
+        }
+        return fromJson(JsonObject.makeJson(json));
     }
 
     public String getHost() {

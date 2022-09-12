@@ -8,7 +8,7 @@ import java.io.EOFException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
+public abstract class ChunkParser<R> implements OnHttpParse<R> {
     private final ChunkFlagResolver mChunkFlagResolver;
 
     public interface ChunkFlagResolver{
@@ -25,7 +25,9 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
         mChunkFlagResolver=resolver;
     }
 
-    protected abstract R onReadChunk(ChunkFinder chunkFinder, byte[] chunkFlag,Answer answer,Http http)throws Exception;
+    protected void onChunkChecked(byte[] chunk){
+        //Do nothing
+    }
 
     protected byte[] onResolveChunkFlag(Answer answer,Http http){
         return null;
@@ -52,8 +54,21 @@ public abstract class ChunkParser<P,R> implements OnHttpParse<R> {
                 Debug.D("Use http response head chunk flag to read chunk."+thunkFlag);
             }
             chunkFinder=new ChunkFinder(thunkFlag);
-            return onReadChunk(chunkFinder,null!=thunkFlag&&thunkFlag.length>0?
-                    Arrays.copyOf(thunkFlag,thunkFlag.length):null,answer,http);
+            AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+            java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
+            final byte[] buffer=new byte[1024];
+            int length=0;byte[] chunk=null;
+            while ((length=inputStream.read(buffer))>=0){
+                if (length>0){
+                    chunkFinder.write(buffer,0,length);
+                    Debug.D("SFDSAFDSADFA length="+length+" "+new String(thunkFlag));
+                    if (null==(chunk=chunkFinder.checkChunk())){
+                        continue;//Circle to again to until read one chunk
+                    }
+                    onChunkChecked(chunk);
+                }
+            }
+            return onChunkParseFinish(Code.CODE_SUCCEED,chunkFinder.toByteArray(),thunkFlag,http);
         }catch (Exception e){
             Debug.E("Exception parse http thunk.e="+e,e);
             e.printStackTrace();

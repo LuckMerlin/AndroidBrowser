@@ -119,6 +119,8 @@ public class JsonObject extends JSONObject{
             }
         }else if (json instanceof JSONObject){
             return ((JSONObject)json);
+        }else if (json instanceof byte[]&&((byte[])json).length>0){
+            return makeJson(new String((byte[]) json));
         }
         return makeJson(json.toString());
     }

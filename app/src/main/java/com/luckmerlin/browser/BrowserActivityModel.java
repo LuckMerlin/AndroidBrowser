@@ -18,6 +18,8 @@ import android.widget.LinearLayout;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
+import com.luckmerlin.browser.client.ChunkFileInputStream;
+import com.luckmerlin.browser.client.ChunkResponseParser;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
@@ -29,6 +31,7 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
@@ -41,10 +44,12 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
+import com.luckmerlin.http.Connection;
+import com.luckmerlin.http.Http;
+import com.luckmerlin.http.Request;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
-import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.view.ClickableSpan;
@@ -54,6 +59,9 @@ import com.luckmerlin.view.ViewIterator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
+
+import org.json.JSONObject;
+
 import java.util.List;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
@@ -231,24 +239,34 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-//                new JavaHttp().setBaseUrl("http://192.168.0.10:5001").
-//                        call(new Request<>().url("/file/test").
-//                                setOnResponse(new ChunkParser()).post());
+//                    Http http=new JavaHttp().setBaseUrl("http://192.168.0.10:5001");
+//                    Connection connection=http.connect(new Request().url("/file/test").post());
+//                    ChunkFileInputStream inputStream=new ChunkFileInputStream(connection);
+//                    ChunkResponseParser<File> chunkJsonParse=new ChunkResponseParser<File>((data)->
+//                            null!=data&&data instanceof JSONObject ?new File((JSONObject)data):null){
+//                        @Override
+//                        public Response<File> onParse(byte[] from) {
+//                            Debug.D("EEEEE "+super.onParse(from));
+//                            return null;
+//                        }
+//                    };
+//                    inputStream.read(chunkJsonParse,chunkJsonParse);
+//                    Utils.closeStream(connection);
 //                  File fromFile=new File().setHost("192.168.0.10:5001").setSep("/").
 //                            setParent("/Volumes/Work/Workspace/Browser").setName("app.py");
 //                    File toFile=LocalClient.createLocalFile(new java.io.File
 //                            ("/sdcard/Movies/lin.py"));
 
-                    File toFile=new File().setHost("192.168.0.10:5001").setSep("/").
-                            setParent("/Volumes/Work/Workspace/MerlinNodeServer/Common").setName("app.py1");
-                    File fromFile=LocalClient.createLocalFile(new java.io.File
-                            ("/sdcard/Movies/lin.py"));
-                    new FileCopyTask(fromFile,toFile,null).execute(new Runtime(0,null) {
-                        @Override
-                        public Executor getExecutor() {
-                            return conveyorBinder;
-                        }
-                    }, null);
+//                    File toFile=new File().setHost("192.168.0.10:5001").setSep("/").
+//                            setParent("/Volumes/Work/Workspace/MerlinNodeServer/Common").setName("app.py1");
+//                    File fromFile=LocalClient.createLocalFile(new java.io.File
+//                            ("/sdcard/Movies/lin.py"));
+//                    new FileCopyTask(fromFile,toFile,null).execute(new Runtime(0,null) {
+//                        @Override
+//                        public Executor getExecutor() {
+//                            return conveyorBinder;
+//                        }
+//                    }, null);
                 }
             }).start();
         }

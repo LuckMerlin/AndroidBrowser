@@ -1,0 +1,41 @@
+package com.luckmerlin.browser.client;
+
+import com.luckmerlin.browser.Utils;
+import com.luckmerlin.http.Answer;
+import com.luckmerlin.http.AnswerBody;
+import com.luckmerlin.http.ChunkInputStream;
+import com.luckmerlin.http.Connection;
+import com.luckmerlin.http.Headers;
+import com.luckmerlin.http.Requested;
+import java.io.IOException;
+
+public class ChunkFileInputStream extends ChunkInputStream {
+    private static final String CUSTOM_CONTENT_LENGTH_KEY="MerlinContentLength";
+    private final static String CUSTOM_CHUNK_FLAG="chunkFlag";
+    private final Connection mConnection;
+    private long mContentLength;
+
+    public ChunkFileInputStream(Connection connection) {
+        super(null,null);
+        mConnection=connection;
+        Requested requested=null!=connection?connection.getRequested():null;
+        Answer answer=null!=requested?requested.getAnswer():null;
+        AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+        setInputStream(null!=answerBody?answerBody.getInputStream():null);
+        Headers headers=null!=answer?answer.getHeaders():null;
+        long contentLength=answerBody.getContentLength();
+        mContentLength=contentLength<0?headers.getLong(CUSTOM_CONTENT_LENGTH_KEY,-1):contentLength;
+        String flag= null!=headers?headers.get(CUSTOM_CHUNK_FLAG):null;
+        setChunkFlag(null!=flag?flag.getBytes():null);
+    }
+
+    public final long getContentLength() {
+        return mContentLength;
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        Utils.closeStream(mConnection);
+    }
+}

@@ -5,6 +5,7 @@ import android.view.View;
 
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
+import com.luckmerlin.browser.Utils;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
@@ -16,7 +17,11 @@ import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.http.Answer;
+import com.luckmerlin.http.AnswerBody;
+import com.luckmerlin.http.ChunkInputStream;
 import com.luckmerlin.http.Connection;
+import com.luckmerlin.http.Headers;
 import com.luckmerlin.http.OnHttpParse;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Http;
@@ -62,13 +67,6 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
-        String filePath=null!=file?file.getPath():null;
-        return mHttp.call(new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post(),
-                new FileChunkParser(Mode.MODE_DELETE,update));
-    }
-
-    @Override
     public Response<Folder> listFiles(File folder, long start, int size, Filter filter){
         String folderPath=null!=folder?folder.getPath():null;
         return mHttp.call(new Request().url("/file/browser").
@@ -88,16 +86,32 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<InputStream> openInputStream(long openLength, File file) {
-        Http http=mHttp;
-        if (null==http){
-            Debug.E("Fail open nas file input stream while none http.");
-            return new Response<>(Code.CODE_ERROR,"None http.",null);
+    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
+        String filePath=null!=file?file.getPath():null;
+        Request request=new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post();
+        Connection connection=mHttp.connect(request);
+        if (null==connection){
+            Debug.E("Fail delete file while connect http invalid.");
+            return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
         }
-        ChunkInputStreamParser parser=new ChunkInputStreamParser();
-        return http.call(new Request().header(Label.LABEL_FROM,openLength).
-                headerEncode(Label.LABEL_PATH,null!=file?file.getPath():null).
-                url("/file/inputStream").post(),parser);
+        ChunkFileInputStream inputStream=new ChunkFileInputStream(connection);
+        Response<File> response=inputStream.read(null!=update?new DoingFileUpdateParser(Mode.MODE_DELETE,update):null,
+                new ChunkResponseParser<File>((data)->File.fromJson(data)));
+        Utils.closeStream(connection);
+        return response;
+    }
+
+    @Override
+    public Response<InputStream> openInputStream(long openLength, File file) {
+        Request request=new Request().header(Label.LABEL_FROM,openLength).
+                headerEncode(Label.LABEL_PATH,null!=file?file.getPath():null).url("/file/inputStream").post();
+        Connection connection=mHttp.connect(request);
+        if (null==connection){
+            Debug.W("Fail open file input stream.");
+            return new Response<>(Code.CODE_FAIL, "Fail open file input stream.");
+        }
+        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed",
+                new CloudFileInputStream(openLength,connection));
     }
 
     @Override
@@ -127,6 +141,7 @@ public class NasClient extends AbstractClient{
         Requested requested=null!=connection?connection.getRequested():null;
         java.io.OutputStream outputStream=null!=requested?requested.getOutputStream():null;
         if (null==outputStream){
+            Utils.closeStream(connection);
             Debug.E("Fail open nas file output stream while open http output stream invalid.");
             return new Response<>(Code.CODE_ERROR,"Open http output stream invalid.",null);
         }
@@ -140,7 +155,7 @@ public class NasClient extends AbstractClient{
             @Override
             public void close() throws IOException {
                 Response<File> response=responseParser.onParse(mHttp,requested.getAnswer());
-                connection.close();
+                Utils.closeStream(connection);
                 Debug.D("SSSS "+response);
             }
         });
