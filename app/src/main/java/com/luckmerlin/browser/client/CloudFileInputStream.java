@@ -1,33 +1,32 @@
 package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.Utils;
-import com.luckmerlin.http.ChunkInputStream;
-import com.luckmerlin.http.Connection;
 import com.luckmerlin.stream.InputStream;
 import java.io.IOException;
 
 public class CloudFileInputStream extends InputStream {
-    private final ChunkFileInputStream mChunkInputStream;
+    private final AnswerChunkInputStreamReader mReader;
 
-    public CloudFileInputStream(long openLength,Connection connection) {
-        super(openLength, null);
-        mChunkInputStream=null!=connection?new ChunkFileInputStream(connection):null;
+    public CloudFileInputStream(AnswerChunkInputStreamReader reader) {
+        super(null==reader?-1:reader.getContentLength(), null);
+        mReader=reader;
     }
 
     @Override
     public long length() {
-        ChunkFileInputStream inputStream=mChunkInputStream;
-        return null!=inputStream?inputStream.getContentLength():0;
+        AnswerChunkInputStreamReader reader=mReader;
+        return null!=reader?reader.getContentLength():0;
     }
 
     @Override
     protected int onRead() throws IOException {
-        ChunkInputStream inputStream=mChunkInputStream;
-        return null!=inputStream?inputStream.read():-1;
+        AnswerChunkInputStreamReader reader=mReader;
+        return null!=reader?reader.read():-1;
     }
 
     @Override
     public void close() throws IOException {
-        Utils.closeStream(mChunkInputStream);
+        AnswerChunkInputStreamReader reader=mReader;
+        Utils.closeStream(null!=reader?reader.getConnection():null);
     }
 }

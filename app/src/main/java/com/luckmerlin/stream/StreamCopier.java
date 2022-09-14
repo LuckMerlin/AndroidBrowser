@@ -13,11 +13,10 @@ public class StreamCopier {
             return false;
         }
         buffer=null!=buffer&&buffer.length>0?buffer:new byte[1024];
-        int bufferLength=buffer.length;
         int read=-1;long total=inputStream.length();
         Debug.D("Copy stream from into output."+outputStream.getTotal()+"/"+total);
         long time=System.currentTimeMillis();long lastTime=time;long speed=0;
-        while ((read=inputStream.read(buffer,0,bufferLength))>=0){
+        while ((read=inputStream.read(buffer))>=0){
             if (read<=0){
                 continue;
             }

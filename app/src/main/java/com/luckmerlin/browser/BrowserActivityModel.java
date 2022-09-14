@@ -14,12 +14,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.client.ChunkFileInputStream;
-import com.luckmerlin.browser.client.ChunkResponseParser;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
@@ -31,7 +28,6 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
@@ -44,9 +40,7 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
-import com.luckmerlin.http.Connection;
-import com.luckmerlin.http.Http;
-import com.luckmerlin.http.Request;
+import com.luckmerlin.stream.ChunkInputStreamReader;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -60,8 +54,9 @@ import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 
-import org.json.JSONObject;
-
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
@@ -92,7 +87,42 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mBrowserAdapter.setOnPathSpanClick(this);
         mNotifyText.set("LMBrowser");
 //        mContentAdapter.set(mBrowserAdapter);
+        post(()->{
+            try {
+                String flag="li";
+                StringBuffer buffer=new StringBuffer();
+                buffer.append("\n");
+                for (int i = 0; i < 10; i++) {
+                    buffer.append("我爱小河马"+i);
+                    buffer.append(flag+"\n");
+                }
+                buffer.append("我草撒旦法法术法");
+                byte[] bytes=buffer.toString().getBytes();
+                int[] readIndex=new int[]{0};
+                InputStream inputStream=new InputStream() {
+                    @Override
+                    public int read() throws IOException {
+                        return readIndex[0]>=bytes.length?-1:bytes[readIndex[0]++];
+                    }
+                };
 
+//                byte[] test=new byte[bytes.length];
+//                inputStream.read(test);
+//                Debug.D("dddd="+new String(test));
+                    ChunkInputStreamReader chunkInputStream=new ChunkInputStreamReader(inputStream,flag.getBytes());
+                    ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+                    chunkInputStream.pipe(byteArrayOutputStream);
+//                    Debug.D("dddd开始");
+//                    int read=-1;
+//                    while ((read=chunkInputStream.read())!=-1){
+////                        Debug.D("写入 "+read);
+//                        byteArrayOutputStream.write(read);
+//                    }
+                    Debug.D("ddd结束"+new String(byteArrayOutputStream.toByteArray()));
+            }catch (Exception e){
+
+            }
+        },2000);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -235,40 +265,48 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if (null!=conveyorBinder){
            conveyorBinder.putListener(this,null,false);
            selectNextClient();
-           //
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-//                    Http http=new JavaHttp().setBaseUrl("http://192.168.0.10:5001");
-//                    Connection connection=http.connect(new Request().url("/file/test").post());
-//                    ChunkFileInputStream inputStream=new ChunkFileInputStream(connection);
-//                    ChunkResponseParser<File> chunkJsonParse=new ChunkResponseParser<File>((data)->
-//                            null!=data&&data instanceof JSONObject ?new File((JSONObject)data):null){
-//                        @Override
-//                        public Response<File> onParse(byte[] from) {
-//                            Debug.D("EEEEE "+super.onParse(from));
-//                            return null;
-//                        }
-//                    };
-//                    inputStream.read(chunkJsonParse,chunkJsonParse);
-//                    Utils.closeStream(connection);
-//                  File fromFile=new File().setHost("192.168.0.10:5001").setSep("/").
-//                            setParent("/Volumes/Work/Workspace/Browser").setName("app.py");
-//                    File toFile=LocalClient.createLocalFile(new java.io.File
-//                            ("/sdcard/Movies/lin.py"));
 
-//                    File toFile=new File().setHost("192.168.0.10:5001").setSep("/").
-//                            setParent("/Volumes/Work/Workspace/MerlinNodeServer/Common").setName("app.py1");
-//                    File fromFile=LocalClient.createLocalFile(new java.io.File
-//                            ("/sdcard/Movies/lin.py"));
+
+//            new ChunkInputStreamReader(inputStream,flag.getBytes());
+
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+////                    Http http=new JavaHttp().setBaseUrl("http://192.168.0.10:5001");
+////                    Connection connection=http.connect(new Request().url("/file/test").post());
+////                    ChunkFileInputStream inputStream=new ChunkFileInputStream(connection);
+////                    ChunkResponseParser<File> chunkJsonParse=new ChunkResponseParser<File>((data)->
+////                            null!=data&&data instanceof JSONObject ?new File((JSONObject)data):null){
+////                        @Override
+////                        public Response<File> onParse(byte[] from) {
+////                            Debug.D("EEEEE "+super.onParse(from));
+////                            return null;
+////                        }
+////                    };
+////                    inputStream.read(chunkJsonParse,chunkJsonParse);
+////                    Utils.closeStream(connection);
+////                  File fromFile=new File().setHost("192.168.0.10:5001").setSep("/").
+////                            setParent("/Volumes/Work/Workspace/Browser").setName("app.py");
+////                    File toFile=LocalClient.createLocalFile(new java.io.File
+////                            ("/sdcard/Movies/lin.py"));
+//
+////                    File toFile=new File().setHost("192.168.0.10:5001").setSep("/").
+////                            setParent("/Volumes/Work/Workspace/MerlinNodeServer/Common").setName("app.py1");
+////                    File fromFile=LocalClient.createLocalFile(new java.io.File
+////                            ("/sdcard/Movies/lin.py"));
+//
+//                    File fromFile=new File().setHost("192.168.0.10:5001").setSep("/").
+//                            setParent("/Volumes/Work/2019/WTWD").setName("SP_Flash_Tool_exe_Windows_v5.1752.00.000.rar");
+//                    File toFile=LocalClient.createLocalFile(new java.io.File
+//                            ("/sdcard/Movies/SP_Flash_Tool_exe_Windows_v5.1752.00.000.rar"));
 //                    new FileCopyTask(fromFile,toFile,null).execute(new Runtime(0,null) {
 //                        @Override
 //                        public Executor getExecutor() {
 //                            return conveyorBinder;
 //                        }
 //                    }, null);
-                }
-            }).start();
+//                }
+//            }).start();
         }
     }
 

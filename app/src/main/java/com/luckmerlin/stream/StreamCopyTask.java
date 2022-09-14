@@ -78,6 +78,7 @@ public class StreamCopyTask extends AbstractTask {
             return new Response(Code.CODE_SUCCEED,"Succeed.");
         } catch (Exception e) {
             Debug.E("Exception execute stream copy task.e="+e,e);
+            e.printStackTrace();
             return new Response(Code.CODE_ERROR,"Exception execute stream copy task.e="+e);
         }finally {
             Utils.closeStream(outputStream,inputStream);

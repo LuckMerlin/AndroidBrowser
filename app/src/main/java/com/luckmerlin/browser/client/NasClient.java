@@ -26,6 +26,8 @@ import com.luckmerlin.http.OnHttpParse;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Requested;
+import com.luckmerlin.object.Parser;
+import com.luckmerlin.stream.ChunkInputStreamReader;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 
@@ -94,11 +96,17 @@ public class NasClient extends AbstractClient{
             Debug.E("Fail delete file while connect http invalid.");
             return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
         }
-        ChunkFileInputStream inputStream=new ChunkFileInputStream(connection);
-        Response<File> response=inputStream.read(null!=update?new DoingFileUpdateParser(Mode.MODE_DELETE,update):null,
-                new ChunkResponseParser<File>((data)->File.fromJson(data)));
-        Utils.closeStream(connection);
-        return response;
+        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
+        try {
+            return reader.read(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
+                    (byte[] bytes)-> MResponse.parse(bytes,(data)->File.fromJson(data)), 1024);
+        } catch (IOException e) {
+            Debug.E("Exception delete file.e="+e,e);
+            e.printStackTrace();
+            return null;
+        }finally {
+            Utils.closeStream(connection);
+        }
     }
 
     @Override
@@ -110,8 +118,8 @@ public class NasClient extends AbstractClient{
             Debug.W("Fail open file input stream.");
             return new Response<>(Code.CODE_FAIL, "Fail open file input stream.");
         }
-        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed",
-                new CloudFileInputStream(openLength,connection));
+        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
+        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed",new CloudFileInputStream(reader));
     }
 
     @Override

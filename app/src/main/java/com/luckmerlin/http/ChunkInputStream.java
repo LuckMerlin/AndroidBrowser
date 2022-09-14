@@ -1,7 +1,6 @@
 package com.luckmerlin.http;
 
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.object.Converter;
 import com.luckmerlin.object.Parser;
 
 import java.io.ByteArrayOutputStream;
@@ -74,13 +73,16 @@ public class ChunkInputStream extends InputStream {
         }else if (mChunkReadCursor>=0&&null!=mChunk&&mChunkReadCursor<mChunk.length){
             return mChunk[mChunkReadCursor++];
         }
-        int read=0;mChunkReadCursor=-1;
+        int read=0;mChunkReadCursor=-1;mChunk=null;
         OnChunkCheck onChunkCheck=mOnChunkCheck;
-        while ((read=inputStream.read(mBuffer))>0){
-            chunkFinder.write(mBuffer,0,read);
-            if (null!=(mChunk=chunkFinder.checkChunk())&& (null==onChunkCheck||!onChunkCheck.onChunkChecked(mChunk))){
-                mChunkReadCursor=0;
-                break;
+        while ((read=inputStream.read(mBuffer))>=0){
+            if (read>0){
+                chunkFinder.write(mBuffer,0,read);
+                if (null!=(mChunk=chunkFinder.checkChunk())&&
+                        (null==onChunkCheck||!onChunkCheck.onChunkChecked(mChunk))){
+                    mChunkReadCursor=0;
+                    break;
+                }
             }
         }
         return (null==mChunk||mChunkReadCursor!=0)?-1:read();
@@ -126,9 +128,12 @@ public class ChunkInputStream extends InputStream {
             int index=index(mLastCheckedIndex,flag);
             if(index>0){
                 int end=index-flag.length;
-                byte[] chunk=end>0? Arrays.copyOfRange(buf,0,end+1):null;
-                System.arraycopy(buf,end,buf,0,count-=index+1);
-                mLastCheckedIndex=0;
+                byte[] chunk=null;
+                if (end>0){
+                    chunk=Arrays.copyOfRange(buf,0,end+1);
+                    System.arraycopy(buf,end,buf,0,count-=index+1);
+                    mLastCheckedIndex=0;
+                }
                 return chunk;
             }else{
                 mLastCheckedIndex=-index;
