@@ -22,6 +22,7 @@ public class StreamCopier {
             }
             outputStream.write(buffer,0,read);
             time=System.currentTimeMillis();
+//            Debug.D("Copy stream."+read+" "+buffer.length+" "+(time-lastTime));
             speed=lastTime>time?read/time-lastTime:speed;
             lastTime=time;
             if (null==progressChange||progressChange.onProgressChange(outputStream.getTotal(),total,speed)){

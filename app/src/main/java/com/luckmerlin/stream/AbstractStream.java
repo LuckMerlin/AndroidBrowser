@@ -5,11 +5,9 @@ import java.io.Closeable;
 public abstract class AbstractStream implements Closeable,Stream{
     private String mTitle;
     private long mOpenLength=0;
-    protected final Convertor mConvertor;
 
-    public AbstractStream(long openLength,Convertor convertor){
+    public AbstractStream(long openLength){
         mOpenLength=openLength;
-        mConvertor=convertor;
     }
 
     public abstract long getReadOrWriteLength();

@@ -1,38 +1,27 @@
 package com.luckmerlin.stream;
 
-import com.luckmerlin.browser.client.ChunkFileInputStream;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.object.Parser;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-public class ChunkInputStreamReader {
-    private InputStream mInputStream;
+public class ChunkInputStreamReader extends InputStreamReader{
     private byte[] mChunkFlag;
     private int mMatchedCursor=-1;
     private volatile int mFirstNotMatched=-1;
     private volatile int mReadCursor=-1;
     private boolean mChunked=false;
 
-    public ChunkInputStreamReader(){
-        this(null,null);
-    }
-
-    public ChunkInputStreamReader(InputStream inputStream, byte[] chunkFlag){
-        setInputStream(inputStream);
+    public ChunkInputStreamReader(InputStream inputStream, long contentLength,byte[] chunkFlag){
+        super(inputStream,contentLength);
         mChunked=false;
         mMatchedCursor=mFirstNotMatched=mReadCursor=-1;
         setChunkFlag(chunkFlag);
     }
 
-    public final ChunkInputStreamReader setInputStream(InputStream inputStream){
-        mInputStream=inputStream;
-        return this;
-    }
-
-    public final ChunkInputStreamReader setChunkFlag(byte[] chunkFlag){
+    public final InputStreamReader setChunkFlag(byte[] chunkFlag){
         mChunkFlag=null!=chunkFlag&&chunkFlag.length>1?chunkFlag:null;
         return this;
     }
@@ -41,78 +30,24 @@ public class ChunkInputStreamReader {
         return mChunked;
     }
 
-    public final <R> R read(OnChangeUpdate<byte[]> chunkUpdate, Parser<byte[],R> parser2, int size) throws IOException {
+    public final int read() throws IOException {
+        return onRead();
+    }
+
+    public final <R> R readAllChunk(OnChangeUpdate<byte[]> chunkUpdate, Parser<byte[],R> parser2, int size) throws IOException {
         final ByteArrayOutputStream outputStream=new ByteArrayOutputStream(size<=0?1024:size);
-        int read;
+        int read;byte[] chunk=null;
         while ((read=read())!=-1){
             outputStream.write(read);
             if (mChunked){
-                if (null!=chunkUpdate&&chunkUpdate.onChangeUpdated(outputStream.toByteArray())){
-                    continue;
-                }
+                chunk=outputStream.toByteArray();
                 outputStream.reset();
+                if (null!=chunkUpdate&&!chunkUpdate.onChangeUpdated(chunk)){
+                    break;
+                }
             }
         }
         return null!=parser2?parser2.onParse(outputStream.toByteArray()):null;
-    }
-
-    private boolean write(OutputStream outputStream,byte[] bytes){
-        if (null==outputStream||null==bytes){
-            return false;
-        }
-        try {
-            if (null!=bytes&&bytes.length>0){
-                outputStream.write(bytes);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public final boolean pipe(OutputStream outputStream) throws IOException {
-        if (null==outputStream){
-            return false;
-        }
-        read((byte bytes[])->write(outputStream,bytes),(byte[] bytes)->write(outputStream,bytes),1024);
-        return true;
-    }
-
-    public int read(byte buffer[]) throws IOException {
-        return read(buffer, 0, null!=buffer?buffer.length:0);
-    }
-
-    public final int read(byte[] buffer,int offset,int size) throws IOException {
-        if (buffer == null) {
-            throw new NullPointerException();
-        } else if (offset < 0 || size < 0 || size > buffer.length - offset) {
-            throw new IndexOutOfBoundsException();
-        } else if (size == 0) {
-            return 0;
-        }
-
-        int c = read();
-        if (c == -1) {
-            return -1;
-        }
-        buffer[offset] = (byte)c;
-
-        int i = 1;
-        try {
-            for (; i < size ; i++) {
-                c = read();
-                if (c == -1) {
-                    break;
-                }
-                buffer[offset + i] = (byte)c;
-            }
-        } catch (IOException ee) {
-        }
-        return i;
-    }
-
-    public final int read() throws IOException {
-        return onRead();
     }
 
     protected int onRead() throws IOException {

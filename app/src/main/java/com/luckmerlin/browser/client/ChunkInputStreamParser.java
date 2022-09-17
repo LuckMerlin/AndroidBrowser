@@ -11,7 +11,7 @@
 //import com.luckmerlin.stream.InputStream;
 //import java.io.IOException;
 //
-//public class ChunkInputStreamReader extends AbstractChunkParser<Response<InputStream>> {
+//public class InputStreamReader extends AbstractChunkParser<Response<InputStream>> {
 //    private static final String CUSTOM_RANGE_START_KEY="MerlinRangeStart";
 //    private static final String CUSTOM_CONTENT_LENGTH_KEY="MerlinContentLength";
 //

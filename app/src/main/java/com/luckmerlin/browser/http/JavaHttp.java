@@ -10,6 +10,7 @@ import com.luckmerlin.http.Http;
 import com.luckmerlin.http.OnOutputStreamOpen;
 import com.luckmerlin.http.Answer;
 
+import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 
 public class JavaHttp extends Http {
+
+    public Connection test(String method, String url, Request request){
+        return onConnect(method,url,request);
+    }
 
     @Override
     protected Connection onConnect(String method, String url, Request request) {
@@ -49,11 +54,23 @@ public class JavaHttp extends Http {
                 }
             }
             connection.setRequestProperty("Charset","UTF-8");
-            connection.setRequestProperty("Accept-Encoding","deflate");
+//            connection.setRequestProperty("Accept-Encoding","deflate");
             final long requestAtMillis=System.currentTimeMillis();
             connection.setRequestMethod(method.toUpperCase());
             connection.setDoInput(true);
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(10000);
             connection.setDoOutput(true);
+            //
+//            connection.setRequestProperty("Accept-Language", "zh-CN");
+//            connection.setRequestProperty("Charset", "UTF-8");
+//            //设置浏览器类型和版本、操作系统，使用语言等信息
+//            connection.setRequestProperty("User-Agent","Mozilla/5.0 ( compatible ) ");
+//            connection.setRequestProperty("Accept","*/*");
+            connection.setUseCaches(false);
+            //设置为长连接
+//            connection.setRequestProperty("Connection", "Keep-Alive");
+//            connection.usingProxy()
             connection.connect();
             Debug.D("[Java http] Connect with "+method+" "+url);
             final Answer[] answers=new Answer[1];
@@ -105,9 +122,22 @@ public class JavaHttp extends Http {
                                                 }
                                             }
                                             responseHeaders.add(childKey,buffer.toString());
+                                            Debug.D("WWWWW "+childKey+" "+buffer.toString());
                                         }
                                     }
                                 }
+                                //
+//                                if (null!=url&&url.contains("file/inputStream")){
+//                                    InputStream inputStream=connection.getInputStream();
+//                                    inputStream=new BufferedInputStream(inputStream,1024*1024);
+//                                    int read=0;byte[] buffer=new byte[1024*1024];
+//                                    long time=System.currentTimeMillis();
+//                                    while ((read=inputStream.read(buffer))>=0){
+//                                        Debug.D("EEEEE "+read+" "+(System.currentTimeMillis()-time));
+//                                        time=System.currentTimeMillis();
+//                                    }
+//                                }
+                                //
                                 return answers[0]=new Answer() {
                                     @Override
                                     public boolean isRedirect() {

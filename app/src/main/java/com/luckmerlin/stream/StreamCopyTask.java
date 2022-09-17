@@ -58,7 +58,7 @@ public class StreamCopyTask extends AbstractTask {
             Debug.D("Opened copy task input stream.inputTotal="+inputTotal);
             Debug.D("Coping stream task.openLength="+openLength+" inputTotal="+inputTotal);
             byte[] buffer=mBuffer;
-            buffer=null!=buffer&&buffer.length>0?buffer:new byte[1024];
+            buffer=null!=buffer&&buffer.length>0?buffer:new byte[Math.min(1024*1024,inputTotal<=0?1024:(int)inputTotal)];
             if (!new StreamCopier().copy(inputStream, outputStream,buffer, (long current, long total, long speed) ->{
                         int value=progress.intValue();
                         progress.setSpeed(""+speed).setPosition(current).setTotal(total).setTitle(inputTitle);

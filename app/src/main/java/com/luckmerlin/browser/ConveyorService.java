@@ -34,8 +34,8 @@ public class ConveyorService extends Service {
         List<Client> clients=new ArrayList<>();
         clients.add(new NasClient("http://192.168.0.10:5001","NAS"));
         clients.add(new LocalClient());
-        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
-        BrowserTaskExecutor executor=new BrowserTaskExecutor(taskSaver,clients);
+//        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
+        BrowserTaskExecutor executor=new BrowserTaskExecutor(null,clients);
         mExecutorBinder=new ExecutorBinder(executor);
     }
 

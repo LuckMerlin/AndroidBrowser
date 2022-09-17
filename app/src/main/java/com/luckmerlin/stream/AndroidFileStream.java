@@ -42,15 +42,15 @@ public class AndroidFileStream extends AbstractStreamSource {
         if ((skip=(skip>=0?skip:0))>0){
             fileInputStream.skip(skip);
         }
-        InputStream inputStream= new InputStream(skip,convertor) {
+        InputStream inputStream= new InputStream(skip) {
             @Override
             public long length() {
                 return file.length();
             }
 
             @Override
-            protected int onRead() throws IOException {
-                return fileInputStream.read();
+            public int onRead(byte[] b, int off, int len) throws IOException {
+                return fileInputStream.read(b,off,len);
             }
 
             @Override
@@ -98,10 +98,10 @@ public class AndroidFileStream extends AbstractStreamSource {
         }
         Debug.W("Opening file output stream."+file.length()+" "+file);
         final FileOutputStream fileOutputStream=new FileOutputStream(file,true);
-        OutputStream outputStream= new OutputStream(file.length(),convertor) {
+        OutputStream outputStream= new OutputStream(file.length()) {
             @Override
-            protected void onWrite(int b) throws IOException {
-                fileOutputStream.write(b);
+            protected void onWrite(byte[] b, int off, int len) throws IOException {
+                fileOutputStream.write(b,off,len);
             }
 
             @Override

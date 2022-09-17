@@ -1,27 +1,37 @@
 package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.Utils;
+import com.luckmerlin.core.OnChangeUpdate;
+import com.luckmerlin.object.Parser;
+import com.luckmerlin.stream.Convertor;
 import com.luckmerlin.stream.InputStream;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-public class CloudFileInputStream extends InputStream {
+public class CloudFileInputStream<T> extends InputStream {
     private final AnswerChunkInputStreamReader mReader;
+    private long mContentLength=-1;
 
     public CloudFileInputStream(AnswerChunkInputStreamReader reader) {
-        super(null==reader?-1:reader.getContentLength(), null);
+        super(null==reader?-1:reader.getContentLength());
+        mContentLength=-1;
         mReader=reader;
     }
 
     @Override
     public long length() {
+        if (mContentLength>=0){
+            return mContentLength;
+        }
         AnswerChunkInputStreamReader reader=mReader;
-        return null!=reader?reader.getContentLength():0;
+        return mContentLength=null!=reader?reader.getContentLength():0;
     }
 
     @Override
-    protected int onRead() throws IOException {
+    public int onRead(byte[] b, int off, int len) throws IOException {
         AnswerChunkInputStreamReader reader=mReader;
-        return null!=reader?reader.read():-1;
+        return null!=reader?reader.read(b,off,len):-1;
     }
 
     @Override

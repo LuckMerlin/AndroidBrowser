@@ -36,7 +36,6 @@ import java.util.List;
 public final class FileCopyTask extends FileTask implements Parcelable {
     private final File mFromFile;
     private final File mToFile;
-    private byte[] mBuffer;
 
     public FileCopyTask(File fromFile, Folder toFolder, Progress progress) {
         this(fromFile,null!=toFolder&&null!=fromFile?toFolder.childFile(fromFile.getName()):null,progress);
@@ -173,9 +172,7 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                     };
                 }
             }
-            byte[] buffer=mBuffer;
-            buffer=null!=buffer?buffer:(mBuffer=new byte[1024]);
-            return new StreamCopyTask(inputStream,outputStream,buffer,null).setName(fromFile.getName()).
+            return new StreamCopyTask(inputStream,outputStream,null,null).setName(fromFile.getName()).
                     execute(runtime,null!=onFileProgress?(Task task, Progress progress1)-> {
                         if (null!=progress1){
                             progress.setPosition(progress1.getPosition()).setTotal(progress1.getTotal());

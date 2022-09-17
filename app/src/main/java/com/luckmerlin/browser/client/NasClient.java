@@ -19,20 +19,19 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.AnswerBody;
-import com.luckmerlin.http.ChunkInputStream;
 import com.luckmerlin.http.Connection;
 import com.luckmerlin.http.Headers;
 import com.luckmerlin.http.OnHttpParse;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Requested;
-import com.luckmerlin.object.Parser;
-import com.luckmerlin.stream.ChunkInputStreamReader;
 import com.luckmerlin.stream.InputStream;
+import com.luckmerlin.stream.InputStreamReader;
 import com.luckmerlin.stream.OutputStream;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class NasClient extends AbstractClient{
@@ -98,7 +97,7 @@ public class NasClient extends AbstractClient{
         }
         AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
         try {
-            return reader.read(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
+            return reader.readAllChunk(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
                     (byte[] bytes)-> MResponse.parse(bytes,(data)->File.fromJson(data)), 1024);
         } catch (IOException e) {
             Debug.E("Exception delete file.e="+e,e);
@@ -118,8 +117,38 @@ public class NasClient extends AbstractClient{
             Debug.W("Fail open file input stream.");
             return new Response<>(Code.CODE_FAIL, "Fail open file input stream.");
         }
-        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
-        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed",new CloudFileInputStream(reader));
+        Requested requested=null!=connection?connection.getRequested():null;
+        Answer answer=null!=requested?requested.getAnswer():null;
+        AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
+        Headers headers=null!=answer?answer.getHeaders():null;
+        long contentLength=answerBody.getContentLength();
+        final long finalContentLength=contentLength<0?headers.getLong("MerlinContentLength",-1):contentLength;
+        ByteArrayOutputStream arrayOutputStream=new ByteArrayOutputStream();
+        if (null==inputStream){
+            Debug.W("Fail open file input stream while input stream null.");
+            return new Response<>(Code.CODE_FAIL, "Input stream null.");
+        }
+        InputStreamReader inputStreamReader=new InputStreamReader(inputStream,finalContentLength).
+                setOnEndBytesRead((byte[] buffer, int offset, int size)->
+                        arrayOutputStream.write(buffer,offset,size));
+        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed", new InputStream(openLength) {
+            @Override
+            public long length() {
+                return finalContentLength;
+            }
+
+            @Override
+            public int onRead(byte[] b, int off, int len) throws IOException {
+                return inputStreamReader.read(b,off,len);
+            }
+
+            @Override
+            public void close() throws IOException {
+                connection.close();
+                Debug.D("结束 "+new String(arrayOutputStream.toByteArray()));
+            }
+        });
     }
 
     @Override
@@ -154,10 +183,10 @@ public class NasClient extends AbstractClient{
             return new Response<>(Code.CODE_ERROR,"Open http output stream invalid.",null);
         }
         final OnHttpParse<Response<File>> responseParser=new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null);
-        return new Response(Code.CODE_SUCCEED, "", new OutputStream(length,null) {
+        return new Response(Code.CODE_SUCCEED, "", new OutputStream(length) {
             @Override
-            protected void onWrite(int b) throws IOException {
-                outputStream.write(b);
+            protected void onWrite(byte[] b, int off, int len) throws IOException {
+                outputStream.write(b,off,len);
             }
 
             @Override

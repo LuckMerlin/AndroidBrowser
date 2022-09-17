@@ -79,10 +79,10 @@ public abstract class URLConnectionStream extends NetStream{
             connection.connect();
             final java.io.OutputStream outputStream=connection.getDoOutput()?connection.getOutputStream():null;
             if (null!=outputStream){
-                mOutputStream=new OutputStream(mOutputOpenLength,mConvertor) {
+                mOutputStream=new OutputStream(mOutputOpenLength) {
                     @Override
-                    protected void onWrite(int b) throws IOException {
-                        outputStream.write(b);
+                    protected void onWrite(byte[] b, int off, int len) throws IOException {
+                        outputStream.write(b,off,len);
                     }
 
                     @Override
@@ -93,7 +93,7 @@ public abstract class URLConnectionStream extends NetStream{
             }
             final java.io.InputStream inputStream=connection.getDoInput()?connection.getInputStream():null;
             if (null!=inputStream){
-                mInputStream=new InputStream(0,mConvertor) {
+                mInputStream=new InputStream(0) {
                     @Override
                     public long length() {
                         Long inputLength=mInputLength;
@@ -102,8 +102,8 @@ public abstract class URLConnectionStream extends NetStream{
                     }
 
                     @Override
-                    protected int onRead() throws IOException {
-                        return inputStream.read();
+                    public int onRead(byte[] b, int off, int len) throws IOException {
+                        return inputStream.read(b,off,len);
                     }
 
                     @Override

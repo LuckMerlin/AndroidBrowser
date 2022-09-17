@@ -28,6 +28,8 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.http.JavaHttp;
+import com.luckmerlin.browser.http.OKHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
@@ -40,7 +42,9 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
-import com.luckmerlin.stream.ChunkInputStreamReader;
+import com.luckmerlin.http.Connection;
+import com.luckmerlin.http.Request;
+import com.luckmerlin.http.Requested;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -54,7 +58,6 @@ import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnBackPress;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -109,16 +112,16 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //                byte[] test=new byte[bytes.length];
 //                inputStream.read(test);
 //                Debug.D("dddd="+new String(test));
-                    ChunkInputStreamReader chunkInputStream=new ChunkInputStreamReader(inputStream,flag.getBytes());
-                    ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
-                    chunkInputStream.pipe(byteArrayOutputStream);
+//                    InputStreamReader chunkInputStream=new InputStreamReader(inputStream,flag.getBytes());
+//                    ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+//                    chunkInputStream.pipe(byteArrayOutputStream);
 //                    Debug.D("dddd开始");
 //                    int read=-1;
 //                    while ((read=chunkInputStream.read())!=-1){
 ////                        Debug.D("写入 "+read);
 //                        byteArrayOutputStream.write(read);
 //                    }
-                    Debug.D("ddd结束"+new String(byteArrayOutputStream.toByteArray()));
+//                    Debug.D("ddd结束"+new String(byteArrayOutputStream.toByteArray()));
             }catch (Exception e){
 
             }
@@ -129,6 +132,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //                new JavaHttp().setBaseUrl("http://192.168.0.10:5001").
 //                        call(new Request<>().url("/file/test").
 //                                setOnResponse(new ChunkParser()).post());
+//                String url="http://mirror.nju.edu.cn/centos-altarch/7.9.2009/isos/aarch64/CentOS-7-aarch64-Minimal-2009.iso";
+//                url="https://mirrors.neusoft.edu.cn/eclipse/oomph/epp/2022-09/R/eclipse-inst-jre-mac64.dmg";
+                String url="http://192.168.0.10:5001/file/inputStream";
+//                String url="http://192.168.0.10:5000";
+//                Connection connection=new JavaHttp().test("POST",url,new Request().headerEncode("path",
+//                        "/Volumes/Work/1983.搭错车.480P.国语中字.mp4/1983.搭错车.480P.国语中字.mp4").
+//                        header("Content-Type","binary/octet-stream").header("from","0"));
+//                connection.getRequested().getAnswer().getAnswerBody().getInputStream();
             }
         }).start();
 //        mBrowserClient.set(new NasClient(getHttp()));
@@ -267,7 +278,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
            selectNextClient();
 
 
-//            new ChunkInputStreamReader(inputStream,flag.getBytes());
+//            new InputStreamReader(inputStream,flag.getBytes());
 
 //            new Thread(new Runnable() {
 //                @Override

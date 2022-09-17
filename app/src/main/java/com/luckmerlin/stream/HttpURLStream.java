@@ -33,15 +33,15 @@ public class HttpURLStream extends NetStream{
             return null;
         }
         final java.io.InputStream finalHttpInputStream=httpInputStream;
-        return mInputStream=new InputStream(0,convertor) {
+        return mInputStream=new InputStream(0) {
             @Override
             public long length() {
                 return mContentLength;
             }
 
             @Override
-            protected int onRead() throws IOException {
-                return finalHttpInputStream.read();
+            public int onRead(byte[] b, int off, int len) throws IOException {
+                return finalHttpInputStream.read(b,off,len);
             }
 
             @Override

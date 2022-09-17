@@ -184,15 +184,15 @@ public class LocalClient extends AbstractClient {
         OutputStream outputStream =null;
         try{
             FileOutputStream fileOutputStream = new FileOutputStream(androidFile, true);
-            outputStream = new OutputStream(androidFile.length(), null) {
+            outputStream = new OutputStream(androidFile.length()) {
                 @Override
                 public void close() throws IOException {
                     fileOutputStream.close();
                 }
 
                 @Override
-                protected void onWrite(int b) throws IOException {
-                    fileOutputStream.write(b);
+                protected void onWrite(byte[] b, int off, int len) throws IOException {
+                    fileOutputStream.write(b,off,len);
                 }
             };
             outputStream.setTitle(androidFile.getName());
@@ -226,7 +226,7 @@ public class LocalClient extends AbstractClient {
                 Debug.D("Open file input stream with skip."+openLength);
                 fileInputStream.skip(openLength);
             }
-            inputStream=new InputStream(openLength,null){
+            inputStream=new InputStream(openLength){
                 @Override
                 public void close() throws IOException {
                     fileInputStream.close();
@@ -238,8 +238,8 @@ public class LocalClient extends AbstractClient {
                 }
 
                 @Override
-                protected int onRead() throws IOException {
-                    return fileInputStream.read();
+                public int onRead(byte[] b, int off, int len) throws IOException {
+                    return fileInputStream.read(b,off,len);
                 }
             };
             inputStream.setTitle(androidFile.getName());
