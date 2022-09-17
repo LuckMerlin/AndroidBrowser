@@ -151,8 +151,8 @@ public class NasClient extends AbstractClient{
         AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
         java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
         Headers headers=null!=answer?answer.getHeaders():null;
-        long contentLength=answerBody.getContentLength();
-        final long finalContentLength=contentLength<0?headers.getLong("MerlinContentLength",-1):contentLength;
+//        long contentLength=answerBody.getContentLength();
+        final long finalContentLength=headers.getLong("MerlinTotalLength",-1);
         ByteArrayOutputStream arrayOutputStream=new ByteArrayOutputStream();
         if (null==inputStream){
             Debug.W("Fail open file input stream while input stream null.");

@@ -67,4 +67,15 @@ public class FileDeleteTask extends FileTask {
         }
         return response;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }else if (!(o instanceof FileDeleteTask)){
+            return false;
+        }
+        File file=mFile;
+        return ((null==file&&null==mFile)||(null!=file&&null!=mFile&&file.equals(mFile)));
+    }
 }

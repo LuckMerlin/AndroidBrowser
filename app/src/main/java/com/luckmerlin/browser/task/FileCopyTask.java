@@ -158,8 +158,9 @@ public final class FileCopyTask extends FileTask implements Parcelable {
                 return new Response(childInputResponse.getCode(Code.CODE_FAIL),childInputResponse.getMessage());
             }
             if (outputOpenLength>0){
-                if (inputStream.getTotal()==outputOpenLength){
-                    Debug.W("Not need execute file copy task while already done.");
+                if (inputStream.getTotalLength()==outputOpenLength){
+                    Debug.W("Not need execute file copy task while already done."+outputOpenLength);
+                    progress.setPosition(outputOpenLength).setTotal(outputOpenLength);
                     return new Response(Code.CODE_ALREADY,"Already done.");
                 }else if (isConfirmEnabled()){//Need confirm
                     return new ConfirmResult() {
@@ -231,5 +232,20 @@ public final class FileCopyTask extends FileTask implements Parcelable {
             return new FileCopyTask[size];
         }
     };
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }else if (!(o instanceof FileCopyTask)){
+            return false;
+        }
+        File fromFile=mFromFile;
+        File toFile=mToFile;
+        return ((null==fromFile&&null==mFromFile)||(
+                null!=fromFile&&null!=mFromFile&&fromFile.equals(mFromFile)))&&
+                (null==toFile&&null==mToFile)||(
+                null!=toFile&&null!=mToFile&&toFile.equals(mToFile));
+    }
 
 }

@@ -32,11 +32,15 @@ public class ConveyorService extends Service {
         super.onCreate();
         Debug.D("EEEE onCreate "+this);
         List<Client> clients=new ArrayList<>();
-        clients.add(new NasClient("http://192.168.0.10:5001","NAS"));
+        clients.add(new NasClient("http://192.168.0.10:6666","DEV"));
+//        clients.add(new NasClient("http://192.168.0.2:6666","NAS"));
         clients.add(new LocalClient());
-//        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
-        BrowserTaskExecutor executor=new BrowserTaskExecutor(null,clients);
+        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
+//        taskSaver=null;/
+        BrowserTaskExecutor executor=new BrowserTaskExecutor(taskSaver,clients);
         mExecutorBinder=new ExecutorBinder(executor);
+//        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
+        //git remote set-url origin https://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@github.com/LuckMerlin/TsServer.git
     }
 
     @Override

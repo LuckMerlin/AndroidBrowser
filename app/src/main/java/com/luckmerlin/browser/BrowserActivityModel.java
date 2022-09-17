@@ -427,6 +427,8 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             case R.drawable.selector_choose_all:
                 Mode mode=mBrowserMode.get();
                 return null!=mode&&mode.enableAll(!mode.isAllEnabled())&&mBrowserAdapter.setMode(mode);
+            case R.string.share:
+                return null!=obj&&obj instanceof File&&shareFile((File)obj);
             case R.string.exit:
                 return finishActivity()||true;
             case R.string.copy:
@@ -516,6 +518,17 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
         return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
                 showTaskDialog(deleteTask, new TaskDialogContent().setTitle(getString(R.string.delete)));
+    }
+
+    private boolean shareFile(File file){
+        if (null==file){
+            return false;
+        }
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, "This is my text to send.");
+        shareIntent.setType("text/plain");
+        return startActivity(shareIntent);
     }
 
     private boolean openFile(File openFile){

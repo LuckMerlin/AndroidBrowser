@@ -91,4 +91,19 @@ public class FileMoveTask extends FileTask{
         Debug.D("To delete files after copied files while move task."+fromFile.getName());
         return new FileDeleteTask(fromFile,null).execute(runtime,progressChange);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o){
+            return true;
+        }else if (!(o instanceof FileCopyTask)){
+            return false;
+        }
+        File fromFile=mFromFile;
+        File toFile=mToFile;
+        return ((null==fromFile&&null==mFromFile)||(
+                null!=fromFile&&null!=mFromFile&&fromFile.equals(mFromFile)))&&
+                (null==toFile&&null==mToFile)||(
+                null!=toFile&&null!=mToFile&&toFile.equals(mToFile));
+    }
 }

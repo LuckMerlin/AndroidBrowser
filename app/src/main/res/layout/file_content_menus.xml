@@ -4,6 +4,7 @@
     <data>
         <variable name="content" type="com.luckmerlin.browser.dialog.FileContextDialogContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="android.view.View"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
     <LinearLayout android:orientation="vertical" android:background="@drawable/round_corner_gray"
@@ -26,6 +27,7 @@
                 <TextView  binding:bind="@{VB.clickId(content.file.localFile?R.string.upload:R.string.download,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.setAsHome,content.file)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.multiChoose,content.file)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.share,content.file)}" android:visibility="@{content.file.directory?View.GONE:View.VISIBLE}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.attr,content.file)}" style="@style/contextMenuTextView" />
             </LinearLayout>
         </ScrollView>
