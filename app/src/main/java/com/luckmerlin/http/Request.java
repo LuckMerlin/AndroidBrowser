@@ -59,15 +59,19 @@ public class Request{
     }
 
     public final Request headerEncode(String key, String value, String encode){
+        return header(key,encode(value,encode));
+    }
+
+    public static String encode(String value,String encode){
         if (null!=value&&value.length()>0){
             try {
-                value=URLEncoder.encode(value,null!=encode&&encode.length()>0?encode:"UTF-8");
+                return URLEncoder.encode(value,null!=encode&&encode.length()>0?encode:"UTF-8");
             } catch (UnsupportedEncodingException e) {
-                Debug.E("Fail header with value encode.e="+e);
+                Debug.E("Fail encode with value encode.e="+e);
                 e.printStackTrace();
             }
         }
-        return header(key,value);
+        return value;
     }
 
     public final Request header(String key, Object value){

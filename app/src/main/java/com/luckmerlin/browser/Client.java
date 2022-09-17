@@ -1,5 +1,6 @@
 package com.luckmerlin.browser;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
@@ -38,4 +39,5 @@ public interface Client {
     Drawable loadThumb(View root, File file, Canceled canceled);
     Response<InputStream> openInputStream(long openLength, File file);
     Response<OutputStream> openOutputStream(File file);
+    boolean openFile(File file, Context context);
 }

@@ -1,6 +1,9 @@
 package com.luckmerlin.browser.client;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.View;
 
 import com.luckmerlin.browser.Code;
@@ -57,6 +60,32 @@ public class NasClient extends AbstractClient{
     @Override
     public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
         return null;
+    }
+
+    @Override
+    public boolean openFile(File openFile, Context context) {
+        String filePath=null!=openFile?openFile.getPath():null;
+        String host=null!=openFile?openFile.getHost():null;
+        if (null==filePath||filePath.length()<=0||null==host||host.length()<=0){
+            return false;
+        }else if (openFile.isLocalFile()){
+            return false;
+        }else if (openFile.isType(File.Type.VIDEO)||openFile.isType(File.Type.AUDIO)||
+                openFile.isType(File.Type.IMAGE)){
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            Uri uri = Uri.parse(host+"/file/play?path="+Request.encode(filePath,null));
+            intent.setDataAndType(uri, openFile.getMime());
+            try {
+                context.startActivity(intent);
+                return true;
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return false;
+        }
+        return false;
     }
 
     @Override

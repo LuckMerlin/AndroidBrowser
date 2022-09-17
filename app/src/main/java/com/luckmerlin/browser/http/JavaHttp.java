@@ -58,6 +58,8 @@ public class JavaHttp extends Http {
             final long requestAtMillis=System.currentTimeMillis();
             connection.setRequestMethod(method.toUpperCase());
             connection.setDoInput(true);
+//            connection.setRequestProperty("Encoding","");
+            connection.setChunkedStreamingMode(1024*8);
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(10000);
             connection.setDoOutput(true);
@@ -122,22 +124,9 @@ public class JavaHttp extends Http {
                                                 }
                                             }
                                             responseHeaders.add(childKey,buffer.toString());
-                                            Debug.D("WWWWW "+childKey+" "+buffer.toString());
                                         }
                                     }
                                 }
-                                //
-//                                if (null!=url&&url.contains("file/inputStream")){
-//                                    InputStream inputStream=connection.getInputStream();
-//                                    inputStream=new BufferedInputStream(inputStream,1024*1024);
-//                                    int read=0;byte[] buffer=new byte[1024*1024];
-//                                    long time=System.currentTimeMillis();
-//                                    while ((read=inputStream.read(buffer))>=0){
-//                                        Debug.D("EEEEE "+read+" "+(System.currentTimeMillis()-time));
-//                                        time=System.currentTimeMillis();
-//                                    }
-//                                }
-                                //
                                 return answers[0]=new Answer() {
                                     @Override
                                     public boolean isRedirect() {

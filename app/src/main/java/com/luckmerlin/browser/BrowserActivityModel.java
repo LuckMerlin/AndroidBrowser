@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.text.Spannable;
@@ -466,7 +467,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             if (file.isDirectory()){
                 return browserPath(file);
             }
-            return toast("点击文件 "+file.getName());
+            return openFile(file);
         }
         return false;
     }
@@ -515,6 +516,14 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
         return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
                 showTaskDialog(deleteTask, new TaskDialogContent().setTitle(getString(R.string.delete)));
+    }
+
+    private boolean openFile(File openFile){
+        Client client=mBrowserAdapter.getClient();
+        if (!(null!=client&&client.openFile((File)openFile,getContext()))){
+            return toast(getString(R.string.whichFailed,getString(R.string.open)));
+        }
+        return false;
     }
 
     private boolean showTaskDialog(Task task,TaskDialogContent dialogContent){

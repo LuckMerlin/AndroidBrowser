@@ -204,7 +204,7 @@ public class File extends JsonObject {
     }
 
     public interface Type{
-        public final static String VIDEO="image/";
+        public final static String VIDEO="video/";
         public final static String IMAGE="image/";
         public final static String AUDIO="audio/";
         public final static String APK="application/vnd.android";

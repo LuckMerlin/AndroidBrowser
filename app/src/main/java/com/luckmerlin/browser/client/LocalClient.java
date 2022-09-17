@@ -1,15 +1,18 @@
 package com.luckmerlin.browser.client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
 import com.luckmerlin.browser.Code;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -249,6 +252,28 @@ public class LocalClient extends AbstractClient {
             e.printStackTrace();
             return new Response<InputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
         }
+    }
+
+    @Override
+    public boolean openFile(File openFile, Context context) {
+        String filePath=null!=openFile?openFile.getPath():null;
+        if (null==filePath||filePath.length()<=0){
+            return false;
+        }else if (!openFile.isLocalFile()){
+            return false;
+        }
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Uri uri = Uri.fromFile(new java.io.File(filePath));
+        intent.setDataAndType(uri, openFile.getMime());
+        try {
+            context.startActivity(intent);
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override

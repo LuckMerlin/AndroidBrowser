@@ -1,5 +1,6 @@
 package com.luckmerlin.browser.client;
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
@@ -29,6 +30,11 @@ public class BaiduCloudClient extends AbstractClient{
     @Override
     public String getHost() {
         return "baidu";
+    }
+
+    @Override
+    public boolean openFile(File file, Context context) {
+        return false;
     }
 
     @Override
