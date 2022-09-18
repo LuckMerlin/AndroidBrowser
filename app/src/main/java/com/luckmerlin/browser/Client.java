@@ -37,7 +37,8 @@ public interface Client {
     Response<File> deleteFile(File file, OnFileDoingUpdate update);
     Response<Folder> listFiles(File folder,long start,int size,Filter filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
-    Response<InputStream> openInputStream(long openLength, File file);
+    Response<InputStream> openInputStream(long skip,File file);
     Response<OutputStream> openOutputStream(File file);
     boolean openFile(File file, Context context);
+    Response<File> loadFile(String file);
 }

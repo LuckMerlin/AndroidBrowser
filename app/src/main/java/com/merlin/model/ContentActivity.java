@@ -2,6 +2,7 @@ package com.merlin.model;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -46,6 +47,24 @@ public abstract class ContentActivity extends Activity implements ContentResolve
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(Color.parseColor("#55000000"));
             window.setNavigationBarColor(Color.parseColor("#55000000"));
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Content model=mModel;
+        if (null!=model&&model instanceof OnActivityStart){
+            ((OnActivityStart)model).onActivityStart(this);
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Content model=mModel;
+        if (null!=model&&model instanceof OnActivityNewIntent){
+            ((OnActivityNewIntent)model).onNewIntent(this,intent);
         }
     }
 

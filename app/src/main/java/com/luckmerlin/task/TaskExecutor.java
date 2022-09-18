@@ -1,5 +1,6 @@
 package com.luckmerlin.task;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcel;
@@ -10,6 +11,7 @@ import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +27,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     private final List<ExecuteTask> mQueue=new CopyOnWriteArrayList<>();
     private ExecutorService mExecutor;
     private boolean mFullExecuting=false;
+    private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
     private final TaskSaver mTaskSaver;
 
-    public TaskExecutor(){
-        this(null);
-    }
-
-    public TaskExecutor(TaskSaver taskSaver){
+    public TaskExecutor(Context context,TaskSaver taskSaver){
         mTaskSaver=taskSaver;
+        mContextReference=null!=context?new WeakReference<>(context):null;
         final int maxPoolSize=4;
         ThreadPoolExecutor poolExecutor=new ThreadPoolExecutor(0, maxPoolSize,
                 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), (Runnable r) -> {
@@ -72,6 +72,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 }
             },Option.NONE);
         }
+    }
+
+    public final Context getContext(){
+        WeakReference<Context> reference=mContextReference;
+        return null!=reference?reference.get():null;
     }
 
     @Override
@@ -169,7 +174,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         match((ExecuteTask data)-> null!=data&&data.isTask(task)&&null!=(existTask[0]=data));
         ExecuteTask executeTask=existTask[0];
         if (null==executeTask){
-            executeTask=new ExecuteTask(this,task, option,mHandler, fromSaved,callback) {
+            executeTask=new ExecuteTask(this,task,getContext(), option,mHandler, fromSaved,callback) {
                 @Override
                 public void run() {
                     setStatus(STATUS_EXECUTING);
@@ -190,12 +195,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     }
                     setStatus(STATUS_FINISH);
                     mFullExecuting=false;
+                    boolean deleteSucceed=false;
                     if (task instanceof OnExecuteFinish&&((OnExecuteFinish)task).onExecuteFinish(TaskExecutor.this)){
-                        //Do nothing
+                        deleteSucceed=true;
                     }
                     notifyStatusChange(STATUS_FINISH,task,mListeners);
+                    deleteSucceed=deleteSucceed||isDeleteSucceedEnabled();
                     Progress progress=null;
-                    if (isDeleteSucceedEnabled()&&null!=(progress=task.getProgress())&&progress.isSucceed()){
+                    if (deleteSucceed&&null!=(progress=task.getProgress())&&progress.isSucceed()){
                         deleteSaveTask(this);
                     }else if (needSave&&!isDeleteEnabled()){
                         saveTask(task,option);
@@ -312,9 +319,9 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         protected final OnProgressChange mCallback;
         protected final Executor mExecutor;
 
-        protected ExecuteTask(Executor executor,Task task,int option,Handler handler,
-                              boolean fromSaved,OnProgressChange callback){
-            super(option,handler);
+        protected ExecuteTask(Executor executor, Task task, Context context,int option, Handler handler,
+                              boolean fromSaved, OnProgressChange callback){
+            super(option,handler,context);
             mExecutor=executor;
             mTask=task;
             mFromSaved=fromSaved;

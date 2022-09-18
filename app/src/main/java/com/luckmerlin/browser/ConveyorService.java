@@ -37,7 +37,7 @@ public class ConveyorService extends Service {
 //        clients.add(new NasClient("http://192.168.0.2:6666","NAS"));
         ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
 //        taskSaver=null;/
-        BrowserTaskExecutor executor=new BrowserTaskExecutor(taskSaver,clients);
+        BrowserTaskExecutor executor=new BrowserTaskExecutor(getApplication(),taskSaver,clients);
         mExecutorBinder=new ExecutorBinder(executor);
 //        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
         //git remote set-url origin https://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@github.com/LuckMerlin/TsServer.git
@@ -136,8 +136,8 @@ public class ConveyorService extends Service {
     private static class BrowserTaskExecutor extends TaskExecutor implements BrowserExecutor{
         private List<Client> mClients;
 
-        public BrowserTaskExecutor(TaskSaver taskSaver,List<Client> clients){
-            super(taskSaver);
+        public BrowserTaskExecutor(Context context,TaskSaver taskSaver,List<Client> clients){
+            super(context,taskSaver);
             mClients=clients;
         }
 

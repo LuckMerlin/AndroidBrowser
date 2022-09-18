@@ -296,6 +296,11 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
        }
     }
 
+    public Folder getFolder() {
+        ObservableField<Folder> folderField=mCurrentFolder;
+        return null!=folderField?folderField.get():null;
+    }
+
     public ObservableField<Boolean> getPageLoading() {
         return mPageLoading;
     }

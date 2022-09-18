@@ -110,8 +110,9 @@ public class NasClient extends AbstractClient{
         return null;
     }
 
-    public Response<File> getFileDetail(File file,boolean detail){
-        return mHttp.call(new Request().headerEncode(Label.LABEL_PATH, null!=file?file.getPath():null).url("/file/detail").post().post(),
+    @Override
+    public Response<File> loadFile(String file) {
+        return mHttp.call(new Request().headerEncode(Label.LABEL_PATH, file).url("/file/detail").post().post(),
                 new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null));
     }
 
@@ -138,9 +139,10 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<InputStream> openInputStream(long openLength, File file) {
-        Request request=new Request().header(Label.LABEL_FROM,openLength).
-                headerEncode(Label.LABEL_PATH,null!=file?file.getPath():null).url("/file/inputStream").post();
+    public Response<InputStream> openInputStream(long skip, File file) {
+        String filePath=null!=file?file.getPath():null;
+        Request request=new Request().header(Label.LABEL_FROM,skip).
+                headerEncode(Label.LABEL_PATH,filePath).url("/file/inputStream").post();
         Connection connection=mHttp.connect(request);
         if (null==connection){
             Debug.W("Fail open file input stream.");
@@ -149,70 +151,48 @@ public class NasClient extends AbstractClient{
         Requested requested=null!=connection?connection.getRequested():null;
         Answer answer=null!=requested?requested.getAnswer():null;
         AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
-        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
         Headers headers=null!=answer?answer.getHeaders():null;
-//        long contentLength=answerBody.getContentLength();
-        final long finalContentLength=headers.getLong("MerlinTotalLength",-1);
-        ByteArrayOutputStream arrayOutputStream=new ByteArrayOutputStream();
-        if (null==inputStream){
-            Debug.W("Fail open file input stream while input stream null.");
-            return new Response<>(Code.CODE_FAIL, "Input stream null.");
-        }
-        InputStreamReader inputStreamReader=new InputStreamReader(inputStream,finalContentLength).
-                setOnEndBytesRead((byte[] buffer, int offset, int size)->
-                        arrayOutputStream.write(buffer,offset,size));
-        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed", new InputStream(openLength) {
+        final long finalTotalLength=headers.getLong("MerlinTotalLength",-1);
+        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
+        return new Response<>(Code.CODE_SUCCEED, "Succeed.", new InputStream(0) {
             @Override
             public long length() {
-                return finalContentLength;
+                return finalTotalLength;
             }
 
             @Override
             public int onRead(byte[] b, int off, int len) throws IOException {
-                return inputStreamReader.read(b,off,len);
+                return inputStream.read(b,off,len);
             }
 
             @Override
             public void close() throws IOException {
                 connection.close();
-                Debug.D("结束 "+new String(arrayOutputStream.toByteArray()));
             }
         });
     }
 
     @Override
     public Response<OutputStream> openOutputStream(File file) {
-        if (null==file){
-            Debug.E("Fail open nas file output stream while file invalid.");
-            return new Response<>(Code.CODE_ERROR,"File invalid.",null);
-        }
-        Http http=mHttp;
-        if (null==http){
-            Debug.E("Fail open nas file output stream while none http.");
-            return new Response<>(Code.CODE_ERROR,"None http.",null);
-        }
-        Response<File> response=getFileDetail(file,false);
+        String filePath=null!=file?file.getPath():null;
+        Response<File> response=loadFile(filePath);
         response=null!=response?response:new Response<>(Code.CODE_FAIL,"Unknown error.");
+        File currentFile=response.getData();
+        final long currentLength=null!=currentFile?currentFile.getLength():-1;
         if (null==response||!response.isAnyCode(Code.CODE_SUCCEED,Code.CODE_NOT_EXIST)){
             Debug.E("Fail open nas file output stream while fetch file error.");
             return new Response<>(response.getCode(Code.CODE_FAIL),response.getMessage(),null);
         }
-        File currentFile=null!=response?response.getData():null;
-        long length=null!=currentFile?currentFile.getLength():0;
-        Debug.D("Open nas file output stream. from="+length+" "+file.getPath());
-        String filePath=null!=file?file.getPath():null;
-        final Request request=new Request().headerEncode(Label.LABEL_PATH, filePath).
-                header(Label.LABEL_SIZE,length).url("/file/outputStream").post();
+        final Request request=new Request().headerEncode(Label.LABEL_PATH, filePath).url("/file/outputStream").post();
         Connection connection=mHttp.connect(request);
         Requested requested=null!=connection?connection.getRequested():null;
         java.io.OutputStream outputStream=null!=requested?requested.getOutputStream():null;
         if (null==outputStream){
-            Utils.closeStream(connection);
-            Debug.E("Fail open nas file output stream while open http output stream invalid.");
-            return new Response<>(Code.CODE_ERROR,"Open http output stream invalid.",null);
+            Debug.W("Fail open file output stream.");
+            com.luckmerlin.utils.Utils.closeStream(connection);
+            return new Response<>(Code.CODE_FAIL, "Fail open file output stream.");
         }
-        final OnHttpParse<Response<File>> responseParser=new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null);
-        return new Response(Code.CODE_SUCCEED, "", new OutputStream(length) {
+        return new Response<>(Code.CODE_SUCCEED, "Succeed", new OutputStream(currentLength) {
             @Override
             protected void onWrite(byte[] b, int off, int len) throws IOException {
                 outputStream.write(b,off,len);
@@ -220,11 +200,100 @@ public class NasClient extends AbstractClient{
 
             @Override
             public void close() throws IOException {
-                Response<File> response=responseParser.onParse(mHttp,requested.getAnswer());
-                Utils.closeStream(connection);
-                Debug.D("SSSS "+response);
+                connection.close();
             }
         });
     }
+
+    //    @Override
+//    public Response<InputStream> openInputStream(File file) {
+//        Request request=new Request().header(Label.LABEL_FROM,openLength).
+//                headerEncode(Label.LABEL_PATH,null!=file?file.getPath():null).url("/file/inputStream").post();
+//        Connection connection=mHttp.connect(request);
+//        if (null==connection){
+//            Debug.W("Fail open file input stream.");
+//            return new Response<>(Code.CODE_FAIL, "Fail open file input stream.");
+//        }
+//        Requested requested=null!=connection?connection.getRequested():null;
+//        Answer answer=null!=requested?requested.getAnswer():null;
+//        AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+//        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
+//        Headers headers=null!=answer?answer.getHeaders():null;
+////        long contentLength=answerBody.getContentLength();
+//        final long finalContentLength=headers.getLong("MerlinTotalLength",-1);
+//        ByteArrayOutputStream arrayOutputStream=new ByteArrayOutputStream();
+//        if (null==inputStream){
+//            Debug.W("Fail open file input stream while input stream null.");
+//            return new Response<>(Code.CODE_FAIL, "Input stream null.");
+//        }
+//        InputStreamReader inputStreamReader=new InputStreamReader(inputStream,finalContentLength).
+//                setOnEndBytesRead((byte[] buffer, int offset, int size)->
+//                        arrayOutputStream.write(buffer,offset,size));
+//        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed", new InputStream(openLength) {
+//            @Override
+//            public long length() {
+//                return finalContentLength;
+//            }
+//
+//            @Override
+//            public int onRead(byte[] b, int off, int len) throws IOException {
+//                return inputStreamReader.read(b,off,len);
+//            }
+//
+//            @Override
+//            public void close() throws IOException {
+//                connection.close();
+//                Debug.D("结束 "+new String(arrayOutputStream.toByteArray()));
+//            }
+//        });
+//        return null;
+//    }
+//
+//    @Override
+//    public Response<OutputStream> openOutputStream(File file) {
+//        if (null==file){
+//            Debug.E("Fail open nas file output stream while file invalid.");
+//            return new Response<>(Code.CODE_ERROR,"File invalid.",null);
+//        }
+//        Http http=mHttp;
+//        if (null==http){
+//            Debug.E("Fail open nas file output stream while none http.");
+//            return new Response<>(Code.CODE_ERROR,"None http.",null);
+//        }
+//        Response<File> response=getFileDetail(file,false);
+//        response=null!=response?response:new Response<>(Code.CODE_FAIL,"Unknown error.");
+//        if (null==response||!response.isAnyCode(Code.CODE_SUCCEED,Code.CODE_NOT_EXIST)){
+//            Debug.E("Fail open nas file output stream while fetch file error.");
+//            return new Response<>(response.getCode(Code.CODE_FAIL),response.getMessage(),null);
+//        }
+//        File currentFile=null!=response?response.getData():null;
+//        long length=null!=currentFile?currentFile.getLength():0;
+//        Debug.D("Open nas file output stream. from="+length+" "+file.getPath());
+//        String filePath=null!=file?file.getPath():null;
+//        final Request request=new Request().headerEncode(Label.LABEL_PATH, filePath).
+//                header(Label.LABEL_SIZE,length).url("/file/outputStream").post();
+//        Connection connection=mHttp.connect(request);
+//        Requested requested=null!=connection?connection.getRequested():null;
+//        java.io.OutputStream outputStream=null!=requested?requested.getOutputStream():null;
+//        if (null==outputStream){
+//            Utils.closeStream(connection);
+//            Debug.E("Fail open nas file output stream while open http output stream invalid.");
+//            return new Response<>(Code.CODE_ERROR,"Open http output stream invalid.",null);
+//        }
+//        final OnHttpParse<Response<File>> responseParser=new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null);
+//        return new Response(Code.CODE_SUCCEED, "", new OutputStream(length) {
+//            @Override
+//            protected void onWrite(byte[] b, int off, int len) throws IOException {
+//                outputStream.write(b,off,len);
+//            }
+//
+//            @Override
+//            public void close() throws IOException {
+//                Response<File> response=responseParser.onParse(mHttp,requested.getAnswer());
+//                Utils.closeStream(connection);
+//                Debug.D("SSSS "+response);
+//            }
+//        });
+//    }
 
 }

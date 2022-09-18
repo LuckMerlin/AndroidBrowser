@@ -38,6 +38,11 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
+    public Response<File> loadFile(String file) {
+        return null;
+    }
+
+    @Override
     public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
         return null;
     }
@@ -58,12 +63,12 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Response<OutputStream> openOutputStream(File file) {
+    public Response<InputStream> openInputStream(long skip, File file) {
         return null;
     }
 
     @Override
-    public Response<InputStream> openInputStream(long openLength, File file) {
+    public Response<OutputStream> openOutputStream(File file) {
         return null;
     }
 

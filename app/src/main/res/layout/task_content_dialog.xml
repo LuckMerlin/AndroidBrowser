@@ -15,7 +15,7 @@
         android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
         <TextView android:text="@{null!=content.confirm?content.confirm.title:content.title??``}" android:textColor="@color/textTitle"
-            android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
+            android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="20dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <TextView android:text="@{null!=content.confirm?content.confirm.message:content.message??``}" android:textColor="@color/textNormal"
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
         <LinearLayout android:orientation="horizontal" android:layout_gravity="center" android:gravity="center"
-            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp">
             <TextView binding:bind="@{null!=content.confirm?VB.clickId(R.string.confirm):null}" style="@style/button"
                 android:visibility="@{null==content.confirm?View.GONE:View.VISIBLE}"
                 android:textSize="15sp" android:layout_margin="5dp" android:padding="8dp"/>

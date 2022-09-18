@@ -73,7 +73,7 @@
                     <LinearLayout android:visibility="@{vm.browserMode.isMode(Mode.MODE_COPY,Mode.MODE_UPLOAD,Mode.MODE_MOVE,Mode.MODE_DOWNLOAD)?View.VISIBLE:View.GONE}"
                         android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
                         android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <TextView binding:bind="@{VB.clickId(vm.browserMode.mode)}" style="@style/browserBottomTextView"/>
+                        <TextView binding:bind="@{VB.clickId(R.string.sure)}" style="@style/browserBottomTextView"/>
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>

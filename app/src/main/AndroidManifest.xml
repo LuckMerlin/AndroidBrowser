@@ -21,6 +21,16 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter android:label="@string/upload">
+                <action android:name="android.intent.action.SEND"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <data android:mimeType="*/*"></data>
+            </intent-filter>
+            <intent-filter android:label="@string/upload">
+                <action android:name="android.intent.action.SEND_MULTIPLE"></action>
+                <category android:name="android.intent.category.DEFAULT"></category>
+                <data android:mimeType="*/*"></data>
+            </intent-filter>
         </activity>
 
         <activity android:name=".ConveyorActivity"

@@ -161,23 +161,23 @@ public class LocalClient extends AbstractClient {
 
     @Override
     public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
-        if (null==file||!file.isLocalFile()){
+        if (null == file || !file.isLocalFile()) {
             Debug.D("Fail delete local client file while file arg invalid.");
-            return new Response<File>().set(Code.CODE_ARGS_INVALID,"File invalid.",file);
+            return new Response<File>().set(Code.CODE_ARGS_INVALID, "File invalid.", file);
         }
-        String path=file.getPath();
-        if (null==path||path.length()<=0){
+        String path = file.getPath();
+        if (null == path || path.length() <= 0) {
             Debug.D("Fail delete local client file while file path invalid.");
-            return new Response<File>().set(Code.CODE_ARGS_INVALID,"File path invalid.",file);
+            return new Response<File>().set(Code.CODE_ARGS_INVALID, "File path invalid.", file);
         }
-        return deleteAndroidFile(new java.io.File(path),update);
+        return deleteAndroidFile(new java.io.File(path), update);
     }
 
     @Override
     public Response<OutputStream> openOutputStream(File file) {
         String path=null;
         if (null==file||!file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
-            Debug.W("Fail open file output stream while file invalid.file="+file);
+            Debug.W("Fail open file output stream while file invalid.");
             return new Response(Code.CODE_ARGS_INVALID, "File invalid");
         }
         java.io.File androidFile = new java.io.File(path);
@@ -209,7 +209,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Response<InputStream> openInputStream(long openLength, File file) {
+    public Response<InputStream> openInputStream(long skip, File file) {
         String path=null;
         if (null==file||!file.isLocalFile()||null==(path=file.getPath())||path.length()<=0){
             Debug.W("Fail open file input stream while file invalid.");
@@ -220,40 +220,84 @@ public class LocalClient extends AbstractClient {
             Debug.W("Fail open file input stream while file is android directory.");
             return new Response(Code.CODE_ARGS_INVALID, "File is android directory");
         }
-        InputStream inputStream=null;
+        final long inputLength=androidFile.length();
+        if (inputLength<0){
+            Debug.W("Fail open file input stream while file open length invalid.");
+            return new Response(Code.CODE_ARGS_INVALID,"File open length invalid");
+        }
+        FileInputStream fileInputStream= null;
         try {
-            final FileInputStream fileInputStream = new FileInputStream(androidFile);
-            if (openLength<0){
-                Debug.W("Fail open file input stream while file open length invalid.");
-                return new Response(Code.CODE_ARGS_INVALID,"File open length invalid");
-            }else if (openLength>0){
-                Debug.D("Open file input stream with skip."+openLength);
-                fileInputStream.skip(openLength);
+            final FileInputStream finalFileInputStream=fileInputStream = new FileInputStream(androidFile);
+            if (skip>0){
+                Debug.D("Open file input stream with skip."+skip);
+                finalFileInputStream.skip(skip);
             }
-            inputStream=new InputStream(openLength){
-                @Override
-                public void close() throws IOException {
-                    fileInputStream.close();
-                }
-
+            return new Response<>(Code.CODE_SUCCEED, "Succeed.", new InputStream(skip) {
                 @Override
                 public long length() {
-                    return androidFile.length();
+                    return inputLength;
                 }
 
                 @Override
                 public int onRead(byte[] b, int off, int len) throws IOException {
-                    return fileInputStream.read(b,off,len);
+                    return finalFileInputStream.read(b,off,len);
                 }
-            };
-            inputStream.setTitle(androidFile.getName());
-            return new Response<InputStream>().set(Code.CODE_SUCCEED,"Succeed.",inputStream);
+
+                @Override
+                public void close() throws IOException {
+                    finalFileInputStream.close();
+                }
+            });
         } catch (Exception e) {
-            Utils.closeStream(inputStream);
+            Debug.W("Exception open file input stream.e="+e);
+            Utils.closeStream(fileInputStream);
             e.printStackTrace();
-            return new Response<InputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
+            return new Response(Code.CODE_FAIL,"Exception open file input stream.e="+e);
         }
     }
+
+    @Override
+    public Response<File> loadFile(String file) {
+        if (null==file||file.length()<=0){
+            return new Response<>(Code.CODE_FAIL,"File path invalid.");
+        }
+        return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(new java.io.File(file)));
+    }
+
+    //        InputStream inputStream=null;
+//        try {
+//            final FileInputStream fileInputStream = new FileInputStream(androidFile);
+//            if (openLength<0){
+//                Debug.W("Fail open file input stream while file open length invalid.");
+//                return new Response(Code.CODE_ARGS_INVALID,"File open length invalid");
+//            }else if (openLength>0){
+//                Debug.D("Open file input stream with skip."+openLength);
+//                fileInputStream.skip(openLength);
+//            }
+//            inputStream=new InputStream(openLength){
+//                @Override
+//                public void close() throws IOException {
+//                    fileInputStream.close();
+//                }
+//
+//                @Override
+//                public long length() {
+//                    return androidFile.length();
+//                }
+//
+//                @Override
+//                public int onRead(byte[] b, int off, int len) throws IOException {
+//                    return fileInputStream.read(b,off,len);
+//                }
+//            };
+//            inputStream.setTitle(androidFile.getName());
+//            return new Response<InputStream>().set(Code.CODE_SUCCEED,"Succeed.",inputStream);
+//        } catch (Exception e) {
+//            Utils.closeStream(inputStream);
+//            e.printStackTrace();
+//            return new Response<InputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
+//        }
+//    }
 
     @Override
     public boolean openFile(File openFile, Context context) {

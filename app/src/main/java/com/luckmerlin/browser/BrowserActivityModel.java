@@ -5,9 +5,9 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.method.LinkMovementMethod;
@@ -29,12 +29,12 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.http.JavaHttp;
-import com.luckmerlin.browser.http.OKHttp;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
+import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.core.MatchedCollector;
+import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
@@ -43,29 +43,27 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
-import com.luckmerlin.http.Connection;
 import com.luckmerlin.http.Request;
-import com.luckmerlin.http.Requested;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
 import com.merlin.adapter.ListAdapter;
 import com.merlin.model.OnActivityCreate;
+import com.merlin.model.OnActivityNewIntent;
+import com.merlin.model.OnActivityStart;
 import com.merlin.model.OnBackPress;
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.ArrayList;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
         OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
-        OnViewDetachedFromWindow, Executor.OnStatusChangeListener {
+        OnViewDetachedFromWindow, Executor.OnStatusChangeListener, OnActivityStart, OnActivityNewIntent {
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
     private final ObservableField<AlertText> mAlertText=new ObservableField<>();
@@ -141,6 +139,27 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //                        "/Volumes/Work/1983.搭错车.480P.国语中字.mp4/1983.搭错车.480P.国语中字.mp4").
 //                        header("Content-Type","binary/octet-stream").header("from","0"));
 //                connection.getRequested().getAnswer().getAnswerBody().getInputStream();
+
+                Request request=new Request().headerEncode(Label.LABEL_PATH,"/Volumes/Work/1983.搭错车.480P.国语中字.mp4/1983.搭错车.480P.国语中字.mp4").
+                        url("/file/inputStream").post();
+//                Connection connection=new JavaHttp().setBaseUrl("http://192.168.0.10:6666").connect(request);
+//                if (null==connection){
+//                    Debug.W("Fail open file input stream.");
+//                    return;
+//                }
+//                Requested requested=null!=connection?connection.getRequested():null;
+//                Answer answer=null!=requested?requested.getAnswer():null;
+//                AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
+//                Headers headers=null!=answer?answer.getHeaders():null;
+//                final long finalContentLength=headers.getLong("MerlinTotalLength",-1);
+//                java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
+//                try {
+//                    Debug.W("skip&&&&&&&&.");
+//                    inputStream.skip(100000);
+//                } catch (IOException e) {
+//                    Debug.W("DDDDDDDDD."+e);
+//                    e.printStackTrace();
+//                }
             }
         }).start();
 //        mBrowserClient.set(new NasClient(getHttp()));
@@ -217,35 +236,52 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
     }
 
-    public boolean entryMode(Integer modeInt,Object obj,ModeFileTaskCreator creator){
+    public boolean entryMode(Integer modeInt, OnConfirm<Object,Boolean> onConfirm, Object... args){
         Mode current=mBrowserMode.get();
         if(null==current&&null==modeInt){
+            Debug.D("Not need entry mode while not changed.");
             return true;
         }else if (null!=current&&null!=modeInt&&current.isMode(modeInt)){
-            if (null==creator){
-                return true;
-            }
-            List args=current.getArgs();
-            if (null==args||args.size()<=0){
-                return true;
-            }
-            Client client=mBrowserAdapter.getClient();
-            Folder currentFolder=getCurrentFolder();
-            TaskGroup group=new TaskGroup();int size=0;
-            if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&& null!=group.
-                    add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&&(size=group.getSize())>0){
-                Task task=size==1?group.find(null):group;
-                startTask(task, Executor.Option.NONE,null);
-                showTaskDialog(task,null);
-            }
-            entryMode(null,null,null);//Entry normal mode again
+            current.setOnConfirm(onConfirm);
+            Debug.D("Not need entry mode while not changed."+current);
             return true;
         }
-        Mode mode=null!=modeInt?new Mode(modeInt).add(obj):null;
+        Mode mode=null!=modeInt?new Mode(modeInt).setOnConfirm(onConfirm):null;
         mBrowserMode.set(mode);
         mBrowserAdapter.setMode(mode);
         return true;
     }
+
+//    @Deprecated
+//    public boolean entryMode(Integer modeInt,Object obj,ModeFileTaskCreator creator){
+//        Mode current=mBrowserMode.get();
+//        if(null==current&&null==modeInt){
+//            return true;
+//        }else if (null!=current&&null!=modeInt&&current.isMode(modeInt)){
+//            if (null==creator){
+//                return true;
+//            }
+//            List args=current.getArgs();
+//            if (null==args||args.size()<=0){
+//                return true;
+//            }
+//            Client client=mBrowserAdapter.getClient();
+//            Folder currentFolder=getCurrentFolder();
+//            TaskGroup group=new TaskGroup();int size=0;
+//            if (current.checkArgs((checkObj)->null!=checkObj&&checkObj instanceof File&& null!=group.
+//                    add(creator.onCreateTask(current,client,(File)checkObj,currentFolder)))&&(size=group.getSize())>0){
+//                Task task=size==1?group.find(null):group;
+//                startTask(task, Executor.Option.NONE,null);
+//                showTaskDialog(task,null);
+//            }
+//            entryMode(null,null,null);//Entry normal mode again
+//            return true;
+//        }
+//        Mode mode=null!=modeInt?new Mode(modeInt).add(obj):null;
+//        mBrowserMode.set(mode);
+//        mBrowserAdapter.setMode(mode);
+//        return true;
+//    }
 
     private boolean startTask(Task task,int option,OnProgressChange change){
         Executor executor=mExecutor;
@@ -311,7 +347,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //                            setParent("/Volumes/Work/2019/WTWD").setName("SP_Flash_Tool_exe_Windows_v5.1752.00.000.rar");
 //                    File toFile=LocalClient.createLocalFile(new java.io.File
 //                            ("/sdcard/Movies/SP_Flash_Tool_exe_Windows_v5.1752.00.000.rar"));
-//                    new FileCopyTask(fromFile,toFile,null).execute(new Runtime(0,null) {
+//                    new FileCopyTask1(fromFile,toFile,null).execute(new Runtime(0,null) {
 //                        @Override
 //                        public Executor getExecutor() {
 //                            return conveyorBinder;
@@ -403,13 +439,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return true;
             case R.drawable.selector_cancel:
             case R.string.cancel:
-                return entryMode(null,null,null)||true;
+                return entryMode(null,null)||true;
             case R.string.delete:
                 return deleteFile(obj,true)||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.multiChoose:
-                return entryMode(Mode.MODE_MULTI_CHOOSE,obj,null);
+                return entryMode(Mode.MODE_MULTI_CHOOSE,null,obj);
             case R.string.setAsHome:
                 return setCurrentAsHome()||true;
             case R.layout.item_client_name:
@@ -431,37 +467,37 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
             case R.string.exit:
                 return finishActivity()||true;
-            case R.string.copy:
-                return entryMode(Mode.MODE_COPY, obj, (Mode copyMode,Client client,File file,Folder folder)-> {
-                    if (null==copyMode||null==folder||folder.isChild(file,false)){
+            case R.string.sure:
+                return makeModeSure(null)||true;
+            case Mode.MODE_COPY:
+            case Mode.MODE_UPLOAD:
+            case Mode.MODE_DOWNLOAD:
+                if (null==obj||!(obj instanceof File)){
+                    return toast(getString(R.string.fail));
+                }
+                return entryMode(Mode.MODE_COPY, (Object obj1)-> {
+                    Folder folder=mBrowserAdapter.getFolder();
+                    if (null==folder||folder.isChild(obj,false)){
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileCopyTask(file,folder,null).enableDeleteSucceed(true).setName(getString(R.string.copy));
+                    return launchTask(new FileCopyTask((File)obj,folder,null).
+                            enableDeleteSucceed(true).setName(getString(R.string.copy)),
+                            Executor.Option.NONE,true);
                 });
             case R.string.move:
-                return entryMode(Mode.MODE_MOVE, obj, (Mode moveMode,Client client,File file, Folder folder)-> {
-                    if (null==moveMode||null==folder||folder.isChild(file,false)){
+                if (null==obj||!(obj instanceof File)){
+                    return toast(getString(R.string.fail));
+                }
+                return entryMode(Mode.MODE_MOVE,(Object obj1)-> {
+                    Folder folder=mBrowserAdapter.getFolder();
+                    if (null==folder||folder.isChild(obj,false)){
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return new FileMoveTask(file,folder,null).enableDeleteSucceed(true).setName(getString(R.string.move));
-                });
-            case R.string.download:
-                return entryMode(Mode.MODE_DOWNLOAD, obj, (Mode downloadMode,Client client,File file, Folder folder)-> {
-                    if (null==downloadMode||null==folder||folder.isChild(file,false)){
-                        toast(R.string.canNotOperateHere,-1);
-                        return null;
-                    }
-                    return new FileCopyTask(file,folder,null).setName(getString(R.string.download));
-                });
-            case R.string.upload:
-                return entryMode(Mode.MODE_UPLOAD, obj, (Mode uploadMode,Client client,File file, Folder folder)-> {
-                    if (null==uploadMode||null==folder||folder.isChild(file,false)){
-                        toast(R.string.canNotOperateHere,-1);
-                        return null;
-                    }
-                    return new FileCopyTask(file,folder,null).setName(getString(R.string.upload));
+                    return launchTask(new FileMoveTask((File)obj ,folder,null).
+                            enableDeleteSucceed(true).setName(getString(R.string.move)),
+                            Executor.Option.NONE,true);
                 });
         }
         if (null!=obj&&obj instanceof File){
@@ -472,6 +508,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return openFile(file);
         }
         return false;
+    }
+
+    private boolean makeModeSure(Object arg){
+        Mode mode=mBrowserMode.get();
+        OnConfirm<Object,Boolean> onConfirm=null!=mode?mode.getOnConfirm():null;
+        Boolean confirmed=null!=onConfirm?onConfirm.onConfirm(arg):null;
+        return null!=confirmed&&confirmed&&entryMode(null,null);
     }
 
     private boolean selectClients(View view,Client client){
@@ -550,10 +593,54 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
         return null!=showContentDialog(content, new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
     }
 
-    private boolean showFileContextMenu(View view,File file){
+    private boolean launchTask(Task task,int option,boolean showDialog){
+        return null!=task&&startTask(task,option,null)&&showDialog&&showTaskDialog(task,null);
+    }
+
+    @Override
+    public void onNewIntent(Activity activity, Intent intent) {
+        handleIntentFileUpload(intent);
+    }
+
+    @Override
+    public void onActivityStart(Activity activity) {
+        handleIntentFileUpload(null!=activity?activity.getIntent():null);
+    }
+
+    private boolean handleIntentFileUpload(Intent intent){
+        String action=null!=intent?intent.getAction():null;
+        if (null!=action&&action.equals(Intent.ACTION_SEND)){
+            Parcelable parcelable=intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            intent.removeExtra(Intent.EXTRA_STREAM);
+            return null!=parcelable&&entryMode(Mode.MODE_UPLOAD, (Object data) ->{
+                Folder folder=mBrowserAdapter.getFolder();
+                if (null==folder||folder.isLocalFile()){
+                    toast(getString(R.string.canNotOperateHere));
+                }
+                UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
+                uploadTask.setName(getString(R.string.upload));
+                return launchTask(uploadTask,Executor.Option.NONE,true);
+            });
+        }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
+            ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            intent.removeExtra(Intent.EXTRA_STREAM);
+            return entryMode(Mode.MODE_UPLOAD, (Object data)-> {
+                Folder folder=mBrowserAdapter.getFolder();
+                if (null==folder||folder.isLocalFile()){
+                    toast(getString(R.string.canNotOperateHere));
+                }
+                UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
+                uploadTask.setName(getString(R.string.upload));
+                return launchTask(uploadTask,Executor.Option.NONE,true);
+            });
+        }
+        return false;
+    }
+
+    private boolean showFileContextMenu(View view, File file){
         if (null==view||null==file){
             return false;
         }

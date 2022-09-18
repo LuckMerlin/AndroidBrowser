@@ -120,7 +120,8 @@ public class File extends JsonObject {
     }
 
     public File childFile(String childName){
-        return null!=childName&&childName.length()>0?new File(this).setParent(getPath()).setName(childName):null;
+        return null!=childName&&childName.length()>0?
+                new File(this).setParent(getPath()).setName(childName):null;
     }
 
     public File setMime(String mime){

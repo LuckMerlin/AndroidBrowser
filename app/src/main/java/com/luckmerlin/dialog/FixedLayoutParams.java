@@ -82,13 +82,13 @@ public class FixedLayoutParams implements LayoutParamsResolver {
     private int computeSize(Number size,int max,int full){
         if (null==size){
             if (max>0){
-                return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.UNSPECIFIED);
+                return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST);
             }
             return ViewGroup.LayoutParams.MATCH_PARENT;
         }else if(size instanceof Integer){
             if (max>0){
                 if (((Integer)size)<0||(((Integer)size)>0&&((Integer)size)>max)){
-                    return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.UNSPECIFIED);
+                    return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST);
                 }
             }
             return (Integer)size;

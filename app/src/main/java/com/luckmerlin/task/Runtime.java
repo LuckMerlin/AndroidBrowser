@@ -1,16 +1,21 @@
 package com.luckmerlin.task;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+
+import java.lang.ref.WeakReference;
 
 public abstract class Runtime {
     private int mOption;
     private int mStatus=Executor.STATUS_PENDING;
     private Handler mHandler;
+    private final WeakReference<Context> mContextReference;
 
-    protected Runtime(int option,Handler handler){
+    protected Runtime(int option,Handler handler,Context context){
         mOption=option;
         mHandler=handler;
+        mContextReference=null!=context?new WeakReference<>(context):null;
     }
 
     protected final Runtime setStatus(int status){
@@ -63,6 +68,11 @@ public abstract class Runtime {
 
     public final Runtime cancel(boolean cancel) {
         return enableOption(Executor.Option.CANCEL,cancel);
+    }
+
+    public final Context getContext() {
+        WeakReference<Context> reference=mContextReference;
+        return null!=reference?reference.get():null;
     }
 
     public final boolean isCancelEnabled() {

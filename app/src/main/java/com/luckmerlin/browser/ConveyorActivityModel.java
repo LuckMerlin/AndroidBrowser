@@ -12,9 +12,7 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
-import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
-import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -49,7 +47,7 @@ public class ConveyorActivityModel extends BaseModel implements
 //        mConveyorListAdapter.add(deleteTask);
 //        deleteTask.execute(null);
 //        //
-//        new FileCopyTask(LocalClient.createLoadFile(new File("/sdcard/test.png")),
+//        new FileCopyTask1(LocalClient.createLoadFile(new File("/sdcard/test.png")),
 //                LocalClient.createLoadFile(new File("/sdcard/test2.png")),null);
 //        //
 //        new Thread(()->streamCopyTask.execute(null)).start();
@@ -125,36 +123,14 @@ public class ConveyorActivityModel extends BaseModel implements
             }
 
 
-//            FileCopyTask copyTask=new FileCopyTask(LocalClient.createLocalFile
+//            FileCopyTask1 copyTask=new FileCopyTask1(LocalClient.createLocalFile
 ////                    (new File("/sdcard/Test")),LocalClient.createLocalFile
 //                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
 //                    (new File("/sdcard/Test2")),null);
 //            copyTask.setName("任务名字");
-        FileCopyTask copyTask=null;
-        copyTask=new FileCopyTask(LocalClient.createLocalFile
+//        FileCopyTask1 copyTask=null;
+//        copyTask=new FileCopyTask1(LocalClient.createLocalFile
 //                    (new File("/sdcard/Test")),LocalClient.createLocalFile
-        (new File("/sdcard/TestNew/ddd.mp3")),LocalClient.createLocalFile
-                    (new File("/sdcard/TestNew/我们.mp3")),null);
-//            copyTask.enableConfirm()
-            copyTask.setName("任务名字");
-//            mConveyorListAdapter.add(copyTask);
-//            executor.execute(copyTask, Executor.Option.NONE,null);
-            for (int i = 0; i < 1; i++) {
-                copyTask=new FileCopyTask(LocalClient.createLocalFile(new File("/sdcard/test.png")),
-                        LocalClient.createLocalFile(new File("/sdcard/test"+i+".png")),null);
-//                mConveyorListAdapter.add(copyTask);
-//                executor.execute(copyTask,null);
-            }
-            //
-//            TaskGroup group=new TaskGroup(null);
-//            group.setName("删除群组");
-//            for (int i = 0; i < 100; i++) {
-//                FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLocalFile
-//                        (new File("/sdcard/test"+i+".png")),null);
-//                group.add(deleteTask.enableConfirm(false));
-//            }
-//            mConveyorListAdapter.add(group);
-//            executor.execute(group,null);
         }
     }
 

@@ -1,7 +1,10 @@
 package com.luckmerlin.browser.file;
 
+import com.luckmerlin.browser.BrowserActivityModel;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.core.Matcher;
+import com.luckmerlin.core.OnConfirm;
+import com.luckmerlin.core.OnFinish;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,7 @@ public final class Mode {
     private final int mMode;
     private Map<String,String> mExtra;
     private boolean mAllEnabled;
+    private OnConfirm<Object,Boolean> mOnConfirm;
 
     public Mode(int mode){
         this(mode,null);
@@ -26,6 +30,15 @@ public final class Mode {
     public Mode(int mode, ArrayList<File> args){
         mMode=mode;
         mArgs=args;
+    }
+
+    public final Mode setOnConfirm(OnConfirm<Object,Boolean> onConfirm) {
+        this.mOnConfirm = onConfirm;
+        return this;
+    }
+
+    public OnConfirm<Object, Boolean> getOnConfirm() {
+        return mOnConfirm;
     }
 
     public boolean isContains(Object arg){

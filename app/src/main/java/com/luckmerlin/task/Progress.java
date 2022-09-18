@@ -112,4 +112,16 @@ public final class Progress implements Parcelable {
         dest.writeString(mSpeed);
         dest.writeParcelable(mProgress, flags);
     }
+
+    @Override
+    public String toString() {
+        return "Progress{" +
+                "mTotal=" + mTotal +
+                ", mPosition=" + mPosition +
+                ", mTitle='" + mTitle + '\'' +
+                ", mSpeed='" + mSpeed + '\'' +
+                ", mProgress=" + mProgress +
+                ", mData=" + mData +
+                '}';
+    }
 }
