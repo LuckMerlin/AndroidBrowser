@@ -74,17 +74,21 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         if (null==full||full.length<2){
             return new int[]{ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT};
         }
-        return new int[]{computeSize(mWidth,computeSize(mMaxWidth,0,full[0]),full[0]),
-                computeSize(mHeight,computeSize(mMaxHeight,0,full[1]),full[1])};
+        int maxWidth=computeSize(mMaxWidth,0,full[0]);
+        int maxHeight=computeSize(mMaxHeight,0,full[1]);
+        return new int[]{computeSize(mWidth,maxWidth,full[0]), computeSize(mHeight,maxHeight,full[1])};
     }
 
     private int computeSize(Number size,int max,int full){
         if (null==size){
+            if (max>0){
+                return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.UNSPECIFIED);
+            }
             return ViewGroup.LayoutParams.MATCH_PARENT;
         }else if(size instanceof Integer){
             if (max>0){
-                if (((Integer)size)>0&&((Integer)size)>max){
-                    return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.AT_MOST);
+                if (((Integer)size)<0||(((Integer)size)>0&&((Integer)size)>max)){
+                    return View.MeasureSpec.makeMeasureSpec(max, View.MeasureSpec.UNSPECIFIED);
                 }
             }
             return (Integer)size;

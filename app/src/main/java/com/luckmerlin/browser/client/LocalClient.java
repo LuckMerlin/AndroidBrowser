@@ -92,7 +92,8 @@ public class LocalClient extends AbstractClient {
         });
         List<File> fileList=files.getList();
         long total=null!=fileList?fileList.size():0;
-        Folder queryFiles=new Folder(createLocalFile(browserFile)).setTotal(total).setFrom(start);
+        Folder queryFiles=new Folder(createLocalFile(browserFile)).setFrom(start);
+        queryFiles.setTotal(total);
         queryFiles.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
         List<File> subFiles=total>0&&start<total?fileList.subList((int)start,Math.min((int)(start+size),(int)total)):null;
         return new Response<Folder>().set(Code.CODE_SUCCEED,"Succeed.", queryFiles.setChildren(subFiles));

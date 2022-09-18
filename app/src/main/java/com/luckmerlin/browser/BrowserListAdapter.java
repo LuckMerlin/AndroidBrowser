@@ -46,6 +46,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private Executor mExecutor;
 
     protected BrowserListAdapter() {
+        setPageSize(50);
         setFixedHolder(VIEW_TYPE_EMPTY,R.layout.item_content_empty);
     }
 

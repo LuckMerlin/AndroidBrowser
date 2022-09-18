@@ -12,7 +12,6 @@ import java.util.List;
 
 public class Folder extends File implements PageListAdapter.Page<File> {
     private long mFrom;
-    private long mTotal;
     private List<File> mFiles;
 
     public Folder(JSONObject jsonObject){
@@ -36,11 +35,6 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         return this;
     }
 
-    public Folder setTotal(long total) {
-        this.mTotal = total;
-        return this;
-    }
-
     public long getFrom() {
         return mFrom;
     }
@@ -56,12 +50,8 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         return null!=files?files.size():0;
     }
 
-    public long getTotal() {
-        return mTotal;
-    }
-
     public boolean isQueryFinish(){
-        return getEnd()>=mTotal;
+        return getEnd()>=getTotal();
     }
 
     public final boolean isEmpty(){

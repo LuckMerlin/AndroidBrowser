@@ -559,13 +559,13 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         return null!=showContentDialog(new FileContextDialogContent(file),
                 view.getContext(),new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
     }
 
     private boolean showBrowserContextMenu(Context context){
         return null!=showContentDialog(new BrowserMenuContextDialogContent().setTitle(getString(R.string.app_name)),
                 context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f));
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
     }
 
     private boolean toggleSelectFile(File file){

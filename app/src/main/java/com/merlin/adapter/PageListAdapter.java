@@ -30,6 +30,10 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
             super.onScrollStateChanged(recyclerView, newState);
             switch (newState){
                 case RecyclerView.SCROLL_STATE_IDLE:
+                    SwipeRefreshLayout refreshLayout=mRefreshLayout;
+                    if (null!=refreshLayout&&refreshLayout.isRefreshing()){
+                        return;
+                    }
                     RecyclerView.LayoutManager manager=null!=recyclerView?recyclerView.getLayoutManager():null;
                     if (null!=manager&&manager instanceof LinearLayoutManager){
                         LinearLayoutManager layoutManager=(LinearLayoutManager)manager;
@@ -129,7 +133,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
 
     public final boolean loadNext(int pageSize,OnPageLoadListener<T> callback){
         int index=getSize()-1;
-        return load(index,getItem(index), pageSize,(boolean succeed, Page<T> page)-> {
+        return load(index<0?index:index+1,getItem(index), pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(Integer.MAX_VALUE,null!=page?page.getPageData():null);
             }
