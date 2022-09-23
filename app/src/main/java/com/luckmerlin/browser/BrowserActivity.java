@@ -10,7 +10,8 @@ public class BrowserActivity extends ContentActivity {
 
     @Override
     public Content onResolveContent() {
-        return new BrowserActivityModel();
+//        return new BrowserActivityModel();
+        return new BrowserModel();
     }
 
 }

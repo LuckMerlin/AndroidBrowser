@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -118,6 +119,16 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
                 }
             }
         }
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams onCreateViewHolderLayoutParams(ViewGroup parent, int viewType, RecyclerView.ViewHolder viewHolder) {
+        if (viewType==VIEW_TYPE_DATA){
+            ViewGroup.MarginLayoutParams params=new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.bottomMargin=params.topMargin=5;
+            return params;
+        }
+        return super.onCreateViewHolderLayoutParams(parent, viewType, viewHolder);
     }
 
     public final boolean setFolder(BrowseQuery folder){

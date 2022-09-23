@@ -78,21 +78,19 @@ public class ViewBinding extends ObjectBinding {
         return this;
     }
 
-    public ViewBinding img(int img){
-        return img(img!=Resources.ID_NULL?(View view,Binding binding, ImageFetcher.OnImageFetch callback)->
-                callback.onImageFetched(getResource(null!=view?view.getContext():null,img)):null);
-    }
-
-    public ViewBinding img(Bitmap img){
-        return img(null!=img?(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img):null);
-    }
-
-    public ViewBinding img(Drawable img){
-        return img(null!=img?(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img):null);
-    }
-
-    public ViewBinding img(ImageFetcher img){
-        mImage=img;
+    public ViewBinding img(Object img){
+        if (null==img){
+            mImage=null;
+        }else if (img instanceof ImageFetcher){
+            mImage=(ImageFetcher)img;
+        }else if (img instanceof Drawable){
+            mImage=(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img);
+        }else if (img instanceof Bitmap){
+            mImage=(View view,Binding binding, ImageFetcher.OnImageFetch callback)-> callback.onImageFetched(img);
+        }else if (img instanceof Integer){
+            mImage=(View view,Binding binding, ImageFetcher.OnImageFetch callback)->
+                    callback.onImageFetched(getResource(null!=view?view.getContext():null,(Integer) img));
+        }
         return this;
     }
 

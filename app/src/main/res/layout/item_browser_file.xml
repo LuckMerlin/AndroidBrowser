@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:binding="http://schemas.android.com/apk/res-auto">
-
     <data>
         <variable name="path" type="com.luckmerlin.browser.file.File" />
         <variable name="selected" type="boolean" />
@@ -18,26 +17,27 @@
         <import type="android.view.View"/>
     </data>
     <LinearLayout binding:bind="@{clickBinding.enableLongClick(true)}"
+        android:background="@drawable/selector_item_browser_file_bg"
         android:paddingBottom="2dp" android:paddingTop="2dp" android:orientation="horizontal"
         android:layout_width="match_parent" android:layout_height="match_parent">
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
             android:layout_width="wrap_content" android:layout_height="wrap_content">
 <!--        <ImageView binding:bind="@{VB.create(path).img(BB.instance)}"-->
-            <ImageView android:imageDrawable="@{thumb}" android:layout_width="50dp" android:layout_height="50dp"/>
+            <ImageView android:imageDrawable="@{thumb}" android:padding="5dp"
+                android:layout_width="50dp" android:layout_height="50dp"/>
         </FrameLayout>
 
         <FrameLayout android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:gravity="center_vertical"
                 android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:text="@{path.name??``}" android:textColor="@color/textTitle" android:textSize="12sp"
+                <TextView android:text="@{path.name??``}" android:textColor="@color/itemFileName" android:textSize="12sp"
                     android:textStyle="bold" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <Space  android:layout_width="match_parent" android:layout_height="5dp"/>
                 <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
                     <TextView android:text="@{path.total>=0?`(`+path.total+`)`:FileSize.formatSizeText(path.length)}" android:textColor="@color/textTitleSub" android:textSize="10sp"
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
-                     <TextView android:text="@{path.mime??@string/unknown.toLowerCase()}" android:textColor="@color/textTitleSub" android:textSize="10sp"
+                    <TextView android:text="@{path.mime??@string/unknown.toLowerCase()}" android:textColor="@color/textTitleSub" android:textSize="10sp"
                         android:visibility="@{path.directory?View.GONE:View.VISIBLE}"
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
                     <TextView android:text="@{Time.formatTime(path.modifyTime)??``}" android:textColor="@color/textTitleSub" android:textSize="10sp"

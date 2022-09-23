@@ -19,6 +19,7 @@
     <string name="exit">Exit</string>
     <string name="attr">Attribute</string>
     <string name="cancel">Cancel</string>
+    <string name="time">Time</string>
     <string name="uploadWithDel">Upload&amp;Delete</string>
     <string name="copy">Copy</string>
     <string name="open">Open</string>

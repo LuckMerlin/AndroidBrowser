@@ -3,6 +3,7 @@ package com.merlin.model;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.luckmerlin.browser.R;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.ContentResolver;
 import com.luckmerlin.view.ViewIterate;
@@ -45,8 +47,9 @@ public abstract class ContentActivity extends Activity implements ContentResolve
             window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.parseColor("#55000000"));
-            window.setNavigationBarColor(Color.parseColor("#55000000"));
+            Resources resources=getResources();
+            window.setStatusBarColor(resources.getColor(R.color.modelBackground));
+            window.setNavigationBarColor(resources.getColor(R.color.modelBackground));
         }
     }
 
