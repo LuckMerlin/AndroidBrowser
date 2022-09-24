@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="path" type="com.luckmerlin.browser.file.File" />
+        <variable name="selected" type="boolean" />
+        <variable name="thumb" type="android.graphics.drawable.Drawable" />
+        <variable name="position" type="int" />
+        <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
+        <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
+        <import type="com.luckmerlin.browser.utils.Time"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="com.luckmerlin.browser.utils.FileSize"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.BrowserBinding" alias="BB"/>
+        <import type="com.luckmerlin.browser.file.Mode"/>
+        <import type="android.view.View"/>
+    </data>
+    <FrameLayout binding:bind="@{clickBinding.enableLongClick(true)}"
+        android:background="@drawable/selector_item_browser_file_bg" android:padding="5dp" android:orientation="vertical"
+        android:layout_width="match_parent" android:layout_height="match_parent" >
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+            <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <ImageView android:imageDrawable="@{thumb}" android:padding="5dp"
+                        android:layout_width="50dp" android:layout_height="50dp"/>
+                </FrameLayout>
+                <LinearLayout android:orientation="vertical"
+                    android:layout_width="wrap_content" android:layout_height="match_parent">
+                    <Space android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="0dp"/>
+                    <TextView android:text="@{path.mime??@string/unknown.toLowerCase()}"
+                        android:textColor="@color/textTitleSub" android:textSize="10sp"
+                        android:visibility="@{path.directory?View.GONE:View.VISIBLE}"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
+                    <TextView android:text="@{path.total>=0?`(`+path.total+`)`:FileSize.formatSizeText(path.length)}"
+                        android:textColor="@color/textTitleSub" android:textSize="10sp"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            <TextView android:text="@{path.name??``}" android:textColor="@color/itemFileName" android:textSize="11sp"
+                android:textStyle="bold" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:maxLines="1"/>
+            <TextView android:text="@{Time.formatTime(path.modifyTime)??``}"
+                android:textColor="@color/textTitleSub" android:textSize="9sp" android:maxLines="1"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
+        </LinearLayout>
+        <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,path)}" android:button="@drawable/selector_checkbox"
+            android:layout_gravity="top|right" android:checked="@{selected}"
+            android:visibility="@{mode.isMode(Mode.MODE_MULTI_CHOOSE)?View.VISIBLE:View.INVISIBLE}"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </FrameLayout>
+</layout>

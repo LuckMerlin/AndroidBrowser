@@ -5,6 +5,7 @@
         <variable name="vm" type="com.luckmerlin.browser.BrowserModel" />
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="android.text.method.LinkMovementMethod"/>
     </data>
 
@@ -46,8 +47,8 @@
                        <TextView android:text="@string/time" android:textColor="@color/sortTitle"
                            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                        <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-                       <ImageView android:src="@drawable/selector_gird" android:padding="5dp"
-                            android:layout_width="40dp" android:layout_height="40dp"/>
+                       <ImageView binding:bind="@{VB.clickId(vm.browserAdapter.gridLayout?R.drawable.selector_list:R.drawable.selector_gird)}"
+                           android:padding="5dp" android:layout_width="40dp" android:layout_height="40dp"/>
                    </LinearLayout>
                </LinearLayout>
             </LinearLayout>

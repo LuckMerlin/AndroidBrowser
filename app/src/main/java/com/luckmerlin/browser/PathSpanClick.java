@@ -21,7 +21,7 @@ public class PathSpanClick {
         return this;
     }
 
-    public CharSequence generate(File file){
+    public CharSequence generate(File file,int color){
         String path=null!=file?file.getPath():null;
         String sep=null!=file?file.getSep():null;
         if (null!=path&&path.length()>1&&null!=sep&&sep.length()>0){
@@ -53,8 +53,7 @@ public class PathSpanClick {
                                 textPaint.bgColor= Color.TRANSPARENT;
                                 textPaint.linkColor=Color.TRANSPARENT;
                                 textPaint.setUnderlineText(false);
-//                                ColorStateList list = textView.getTextColors();
-                                textPaint.setColor(Color.parseColor("#88ffffff"));
+                                textPaint.setColor(color);
                                 textPaint.clearShadowLayer();
                             }
                         }

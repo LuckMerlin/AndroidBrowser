@@ -12,6 +12,8 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.databinding.ViewDataBinding;
+
 import com.luckmerlin.click.Listener;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -48,6 +50,17 @@ public class ViewBinding extends ObjectBinding {
         return this;
     }
 
+    public final static boolean binding(ViewDataBinding viewBinding,Binding binding){
+        return null!=viewBinding&&binding(viewBinding.getRoot(),binding);
+    }
+
+    public final static boolean binding(View view,Binding binding){
+        if(null!=view&&null!=binding){
+            binding.onBind(view);
+        }
+        return false;
+    }
+
     public final boolean isAutoFill() {
         return mAutoFill;
     }
@@ -67,6 +80,10 @@ public class ViewBinding extends ObjectBinding {
 
     public static ViewBinding clickId(int clickId, Object obj){
         return new ViewBinding(obj).setClickId(clickId);
+    }
+
+    public static ViewBinding create(){
+        return create(null);
     }
 
     public static ViewBinding create(Object obj){

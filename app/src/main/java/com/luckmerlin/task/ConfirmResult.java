@@ -1,8 +1,12 @@
 package com.luckmerlin.task;
 
 import android.content.Context;
+import android.view.View;
 
+import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.OnViewBinding;
 import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.Result;
 
 public abstract class ConfirmResult implements Result {
@@ -12,9 +16,12 @@ public abstract class ConfirmResult implements Result {
         ViewBinding onConfirm(boolean confirm);
     }
 
-    public static class Confirm{
+    public static class Confirm implements Brief {
         private String mMessage;
         private String mTitle;
+        private Binding mBinding;
+
+        @Deprecated
         private OnConfirm mOnConfirmFinish;
 
         public Confirm(){
@@ -29,6 +36,7 @@ public abstract class ConfirmResult implements Result {
             return mMessage;
         }
 
+        @Deprecated
         public final OnConfirm getOnConfirm() {
             return mOnConfirmFinish;
         }
@@ -47,9 +55,29 @@ public abstract class ConfirmResult implements Result {
             return mTitle;
         }
 
+        @Deprecated
         public final Confirm setOnConfirm(OnConfirm callback) {
             mOnConfirmFinish = callback;
             return this;
+        }
+
+        @Override
+        public CharSequence getNote() {
+            return mMessage;
+        }
+
+        @Override
+        public CharSequence getName() {
+            return mTitle;
+        }
+
+        @Override
+        public Object getIcon() {
+            return null;
+        }
+
+        public final Binding getBinding() {
+            return mBinding;
         }
     }
 

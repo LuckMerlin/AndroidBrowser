@@ -1,5 +1,9 @@
 package com.luckmerlin.utils;
 
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.security.ConfirmationCallback;
+
 import com.luckmerlin.task.Progress;
 
 import java.io.Closeable;
@@ -27,5 +31,14 @@ public class Utils {
                 }
             }
         }
+    }
+
+    public static boolean isLandscape(Resources resources){
+        return isOrientation(resources,Configuration.ORIENTATION_LANDSCAPE);
+    }
+
+    public static boolean isOrientation(Resources resources,int orientation){
+        Configuration configuration=null!=resources?resources.getConfiguration():null;
+        return null!=configuration&&configuration.orientation==orientation;
     }
 }

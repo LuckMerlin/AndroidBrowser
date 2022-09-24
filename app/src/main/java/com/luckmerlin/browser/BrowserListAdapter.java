@@ -1,5 +1,7 @@
 package com.luckmerlin.browser;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
+import com.luckmerlin.browser.databinding.ItemBrowserFileGirdBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
@@ -24,6 +27,9 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.task.Task;
+import com.luckmerlin.task.TaskGroup;
+import com.luckmerlin.utils.Utils;
 import com.merlin.adapter.PageListAdapter;
 
 import java.util.Collection;
@@ -43,6 +49,8 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private final Map<RecyclerView.ViewHolder,Canceler> mThumbLoading=new HashMap<>();
     private ObservableField<CharSequence> mCurrentPath=new ObservableField<>();
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
+    private ObservableField<Boolean> mGridLayout=new ObservableField<>(true);
+    private final static int VIEW_TYPE_DATA_GRID=2000;
     private Mode mMode;
     private Executor mExecutor;
 
@@ -64,6 +72,14 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return this;
     }
 
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        if(null!=recyclerView){
+            recyclerView.setLayoutManager(createBrowserLayoutManager(recyclerView.getContext()));
+        }
+        super.onAttachedToRecyclerView(recyclerView);
+    }
+
     private boolean execute(Runnable runnable){
         if (null==runnable){
             return false;
@@ -76,6 +92,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         }));
         executor.execute(runnable);
         return true;
+    }
+
+    private RecyclerView.LayoutManager createBrowserLayoutManager(Context context){
+         Boolean gird=mGridLayout.get();
+         if (null!=gird&&gird){
+             return createGridLayout(context,null!=context&&Utils.
+                     isLandscape(context.getResources())?4:3,RecyclerView.VERTICAL,false);
+         }
+         return createLinearLayout(context);
     }
 
     @Override
@@ -106,6 +131,18 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return this;
     }
 
+    public final boolean setGirdLayout(boolean enable){
+        Boolean current=mGridLayout.get();
+        current=null!=current?current:false;
+        if (current!=enable){
+            mGridLayout.set(enable);
+            setLayoutManager(createBrowserLayoutManager(getContext()));
+            notifyDataSetChanged();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     protected void onPageLoadFinish(boolean succeed, Page<File> page) {
         super.onPageLoadFinish(succeed, page);
@@ -113,7 +150,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             if (null!=page&&page instanceof Folder){
                 Folder folder=(Folder)page;
                 mCurrentFolder.set(folder);
-                mCurrentPath.set(mPathSpanClick.generate(folder));
+                mCurrentPath.set(mPathSpanClick.generate(folder, Color.parseColor("#483fe6")));
                 if (getSize()>0&&folder.isEmpty()){
 //                    toast(R.string.noMoreData,500);
                 }
@@ -124,8 +161,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     @Override
     protected ViewGroup.LayoutParams onCreateViewHolderLayoutParams(ViewGroup parent, int viewType, RecyclerView.ViewHolder viewHolder) {
         if (viewType==VIEW_TYPE_DATA){
-            ViewGroup.MarginLayoutParams params=new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            ViewGroup.MarginLayoutParams params=new ViewGroup.MarginLayoutParams
+                    (ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             params.bottomMargin=params.topMargin=5;
+            return params;
+        }else if (viewType==VIEW_TYPE_DATA_GRID){
+            ViewGroup.MarginLayoutParams params=new ViewGroup.MarginLayoutParams
+                    (ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.bottomMargin=params.topMargin=5;
+            params.leftMargin=params.rightMargin=5;
             return params;
         }
         return super.onCreateViewHolderLayoutParams(parent, viewType, viewHolder);
@@ -218,7 +262,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return null!=current&&current.isContains(file);
     }
 
-    private boolean cancelLoadThumb(ItemBrowserFileBinding binding){
+    private boolean cancelLoadThumb(ViewDataBinding binding){
         Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;
         Canceler canceler=null!=binding&&null!=thumbLoading?thumbLoading.get(binding):null;
         if (null!=canceler){
@@ -267,19 +311,62 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     }
 
     @Override
+    public int getItemViewType(int position) {
+        int viewType=super.getItemViewType(position);
+        if (viewType==VIEW_TYPE_DATA){
+            Boolean gird=mGridLayout.get();
+            viewType=null!=gird&&gird ?VIEW_TYPE_DATA_GRID:viewType;
+        }
+        return viewType;
+    }
+
+    @Override
     protected Object onCreateViewTypeHolder(int viewType, ViewGroup parent) {
-        return viewType==VIEW_TYPE_DATA? R.layout.item_browser_file:
-                super.onCreateViewTypeHolder(viewType,parent);
+        if (viewType==VIEW_TYPE_DATA){
+            return R.layout.item_browser_file;
+        }else if (viewType==VIEW_TYPE_DATA_GRID){
+            return R.layout.item_browser_file_gird;
+        }
+        return super.onCreateViewTypeHolder(viewType,parent);
     }
 
     @Override
     protected void onBindData(RecyclerView.ViewHolder holder, int position, List<Object> payloads) {
         View itemView=null!=holder?holder.itemView:null;
         ViewDataBinding binding=null!=itemView? DataBindingUtil.getBinding(itemView):null;
-        if (null!=binding&&binding instanceof ItemBrowserFileBinding){
+        if (null==binding){
+            return;
+        }
+        cancelLoadThumb(binding);
+        File file=getItem(position);
+        if (binding instanceof ItemBrowserFileBinding){
             ItemBrowserFileBinding fileBinding=((ItemBrowserFileBinding)binding);
-            cancelLoadThumb(fileBinding);
-            File file=getItem(position);
+            fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
+            fileBinding.setPath(file);
+            fileBinding.setPosition(position+1);
+            Mode mode=mMode;
+            fileBinding.setMode(mode);
+            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
+            fileBinding.setClickBinding(new ViewBinding(file));
+            Client client=null;Canceler canceler;
+            if (null!=file&&null!=(client=getClient())){//Try load file thumb
+                Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;
+                if (null!=(canceler=loadThumb(itemView,client,file,(Drawable thumb)-> postIfPossible(()->{
+                    File currentFile=fileBinding.getPath();
+                    if (null!=currentFile&&currentFile==file){
+                        thumbLoading.remove(fileBinding);
+                        if(null!=thumb){
+                            fileBinding.setThumb(thumb);
+                        }
+                    }},0)))){
+                    thumbLoading.put(holder,()->{
+                        thumbLoading.remove(fileBinding);
+                        return canceler.cancel();
+                    });
+                }
+            }
+        }else if (binding instanceof ItemBrowserFileGirdBinding){
+            ItemBrowserFileGirdBinding fileBinding=((ItemBrowserFileGirdBinding)binding);
             fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
@@ -322,5 +409,9 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public ObservableField<CharSequence> getCurrentPath() {
         return mCurrentPath;
+    }
+
+    public ObservableField<Boolean> getGridLayout() {
+        return mGridLayout;
     }
 }

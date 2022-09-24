@@ -2,8 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="doing" type="com.luckmerlin.browser.dialog.DoingTaskContent" />
+        <variable name="doing" type="com.luckmerlin.browser.dialog.DoingContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.binding.LayoutBinding"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>
         <import type="com.luckmerlin.browser.utils.FileSize"/>
@@ -13,36 +14,44 @@
         android:layout_width="match_parent" android:layout_height="match_parent"
         android:gravity="center_horizontal" android:minWidth="280dp">
 
-        <TextView android:text="@{doing.name??``}" android:maxLines="1" android:textColor="@color/textMain"
+        <TextView android:text="@{doing.confirm.name??doing.name??``}"
+            android:maxLines="1" android:textColor="@color/textMain"
             android:textSize="15sp" android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:layout_marginBottom="10dp" android:textStyle="bold"
             android:paddingLeft="5dp" android:paddingRight="5dp"/>
 
-        <LinearLayout android:orientation="horizontal" android:layout_marginTop="15dp" android:layout_marginBottom="15dp"
+        <FrameLayout android:layout_marginTop="15dp" android:layout_marginBottom="15dp"
             android:layout_marginLeft="20dp" android:layout_marginRight="20dp" android:gravity="center"
-            android:layout_width="280dp" android:layout_height="wrap_content">
-            <include binding:brief="@{doing.from}" layout="@layout/doing_item"
-                android:visibility="@{null==doing.from?View.GONE:View.VISIBLE}" android:layout_weight="1"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-            <LinearLayout android:orientation="vertical" android:layout_gravity="center" android:gravity="center"
-                android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <TextView android:text="@{doing.progress.intValue()+`%`}" android:textStyle="bold" android:gravity="center"
-                    android:textSize="12sp" android:textColor="@color/textMain" android:layout_gravity="center"
+            android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <LinearLayout android:visibility="@{null==doing.confirm?View.VISIBLE:View.GONE}"
+                android:orientation="horizontal" android:layout_marginTop="15dp" android:layout_marginBottom="15dp"
+                android:layout_marginLeft="20dp" android:layout_marginRight="20dp" android:gravity="center"
+                android:layout_width="280dp" android:layout_height="wrap_content">
+                <include binding:brief="@{doing.from}" layout="@layout/doing_item"
+                    android:visibility="@{null==doing.from?View.GONE:View.VISIBLE}" android:layout_weight="1"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <ImageView android:layout_width="wrap_content" android:src="@drawable/progress_icon"
-                    android:visibility="@{null==doing.from||null==doing.to?View.GONE:View.VISIBLE}" android:layout_height="40dp"/>
-                <TextView android:text="@{doing.progress.title??``}" android:textSize="12sp" android:textColor="@color/textMain"
-                    android:maxLines="1" android:layout_width="wrap_content" android:ellipsize="end" android:layout_height="wrap_content"/>
+                <LinearLayout android:orientation="vertical" android:layout_gravity="center" android:gravity="center"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <TextView android:text="@{doing.progress.intValue()+`%`}" android:textStyle="bold" android:gravity="center"
+                        android:textSize="12sp" android:textColor="@color/textMain" android:layout_gravity="center"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <ImageView android:layout_width="wrap_content" android:src="@drawable/progress_icon"
+                        android:visibility="@{null==doing.from||null==doing.to?View.GONE:View.VISIBLE}" android:layout_height="40dp"/>
+                    <TextView android:text="@{doing.progress.title??``}" android:textSize="12sp" android:textColor="@color/textMain"
+                        android:maxLines="1" android:layout_width="wrap_content" android:ellipsize="end" android:layout_height="wrap_content"/>
+                </LinearLayout>
+                <include binding:brief="@{doing.to}" layout="@layout/doing_item" android:layout_weight="1"
+                    android:visibility="@{null==doing.to?View.GONE:View.VISIBLE}"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-            <include binding:brief="@{doing.to}" layout="@layout/doing_item" android:layout_weight="1"
-                android:visibility="@{null==doing.to?View.GONE:View.VISIBLE}"
+
+            <include binding:brief="@{doing.confirm}" layout="@layout/doing_item"
+                android:visibility="@{null==doing.confirm?View.GONE:View.VISIBLE}"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        </LinearLayout>
+        </FrameLayout>
 
         <LinearLayout android:orientation="horizontal" android:paddingLeft="15dp" android:paddingRight="15dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content">
-            <TextView binding:bind="@{VB.clickId(R.string.sure)}" android:layout_weight="1" style="@style/dialogButton"/>
-            <TextView binding:bind="@{VB.clickId(R.string.cancel)}" android:layout_weight="1" style="@style/dialogButton"/>
-        </LinearLayout>
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            binding:bind="@{LayoutBinding.layout(null!=doing.confirm?doing.confirm.binding:doing.clickBinding).removeAll(true).toParent(false)}" />
     </LinearLayout>
 </layout>

@@ -1,7 +1,6 @@
 package com.luckmerlin.core;
 
-public interface Brief{
-    CharSequence getTitle();
-    CharSequence getSubTitle();
+public interface Brief extends Named{
+    CharSequence getNote();
     Object getIcon();
 }

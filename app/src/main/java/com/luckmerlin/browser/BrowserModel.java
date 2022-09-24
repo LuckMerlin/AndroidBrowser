@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.databinding.ObservableField;
@@ -17,9 +18,9 @@ import androidx.recyclerview.widget.ListAdapter;
 
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.BrowserModelBinding;
-import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
-import com.luckmerlin.browser.dialog.DoingTaskContent;
+import com.luckmerlin.browser.dialog.DoingContent;
+import com.luckmerlin.browser.dialog.TaskDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.click.OnClickListener;
@@ -29,7 +30,6 @@ import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.view.Content;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
@@ -66,7 +66,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         mNotifyText.set("LMBrowser");
         mContentAdapter.set(mBrowserAdapter);
         //
-        showContentDialog(new DoingTaskContent(),null);
+//        showContentDialog(new DoingContent(),null);
     }
 
     @Override
@@ -81,6 +81,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return true;
             case R.layout.item_client_name:
                 return selectClients(view,null!=obj&&obj instanceof Client?(Client)obj:null)||true;
+            case R.drawable.selector_list:
+                return mBrowserAdapter.setGirdLayout(false)||true;
+            case R.drawable.selector_gird:
+                return mBrowserAdapter.setGirdLayout(true)||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -94,7 +98,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     private boolean openFile(File openFile){
         Client client=mBrowserAdapter.getClient();
-        if (!(null!=client&&client.openFile((File)openFile,getContext()))){
+        if (!(null!=client&&client.openFile(openFile,getContext()))){
             return toast(getString(R.string.whichFailed,getString(R.string.open)));
         }
         return false;
@@ -136,6 +140,19 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }
         popupWindow.setContentView((Context context1, ViewIterator iterator)-> linearLayout);
         return popupWindow.showAsDropDown(view,0,0, Gravity.CENTER);
+    }
+
+    private boolean showTaskDialog(Task task, DoingContent dialogContent){
+        Executor executor=mExecutor;
+        if (null==executor|null==task){
+            return false;
+        }
+        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setName(task.getName());
+        content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
+                executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
+        content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
+        return null!=showContentDialog(content, new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
     }
 
     private Folder getCurrentFolder(){

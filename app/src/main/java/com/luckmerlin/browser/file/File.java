@@ -3,15 +3,18 @@ package com.luckmerlin.browser.file;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
+import com.luckmerlin.browser.utils.FileSize;
+import com.luckmerlin.core.Brief;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.json.Json;
 import com.luckmerlin.json.JsonObject;
 
 import org.json.JSONObject;
 
+import java.nio.file.Files;
 import java.util.logging.Handler;
 
-public class File extends JsonObject {
+public class File extends JsonObject implements Brief {
 
     public File(){
         super();
@@ -217,6 +220,16 @@ public class File extends JsonObject {
 
     public static boolean isType(String mime,String type){
         return null!=mime&&null!=type&&mime.startsWith(type);
+    }
+
+    @Override
+    public CharSequence getNote() {
+        return FileSize.formatSizeText(getLength());
+    }
+
+    @Override
+    public final Object getIcon() {
+        return null;
     }
 
     @Override

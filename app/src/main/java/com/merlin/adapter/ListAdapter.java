@@ -9,11 +9,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.browser.binding.DataBindingUtil;
@@ -258,7 +260,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         if (null!=recyclerView){
             mRecyclerView=new WeakReference<>(recyclerView);
             if (recyclerView.getLayoutManager()==null){
-                linearLayout();
+                setLayoutManager(createLinearLayout(recyclerView.getContext()));
             }
         }
         if (null!=current){
@@ -293,19 +295,31 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         return position==total-1&&getFixedViewHolder(VIEW_TYPE_TAIL)!=null? VIEW_TYPE_TAIL:VIEW_TYPE_DATA;
     }
 
+    public final Context getContext(){
+        RecyclerView recyclerView=getRecyclerView();
+        return null!=recyclerView?recyclerView.getContext():null;
+    }
+
     public final RecyclerView getRecyclerView(){
         WeakReference<RecyclerView> reference=mRecyclerView;
         return null!=reference?reference.get():null;
     }
 
-    public final ListAdapter<T> linearLayout() {
-        return linearLayout(RecyclerView.VERTICAL,false);
+    public final static LinearLayoutManager createLinearLayout(Context context) {
+        return createLinearLayout(context,RecyclerView.VERTICAL,false);
     }
 
-    public final ListAdapter<T> linearLayout(int orientation,boolean reverseLayout){
-        RecyclerView recyclerView=getRecyclerView();
-        Context context=null!=recyclerView?recyclerView.getContext():null;
-        return null!=context?setLayoutManager(new LinearLayoutManager(context,orientation,reverseLayout)):this;
+    public final static LinearLayoutManager createLinearLayout(Context context,int orientation,boolean reverseLayout){
+        return null!=context?new LinearLayoutManager(context,orientation,reverseLayout):null;
+    }
+
+    public final static GridLayoutManager createGridLayout(Context context, int spanCount){
+        return createGridLayout(context,spanCount,RecyclerView.VERTICAL,false);
+    }
+
+    public final static GridLayoutManager createGridLayout(Context context, int spanCount,
+                                                    int orientation, boolean reverseLayout){
+        return null!=context?new GridLayoutManager(context,spanCount,orientation,reverseLayout):null;
     }
 
     public final ListAdapter<T> setLayoutManager(RecyclerView.LayoutManager manager){

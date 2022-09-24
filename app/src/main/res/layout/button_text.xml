@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="binding" type="com.luckmerlin.binding.Binding" />
+    </data>
+
+    <TextView binding:bind="@{binding}" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:layout_weight="1" style="@style/dialogButton"/>
+</layout>
