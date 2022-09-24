@@ -31,14 +31,14 @@
                            android:layout_width="wrap_content" android:layout_height="wrap_content"
                            android:paddingLeft="10dp" android:paddingRight="10dp"
                            android:paddingBottom="5dp" android:paddingTop="5dp" android:gravity="center">
-                           <ImageView android:src="@drawable/search_normal" android:padding="5dp"
+                           <ImageView binding:bind="@{VB.clickId(R.drawable.selector_search)}" android:padding="5dp"
                                android:layout_width="40dp" android:layout_height="40dp"/>
                            <EditText android:hint="@string/search" android:background="#00000000"
                                android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_weight="1"
                                android:layout_width="0dp" android:layout_height="wrap_content"/>
                        </LinearLayout>
                        <Space android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                       <ImageView android:src="@drawable/transport_normal" android:padding="5dp"
+                       <ImageView binding:bind="@{VB.clickId(R.drawable.selector_transport)}" android:padding="5dp"
                            android:layout_width="40dp" android:layout_height="40dp" android:rotation="90"/>
                    </LinearLayout>
                    <Space android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp"/>

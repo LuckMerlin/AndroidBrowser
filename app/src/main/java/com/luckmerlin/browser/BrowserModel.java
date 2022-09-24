@@ -85,6 +85,12 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return mBrowserAdapter.setGirdLayout(false)||true;
             case R.drawable.selector_gird:
                 return mBrowserAdapter.setGirdLayout(true)||true;
+            case R.drawable.selector_transport:
+                return startActivity(ConveyorActivity.class)||true;
+            case R.drawable.selector_search:
+                BrowserListAdapter browserListAdapter=mBrowserAdapter;
+                BrowseQuery query=null!=browserListAdapter?browserListAdapter.getCurrent():null;
+                return (null!=query&&browserPath(query.mFolder))||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -180,7 +186,12 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     private boolean browserPath(File file){
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
-        return null!=file&&null!=adapter&&adapter.reset(new BrowseQuery(file,searchInput),null);
+        return null!=file&&null!=adapter&&browserPath(new BrowseQuery(file,searchInput));
+    }
+
+    private boolean browserPath(BrowseQuery query){
+        BrowserListAdapter adapter=mBrowserAdapter;
+        return null!=adapter&&adapter.reset(query,null);
     }
 
     private boolean selectNextClient(){
