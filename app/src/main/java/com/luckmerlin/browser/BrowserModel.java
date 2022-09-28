@@ -24,12 +24,14 @@ import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.DoingContent;
+import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.TaskDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
@@ -52,7 +54,7 @@ import java.util.ArrayList;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
         OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick,
-        OnViewDetachedFromWindow, OnClickListener, OnBackPress,
+        OnViewDetachedFromWindow, OnClickListener, OnLongClickListener, OnBackPress,
         OnActivityNewIntent, OnActivityStart {
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
@@ -84,7 +86,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         //
 //        showContentDialog(new DoingContent(),null);
 //        startActivity(ConveyorActivity.class);
-        showBrowserContextMenu(activity);
+//        showBrowserContextMenu(activity);
     }
 
     @Override
@@ -125,6 +127,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return entryMode(null,null)||true;
             case R.string.exit:
                 return finishActivity()||true;
+            case R.string.share:
+                return null!=obj&&obj instanceof File&&shareFile((File)obj);
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -224,6 +228,12 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
     }
 
+    private boolean showFileContextMenu(View view, File file){
+        return null!=view&&null!=file&&null!=showContentDialog(new FileContextDialogContent(file).
+                        outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter()),
+                view.getContext(),new FixedLayoutParams().fillParentAndCenter());
+    }
+
     private Folder getCurrentFolder(){
         ObservableField<Folder> field=mBrowserAdapter.getCurrentFolder();
         return null!=field?field.get():null;
@@ -239,6 +249,14 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null!=value&&value.length()>0){
             browserPath(path.generateFile(value));
         }
+    }
+
+    @Override
+    public boolean onLongClick(View view, int clickId, Object obj) {
+        if (null!=obj&&obj instanceof File){
+            return showFileContextMenu(view,(File)obj);
+        }
+        return true;
     }
 
     @Override
@@ -333,8 +351,19 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     private boolean showBrowserContextMenu(Context context){
         return null!=showContentDialog(new BrowserMenuContextDialogContent().setTitle(getString(R.string.app_name)).
-        setBackgroundColor(getColor(R.color.hintColor)).setLayoutParams(new FixedLayoutParams().
-        wrapContentAndCenter()).outsideDismiss(), context, new FixedLayoutParams().fillParentAndCenter());
+                setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f)).
+                outsideDismiss(), context, new FixedLayoutParams().fillParentAndCenter());
+    }
+
+    private boolean shareFile(File file){
+        if (null==file){
+            return false;
+        }
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_STREAM, "This is my text to send.");
+        shareIntent.setType(file.getMime());
+        return startActivity(shareIntent);
     }
 
     @Override

@@ -9,8 +9,7 @@
         <import type="android.text.method.LinkMovementMethod"/>
     </data>
 
-    <FrameLayout android:paddingLeft="10dp" android:paddingRight="10dp"
-        android:background="@color/modelBackground"
+    <FrameLayout android:paddingLeft="10dp" android:paddingRight="10dp" android:background="@color/modelBackground"
         android:layout_width="match_parent" android:layout_height="match_parent">
 
         <LinearLayout android:orientation="vertical"
@@ -54,8 +53,7 @@
                     android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginLeft="5dp" android:orientation="horizontal">
                     <TextView android:text="@string/time" android:textColor="@color/sortTitle"
                         android:paddingLeft="5dp" android:paddingRight="5dp"
-                        android:paddingBottom="5dp" android:paddingTop="5dp"
-                        android:background="@drawable/round_bt_bg" android:layout_gravity="bottom"
+                        android:paddingBottom="5dp" android:paddingTop="5dp" android:layout_gravity="bottom"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
                     <ImageView binding:bind="@{VB.clickId(vm.browserAdapter.gridLayout?R.drawable.selector_list:R.drawable.selector_gird)}"

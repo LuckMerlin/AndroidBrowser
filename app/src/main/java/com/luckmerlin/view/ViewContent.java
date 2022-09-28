@@ -1,6 +1,7 @@
 package com.luckmerlin.view;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -16,6 +17,7 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
@@ -57,6 +59,10 @@ public abstract class ViewContent implements Content {
     public final boolean removeOnAttachStateChangeListener(ViewAttachedListener listener){
         List<ViewAttachedListener> attachListeners=mAttachListeners;
         return null!=attachListeners&&null!=listener&&attachListeners.remove(listener);
+    }
+
+    public final ViewContent setDimAmount(float amount){
+        return setBackground(new ColorDrawable(Color.argb((int)(amount*255),0,0,0)));
     }
 
     public final ViewContent setBackgroundColor(int color){

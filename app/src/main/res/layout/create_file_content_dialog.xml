@@ -6,7 +6,7 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
-    <FrameLayout android:background="@drawable/round_bg"
+    <FrameLayout android:background="@drawable/dialog_bg"
         android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="vertical" android:layout_marginTop="10dp"
         android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -28,9 +28,9 @@
         <TextView binding:bind="@{VB.clickId(content.mCreateDir?R.string.createFolder:R.string.createFile)}"
             android:layout_gravity="center" android:textColor="@color/textTitle"
             android:textSize="18sp" android:textStyle="bold" android:gravity="center"
-            android:background="@drawable/selector_button" android:paddingTop="5dp"
-            android:paddingLeft="5dp" android:layout_marginTop="30dp"
-            android:layout_marginLeft="40dp" android:layout_marginRight="40dp"
+            android:background="@drawable/selector_button" android:layout_marginTop="30dp"
+            android:paddingBottom="10dp" android:paddingTop="10dp"
+            android:layout_marginLeft="50dp" android:layout_marginRight="50dp"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
     </LinearLayout>
     <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"

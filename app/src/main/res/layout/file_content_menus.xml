@@ -9,13 +9,14 @@
     </data>
     <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout android:orientation="vertical" android:background="@drawable/round_corner_gray"
-            android:layout_width="250dp" android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:paddingTop="5dp" android:paddingBottom="15dp"
             android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
-            <TextView android:text="@{content.title??content.file.name??``}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
-                android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp" android:ellipsize="end"
-                android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="3"/>
+            <com.luckmerlin.view.MarqueeTextView android:text="@{content.title??content.file.name??``}"
+                android:textColor="@color/textTitle" android:textSize="@dimen/textTitle" android:gravity="center"
+                android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
+                android:layout_width="180dp" android:layout_height="wrap_content"/>
 
             <ScrollView android:layout_gravity="center" android:scrollbars="none" android:layout_marginTop="5dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
@@ -26,9 +27,8 @@
                     <TextView  binding:bind="@{VB.clickId(R.string.move,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.delete,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(content.file.localFile?R.string.upload:R.string.download,content.file)}" style="@style/contextMenuTextView" />
-                    <TextView  binding:bind="@{VB.clickId(R.string.setAsHome,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.multiChoose,content.file)}" style="@style/contextMenuTextView" />
-                    <TextView  binding:bind="@{VB.clickId(R.string.share,content.file)}" android:visibility="@{content.file.directory?View.GONE:View.VISIBLE}" style="@style/contextMenuTextView" />
+                    <TextView  binding:bind="@{VB.clickId(R.string.share,content.file)}" android:visibility="@{!content.file.localFile||content.file.directory?View.GONE:View.VISIBLE}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.attr,content.file)}" style="@style/contextMenuTextView" />
                 </LinearLayout>
             </ScrollView>
