@@ -11,7 +11,7 @@
         <import type="android.text.method.LinkMovementMethod"/>
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
     </data>
-   <FrameLayout android:fitsSystemWindows="true" android:background="#55000000"
+   <FrameLayout android:fitsSystemWindows="true" android:background="@color/modelBackground"
        android:layout_width="match_parent" android:layout_height="match_parent">
 
        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">

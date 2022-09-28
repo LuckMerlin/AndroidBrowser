@@ -16,41 +16,51 @@
         <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent" android:layout_height="match_parent" android:fitsSystemWindows="true">
 
-            <LinearLayout android:orientation="horizontal" android:layout_marginTop="5dp" android:layout_marginBottom="5dp"
+            <LinearLayout android:orientation="horizontal"
+                android:layout_marginBottom="5dp" android:layout_marginTop="5dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content">
-                <include binding:client="@{vm.browserAdapter.browserClient}"
-                    android:layout_weight="2.5" android:layout_width="0dp"
+                <ImageView binding:bind="@{VB.clickId(R.drawable.selector_back)}" android:padding="5dp"
+                    android:layout_width="40dp" android:layout_height="40dp"/>
+                
+                <LinearLayout android:background="@drawable/edit_round_bg" android:layout_weight="1"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:paddingLeft="10dp" android:paddingRight="10dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_height="wrap_content" layout="@layout/client_card"/>
-               <LinearLayout   android:layout_weight="2"  android:layout_width="0dp" android:layout_height="match_parent"
-                   android:layout_marginLeft="5dp" android:gravity="center" android:orientation="vertical">
-                   <LinearLayout android:orientation="horizontal" android:layout_width="match_parent"
-                       android:layout_height="wrap_content">
-                       <LinearLayout android:background="@drawable/round_bg" android:layout_weight="1.1"
-                           android:layout_width="wrap_content" android:layout_height="wrap_content"
-                           android:paddingLeft="10dp" android:paddingRight="10dp"
-                           android:paddingBottom="5dp" android:paddingTop="5dp" android:gravity="center">
-                           <ImageView binding:bind="@{VB.clickId(R.drawable.selector_search)}" android:padding="5dp"
-                               android:layout_width="40dp" android:layout_height="40dp"/>
-                           <EditText android:hint="@string/search" android:background="#00000000"
-                               android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_weight="1"
-                               android:layout_width="0dp" android:layout_height="wrap_content"/>
-                       </LinearLayout>
-                       <Space android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                       <ImageView binding:bind="@{VB.clickId(R.drawable.selector_transport)}" android:padding="5dp"
-                           android:layout_width="40dp" android:layout_height="40dp" android:rotation="90"/>
-                   </LinearLayout>
-                   <Space android:layout_weight="1" android:layout_width="match_parent" android:layout_height="0dp"/>
-                   <LinearLayout android:orientation="horizontal" android:gravity="bottom"
-                       android:layout_width="match_parent" android:layout_height="wrap_content">
-                       <TextView android:text="@string/time" android:textColor="@color/sortTitle"
-                           android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                       <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-                       <ImageView binding:bind="@{VB.clickId(vm.browserAdapter.gridLayout?R.drawable.selector_list:R.drawable.selector_gird)}"
-                           android:padding="5dp" android:layout_width="40dp" android:layout_height="40dp"/>
-                   </LinearLayout>
-               </LinearLayout>
+                    android:paddingBottom="5dp" android:paddingTop="5dp" android:gravity="center">
+                    <ImageView binding:bind="@{VB.clickId(R.drawable.selector_search)}" android:padding="5dp"
+                        android:layout_width="30dp" android:layout_height="30dp"/>
+                    <EditText android:hint="@string/search" android:paddingLeft="5dp"
+                        android:paddingRight="5dp" android:layout_weight="1" android:background="#00000000"
+                        android:layout_width="0dp" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <ImageView binding:bind="@{VB.clickId(R.drawable.selector_transport)}" android:padding="5dp"
+                    android:layout_width="40dp" android:layout_height="40dp" android:rotation="90"/>
+                <ImageView binding:bind="@{VB.create(vm.browserAdapter.mode==null?R.drawable.selector_menu:R.drawable.selector_cancel)}"
+                    android:layout_width="40dp" android:layout_height="40dp" android:padding="5dp"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:background="@drawable/client_card_bg" android:orientation="horizontal"
+                android:paddingLeft="5dp" android:paddingRight="5dp"
+                android:paddingTop="5dp" android:paddingBottom="5dp"
+                android:layout_marginBottom="5dp" android:layout_marginTop="5dp">
+
+                <include binding:client="@{vm.browserAdapter.browserClient}" android:layout_width="0dp"
+                    android:paddingLeft="15dp" android:paddingRight="15dp" android:layout_marginRight="5dp"
+                    android:layout_height="wrap_content" layout="@layout/item_client" android:layout_weight="1"/>
+
+                <LinearLayout android:background="@drawable/client_bg_sub"  android:gravity="center_vertical" android:layout_weight="1"
+                    android:paddingLeft="15dp" android:paddingRight="15dp" android:layout_gravity="center"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginLeft="5dp" android:orientation="horizontal">
+                    <TextView android:text="@string/time" android:textColor="@color/sortTitle"
+                        android:paddingLeft="5dp" android:paddingRight="5dp"
+                        android:paddingBottom="5dp" android:paddingTop="5dp"
+                        android:background="@drawable/round_bt_bg" android:layout_gravity="bottom"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+                    <ImageView binding:bind="@{VB.clickId(vm.browserAdapter.gridLayout?R.drawable.selector_list:R.drawable.selector_gird)}"
+                       android:layout_width="40dp" android:layout_height="40dp" android:padding="5dp"/>
+                </LinearLayout>
             </LinearLayout>
 
             <HorizontalScrollView android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_marginLeft="5dp"

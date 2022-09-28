@@ -6,13 +6,13 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
-    <LinearLayout android:orientation="vertical" android:background="@drawable/round_corner_gray"
+    <LinearLayout android:orientation="vertical" android:background="@drawable/round_bg"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingTop="5dp" android:paddingBottom="15dp"
         android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
-        <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
-            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp" android:minLines="2" android:maxLines="2"
+        <TextView android:text="@{content.title??``}" android:textColor="@color/textMain" android:textSize="@dimen/textTitle"
+            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp" android:maxLines="2"
             android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxWidth="120dp" android:ellipsize="end"/>
 
         <ScrollView android:layout_gravity="center" android:scrollbars="none" android:layout_marginTop="5dp"
@@ -21,11 +21,9 @@
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
                 <TextView  binding:bind="@{VB.clickId(R.string.refresh)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.conveyor)}" style="@style/contextMenuTextView" />
-                <TextView  binding:bind="@{VB.clickId(R.string.setAsHome)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.create)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.goTo)}" style="@style/contextMenuTextView" />
-                <TextView  binding:bind="@{VB.clickId(R.string.terminal)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.exit)}" style="@style/contextMenuTextView" />
             </LinearLayout>
         </ScrollView>

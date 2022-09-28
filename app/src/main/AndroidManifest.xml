@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".BrowserApplication"
         android:requestLegacyExternalStorage="true"
         android:networkSecurityConfig="@xml/network_security_config"
         android:allowBackup="true"
@@ -15,6 +16,7 @@
         android:supportsRtl="true"
         tools:targetApi="31" >
         <activity android:name=".BrowserActivity"
+            android:screenOrientation="sensor"
             android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
             android:exported="true" android:launchMode="singleInstance">
             <intent-filter>

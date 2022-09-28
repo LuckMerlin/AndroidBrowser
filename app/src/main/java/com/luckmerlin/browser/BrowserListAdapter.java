@@ -24,6 +24,7 @@ import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
@@ -51,7 +52,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private final PathSpanClick mPathSpanClick=new PathSpanClick();
     private ObservableField<Boolean> mGridLayout=new ObservableField<>(true);
     private final static int VIEW_TYPE_DATA_GRID=2000;
-    private Mode mMode;
+    private final ObservableField<Mode> mMode=new ObservableField<>();
     private Executor mExecutor;
 
     protected BrowserListAdapter() {
@@ -229,14 +230,31 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return mBrowserClient;
     }
 
-    public final boolean setMode(Mode mode){
-        mMode=mode;
+    public final boolean entryMode(Integer modeInt){
+        return entryMode(modeInt,null);
+    }
+
+    public final boolean entryMode(Integer modeInt, OnConfirm<Object,Boolean> onConfirm, Object... args){
+        Mode current=mMode.get();
+        if(null==current&&null==modeInt){
+            Debug.D("Not need entry mode while not changed.");
+            return true;
+        }else if (null!=current&&null!=modeInt&&current.isMode(modeInt)){
+            current.setOnConfirm(onConfirm);
+            Debug.D("Not need entry mode while not changed."+current);
+            return true;
+        }
+        return entryMode(null!=modeInt?new Mode(modeInt).setOnConfirm(onConfirm):null);
+    }
+
+    public final boolean entryMode(Mode mode){
+        mMode.set(mode);
         notifyAttachedItemChanged();
         return true;
     }
 
     public final boolean selectFile(File file){
-        Mode current=mMode;
+        Mode current=mMode.get();
         int index= null!=file&&null!=current?indexPosition(file):-1;
         if (index>=0){
             current.add(file);
@@ -247,7 +265,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     }
 
     public final boolean unSelectFile(File file){
-        Mode current=mMode;
+        Mode current=mMode.get();
         int index= null!=file&&null!=current?indexPosition(file):-1;
         if (index>=0){
             current.remove(file);
@@ -258,7 +276,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     }
 
     public final boolean isSelectedFile(File file){
-        Mode current=null!=file?mMode:null;
+        Mode current=null!=file?mMode.get():null;
         return null!=current&&current.isContains(file);
     }
 
@@ -344,7 +362,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
-            Mode mode=mMode;
+            Mode mode=mMode.get();
             fileBinding.setMode(mode);
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
@@ -370,7 +388,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
-            Mode mode=mMode;
+            Mode mode=mMode.get();
             fileBinding.setMode(mode);
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
@@ -413,5 +431,9 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public ObservableField<Boolean> getGridLayout() {
         return mGridLayout;
+    }
+
+    public ObservableField<Mode> getMode() {
+        return mMode;
     }
 }

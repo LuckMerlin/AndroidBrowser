@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="client" type="com.luckmerlin.browser.Client" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
+        <import type="com.luckmerlin.browser.utils.FileSize"/>
+    </data>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_marginBottom="5dp"
+        android:layout_height="wrap_content" android:gravity="center_vertical">
+        <ImageView android:padding="1dp" android:background="@drawable/round_client_logo_bg"
+            android:src="@mipmap/ic_launcher" android:layout_width="55dp" android:layout_height="55dp"/>
+        <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
+            android:paddingLeft="5dp" android:paddingRight="5dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+
+            <include binding:client="@{client}" layout="@layout/item_client_name"/>
+
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="@dimen/textTitleSub"
+                    android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
+                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="@dimen/textTitleSub"
+                    android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <SeekBar android:layout_width="match_parent" android:layout_height="2dp"/>
+        </LinearLayout>
+    </LinearLayout>
+</layout>

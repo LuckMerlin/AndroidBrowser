@@ -248,7 +248,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         }
         Mode mode=null!=modeInt?new Mode(modeInt).setOnConfirm(onConfirm):null;
         mBrowserMode.set(mode);
-        mBrowserAdapter.setMode(mode);
+//        mBrowserAdapter.setMode(mode);
         return true;
     }
 
@@ -462,7 +462,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             case R.drawable.selector_choose_none:
             case R.drawable.selector_choose_all:
                 Mode mode=mBrowserMode.get();
-                return null!=mode&&mode.enableAll(!mode.isAllEnabled())&&mBrowserAdapter.setMode(mode);
+                return null!=mode&&mode.enableAll(!mode.isAllEnabled())&&mBrowserAdapter.entryMode(mode);
             case R.string.share:
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
             case R.string.exit:

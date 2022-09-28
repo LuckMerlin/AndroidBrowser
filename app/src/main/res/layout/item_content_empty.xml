@@ -24,7 +24,7 @@
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="2dp"
                 android:textSize="@dimen/textTitle"
-                android:textColor="@color/textTitle"
+                android:textColor="@color/textMain"
                 android:textStyle="bold"/>
         </LinearLayout>
 

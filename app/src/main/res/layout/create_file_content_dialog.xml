@@ -6,7 +6,7 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
-    <FrameLayout android:background="@drawable/round_corner_gray"
+    <FrameLayout android:background="@drawable/round_bg"
         android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="vertical" android:layout_marginTop="10dp"
         android:layout_width="match_parent" android:layout_height="wrap_content"
