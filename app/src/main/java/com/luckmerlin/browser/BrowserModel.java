@@ -332,9 +332,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean showBrowserContextMenu(Context context){
-        return null!=showContentDialog(new BrowserMenuContextDialogContent().setTitle(getString(R.string.app_name)),
-                context,new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER));
+        return null!=showContentDialog(new BrowserMenuContextDialogContent().setTitle(getString(R.string.app_name)).
+        setBackgroundColor(getColor(R.color.hintColor)).setLayoutParams(new FixedLayoutParams().
+        wrapContentAndCenter()).outsideDismiss(), context, new FixedLayoutParams().fillParentAndCenter());
     }
 
     @Override

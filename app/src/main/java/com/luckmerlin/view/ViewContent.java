@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
@@ -16,6 +20,10 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 
+import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.click.Listener;
+import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.MatcherInvoker;
 import com.luckmerlin.debug.Debug;
@@ -27,6 +35,9 @@ import java.util.concurrent.Executor;
 public abstract class ViewContent implements Content {
     private View mRoot;
     private List<ViewAttachedListener> mAttachListeners;
+    private Drawable mBackground;
+    private LayoutParamsResolver mLayoutParamsResolver;
+    private Binding mBinding;
 
     protected abstract View onCreateContent(Context context);
 
@@ -46,6 +57,42 @@ public abstract class ViewContent implements Content {
     public final boolean removeOnAttachStateChangeListener(ViewAttachedListener listener){
         List<ViewAttachedListener> attachListeners=mAttachListeners;
         return null!=attachListeners&&null!=listener&&attachListeners.remove(listener);
+    }
+
+    public final ViewContent setBackgroundColor(int color){
+        return setBackground(new ColorDrawable(color));
+    }
+
+    public final ViewContent setBackground(Drawable drawable){
+        if (!isCreated()){
+            mBackground=drawable;
+        }
+        return this;
+    }
+
+    public final ViewContent setLayoutParams(LayoutParamsResolver layoutParamsResolver) {
+        if (!isCreated()) {
+            this.mLayoutParamsResolver = layoutParamsResolver;
+        }
+        return this;
+    }
+
+    public final ViewContent setBinding(Binding binding){
+           if (! isCreated()){
+               mBinding=binding;
+           }
+        return this;
+    }
+
+    public final ViewContent outsideDismiss(){
+        return outsideDismiss(null);
+    }
+
+    public final ViewContent outsideDismiss(OnClickListener listener){
+        setBinding(new ViewBinding(null).setListener((OnClickListener)
+                (View view, int clickId, int count, Object obj)->
+                  (null!=listener&&listener.onClick(view,clickId,count,obj))||removeFromParent()));
+        return this;
     }
 
     @Override
@@ -96,11 +143,27 @@ public abstract class ViewContent implements Content {
                     });
                 }
             });
-            frameLayout.addView(root,new FrameLayout.LayoutParams(ViewGroup.
-                    LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            LayoutParamsResolver layoutParamsResolver=mLayoutParamsResolver;
+            FrameLayout.LayoutParams layoutParams=new FrameLayout.LayoutParams(ViewGroup.
+                    LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            if (null!=layoutParamsResolver){
+                layoutParamsResolver.onResolveLayoutParams(context,layoutParams);
+            }
+            frameLayout.addView(root,layoutParams);
             root=frameLayout;
         }
-        return mRoot=root;
+        mRoot=root;
+        if (null!=root){
+            root.setBackground(mBackground);
+            Binding binding=mBinding;
+            if (null!=binding){
+                binding.onBind(root);
+            }
+        }
+        mLayoutParamsResolver=null;
+        mBackground=null;
+        mBinding=null;
+        return mRoot;
     }
 
     public final boolean removeFromParent(){
@@ -111,6 +174,10 @@ public abstract class ViewContent implements Content {
             return true;
         }
         return false;
+    }
+
+    public final boolean isCreated(){
+        return null!=getRoot();
     }
 
     public final View getRoot(){
@@ -157,6 +224,12 @@ public abstract class ViewContent implements Content {
     public final String getString(int resId, Object... formatArgs){
         Context context=getContext();
         return null!=context?context.getString(resId,formatArgs):null;
+    }
+
+    public final int getColor(int resId){
+        Context context=getContext();
+        Resources resources=null!=context?context.getResources():null;
+        return null!=resources?resources.getColor(resId):Color.TRANSPARENT;
     }
 
     public final CharSequence getText(int resId){

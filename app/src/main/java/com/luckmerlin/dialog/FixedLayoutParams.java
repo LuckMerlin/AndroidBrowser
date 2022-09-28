@@ -42,7 +42,42 @@ public class FixedLayoutParams implements LayoutParamsResolver {
         return this;
     }
 
-    public FixedLayoutParams dialog(){
+    public final FixedLayoutParams fillParentAndCenter(){
+        return fillParent(Gravity.CENTER);
+    }
+
+    public final FixedLayoutParams wrapContentAndCenter(){
+        return wrapContent(Gravity.CENTER);
+    }
+
+    public final FixedLayoutParams wrapContent(int gravity){
+        setHeight(ViewGroup.LayoutParams.WRAP_CONTENT).
+                setWidth(ViewGroup.LayoutParams.WRAP_CONTENT).setGravity(gravity);
+        return this;
+    }
+
+    public final FixedLayoutParams fillParent(int gravity){
+        setHeight(ViewGroup.LayoutParams.MATCH_PARENT).
+                setWidth(ViewGroup.LayoutParams.MATCH_PARENT).setGravity(gravity);
+        return this;
+    }
+
+    public FixedLayoutParams setGravity(int gravity) {
+        this.mGravity = gravity;
+        return this;
+    }
+
+    public FixedLayoutParams setHeight(Number height) {
+        this.mHeight = height;
+        return this;
+    }
+
+    public FixedLayoutParams setWidth(Number width) {
+        this.mWidth = width;
+        return this;
+    }
+
+    public final FixedLayoutParams dialog(){
         mWidth=ViewGroup.LayoutParams.WRAP_CONTENT;
         mHeight=ViewGroup.LayoutParams.WRAP_CONTENT;
         mGravity=Gravity.CENTER;

@@ -6,7 +6,7 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
     </data>
-    <LinearLayout android:orientation="vertical" android:background="@drawable/round_bg"
+    <LinearLayout android:orientation="vertical" android:background="@drawable/dialog_bg"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingTop="5dp" android:paddingBottom="15dp"
         android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
@@ -16,7 +16,7 @@
             android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxWidth="120dp" android:ellipsize="end"/>
 
         <ScrollView android:layout_gravity="center" android:scrollbars="none" android:layout_marginTop="5dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content">
+            android:layout_width="wrap_content" android:layout_height="wrap_content" >
             <LinearLayout android:orientation="vertical" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content">
                 <TextView  binding:bind="@{VB.clickId(R.string.refresh)}" style="@style/contextMenuTextView" />
