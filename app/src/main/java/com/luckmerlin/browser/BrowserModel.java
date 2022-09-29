@@ -221,11 +221,11 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return false;
         }
         final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setName(task.getName());
+        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setMaxWidth(0.8f));
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
-        return null!=showContentDialog(content, new FixedLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER).setMaxHeight(0.5f).setMaxWidth(0.8f));
+        return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
     }
 
     private boolean showFileContextMenu(View view, File file){
@@ -308,6 +308,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null!=conveyorBinder) {
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
+            //Test
+            TestTask testTask=new TestTask(getActivity());
+            testTask.setName("eeeeeeeee");
+            launchTask(testTask, Executor.Option.NONE,true);
         }
     }
 

@@ -4,6 +4,7 @@
     <data>
         <variable name="brief" type="com.luckmerlin.core.Brief" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="android.view.View"/>
     </data>
 
     <LinearLayout android:orientation="vertical" android:layout_gravity="center"
@@ -14,12 +15,14 @@
             android:src="@mipmap/ic_launcher" android:layout_width="50dp" android:layout_height="50dp"/>
 
         <com.luckmerlin.view.MarqueeTextView android:text="@{brief.name??``}"
-            android:textColor="@color/textMain" android:textSize="13sp"
+            android:visibility="@{brief.name.length()>0?View.VISIBLE:View.GONE}"
+            android:textColor="@color/textMainAnti" android:textSize="13sp"
             android:layout_gravity="center_horizontal" android:singleLine="true"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:ellipsize="none"/>
 
-        <com.luckmerlin.view.MarqueeTextView android:text="@{brief.note??``}" android:textColor="@color/textMain"
+        <com.luckmerlin.view.MarqueeTextView android:text="@{brief.note??``}" android:textColor="@color/textMainAnti"
+            android:visibility="@{brief.note.length()>0?View.VISIBLE:View.GONE}"
             android:textSize="13sp" android:layout_gravity="center_horizontal" android:maxLines="1"
             android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>

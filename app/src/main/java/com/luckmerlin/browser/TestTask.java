@@ -1,9 +1,17 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
+import android.content.Context;
+import android.view.View;
 
+import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
+import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
 public class TestTask extends AbstractTask {
@@ -16,6 +24,38 @@ public class TestTask extends AbstractTask {
 
     @Override
     protected Result onExecute(Runtime runtime) {
+//        if (System.currentTimeMillis()%2!=0){
+            Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
+                    setSpeed("666MB/S");
+            while (progress.getPosition()<progress.getTotal()){
+                progress.setPosition(progress.getPosition()+1);
+                notifyProgress(progress);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+//            return null;
+//        }
+        return new ConfirmResult() {
+            @Override
+            protected Confirm onCreate(Context context) {
+                return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(
+                        ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
+            }
+        };
+//        while (true){
+//            try {
+//
+////                notifyProgress();
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
+
 
 //        try {
 //            HttpURLConnection connection= (HttpURLConnection) new URL("http://192.168.0.10:5001/file/test").openConnection();
@@ -67,7 +107,7 @@ public class TestTask extends AbstractTask {
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        return null;
+//        return null;
     }
 //    @Override
 //    protected Object onExecute(Object arg) {

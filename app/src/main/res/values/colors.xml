@@ -9,7 +9,7 @@
     <color name="textMain">#284eeb</color>
     <color name="hintColor">#55000000</color>
     <color name="textMainAnti">#fff</color>
-    <color name="dialogBg">#aa444444</color>
+    <color name="dialogBg">#ee444444</color>
     <color name="browserBackground">#55000000</color>
     <color name="textTitleSub">#a000</color>
     <color name="syncNull">@android:color/transparent</color>

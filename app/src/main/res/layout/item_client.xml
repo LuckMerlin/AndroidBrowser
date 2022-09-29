@@ -19,13 +19,15 @@
             <include binding:client="@{client}" layout="@layout/item_client_name"/>
 
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="@dimen/textTitleSub"
+                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="11sp"
                     android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>
-                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="@dimen/textTitleSub"
+                <TextView android:text="1012.45MB" android:textColor="@color/textTitle" android:textSize="11sp"
                     android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
             </LinearLayout>
-            <SeekBar android:layout_width="match_parent" android:layout_height="2dp"/>
+            <ProgressBar android:layout_width="match_parent" android:layout_height="2dp"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:progressDrawable="@drawable/seekbar_bg"/>
         </LinearLayout>
     </LinearLayout>
 </layout>

@@ -58,8 +58,7 @@ public class DoingContent extends BaseContent implements OnClickListener,
 
     @Override
     protected View onCreateContent(Context context) {
-        mBinding=new DialogButtonBinding(ViewBinding.clickId(R.string.sure),
-                ViewBinding.clickId(R.string.cancel));
+        mBinding=new DialogButtonBinding(ViewBinding.clickId(R.string.sure), ViewBinding.clickId(R.string.cancel));
         DoingTaskBinding binding=inflate(context,R.layout.doing_task);
         binding.setDoing(this);
 //        Handler handler=new Handler();
@@ -87,6 +86,7 @@ public class DoingContent extends BaseContent implements OnClickListener,
     @Override
     public void onProgressChanged(Task task, Progress progress) {
         mProgress.set(progress);
+        mProgress.notifyChange();
         Object object=null!=progress?progress.getData():null;
         DoingFiles doingFiles=null!=object&&object instanceof DoingFiles?((DoingFiles)object):null;
         mFrom.set(null!=doingFiles?doingFiles.getFrom():null);

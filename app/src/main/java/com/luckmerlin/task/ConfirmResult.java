@@ -46,6 +46,11 @@ public abstract class ConfirmResult implements Result {
             return this;
         }
 
+        public final Confirm setBinding(Binding binding) {
+            mBinding = binding;
+            return this;
+        }
+
         public final Confirm setTitle(String title) {
             mTitle = title;
             return this;

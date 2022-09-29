@@ -6,5 +6,6 @@
     </data>
 
     <TextView binding:bind="@{binding}" android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_weight="1" style="@style/dialogButton"/>
+        android:layout_weight="1" style="@style/dialogButton"
+        android:paddingBottom="5dp" android:paddingTop="5dp"/>
 </layout>
