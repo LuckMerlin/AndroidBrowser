@@ -29,6 +29,8 @@ import com.luckmerlin.browser.dialog.TaskDialogContent;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.task.FileCopyTask;
+import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -129,6 +131,32 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return finishActivity()||true;
             case R.string.share:
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
+            case Mode.MODE_COPY:
+            case Mode.MODE_UPLOAD:
+            case Mode.MODE_DOWNLOAD:
+                return null!=obj&&obj instanceof File&&entryMode(new Mode(clickId).makeSureBinding(
+                        (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
+                    Folder folder=mBrowserAdapter.getFolder();
+                    if (null==folder||folder.isChild(obj,true)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return true;
+                    }
+                    entryMode(null);
+                    return launchTask(new FileCopyTask((File)obj,folder,null).
+                            enableDeleteSucceed(true).setName(getString(R.string.copy)), Executor.Option.NONE,true)||true;
+                }));
+            case R.string.move:
+                return null!=obj&&obj instanceof File&&entryMode(new Mode(Mode.MODE_MOVE).makeSureBinding(
+                        (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
+                    Folder folder=mBrowserAdapter.getFolder();
+                    if (null==folder||folder.isChild(obj,true)){
+                        toast(R.string.canNotOperateHere,-1);
+                        return true;
+                    }
+                    entryMode(null);
+                    return launchTask(new FileMoveTask((File)obj ,folder,null).enableDeleteSucceed
+                                    (true).setName(getString(R.string.move)), Executor.Option.NONE,true)||true;
+                }));
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -148,8 +176,20 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return false;
     }
 
-    public boolean entryMode(Integer modeInt, OnConfirm<Object,Boolean> onConfirm, Object... args){
-        return mBrowserAdapter.entryMode(modeInt,onConfirm,args);
+    public boolean entryMode(Object mode, Object... args){
+        return entryMode(mode,null,args);
+    }
+
+    public boolean entryMode(Object mode, OnConfirm<Object,Boolean> onConfirm, Object... args){
+        return mBrowserAdapter.entryMode(mode,onConfirm,args);
+    }
+
+    private boolean makeModeSure(Object arg){
+        ObservableField<Mode> observable=mBrowserAdapter.getMode();
+        Mode mode=null!=observable?observable.get():null;
+        OnConfirm<Object,Boolean> onConfirm=null!=mode?mode.getOnConfirm():null;
+        Boolean confirmed=null!=onConfirm?onConfirm.onConfirm(arg):null;
+        return null!=confirmed&&confirmed&&entryMode(null,null);
     }
 
     private boolean createFile(){
@@ -311,7 +351,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             //Test
             TestTask testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
-            launchTask(testTask, Executor.Option.NONE,true);
+//            launchTask(testTask, Executor.Option.NONE,true);
         }
     }
 

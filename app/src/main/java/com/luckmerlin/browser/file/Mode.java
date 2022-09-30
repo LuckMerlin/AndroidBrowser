@@ -1,7 +1,11 @@
 package com.luckmerlin.browser.file;
 
+import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.BrowserActivityModel;
 import com.luckmerlin.browser.R;
+import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.click.Listener;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
@@ -22,6 +26,7 @@ public final class Mode {
     private Map<String,String> mExtra;
     private boolean mAllEnabled;
     private OnConfirm<Object,Boolean> mOnConfirm;
+    private Binding mBinding;
 
     public Mode(int mode){
         this(mode,null);
@@ -39,6 +44,11 @@ public final class Mode {
 
     public OnConfirm<Object, Boolean> getOnConfirm() {
         return mOnConfirm;
+    }
+
+    public Mode makeSureBinding(Listener listener){
+        mBinding= new DialogButtonBinding(ViewBinding.clickId(R.string.sure).setListener(listener));
+        return this;
     }
 
     public boolean isContains(Object arg){
@@ -144,9 +154,12 @@ public final class Mode {
     }
 
     public final boolean isMode(int... modes){
-        for (int child:modes) {
-            if (child==mMode){
-                return true;
+        Integer current=mMode;
+        if (null!=current&&null!=modes){
+            for (int child:modes) {
+                if (child==current){
+                    return true;
+                }
             }
         }
         return false;
@@ -167,5 +180,14 @@ public final class Mode {
 
     public int getMode() {
         return mMode;
+    }
+
+    public Mode setBinding(Binding binding){
+        mBinding=binding;
+        return this;
+    }
+
+    public Binding getBinding() {
+        return mBinding;
     }
 }

@@ -9,6 +9,7 @@
         <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="android.text.method.LinkMovementMethod"/>
+        <import type="com.luckmerlin.binding.LayoutBinding"/>
     </data>
 
     <FrameLayout android:paddingLeft="10dp" android:paddingRight="10dp" android:background="@color/modelBackground"
@@ -113,11 +114,11 @@
                         style="@style/LoadingProgressBar" android:layout_gravity="center"
                         android:layout_width="50dp" android:layout_height="50dp"/>
                 </FrameLayout>
-                <LinearLayout android:visibility="@{vm.browserAdapter.mode.isMode(Mode.MODE_COPY,Mode.MODE_UPLOAD,Mode.MODE_MOVE,Mode.MODE_DOWNLOAD)?View.VISIBLE:View.GONE}"
-                    android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp" android:paddingTop="2dp" android:layout_marginBottom="10dp"
-                    android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                    <TextView binding:bind="@{VB.clickId(R.string.sure)}" style="@style/browserBottomTextView"/>
-                </LinearLayout>
+                <LinearLayout android:visibility="@{vm.browserAdapter.mode.binding==null?View.GONE:View.VISIBLE}"
+                    android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp"
+                    android:paddingTop="2dp" android:layout_marginBottom="10dp" android:orientation="horizontal"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    binding:bind="@{LayoutBinding.layout(vm.browserAdapter.mode.binding).removeAll(true).toParent(false)}" />
             </LinearLayout>
 
         </LinearLayout>

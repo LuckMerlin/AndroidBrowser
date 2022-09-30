@@ -53,6 +53,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Boolean> mGridLayout=new ObservableField<>(true);
     private final static int VIEW_TYPE_DATA_GRID=2000;
     private final ObservableField<Mode> mMode=new ObservableField<>();
+    private final static String PAYLOADS_MODE_CHANGED="ModeChanged";
     private Executor mExecutor;
 
     protected BrowserListAdapter() {
@@ -230,11 +231,19 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return mBrowserClient;
     }
 
-    public final boolean entryMode(Integer modeInt){
-        return entryMode(modeInt,null);
+    public final boolean entryMode(Object mode){
+        return entryMode(mode,null);
     }
 
-    public final boolean entryMode(Integer modeInt, OnConfirm<Object,Boolean> onConfirm, Object... args){
+    public final boolean entryMode(Object mode, OnConfirm<Object,Boolean> onConfirm, Object... args){
+        Integer modeInt=null;
+        if(null==mode){
+            //
+        }else if (mode instanceof Integer){
+            modeInt=(Integer)mode;
+        }else if(mode instanceof Mode){
+            modeInt=((Mode)mode).getMode();
+        }
         Mode current=mMode.get();
         if(null==current&&null==modeInt){
             Debug.D("Not need entry mode while not changed.");
@@ -244,12 +253,13 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             Debug.D("Not need entry mode while not changed."+current);
             return true;
         }
-        return entryMode(null!=modeInt?new Mode(modeInt).setOnConfirm(onConfirm):null);
+        return entryMode(null!=modeInt?(null!=mode&&mode instanceof Mode?((Mode) mode):
+                new Mode(modeInt)).setOnConfirm(onConfirm):null);
     }
 
     public final boolean entryMode(Mode mode){
         mMode.set(mode);
-        notifyAttachedItemChanged();
+        notifyAttachedItemChanged(PAYLOADS_MODE_CHANGED);
         return true;
     }
 
@@ -359,7 +369,6 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         File file=getItem(position);
         if (binding instanceof ItemBrowserFileBinding){
             ItemBrowserFileBinding fileBinding=((ItemBrowserFileBinding)binding);
-            fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
@@ -367,6 +376,9 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
             Client client=null;Canceler canceler;
+            if (!checkContains(payloads,PAYLOADS_MODE_CHANGED)){
+                fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
+            }
             if (null!=file&&null!=(client=getClient())){//Try load file thumb
                 Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;
                 if (null!=(canceler=loadThumb(itemView,client,file,(Drawable thumb)-> postIfPossible(()->{
@@ -385,13 +397,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             }
         }else if (binding instanceof ItemBrowserFileGirdBinding){
             ItemBrowserFileGirdBinding fileBinding=((ItemBrowserFileGirdBinding)binding);
-            fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
             fileBinding.setMode(mode);
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
+            if (!checkContains(payloads,PAYLOADS_MODE_CHANGED)){
+                fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
+            }
             Client client=null;Canceler canceler;
             if (null!=file&&null!=(client=getClient())){//Try load file thumb
                 Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;

@@ -130,6 +130,10 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
     }
 
     public final boolean notifyAttachedItemChanged(){
+        return notifyAttachedItemChanged(null);
+    }
+
+    public final boolean notifyAttachedItemChanged(Object payload){
         Map<RecyclerView.ViewHolder,Object> attachViewHolders=mAttachViewHolders;
         Collection<Object> collection=null!=attachViewHolders?attachViewHolders.values():null;
         if (null!=collection){
@@ -137,17 +141,17 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
                 if (child instanceof UpdateData){
                     child=((UpdateData)child).mData;
                 }
-                notifyFirstItemChanged(child);
+                notifyFirstItemChanged(child,null!=payload?payload:"NotifyAttachedChanged");
             }
             return true;
         }
         return false;
     }
 
-    public final boolean notifyFirstItemChanged(Object object){
+    public final boolean notifyFirstItemChanged(Object object,Object payload){
         int index=null!=object?indexPosition(object):null;
         if (index>=0){
-            notifyItemChanged(index,"NotifyFirst");
+            notifyItemChanged(index,null!=payload?payload:"NotifyFirst");
             return true;
         }
         return false;
@@ -446,6 +450,17 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
         Looper looper=Looper.myLooper();
         Looper uiLooper=Looper.getMainLooper();
         return null!=looper&&null!=uiLooper&&looper==uiLooper;
+    }
+
+    public final boolean checkContains(List<Object> list,Object obj){
+        if (null!=list&&null!=obj){
+            for (Object child:list) {
+                if (null!=child&&child.equals(obj)){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public final RecyclerView.ViewHolder inflateViewHolder(Context context, Object viewHolder){

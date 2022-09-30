@@ -55,7 +55,8 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
 
     public boolean unSelect(Object obj){
         List<Task> select=mSelectedList;
-        return null!=obj&&obj instanceof Task&&null!=select&&select.remove(obj)&&notifyFirstItemChanged(obj);
+        return null!=obj&&obj instanceof Task&&null!=select&&select.remove(obj)&&
+                notifyFirstItemChanged(obj,"UnSelected");
     }
 
     public boolean select(Object obj){
@@ -64,7 +65,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             select=null!=select?select:(mSelectedList=new ArrayList<>());
             if (!select.contains(obj)){
                 select.add((Task) obj);
-                return notifyFirstItemChanged(select);
+                return notifyFirstItemChanged(select,"SelectedChanged");
             }
         }
         return false;
