@@ -19,8 +19,8 @@
     <color name="synced">#0f0</color>
     <color name="itemFileName">#000</color>
     <color name="sortTitle">#483fe6</color>
-    <color name="iconNormal">#483fe6</color>
-    <color name="iconPressed">#55483fe6</color>
+    <color name="iconNormal">#284eeb</color>
+    <color name="iconPressed">#55284eeb</color>
     <color name="iconDisable">#33e6e6e6</color>
     <color name="buttonNormal">#88ffffff</color>
     <color name="buttonPressed">#33ffffff</color>

@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
 
+import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.Utils;
@@ -97,7 +98,7 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, Filter filter){
+    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter){
         String folderPath=null!=folder?folder.getPath():null;
         return mHttp.call(new Request().url("/file/browser").
                 headerEncode(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).

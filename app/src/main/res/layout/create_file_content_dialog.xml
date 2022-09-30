@@ -8,32 +8,33 @@
     </data>
     <FrameLayout android:background="@drawable/dialog_bg"
         android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical" android:layout_marginTop="10dp"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:minWidth="350dp" android:paddingTop="5dp" android:paddingBottom="15dp"
-        android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
+        <LinearLayout android:orientation="vertical" android:layout_marginTop="10dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:minWidth="350dp" android:paddingTop="5dp" android:paddingBottom="15dp"
+            android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
-        <TextView android:text="@string/create" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
-            android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="@string/create" android:textColor="@color/textTitle" android:textSize="@dimen/textTitle"
+                android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <EditText android:text="@={content.mInputName}" android:hint="@string/name" style="@style/editText"
-            android:textColor="@color/textTitle"
-            android:layout_marginLeft="15dp" android:layout_marginRight="15dp" />
+            <EditText android:text="@={content.mInputName}" android:hint="@string/name" style="@style/editText"
+                android:textColor="@color/textTitle" android:layout_marginBottom="5dp"
+                android:layout_marginLeft="15dp" android:layout_marginRight="15dp" />
 
-        <CheckBox android:checked="@={content.mCreateDir}" android:text="@string/createFolder"
-            android:textColor="@color/textTitle" android:textSize="13sp" android:layout_marginLeft="20dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <CheckBox android:checked="@={content.mCreateDir}" android:text="@string/createFolder"
+                android:button="@drawable/selector_checkbox" android:layout_marginTop="5dp" android:drawablePadding="5dp"
+                android:textColor="@color/textTitle" android:textSize="13sp" android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <TextView binding:bind="@{VB.clickId(content.mCreateDir?R.string.createFolder:R.string.createFile)}"
-            android:layout_gravity="center" android:textColor="@color/textTitle"
-            android:textSize="18sp" android:textStyle="bold" android:gravity="center"
-            android:background="@drawable/selector_button" android:layout_marginTop="30dp"
-            android:paddingBottom="10dp" android:paddingTop="10dp"
-            android:layout_marginLeft="50dp" android:layout_marginRight="50dp"
-            android:layout_width="match_parent" android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
-        android:layout_gravity="right|top" android:layout_width="40dp" android:layout_height="40dp"/>
+            <TextView binding:bind="@{VB.clickId(content.mCreateDir?R.string.createFolder:R.string.createFile)}"
+                android:layout_gravity="center" android:textColor="@color/textTitle"
+                android:textSize="18sp" android:textStyle="bold" android:gravity="center"
+                android:background="@drawable/selector_button" android:layout_marginTop="30dp"
+                android:paddingBottom="10dp" android:paddingTop="10dp"
+                android:layout_marginLeft="50dp" android:layout_marginRight="50dp"
+                android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
+            android:layout_gravity="right|top" android:layout_width="40dp" android:layout_height="40dp"/>
     </FrameLayout>
 </layout>

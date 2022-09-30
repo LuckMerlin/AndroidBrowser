@@ -112,8 +112,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return startActivity(ConveyorActivity.class)||true;
             case R.drawable.selector_search:
                 BrowserListAdapter browserListAdapter=mBrowserAdapter;
-                BrowseQuery query=null!=browserListAdapter?browserListAdapter.getCurrent():null;
-                return (null!=query&&browserPath(query.mFolder))||true;
+                return (null!=browserListAdapter&&browserPath(browserListAdapter.getFolder()))||true;
             case R.drawable.selector_menu:
                 return showBrowserContextMenu(view.getContext())||true;
             case R.string.refresh:
@@ -124,6 +123,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return entryMode(Mode.MODE_MULTI_CHOOSE,null,obj);
             case R.string.goTo:
                 return true;
+            case R.drawable.selector_checkbox:
+                return null!=obj&&obj instanceof File&&toggleSelectFile((File)obj);
             case R.drawable.selector_cancel:
             case R.string.cancel:
                 return entryMode(null,null)||true;
@@ -176,6 +177,11 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return false;
     }
 
+    private boolean toggleSelectFile(File file){
+        BrowserListAdapter listAdapter=null!=file?mBrowserAdapter:null;
+        return null!=listAdapter&&listAdapter.isSelectedFile(file)?listAdapter.unSelectFile(file): listAdapter.selectFile(file);
+    }
+
     public boolean entryMode(Object mode, Object... args){
         return entryMode(mode,null,args);
     }
@@ -214,7 +220,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     return true;
                 }
                 return execute(()-> callback.onFinish(client.createFile(parent,name,createDir)));
-            }},null);
+            }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter()).outsideDismiss(),
+                new FixedLayoutParams().fillParentAndCenter());
     }
 
     private boolean selectClients(View view,Client client){
@@ -456,5 +463,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     public BrowserListAdapter getBrowserAdapter() {
         return mBrowserAdapter;
+    }
+
+    public ObservableField<String> getSearchInput() {
+        return mSearchInput;
     }
 }

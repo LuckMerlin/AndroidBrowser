@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.http.JavaHttp;
@@ -73,7 +74,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
+    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter) {
         return null;
     }
 }

@@ -11,6 +11,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
+
+import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.DoingFiles;
@@ -49,7 +51,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, Filter filter) {
+    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter) {
         size=size<=0?10:size;
         start=start<=0?0:start;
         String pathValue=null!=folder?folder.getPath():null;
@@ -65,7 +67,7 @@ public class LocalClient extends AbstractClient {
             Debug.W("Can't load client while query file not directory.");
             return new Response<Folder>().setCode(Code.CODE_ARGS_INVALID).setMsg("Query file not directory.");
         }
-        String filterName=null!=filter?filter.getName():null;
+        String filterName=null!=filter?filter.mSearchInput:null;
         Debug.D("Loading local client.name="+filterName+" from="+start+" path="+browserPath);
         final ComparedList<File> files=new ComparedList<>((File file1, File file2)-> {
             boolean directory1=file1.isDirectory();

@@ -17,25 +17,12 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 
 public interface Client {
-
-    public class Filter extends JsonObject {
-
-        public String getName(){
-            return optString(Label.LABEL_NAME);
-        }
-
-        public Filter setName(String name){
-            return putSafe(this,Label.LABEL_NAME,name);
-        }
-
-    }
-
     String getName();
     String getHost();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnFileDoingUpdate update);
-    Response<Folder> listFiles(File folder,long start,int size,Filter filter);
+    Response<Folder> listFiles(File folder,long start,int size,BrowseQuery filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
     Response<InputStream> openInputStream(long skip,File file);
     Response<OutputStream> openOutputStream(File file);

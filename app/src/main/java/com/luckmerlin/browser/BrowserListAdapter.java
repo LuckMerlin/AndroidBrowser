@@ -1,10 +1,14 @@
 package com.luckmerlin.browser;
 
+import android.animation.ObjectAnimator;
+import android.animation.TimeInterpolator;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -53,7 +57,8 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Boolean> mGridLayout=new ObservableField<>(true);
     private final static int VIEW_TYPE_DATA_GRID=2000;
     private final ObservableField<Mode> mMode=new ObservableField<>();
-    private final static String PAYLOADS_MODE_CHANGED="ModeChanged";
+//    private final static String PAYLOADS_MODE_CHANGED="ModeChanged";
+    private final TimeInterpolator mInterpolator=new AccelerateInterpolator();
     private Executor mExecutor;
 
     protected BrowserListAdapter() {
@@ -116,7 +121,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         }
         boolean[] canceled=new boolean[]{false};
         execute(()->{
-            Response<Folder> response=client.listFiles(null!=args?args.mFolder:null,fromIndex,pageSize,null);
+            Response<Folder> response=client.listFiles(null!=args?args.mFolder:null,fromIndex,pageSize,args);
             if (!canceled[0]){
                 callback.onPageLoad(null!=response&&response.isSucceed(),null!=response?response.getData():null);
             }
@@ -259,7 +264,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public final boolean entryMode(Mode mode){
         mMode.set(mode);
-        notifyAttachedItemChanged(PAYLOADS_MODE_CHANGED);
+        notifyAttachedItemChanged("ModeChanged");
         return true;
     }
 
@@ -369,59 +374,65 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         File file=getItem(position);
         if (binding instanceof ItemBrowserFileBinding){
             ItemBrowserFileBinding fileBinding=((ItemBrowserFileBinding)binding);
+            if (null==fileBinding.getPath()){
+                ObjectAnimator animator=ObjectAnimator.ofFloat(binding.getRoot(),"alpha",0,1).setDuration(50);
+                animator.setInterpolator(mInterpolator);
+                animator.start();
+            }
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
             fileBinding.setMode(mode);
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
+            Drawable defaultThumb=itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file));
             Client client=null;Canceler canceler;
-            if (!checkContains(payloads,PAYLOADS_MODE_CHANGED)){
-                fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
-            }
             if (null!=file&&null!=(client=getClient())){//Try load file thumb
                 Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;
                 if (null!=(canceler=loadThumb(itemView,client,file,(Drawable thumb)-> postIfPossible(()->{
                     File currentFile=fileBinding.getPath();
                     if (null!=currentFile&&currentFile==file){
                         thumbLoading.remove(fileBinding);
-                        if(null!=thumb){
-                            fileBinding.setThumb(thumb);
-                        }
+                        fileBinding.setThumb(null!=thumb?thumb:defaultThumb);
                     }},0)))){
                     thumbLoading.put(holder,()->{
                         thumbLoading.remove(fileBinding);
                         return canceler.cancel();
                     });
                 }
+            }else {
+                fileBinding.setThumb(defaultThumb);
             }
         }else if (binding instanceof ItemBrowserFileGirdBinding){
             ItemBrowserFileGirdBinding fileBinding=((ItemBrowserFileGirdBinding)binding);
+            if (null==fileBinding.getPath()){
+                ObjectAnimator animator=ObjectAnimator.ofFloat(binding.getRoot(),"alpha",0,1).setDuration(50);
+                animator.setInterpolator(mInterpolator);
+                animator.start();
+            }
             fileBinding.setPath(file);
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
             fileBinding.setMode(mode);
             fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
-            if (!checkContains(payloads,PAYLOADS_MODE_CHANGED)){
-                fileBinding.setThumb(itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file)));
-            }
             Client client=null;Canceler canceler;
+            Drawable defaultThumb=itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file));
             if (null!=file&&null!=(client=getClient())){//Try load file thumb
                 Map<RecyclerView.ViewHolder,Canceler> thumbLoading=mThumbLoading;
                 if (null!=(canceler=loadThumb(itemView,client,file,(Drawable thumb)-> postIfPossible(()->{
                     File currentFile=fileBinding.getPath();
                     if (null!=currentFile&&currentFile==file){
                         thumbLoading.remove(fileBinding);
-                        if(null!=thumb){
-                            fileBinding.setThumb(thumb);
-                        }
+                        fileBinding.setThumb(null!=thumb?thumb:defaultThumb);
                     }},0)))){
                     thumbLoading.put(holder,()->{
                         thumbLoading.remove(fileBinding);
                         return canceler.cancel();
                     });
                 }
+            }else {
+                fileBinding.setThumb(defaultThumb);
             }
        }
     }
