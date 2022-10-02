@@ -162,13 +162,8 @@ public class ConveyorService extends Service {
         }
 
         @Override
-        public boolean execute(Object task,int option, OnProgressChange callback) {
-            return mExecutor.execute(task,option,callback);
-        }
-
-        @Override
-        public boolean option(Object task, int option) {
-            return mExecutor.option(task,option);
+        public boolean execute(Object task,int option) {
+            return mExecutor.execute(task,option);
         }
 
         @Override

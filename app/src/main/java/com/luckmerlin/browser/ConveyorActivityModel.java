@@ -18,6 +18,7 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.view.OnViewAttachedToWindow;
@@ -208,12 +209,12 @@ public class ConveyorActivityModel extends BaseModel implements
 
     private boolean cancelTask(Object task, int option){
         Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.option(task, option);
+        return null!=executor&&executor.execute(task, option|Option.CANCEL);
     }
 
     private boolean executeTask(Object task){
         Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.execute(task, Executor.Option.NONE,null);
+        return null!=executor&&executor.execute(task, Option.NONE);
     }
 
     public final ConveyorListAdapter getConveyorListAdapter() {

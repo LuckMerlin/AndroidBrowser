@@ -15,6 +15,7 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
@@ -48,7 +49,7 @@ public class FilesDeleteTask extends FileTask{
         final BindingResult failBindingResult=new BindingResult().setSucceed(false).
         setBinding(new DialogButtonBinding(cancelViewBinding,ViewBinding.clickId(R.string.skip).
         setListener((OnClickListener)(View view, int clickId, int count, Object obj)->
-            (null!=executor&&executor.execute(FilesDeleteTask.this, Executor.Option.NONE,null))||true
+            (null!=executor&&executor.execute(FilesDeleteTask.this, Option.NONE))||true
         )));
         Doing doing=new Doing().setDoingBinding(cancelBinding);
         Progress progress=new Progress().setTotal(size).setPosition(mCursor).setDoing(doing);

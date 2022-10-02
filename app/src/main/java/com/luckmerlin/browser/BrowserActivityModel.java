@@ -282,9 +282,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 //        return true;
 //    }
 
-    private boolean startTask(Task task,int option,OnProgressChange change){
+    private boolean startTask(Task task,int option){
         Executor executor=mExecutor;
-        return null!=executor&&executor.execute(task,option,change);
+        return null!=executor&&executor.execute(task,option);
     }
 
     @Override
@@ -597,7 +597,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     }
 
     private boolean launchTask(Task task,int option,boolean showDialog){
-        return null!=task&&startTask(task,option,null)&&showDialog&&showTaskDialog(task,null);
+        return null!=task&&startTask(task,option)&&showDialog&&showTaskDialog(task,null);
     }
 
     @Override

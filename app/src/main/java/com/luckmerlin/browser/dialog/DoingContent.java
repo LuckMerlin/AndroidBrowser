@@ -19,6 +19,7 @@ import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 
@@ -73,7 +74,7 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                     (View view, int clickId, int count, Object obj)-> removeFromParent()||true),
                     ViewBinding.clickId(R.string.remove).setListener((OnClickListener)
                         (View view, int clickId, int count, Object obj)->
-                    (null!=executor&&executor.execute(task, Executor.Option.DELETE,null)&&
+                    (null!=executor&&executor.execute(task, Option.DELETE)&&
                             removeFromParent())||true));
                 setDoingBinding(binding);
                 break;

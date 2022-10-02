@@ -48,6 +48,7 @@ import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
@@ -239,7 +240,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
-        startTask(filesDeleteTask, Executor.Option.NONE,null);
+        startTask(filesDeleteTask, Option.NONE);
         return (showDialog&&showTaskDialog(filesDeleteTask,null))||true;
     }
 
@@ -439,12 +440,12 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean launchTask(Task task,int option,boolean showDialog){
-        return null!=task&&startTask(task,option,null)&&showDialog&&showTaskDialog(task,null);
+        return null!=task&&startTask(task,option)&&showDialog&&showTaskDialog(task,null);
     }
 
-    private boolean startTask(Task task, int option, OnProgressChange change){
+    private boolean startTask(Task task, int option){
         Executor executor=mExecutor;
-        return null!=executor&&executor.execute(task,option,change);
+        return null!=executor&&executor.execute(task,option);
     }
 
     private boolean showBrowserContextMenu(Context context){
