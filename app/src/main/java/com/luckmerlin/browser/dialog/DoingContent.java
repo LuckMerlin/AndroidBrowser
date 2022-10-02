@@ -14,6 +14,7 @@ import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
@@ -51,6 +52,10 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                 Result result=null!=task?task.getResult():null;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
                 int autoDismiss=mAutoDismiss;
+                Binding binding=null;
+                if (result instanceof BindingResult){
+                    binding=((BindingResult)result).getBinding();
+                }
                 if (result instanceof Confirm){
                     setConfirm(((Confirm)result));
                     return;
@@ -58,9 +63,10 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                     post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss
                 }
                 mMessage.set(result instanceof MessageResult?((MessageResult)result).getMessage():null);
-                mBinding.set(new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()?
+                binding=null!=binding?binding:new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()?
                         R.string.succeed:R.string.fail).setListener((OnClickListener)
-                        (View view, int clickId, int count, Object obj)-> (removeFromParent()||true))));
+                        (View view, int clickId, int count, Object obj)-> (removeFromParent()||true)));
+                mBinding.set(binding);
                 break;
         }
     }

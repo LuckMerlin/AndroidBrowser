@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.task;
 
+import android.view.View;
+
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
@@ -7,10 +9,12 @@ import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
+import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.BindingResult;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
 public class FilesDeleteTask extends FileTask{
@@ -30,16 +34,31 @@ public class FilesDeleteTask extends FileTask{
         }
         int size=files.size();
         File child=null;Client client;
-        for (int i = 0; i < size; i++) {
+        int cursor=mCursor<=0?0:mCursor;Response<File> response=null;
+        Progress progress=new Progress().setTotal(size).setPosition(cursor);
+        for (int i = cursor; i < size; i++) {
             if (null==(child=files.get(i))){
-                mCursor=i;
                 continue;
-            }else if(null!=(client=getFileClient(child))){
+            }
+            notifyProgress(progress.setPosition(cursor).setTitle(child.getName()));
+            if(null!=(client=getFileClient(child))){
                 BindingResult result=new BindingResult();
+                Executor executor=null!=runtime?runtime.getExecutor():null;
                 return result.setSucceed(false).setBinding(new DialogButtonBinding(ViewBinding.
-                        clickId(R.string.skip))).setMessage("Fail fine file client.");
+                        //我媳妇儿写的
+                        clickId(R.string.skip).setListener((OnClickListener)(View view, int clickId, int count, Object obj)->
+                                null!=executor&&executor.execute(FilesDeleteTask.this,Executor.Option.NONE,null)
+                        ),ViewBinding.clickId(R.string.cancel).setListener((OnClickListener)
+                            (View view, int clickId, int count, Object obj)->
+                             null!=executor&&executor.execute(FilesDeleteTask.this, Executor.Option.DELETE,null)
+                        ))).setMessage("Fail fine file client.");
+            }
+            if (null==(response=client.deleteFile(child, (int mode1, int progress1, String msg1, File from1, File to1)-> {
+                return false;
+            }))||!response.isSucceed()){
+                return response;
             }
         }
-        return null;
+        return new Response<>(Code.CODE_SUCCEED,"Succeed");
     }
 }
