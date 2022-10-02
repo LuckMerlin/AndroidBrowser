@@ -10,10 +10,11 @@ import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.ConfirmContentDialogBinding;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.ConfirmResult1;
 
+@Deprecated
 public class ConfirmDialogContent extends BaseContent implements OnClickListener {
-    private ConfirmResult.Confirm mConfirm;
+    private ConfirmResult1.Confirm mConfirm;
     private OnConfirmFinish mOnConfirmFinish;
     private ObservableField<String> mNotify=new ObservableField<>();
     private final ObservableField<ViewBinding> mConfirmBinding=new ObservableField<>();
@@ -22,7 +23,7 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         Object onConfirmFinish(boolean confirmed,Object confirmObj);
     }
 
-    public ConfirmDialogContent(ConfirmResult.Confirm confirmResult){
+    public ConfirmDialogContent(ConfirmResult1.Confirm confirmResult){
         mConfirm=confirmResult;
     }
 
@@ -64,8 +65,8 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
     }
 
     private final boolean makeConfirm(boolean confirmed){
-        ConfirmResult.Confirm confirm=mConfirm;
-        ConfirmResult.OnConfirm onConfirm=null!=confirm?confirm.getOnConfirm():null;
+        ConfirmResult1.Confirm confirm=mConfirm;
+        ConfirmResult1.OnConfirm onConfirm=null!=confirm?confirm.getOnConfirm():null;
         if (null==onConfirm){
             return true;
         }
@@ -81,7 +82,7 @@ public class ConfirmDialogContent extends BaseContent implements OnClickListener
         return false;
     }
 
-    public final ConfirmResult.Confirm getConfirm() {
+    public final ConfirmResult1.Confirm getConfirm() {
         return mConfirm;
     }
 

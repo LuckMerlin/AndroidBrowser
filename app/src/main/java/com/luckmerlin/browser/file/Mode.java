@@ -21,7 +21,7 @@ public final class Mode {
     public final static int MODE_MOVE=R.string.move;
     public final static int MODE_COPY=R.string.copy;
     public final static int MODE_DELETE=R.string.delete;
-    private ArrayList mArgs;
+    private FileArrayList mFiles;
     private final int mMode;
     private Map<String,String> mExtra;
     private boolean mAllEnabled;
@@ -32,9 +32,9 @@ public final class Mode {
         this(mode,null);
     }
 
-    public Mode(int mode, ArrayList<File> args){
+    public Mode(int mode, FileArrayList files){
         mMode=mode;
-        mArgs=args;
+        mFiles=files;
     }
 
     public final Mode setOnConfirm(OnConfirm<Object,Boolean> onConfirm) {
@@ -51,8 +51,8 @@ public final class Mode {
         return this;
     }
 
-    public boolean isContains(Object arg){
-        ArrayList<Object> args=null!=arg?mArgs:null;
+    public boolean isContainsArg(Object arg){
+        ArrayList<File> args=null!=arg?mFiles:null;
         if (null!=args){
             synchronized (args){
                return args.contains(arg);
@@ -61,8 +61,8 @@ public final class Mode {
         return false;
     }
 
-    public Mode remove(Object arg){
-        ArrayList<Object> args=null!=arg?mArgs:null;
+    public Mode removeArg(Object arg){
+        ArrayList<File> args=null!=arg?mFiles:null;
         if (null!=args){
             synchronized (args){
                 args.remove(arg);
@@ -71,14 +71,10 @@ public final class Mode {
         return this;
     }
 
-    public Mode addFile(Object arg){
-        return (null==arg||!(arg instanceof File))?this:add(arg);
-    }
-
-    public Mode add(Object arg){
+    public Mode addArg(File arg){
         if (null!=arg){
-            ArrayList<Object> args=mArgs;
-            args=null!=args?args:(mArgs=new ArrayList<>());
+            FileArrayList args=mFiles;
+            args=null!=args?args:(mFiles=new FileArrayList());
             synchronized (args){
                 if (!args.contains(arg)){
                     args.add(arg);
@@ -88,12 +84,12 @@ public final class Mode {
         return this;
     }
 
-    public boolean checkArgs(Matcher<Object> matcher){
-        ArrayList<Object> args=mArgs;
+    public boolean checkArgs(Matcher<File> matcher){
+        ArrayList<File> args=mFiles;
         if (null!=args&&null!=matcher){
             synchronized (args){
                 Boolean matched=null;
-                for (Object child:args) {
+                for (File child:args) {
                     if (null==(matched=matcher.match(child))||!matched){
                         return false;
                     }
@@ -105,10 +101,10 @@ public final class Mode {
     }
 
     public Mode cleanArgs(){
-        ArrayList<File> args=mArgs;
+        ArrayList<File> args=mFiles;
         if (null!=args){
             args.clear();
-            mArgs=null;
+            mFiles=null;
         }
         return this;
     }
@@ -174,8 +170,8 @@ public final class Mode {
         return null!=extra&&null!=key?extra.get(key):def;
     }
 
-    public ArrayList getArgs() {
-        return mArgs;
+    public FileArrayList getArgs() {
+        return mFiles;
     }
 
     public int getMode() {

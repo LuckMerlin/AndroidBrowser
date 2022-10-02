@@ -5,7 +5,7 @@
     <data>
         <variable name="task" type="com.luckmerlin.task.TaskGroup" />
         <variable name="selected" type="boolean" />
-        <variable name="confirm" type="com.luckmerlin.task.ConfirmResult.Confirm" />
+        <variable name="confirm" type="com.luckmerlin.task.Confirm" />
         <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
         <variable name="position" type="int" />
         <variable name="selectEnable" type="boolean" />

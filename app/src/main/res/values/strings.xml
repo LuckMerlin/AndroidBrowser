@@ -4,6 +4,7 @@
     <string name="refresh">Refresh</string>
     <string name="multiChoose">Multiple</string>
     <string name="goTo">Go</string>
+    <string name="task">Task</string>
     <string name="terminal">Terminal</string>
     <string name="upload">Upload</string>
     <string name="file">File</string>
@@ -62,7 +63,7 @@
     <string name="confirm">Confirm</string>
     <string name="unknown">Unknown</string>
     <string name="confirmWhich">Confirm %1s</string>
-    <string name="deleteFailedFile">Sure delete UNSUCCEED file</string>
+    <string name="deleteFailedFile">Sure delete unsucceed file</string>
     <string name="reboot">Reboot</string>
     <string name="toWhich">To %1s</string>
     <string name="local">Local</string>

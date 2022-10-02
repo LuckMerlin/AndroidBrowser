@@ -9,7 +9,6 @@ import android.view.View;
 
 import androidx.databinding.ViewDataBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
@@ -17,15 +16,13 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.merlin.model.OnBackPress;
-
-import java.io.File;
 
 public class ConveyorActivityModel extends BaseModel implements
         OnViewAttachedToWindow, OnViewDetachedFromWindow, OnBackPress, OnClickListener,
@@ -150,13 +147,13 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_confirm:
                 Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
                 Result result=null!=task?task.getResult():null;
-                ConfirmResult.Confirm confirm=null!=result&&result instanceof ConfirmResult?
-                        ((ConfirmResult)result).make(getContext()):null;
+                ConfirmResult1.Confirm confirm=null!=result&&result instanceof ConfirmResult1 ?
+                        ((ConfirmResult1)result).make(getContext()):null;
                 return null!=showContentDialog(new ConfirmDialogContent(confirm).setOnConfirmFinish(
                         (boolean confirmed, Object confirmObj)-> executeTask(confirmObj)),null);
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
-                return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult.
+                return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult1.
                         Confirm().setOnConfirm((boolean confirmed)-> confirmed?null:null).
                         setTitle(getString(R.string.delete)).setMessage(getString
                         (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {

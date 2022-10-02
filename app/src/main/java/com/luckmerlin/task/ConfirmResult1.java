@@ -9,7 +9,7 @@ import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.Result;
 
-public abstract class ConfirmResult implements Result {
+public abstract class ConfirmResult1 implements Result {
     private Confirm mConfirm;
 
     public interface OnConfirm{

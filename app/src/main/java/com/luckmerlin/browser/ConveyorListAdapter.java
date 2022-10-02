@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
-import com.luckmerlin.browser.file.File;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
@@ -122,12 +122,12 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
                 progress=item.getProgress();
             }
             int iconRes;
-            ConfirmResult.Confirm confirm=null;
+            Confirm confirm=null;
             if (null==result){
                 iconRes=null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
-            }else if (result instanceof ConfirmResult){
+            }else if (result instanceof Confirm){
                 iconRes=R.drawable.selector_confirm;
-                confirm=((ConfirmResult)result).make(context);
+                confirm=((Confirm)result);
             }else{
                 iconRes=null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
             }

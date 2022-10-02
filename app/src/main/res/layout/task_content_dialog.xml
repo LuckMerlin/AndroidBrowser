@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="content" type="com.luckmerlin.browser.dialog.TaskDialogContent" />
+        <variable name="content" type="com.luckmerlin.browser.dialog.TaskContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>
@@ -18,8 +18,8 @@
             android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="20dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <TextView android:text="@{null!=content.confirm?content.confirm.message:content.message??``}" android:textColor="@color/textNormal"
-            android:visibility="@{content.confirm.message.length()+content.message.length()&lt;1?View.GONE:View.VISIBLE}"
+        <TextView android:text="@{null!=content.confirm?content.confirm.message:content.title??``}" android:textColor="@color/textNormal"
+            android:visibility="@{content.confirm.message.length()+content.title.length()&lt;1?View.GONE:View.VISIBLE}"
             android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

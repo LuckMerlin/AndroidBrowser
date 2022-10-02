@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="content" type="com.luckmerlin.browser.dialog.TaskDialogContent" />
+        <variable name="content" type="com.luckmerlin.browser.dialog.TaskContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>

@@ -272,7 +272,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         Mode current=mMode.get();
         int index= null!=file&&null!=current?indexPosition(file):-1;
         if (index>=0){
-            current.add(file);
+            current.addArg(file);
             notifyItemChanged(index,"SelectFile.");
             return true;
         }
@@ -283,7 +283,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         Mode current=mMode.get();
         int index= null!=file&&null!=current?indexPosition(file):-1;
         if (index>=0){
-            current.remove(file);
+            current.removeArg(file);
             notifyItemChanged(index,"UnselectFile.");
             return true;
         }
@@ -292,7 +292,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public final boolean isSelectedFile(File file){
         Mode current=null!=file?mMode.get():null;
-        return null!=current&&current.isContains(file);
+        return null!=current&&current.isContainsArg(file);
     }
 
     private boolean cancelLoadThumb(ViewDataBinding binding){
@@ -383,7 +383,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
             fileBinding.setMode(mode);
-            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
+            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContainsArg(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
             Drawable defaultThumb=itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file));
             Client client=null;Canceler canceler;
@@ -414,7 +414,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             fileBinding.setPosition(position+1);
             Mode mode=mMode.get();
             fileBinding.setMode(mode);
-            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContains(file)));
+            fileBinding.setSelected(null!=mode&&null!=file&&(mode.isAllEnabled()||mode.isContainsArg(file)));
             fileBinding.setClickBinding(new ViewBinding(file));
             Client client=null;Canceler canceler;
             Drawable defaultThumb=itemView.getResources().getDrawable(BrowserBinding.instance().getThumbResId(file));
@@ -456,6 +456,11 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
 
     public ObservableField<Boolean> getGridLayout() {
         return mGridLayout;
+    }
+
+    public Mode getCurrentMode() {
+        ObservableField<Mode> observableField=mMode;
+        return null!=observableField?observableField.get():null;
     }
 
     public ObservableField<Mode> getMode() {

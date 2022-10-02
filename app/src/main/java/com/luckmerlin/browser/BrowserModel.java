@@ -10,27 +10,31 @@ import android.os.IBinder;
 import android.os.Parcelable;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.ListAdapter;
 
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserModelBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
+import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
+import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
-import com.luckmerlin.browser.dialog.TaskDialogContent;
+import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.File;
+import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileMoveTask;
+import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -41,6 +45,7 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Task;
@@ -120,14 +125,22 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.create:
                 return createFile()||true;
             case R.string.multiChoose:
-                return entryMode(Mode.MODE_MULTI_CHOOSE,null,obj);
+                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).setBinding(new DialogButtonBinding(
+                        ViewBinding.clickId(R.string.move),ViewBinding.clickId(R.string.copy),
+                        ViewBinding.clickId(R.string.delete)).setListener((OnClickListener)
+                        (View view1, int clickId1, int count1, Object obj1)->{
+                        Mode mode=mBrowserAdapter.getCurrentMode();
+                        FileArrayList args=null!=mode&&mode.isMode(Mode.MODE_MULTI_CHOOSE)?mode.getArgs():null;
+                        entryMode(null);
+                        return (null!=args&&args.size()>0&&BrowserModel.this.onClick(view1,clickId1,count,args))||true;
+                })));
             case R.string.goTo:
                 return true;
             case R.drawable.selector_checkbox:
                 return null!=obj&&obj instanceof File&&toggleSelectFile((File)obj);
             case R.drawable.selector_cancel:
             case R.string.cancel:
-                return entryMode(null,null)||true;
+                return entryMode(null)||true;
             case R.string.exit:
                 return finishActivity()||true;
             case R.string.share:
@@ -146,6 +159,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     return launchTask(new FileCopyTask((File)obj,folder,null).
                             enableDeleteSucceed(true).setName(getString(R.string.copy)), Executor.Option.NONE,true)||true;
                 }));
+            case R.string.delete:
+                 return deleteFile(obj,true,false)||true;
             case R.string.move:
                 return null!=obj&&obj instanceof File&&entryMode(new Mode(Mode.MODE_MOVE).makeSureBinding(
                         (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
@@ -195,7 +210,34 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         Mode mode=null!=observable?observable.get():null;
         OnConfirm<Object,Boolean> onConfirm=null!=mode?mode.getOnConfirm():null;
         Boolean confirmed=null!=onConfirm?onConfirm.onConfirm(arg):null;
-        return null!=confirmed&&confirmed&&entryMode(null,null);
+        return null!=confirmed&&confirmed&&entryMode(null);
+    }
+
+    private boolean deleteFile(Object obj,boolean showDialog,boolean confirmed){
+        Executor executor=mExecutor;
+        if (null==executor||null==obj){
+            toast(getString(R.string.whichFailed,getString(R.string.delete)));
+            return false;
+        }else if (obj instanceof File){
+            return deleteFile(new FileArrayList((File) obj),showDialog,confirmed);
+        }else if (!(obj instanceof FileArrayList)||((FileArrayList)obj).size()<=0){
+            return deleteFile(null,showDialog,confirmed);
+        }
+        final FileArrayList files=(FileArrayList)obj;
+        if (!confirmed){
+            String message=files.makeDescription(getContext());
+            final ConfirmContent confirmContent=new ConfirmContent();
+            String title=getString(R.string.sureWhich,getString(R.string.delete));
+            confirmContent.setConfirm(new Confirm().setTitle(title).setMessage(message).setBinding(new DialogButtonBinding(
+            ViewBinding.clickId(R.string.sure).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
+                    ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true))||true),
+            ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
+                    confirmContent.removeFromParent()||true))));
+            return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
+        }
+        FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
+        startTask(filesDeleteTask, Executor.Option.NONE,null);
+        return (showDialog&&showTaskDialog(filesDeleteTask,null))||true;
     }
 
     private boolean createFile(){
@@ -267,7 +309,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null==executor|null==task){
             return false;
         }
-        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setName(task.getName());
+        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
         content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setMaxWidth(0.8f));
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
@@ -358,6 +400,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             //Test
             TestTask testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
+
+            deleteFile(new File().setName(""),true,true);
 //            launchTask(testTask, Executor.Option.NONE,true);
         }
     }

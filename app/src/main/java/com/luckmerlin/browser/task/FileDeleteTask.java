@@ -9,7 +9,7 @@ import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -39,11 +39,11 @@ public class FileDeleteTask extends FileTask {
             Debug.D("Make execute delete android file confirm.");
             Executor executor=null!=runtime?runtime.getExecutor():null;
             OnProgressChange onProgressChange=getOnProgressChange();
-            return null!=executor?new ConfirmResult() {
+            return null!=executor?new ConfirmResult1() {
                 @Override
                 protected Confirm onCreate(Context context) {
                     String delete=""+getString(context,R.string.delete);
-                    return new ConfirmResult.Confirm(getString(context, R.string.confirmWhich,
+                    return new ConfirmResult1.Confirm(getString(context, R.string.confirmWhich,
                             delete+(getString(context,file.isDirectory()?R.string.folder:R.string.file)) +"["+file.getName()+"]"), (boolean confirm)->
                             confirm&&executor.execute(FileDeleteTask.this,runtime.enableConfirm(false).getOption(),onProgressChange)?null:null
                     ).setTitle(delete);

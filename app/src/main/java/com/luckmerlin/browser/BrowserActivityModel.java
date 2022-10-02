@@ -24,7 +24,7 @@ import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
-import com.luckmerlin.browser.dialog.TaskDialogContent;
+import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -560,7 +560,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         FileDeleteTask deleteTask=new FileDeleteTask(file,null);
         deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
         return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
-                showTaskDialog(deleteTask, new TaskDialogContent().setTitle(getString(R.string.delete)));
+                showTaskDialog(deleteTask, new TaskContent().setTitle(getString(R.string.delete)));
     }
 
     private boolean shareFile(File file){
@@ -582,12 +582,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return false;
     }
 
-    private boolean showTaskDialog(Task task,TaskDialogContent dialogContent){
+    private boolean showTaskDialog(Task task, TaskContent dialogContent){
         Executor executor=mExecutor;
         if (null==executor|null==task){
             return false;
         }
-        final TaskDialogContent content=null!=dialogContent?dialogContent:new TaskDialogContent();
+        final TaskContent content=null!=dialogContent?dialogContent:new TaskContent();
         content.setTitle(task.getName());
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));

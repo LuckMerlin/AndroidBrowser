@@ -18,7 +18,7 @@
 //import com.luckmerlin.stream.InputStream;
 //import com.luckmerlin.stream.OutputStream;
 //import com.luckmerlin.stream.StreamCopyTask;
-//import com.luckmerlin.task.ConfirmResult;
+//import com.luckmerlin.task.ConfirmResult1;
 //import com.luckmerlin.task.OnProgressChange;
 //import com.luckmerlin.task.Progress;
 //import com.luckmerlin.task.Runtime;
@@ -116,7 +116,7 @@
 //                        childCopyResult=copyFile(child,fromClient,new File().setHost(child.getHost()).setName(child.getName()).
 //                        setSep(child.getSep()).setParent(toPath),toClient,runtime,onFileProgress);
 //                        childCopyResult=null!=childCopyResult?childCopyResult:new Response<File>().set(Code.CODE_FAIL,"Unknown error.");
-//                        if (childCopyResult instanceof ConfirmResult){
+//                        if (childCopyResult instanceof ConfirmResult1){
 //                            Debug.W("Children copy need confirm.path="+fromPath);
 //                            break;
 //                        }else if (!childCopyResult.isSucceed()){
@@ -156,7 +156,7 @@
 //                    progress.setPosition(outputOpenLength).setTotal(outputOpenLength);
 //                    return new Response(Code.CODE_ALREADY,"Already done.");
 //                }else if (isConfirmEnabled()){//Need confirm
-//                    return new ConfirmResult() {
+//                    return new ConfirmResult1() {
 //                        @Override
 //                        protected Confirm onCreate(Context context) {
 //                            return new Confirm().setMessage(getString(context, R.string.areYourSureWhich,

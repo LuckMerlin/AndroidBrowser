@@ -8,7 +8,7 @@
         <variable name="selectEnable" type="boolean" />
         <variable name="position" type="int" />
         <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
-        <variable name="confirm" type="com.luckmerlin.task.ConfirmResult.Confirm" />
+        <variable name="confirm" type="com.luckmerlin.task.Confirm" />
         <variable name="iconResId" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <import type="com.luckmerlin.browser.utils.Time"/>

@@ -2,15 +2,12 @@ package com.luckmerlin.browser;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.View;
 
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
-import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
-import com.luckmerlin.task.ConfirmResult;
+import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
@@ -38,7 +35,7 @@ public class TestTask extends AbstractTask {
             }
 //            return null;
 //        }
-        return new ConfirmResult() {
+        return new ConfirmResult1() {
             @Override
             protected Confirm onCreate(Context context) {
                 return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(
