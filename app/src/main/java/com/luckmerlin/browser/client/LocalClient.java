@@ -266,41 +266,6 @@ public class LocalClient extends AbstractClient {
         return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(new java.io.File(file)));
     }
 
-    //        InputStream inputStream=null;
-//        try {
-//            final FileInputStream fileInputStream = new FileInputStream(androidFile);
-//            if (openLength<0){
-//                Debug.W("Fail open file input stream while file open length invalid.");
-//                return new Response(Code.CODE_ARGS_INVALID,"File open length invalid");
-//            }else if (openLength>0){
-//                Debug.D("Open file input stream with skip."+openLength);
-//                fileInputStream.skip(openLength);
-//            }
-//            inputStream=new InputStream(openLength){
-//                @Override
-//                public void close() throws IOException {
-//                    fileInputStream.close();
-//                }
-//
-//                @Override
-//                public long length() {
-//                    return androidFile.length();
-//                }
-//
-//                @Override
-//                public int onRead(byte[] b, int off, int len) throws IOException {
-//                    return fileInputStream.read(b,off,len);
-//                }
-//            };
-//            inputStream.setTitle(androidFile.getName());
-//            return new Response<InputStream>().set(Code.CODE_SUCCEED,"Succeed.",inputStream);
-//        } catch (Exception e) {
-//            Utils.closeStream(inputStream);
-//            e.printStackTrace();
-//            return new Response<InputStream>().set(Code.CODE_ERROR, "Exception open local file input stream.", null);
-//        }
-//    }
-
     @Override
     public boolean openFile(File openFile, Context context) {
         String filePath=null!=openFile?openFile.getPath():null;
@@ -380,8 +345,8 @@ public class LocalClient extends AbstractClient {
                 }
             }
         }
-        file.delete();
-        boolean notExist=!file.exists();
+//        file.delete();
+        boolean notExist=true;//!file.exists();
         notifyDeleteUpdate(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish delete.", fileObj,update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }

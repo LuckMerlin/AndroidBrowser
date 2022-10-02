@@ -7,26 +7,26 @@
         <import type="android.view.View"/>
     </data>
 
-    <LinearLayout android:orientation="vertical" android:layout_gravity="center"
+    <LinearLayout android:orientation="horizontal" android:layout_gravity="center"
         android:layout_marginBottom="5dp" android:layout_marginTop="5dp" android:gravity="center"
-        android:layout_width="wrap_content" android:layout_height="match_parent">
+        android:layout_width="match_parent" android:layout_height="match_parent">
 
         <ImageView binding:bind="@{VB.create(null).img(brief.icon)}"
             android:src="@mipmap/ic_launcher" android:layout_width="50dp" android:layout_height="50dp"/>
 
-        <com.luckmerlin.view.MarqueeTextView android:text="@{brief.name??``}"
-            android:visibility="@{brief.name.length()>0?View.VISIBLE:View.GONE}"
-            android:textColor="@color/textMainAnti" android:textSize="13sp"
-            android:layout_gravity="center_horizontal" android:singleLine="true"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:ellipsize="none"/>
+        <LinearLayout android:orientation="vertical" android:gravity="left"
+            android:layout_width="match_parent" android:layout_height="wrap_content">
+            <TextView android:text="@{brief.name??``}" android:visibility="@{brief.name.length()>0?View.VISIBLE:View.GONE}"
+                android:textColor="@color/textMainAnti" android:textSize="13sp"
+                android:layout_gravity="center_horizontal" android:singleLine="true"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="middle"/>
 
-        <com.luckmerlin.view.MarqueeTextView android:text="@{brief.note??``}" android:textColor="@color/textMainAnti"
-            android:visibility="@{brief.note.length()>0?View.VISIBLE:View.GONE}"
-            android:textSize="13sp" android:layout_gravity="center_horizontal" android:maxLines="1"
-            android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <TextView android:text="@{brief.note??``}" android:textColor="@color/textMainAnti"
+                android:visibility="@{brief.note.length()>0?View.VISIBLE:View.GONE}"
+                android:textSize="13sp" android:layout_gravity="center_horizontal" android:singleLine="true"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:ellipsize="middle"/>
 
+        </LinearLayout>
     </LinearLayout>
 
 </layout>

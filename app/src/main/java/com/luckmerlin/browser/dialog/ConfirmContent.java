@@ -22,6 +22,10 @@ public class ConfirmContent extends BaseContent {
     }
 
     public final ConfirmContent setConfirm(Confirm confirm){
+        if (!isUiThread()){
+            post(()->setConfirm(confirm));
+            return this;
+        }
         mConfirm.set(confirm);
         return this;
     }

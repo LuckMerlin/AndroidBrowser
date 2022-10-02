@@ -14,6 +14,7 @@ import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
@@ -38,6 +39,10 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
 
     @Override
     public void onProgressChanged(Task task, Progress progress) {
+        if (!isUiThread()){
+            post(()->onProgressChanged(task,progress));
+            return;
+        }
         mProgress.set(progress);
         Object object=null!=progress?progress.getDoing():null;
         Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
@@ -62,17 +67,37 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                 }else if (autoDismiss>0){
                     post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss
                 }
-                mMessage.set(result instanceof MessageResult?((MessageResult)result).getMessage():null);
+                setMessage(result instanceof MessageResult?((MessageResult)result).getMessage():null);
                 binding=null!=binding?binding:new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()?
-                        R.string.succeed:R.string.fail).setListener((OnClickListener)
-                        (View view, int clickId, int count, Object obj)-> (removeFromParent()||true)),
-                        ViewBinding.clickId(R.string.delete).setListener((OnClickListener)
-                            (View view, int clickId, int count, Object obj)->
-                         null!=executor&&executor.execute(task, Executor.Option.DELETE,null)));
-                mBinding.set(binding);
+                    R.string.succeed:R.string.fail).setListener((OnClickListener)
+                    (View view, int clickId, int count, Object obj)-> removeFromParent()||true),
+                    ViewBinding.clickId(R.string.remove).setListener((OnClickListener)
+                        (View view, int clickId, int count, Object obj)->
+                    (null!=executor&&executor.execute(task, Executor.Option.DELETE,null)&&
+                            removeFromParent())||true));
+                setDoingBinding(binding);
                 break;
         }
     }
+
+    public final DoingContent setDoingBinding(Binding binding){
+        if (!isUiThread()){
+            post(()->setDoingBinding(binding));
+            return this;
+        }
+        mBinding.set(binding);
+        return this;
+    }
+
+    public final DoingContent setMessage(CharSequence message){
+        if (!isUiThread()){
+            post(()->setMessage(message));
+            return this;
+        }
+        mMessage.set(message);
+        return this;
+    }
+
 
     public final DoingContent setAutoDismiss(int autoDismiss) {
         this.mAutoDismiss = autoDismiss;

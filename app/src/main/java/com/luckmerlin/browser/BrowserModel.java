@@ -404,7 +404,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             TestTask testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
 
-            deleteFile(new File().setName(""),true,true);
+            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Executor.Option.NONE,true);
         }
     }
