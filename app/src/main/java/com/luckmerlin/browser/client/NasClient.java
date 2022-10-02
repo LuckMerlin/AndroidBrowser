@@ -118,26 +118,31 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
-        String filePath=null!=file?file.getPath():null;
-        Request request=new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post();
-        Connection connection=mHttp.connect(request);
-        if (null==connection){
-            Debug.E("Fail delete file while connect http invalid.");
-            return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
-        }
-        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
-        try {
-            return reader.readAllChunk(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
-                    (byte[] bytes)-> MResponse.parse(bytes,(data)->File.fromJson(data)), 1024);
-        } catch (IOException e) {
-            Debug.E("Exception delete file.e="+e,e);
-            e.printStackTrace();
-            return null;
-        }finally {
-            Utils.closeStream(connection);
-        }
+    public Response<File> deleteFile(File file, OnFileDeleteUpdate update) {
+        return null;
     }
+
+//    @Override
+//    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
+//        String filePath=null!=file?file.getPath():null;
+//        Request request=new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post();
+//        Connection connection=mHttp.connect(request);
+//        if (null==connection){
+//            Debug.E("Fail delete file while connect http invalid.");
+//            return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
+//        }
+//        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
+//        try {
+//            return reader.readAllChunk(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
+//                    (byte[] bytes)-> MResponse.parse(bytes,(data)->File.fromJson(data)), 1024);
+//        } catch (IOException e) {
+//            Debug.E("Exception delete file.e="+e,e);
+//            e.printStackTrace();
+//            return null;
+//        }finally {
+//            Utils.closeStream(connection);
+//        }
+//    }
 
     @Override
     public Response<InputStream> openInputStream(long skip, File file) {

@@ -59,7 +59,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
+    public Response<File> deleteFile(File file, OnFileDeleteUpdate update) {
         return null;
     }
 

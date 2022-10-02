@@ -22,15 +22,14 @@ import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
+import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
-import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FileCopyTask;
-import com.luckmerlin.browser.task.FileDeleteTask;
 import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.core.MatchedCollector;
@@ -557,10 +556,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return false;
         }
         File file=(File)obj;
-        FileDeleteTask deleteTask=new FileDeleteTask(file,null);
-        deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
-        return executor.execute(deleteTask, Executor.Option.CONFIRM,null) &&showDialog&&
-                showTaskDialog(deleteTask, new TaskContent().setTitle(getString(R.string.delete)));
+//        FilesDeleteTask deleteTask=new FilesDeleteTask(file,null);
+//        deleteTask.enableDeleteSucceed(true).setName(getString(R.string.delete));
+//        return executor.execute(deleteTask, Executor.Option.NONE,null) &&showDialog&&
+//                showTaskDialog(deleteTask, new DoingContent().setTitle(getString(R.string.delete)));
+        return false;
     }
 
     private boolean shareFile(File file){
@@ -582,12 +582,12 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         return false;
     }
 
-    private boolean showTaskDialog(Task task, TaskContent dialogContent){
+    private boolean showTaskDialog(Task task, DoingContent dialogContent){
         Executor executor=mExecutor;
         if (null==executor|null==task){
             return false;
         }
-        final TaskContent content=null!=dialogContent?dialogContent:new TaskContent();
+        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent();
         content.setTitle(task.getName());
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));

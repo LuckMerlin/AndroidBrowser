@@ -162,7 +162,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
+    public Response<File> deleteFile(File file, OnFileDeleteUpdate update) {
         if (null == file || !file.isLocalFile()) {
             Debug.D("Fail delete local client file while file arg invalid.");
             return new Response<File>().set(Code.CODE_ARGS_INVALID, "File invalid.", file);
@@ -344,14 +344,7 @@ public class LocalClient extends AbstractClient {
         return localFile.setTotal(total);
     }
 
-    private Response<File> deleteAndroidFile(java.io.File file,OnFileDoingUpdate update){
-        if (null==file){
-            Debug.W("Fail delete android file while path invalid.");
-            return new Response(Code.CODE_ARGS_INVALID,"Path invalid.");
-        }else if (!file.exists()){
-            Debug.W("Fail delete android file while path not exist.");
-            return new Response(Code.CODE_NOT_EXIST,"Path not exist.");
-        }
+    private Response<File> deleteAndroidFile(java.io.File file,OnFileDeleteUpdate update){
         Debug.D("Deleting android file."+file);
         Response response=doDeleteAndroidFile(file,update);
         if (null!=response&&!response.isSucceed()){
@@ -365,13 +358,13 @@ public class LocalClient extends AbstractClient {
         return new Response(Code.CODE_SUCCEED,null);
     }
 
-    private Response doDeleteAndroidFile(java.io.File file, OnFileDoingUpdate update){
+    private Response doDeleteAndroidFile(java.io.File file, OnFileDeleteUpdate update){
         if (null==file||!file.exists()){
             Debug.D("Fail delete android file."+file);
             return new Response(Code.CODE_ARGS_INVALID,"File not exist or invalid.");
         }
         File fileObj=LocalClient.createLocalFile(file);
-        if (notifyDoingFile(Mode.MODE_DELETE,0,"Start delete.", fileObj,fileObj,update)){
+        if (notifyDeleteUpdate(Mode.MODE_DELETE,"Start delete.", fileObj,update)){
             Debug.D("Fail delete android file while canceled.");
             return new Response(Code.CODE_CANCEL,"Canceled");
         }
@@ -389,7 +382,7 @@ public class LocalClient extends AbstractClient {
         }
         file.delete();
         boolean notExist=!file.exists();
-        notifyDoingFile(Mode.MODE_DELETE,notExist?100:0,"Finish delete.", fileObj,fileObj,update);
+        notifyDeleteUpdate(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish delete.", fileObj,update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }
 
@@ -435,5 +428,9 @@ public class LocalClient extends AbstractClient {
         }catch (Exception e){
             return null;
         }
+    }
+
+    private boolean notifyDeleteUpdate(int code, String msg, File file,OnFileDeleteUpdate update){
+        return null!=update&&update.onFileDeleteUpdate(code,msg,file);
     }
 }

@@ -44,15 +44,7 @@ public abstract class Runtime {
         return mOption;
     }
 
-    public final Runtime enableConfirm(boolean enable){
-        return enableOption(Executor.Option.CONFIRM,enable);
-    }
-
     public abstract Executor getExecutor();
-
-    public final boolean isConfirmEnabled() {
-        return isOptionEnabled(mOption,Executor.Option.CONFIRM);
-    }
 
     public final boolean isDeleteEnabled() {
         return isOptionEnabled(mOption,Executor.Option.DELETE);

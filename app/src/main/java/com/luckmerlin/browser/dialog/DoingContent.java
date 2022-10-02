@@ -65,7 +65,10 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                 mMessage.set(result instanceof MessageResult?((MessageResult)result).getMessage():null);
                 binding=null!=binding?binding:new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()?
                         R.string.succeed:R.string.fail).setListener((OnClickListener)
-                        (View view, int clickId, int count, Object obj)-> (removeFromParent()||true)));
+                        (View view, int clickId, int count, Object obj)-> (removeFromParent()||true)),
+                        ViewBinding.clickId(R.string.delete).setListener((OnClickListener)
+                            (View view, int clickId, int count, Object obj)->
+                         null!=executor&&executor.execute(task, Executor.Option.DELETE,null)));
                 mBinding.set(binding);
                 break;
         }

@@ -75,12 +75,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
         return mResult;
     }
 
-    protected final AbstractTask enableConfirm(Runtime runtime,boolean enable){
-        if (null!=runtime){
-            runtime.enableConfirm(enable);
-        }
-        return this;
-    }
 
     public final Executor getExecutor() {
         Runtime runtime=mRuntime;
@@ -90,11 +84,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
     public final boolean isCancelEnabled() {
         Runtime runtime=mRuntime;
         return null!=runtime&&runtime.isCancelEnabled();
-    }
-
-    public final boolean isConfirmEnabled() {
-        Runtime runtime=mRuntime;
-        return null!=runtime&&runtime.isConfirmEnabled();
     }
 
     protected final String getString(Context context,int textId, Object... args){

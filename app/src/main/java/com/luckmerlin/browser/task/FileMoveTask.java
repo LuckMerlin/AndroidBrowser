@@ -90,7 +90,7 @@ public class FileMoveTask extends FileTask{
         }
         notifyProgress(progress.setPosition(2));
         Debug.D("To delete files after copied files while move task."+fromFile.getName());
-        return new FileDeleteTask(fromFile,null).execute(runtime,progressChange);
+        return new FilesDeleteTask(fromFile).execute(runtime,progressChange);
     }
 
     @Override
