@@ -42,7 +42,8 @@ public class FileMoveTask extends FileTask{
             Debug.W("Fail execute file move task while to file invalid.");
             return new Response(Code.CODE_ARGS_INVALID,"To file invalid");
         }
-        final DoingFiles doingFiles=new DoingFiles().setDoingMode(Mode.MODE_MOVE).setProgress(0).setFrom(fromFile).setTo(toFile);
+        final DoingFiles doingFiles=new DoingFiles();
+        doingFiles.setDoingMode(Mode.MODE_MOVE).setProgress(0).setFrom(fromFile).setTo(toFile);
         final Progress progress=new Progress().setPosition(0).setTotal(2).setData(doingFiles);
         notifyProgress(progress);
         if (fromFile.isLocalFile()&&toFile.isLocalFile()){//Move local file to local

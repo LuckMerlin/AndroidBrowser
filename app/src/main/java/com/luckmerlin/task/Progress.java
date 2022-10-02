@@ -3,13 +3,16 @@ package com.luckmerlin.task;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.luckmerlin.browser.file.Doing;
+import com.luckmerlin.utils.Utils;
+
 public final class Progress implements Parcelable {
     private long mTotal;
     private long mPosition;
     private String mTitle;
     private String mSpeed;
-    private Progress mProgress;
-    private transient Object mData;
+    private Progress mSubProgress;
+    private transient Doing mDoing;
 
     public Progress() {
 
@@ -20,7 +23,7 @@ public final class Progress implements Parcelable {
         mPosition = in.readLong();
         mTitle = in.readString();
         mSpeed = in.readString();
-        mProgress = in.readParcelable(Progress.class.getClassLoader());
+        mSubProgress = in.readParcelable(Progress.class.getClassLoader());
     }
 
     public static final Creator<Progress> CREATOR = new Creator<Progress>() {
@@ -72,21 +75,31 @@ public final class Progress implements Parcelable {
     }
 
     public Progress getSubProgress(){
-        return mProgress;
+        return mSubProgress;
     }
 
     public Progress setSubProgress(Progress progress){
-        mProgress=progress;
+        mSubProgress=progress;
         return this;
     }
 
+    public Progress setDoing(Doing doing) {
+        mDoing=doing;
+        return this;
+    }
+
+    @Deprecated
     public Progress setData(Object data) {
-        this.mData = data;
-        return this;
+        return setDoing(null!=data&&data instanceof Doing?(Doing)data:null);
     }
 
+    @Deprecated
     public Object getData() {
-        return mData;
+        return mDoing;
+    }
+
+    public Doing getDoing() {
+        return mDoing;
     }
 
     public int intValue(){
@@ -94,6 +107,21 @@ public final class Progress implements Parcelable {
         long pos=getPosition();
         return pos>=0&&total>0?(int)(pos*100.f/total):0;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (null==o||!(o instanceof Progress)){
+            return false;
+        }
+        Progress progress=(Progress)o;
+        return progress.mPosition==mPosition&&
+            Utils.isEqualed(progress.mSpeed,mSpeed,false)&&
+            Utils.isEqualed(progress.mSubProgress,mSubProgress,false)&&
+            Utils.isEqualed(progress.mDoing,mDoing,false)&&
+            Utils.isEqualed(progress.mTitle,mTitle,false)&&
+            progress.mTotal==mTotal;
+    }
+
 
     public boolean isSucceed(){
         return intValue()==100;
@@ -110,7 +138,7 @@ public final class Progress implements Parcelable {
         dest.writeLong(mPosition);
         dest.writeString(mTitle);
         dest.writeString(mSpeed);
-        dest.writeParcelable(mProgress, flags);
+        dest.writeParcelable(mSubProgress, flags);
     }
 
     @Override
@@ -120,8 +148,8 @@ public final class Progress implements Parcelable {
                 ", mPosition=" + mPosition +
                 ", mTitle='" + mTitle + '\'' +
                 ", mSpeed='" + mSpeed + '\'' +
-                ", mProgress=" + mProgress +
-                ", mData=" + mData +
+                ", mSubProgress=" + mSubProgress +
+                ", mDoing=" + mDoing +
                 '}';
     }
 }

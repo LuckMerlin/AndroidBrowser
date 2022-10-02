@@ -83,11 +83,16 @@ public abstract class ViewContent implements Content {
         return this;
     }
 
-    public final ViewContent setBinding(Binding binding){
-           if (! isCreated()){
-               mBinding=binding;
-           }
+    public final ViewContent setContentBinding(Binding binding){
+        if (! isCreated()){
+            mBinding=binding;
+        }
         return this;
+    }
+
+    @Deprecated
+    public final ViewContent setBinding(Binding binding){
+        return setContentBinding(binding);
     }
 
     public final ViewContent outsideDismiss(){
@@ -95,7 +100,7 @@ public abstract class ViewContent implements Content {
     }
 
     public final ViewContent outsideDismiss(OnClickListener listener){
-        setBinding(new ViewBinding(null).setListener((OnClickListener)
+        setContentBinding(new ViewBinding(null).setListener((OnClickListener)
                 (View view, int clickId, int count, Object obj)->
                   (null!=listener&&listener.onClick(view,clickId,count,obj))||removeFromParent()));
         return this;

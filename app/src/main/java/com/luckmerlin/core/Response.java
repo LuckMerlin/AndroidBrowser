@@ -1,8 +1,8 @@
 package com.luckmerlin.core;
 
-public class Response<T> implements CodeResult<T> {
+public class Response<T> implements MessageResult ,CodeResult<T> {
     private Integer mCode=0;
-    private String mMsg;
+    private CharSequence mMsg;
     private T mData;
 
     public Response(){
@@ -17,7 +17,7 @@ public class Response<T> implements CodeResult<T> {
         this(code,msg,null);
     }
 
-    public Response(int code,String msg,T data){
+    public Response(int code,CharSequence msg,T data){
         set(code,msg,data);
     }
 
@@ -26,7 +26,7 @@ public class Response<T> implements CodeResult<T> {
         return this;
     }
 
-    public final Response<T> setMsg(String msg) {
+    public final Response<T> setMsg(CharSequence msg) {
         this.mMsg = msg;
         return this;
     }
@@ -49,7 +49,7 @@ public class Response<T> implements CodeResult<T> {
         return set(code,msg,mData);
     }
 
-    public final Response<T> set(int code,String msg,T data){
+    public final Response<T> set(int code,CharSequence msg,T data){
         return setCode(code).setMsg(msg).setData(data);
     }
 
@@ -60,7 +60,7 @@ public class Response<T> implements CodeResult<T> {
     }
 
     @Override
-    public final String getMessage() {
+    public final CharSequence getMessage() {
         return mMsg;
     }
 

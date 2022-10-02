@@ -228,11 +228,14 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             String message=files.makeDescription(getContext());
             final ConfirmContent confirmContent=new ConfirmContent();
             String title=getString(R.string.sureWhich,getString(R.string.delete));
-            confirmContent.setConfirm(new Confirm().setTitle(title).setMessage(message).setBinding(new DialogButtonBinding(
+            Confirm confirm=new Confirm();
+            confirm.setName(title).setMessage(message);
+            confirm.setBinding(new DialogButtonBinding(
             ViewBinding.clickId(R.string.sure).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                     ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true))||true),
             ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
-                    confirmContent.removeFromParent()||true))));
+                    confirmContent.removeFromParent()||true)));
+            confirmContent.setConfirm(confirm);
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
@@ -310,9 +313,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return false;
         }
         final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
-        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setMaxWidth(0.8f));
+        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
-                executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
+        executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
         return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
     }

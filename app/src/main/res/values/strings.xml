@@ -29,6 +29,7 @@
     <string name="scanCurrent">Scan</string>
     <string name="browser">Browser</string>
     <string name="error">Error</string>
+    <string name="skip">Skip</string>
     <string name="sureWhich">Sure %1s</string>
     <string name="skipWhich">Skip %1s</string>
     <string name="noneWhichPermission">None %1s permission</string>

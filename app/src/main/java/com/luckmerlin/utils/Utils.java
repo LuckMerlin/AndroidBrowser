@@ -41,4 +41,8 @@ public class Utils {
         Configuration configuration=null!=resources?resources.getConfiguration():null;
         return null!=configuration&&configuration.orientation==orientation;
     }
+
+    public static boolean isEqualed(Object arg1,Object arg2,boolean ignoreNull){
+        return (null!=arg1&&null!=arg2&&arg1.equals(arg2))&&(ignoreNull?false:(null==arg1&&null==arg2));
+    }
 }

@@ -4,7 +4,7 @@ import com.luckmerlin.browser.Code;
 
 public interface CodeResult<T> extends Result{
     int getCode(int def);
-    String getMessage();
+    CharSequence getMessage();
     T getData();
 
     default boolean isSucceed(){

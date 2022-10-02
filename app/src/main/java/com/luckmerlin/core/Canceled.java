@@ -1,6 +1,6 @@
 package com.luckmerlin.core;
 
-public class Canceled implements Canceler{
+public class Canceled implements Canceler,Result{
     private boolean mCanceled;
 
     @Override

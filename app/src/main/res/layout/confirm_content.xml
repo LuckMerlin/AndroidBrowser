@@ -12,12 +12,12 @@
     <LinearLayout android:orientation="vertical" android:layout_width="wrap_content"
         android:layout_height="wrap_content" android:background="@drawable/dialog_bg" android:padding="5dp">
 
-        <TextView android:text="@{vm.confirm.title??@string/confirm}" android:textColor="@color/textTitle"
+        <TextView android:text="@{vm.confirm.name??@string/confirm}" android:textColor="@color/textTitle"
             android:textSize="16sp" android:textStyle="bold"
             android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <TextView android:text="@{vm.confirm.message??``}" android:textColor="@color/textNormal"
+        <TextView android:text="@{vm.confirm.note??``}" android:textColor="@color/textNormal"
             android:textSize="@dimen/textTitleSub" android:layout_gravity="center_horizontal"
             android:layout_margin="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

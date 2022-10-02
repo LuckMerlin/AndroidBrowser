@@ -147,7 +147,8 @@ public class UriFileUploadTask extends FileTask implements OnTaskSave, OnExecute
             final long finalLength=fileLength;
             final OutputStream finalOutputStream=outputStream;
             final InputStream finalInputStream=inputStream;
-            final DoingFiles doingFiles=new DoingFiles().setDoingMode(Mode.MODE_UPLOAD);
+            final DoingFiles doingFiles=new DoingFiles();
+            doingFiles.setDoingMode(Mode.MODE_UPLOAD);
             doingFiles.setSucceed(false).setTo(toFile);
             return new StreamTask(new com.luckmerlin.stream.InputStream(0) {
                 @Override
