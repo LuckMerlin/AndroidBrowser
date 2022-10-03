@@ -13,6 +13,7 @@ import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
@@ -68,7 +69,6 @@ public class FilesDeleteTask extends FileTask{
             }))){
                 return failBindingResult;
             }else if (response.isAnyCode(Code.CODE_CANCEL)){
-
                 return response;
             }else if (!response.isSucceed()){
                 return failBindingResult;

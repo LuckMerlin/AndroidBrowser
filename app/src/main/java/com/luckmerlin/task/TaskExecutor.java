@@ -182,7 +182,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     },-1);
                 }
             };
-            executeTask.setStatus(STATUS_PENDING);
             if (fromSaved){
                 mQueue.add(0,executeTask);
             }else{
@@ -321,7 +320,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     private void setStatusChange(int status,ExecuteTask task,Map<Listener,Matcher<Task>> listeners){
         if (null!=task){
-            task.setStatus(STATUS_PENDING);
+            task.setStatus(status);
         }
         updateStatusChange(status,null!=task?task.mTask:null,listeners);
     }

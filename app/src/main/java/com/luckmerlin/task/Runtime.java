@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.luckmerlin.debug.Debug;
+
 import java.lang.ref.WeakReference;
 
 public abstract class Runtime {
