@@ -345,8 +345,13 @@ public class LocalClient extends AbstractClient {
                 }
             }
         }
-//        file.delete();
-        boolean notExist=true;//!file.exists();
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+        file.delete();
+        boolean notExist=!file.exists();
         notifyDeleteUpdate(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish delete.", fileObj,update);
         return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
     }

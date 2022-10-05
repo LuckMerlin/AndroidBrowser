@@ -10,7 +10,7 @@ import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnInitialOption;
 import com.luckmerlin.task.Progress;
 
-public abstract class FileTask extends AbstractTask implements OnInitialOption {
+public abstract class FileTask extends AbstractTask {
     private boolean mDeleteSucceedEnable;
 
     public FileTask(Progress progress) {
@@ -20,11 +20,6 @@ public abstract class FileTask extends AbstractTask implements OnInitialOption {
     public final FileTask enableDeleteSucceed(boolean enable){
         mDeleteSucceedEnable=enable;
         return this;
-    }
-
-    @Override
-    public Integer onInitOption(int option, boolean fromSaved) {
-        return mDeleteSucceedEnable?option|Executor.Option.DELETE_SUCCEED:option;
     }
 
     public final Client getFileClient(File file){

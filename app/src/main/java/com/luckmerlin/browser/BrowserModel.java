@@ -28,6 +28,8 @@ import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.TaskContent;
+import com.luckmerlin.browser.file.Doing;
+import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Folder;
@@ -38,6 +40,7 @@ import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
+import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
@@ -49,6 +52,7 @@ import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
+import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
@@ -158,7 +162,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     }
                     entryMode(null);
                     return launchTask(new FileCopyTask((File)obj,folder,null).
-                            enableDeleteSucceed(true).setName(getString(R.string.copy)), Executor.Option.NONE,true)||true;
+                            enableDeleteSucceed(true).setName(getString(R.string.copy)), Option.EXECUTE,true)||true;
                 }));
             case R.string.delete:
                  return deleteFile(obj,true,false)||true;
@@ -172,7 +176,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     }
                     entryMode(null);
                     return launchTask(new FileMoveTask((File)obj ,folder,null).enableDeleteSucceed
-                                    (true).setName(getString(R.string.move)), Executor.Option.NONE,true)||true;
+                                    (true).setName(getString(R.string.move)), Option.EXECUTE,true)||true;
                 }));
         }
         if (null!=obj&&obj instanceof File){
@@ -240,7 +244,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
-        startTask(filesDeleteTask, Option.NONE);
+        startTask(filesDeleteTask, Option.EXECUTE);
         return (showDialog&&showTaskDialog(filesDeleteTask,null))||true;
     }
 
@@ -354,7 +358,34 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
+        mNotifyText.set(""+status+" "+(null!=task?task.getName():""));
+        switch (status){
+            case Executor.STATUS_FINISH:
+                checkDoingFileSucceed(null!=task?task.getProgress():null);
+                break;
+        }
+    }
 
+    private boolean checkDoingFileSucceed(Progress progress){
+        BrowserListAdapter browserListAdapter=mBrowserAdapter;
+        Doing doing=null==progress||!progress.isSucceed()?null:progress.getDoing();
+        if (null==doing||null==browserListAdapter){
+            return false;
+        }
+        if (doing.isDoingMode(Mode.MODE_DELETE)){
+            Brief brief=doing.getFrom();
+            brief=null!=brief?brief:doing.getTo();
+            return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
+        }
+//        if (files.isDoingMode(Mode.MODE_MOVE)){
+//            browserListAdapter.removeIfInFolder(files.getFrom());
+//        }
+//        if (files.isDoingMode(Mode.MODE_COPY)||files.isDoingMode(Mode.MODE_MOVE)){
+//            File toFile=files.getTo();
+//            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&null!=(toFile=toFile.getParentFile())&&
+//                    showFolderFilesChangeAlert(toFile.getName());
+//        }
+        return false;
     }
 
     private boolean browserPath(File file){
@@ -404,8 +435,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             //Test
             TestTask testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
-
-            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
+//            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Executor.Option.NONE,true);
         }
     }
@@ -487,7 +517,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Executor.Option.NONE,true);
+                return launchTask(uploadTask,Option.EXECUTE,true);
             });
         }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
@@ -499,7 +529,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Executor.Option.NONE,true);
+                return launchTask(uploadTask,Option.EXECUTE,true);
             });
         }
         return false;

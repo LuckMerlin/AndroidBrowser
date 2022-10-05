@@ -34,52 +34,40 @@ public abstract class Runtime {
         return this;
     }
 
-    protected final boolean setOption(int option){
-        if (mOption!=option){
-            mOption=option;
-            return true;
-        }
-        return false;
-    }
-
     public int getOption() {
         return mOption;
     }
 
-    public abstract Executor getExecutor();
+    public final boolean isCancelEnabled(){
+        return Option.isOptionEnabled(mOption,Option.CANCEL);
+    }
 
-    public final boolean isDeleteEnabled() {
-        return isOptionEnabled(mOption,Executor.Option.DELETE);
+    public final boolean isDeleteEnabled(){
+        return Option.isOptionEnabled(mOption,Option.DELETE);
     }
 
     public final boolean isDeleteSucceedEnabled(){
-        return isOptionEnabled(mOption,Executor.Option.DELETE_SUCCEED);
+        return Option.isOptionEnabled(mOption,Option.DELETE_SUCCEED);
     }
 
-    protected static final boolean isDeleteEnabled(int src) {
-        return isOptionEnabled(src,Executor.Option.DELETE);
+    public final boolean isExecuteEnabled(){
+        return Option.isOptionEnabled(mOption,Option.EXECUTE);
     }
 
-    public final Runtime cancel(boolean cancel) {
-        return enableOption(Executor.Option.CANCEL,cancel);
+    public final boolean isPendingEnabled(){
+        return Option.isOptionEnabled(mOption,Option.PENDING);
     }
+
+    protected final Runtime setOption(int option){
+        mOption=option;
+        return this;
+    }
+
+    public abstract Executor getExecutor();
 
     public final Context getContext() {
         WeakReference<Context> reference=mContextReference;
         return null!=reference?reference.get():null;
-    }
-
-    public final boolean isCancelEnabled() {
-        return isOptionEnabled(mOption,Executor.Option.CANCEL);
-    }
-
-    private Runtime enableOption(int option,boolean enable){
-        mOption=enable?mOption|option:mOption&~option;
-        return this;
-    }
-
-    protected static boolean isOptionEnabled(int src,int option){
-        return (option&src)==option;
     }
 
     protected int getStatus() {

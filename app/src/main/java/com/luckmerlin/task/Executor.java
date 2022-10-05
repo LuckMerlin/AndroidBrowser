@@ -4,11 +4,6 @@ import com.luckmerlin.core.Matcher;
 
 public interface Executor {
 
-    @Deprecated
-    public static interface Option extends com.luckmerlin.task.Option {
-
-    }
-
     interface Listener{
 
     }
@@ -28,7 +23,7 @@ public interface Executor {
     public final static int STATUS_DELETE=2008;
 
     boolean execute(Object task,int option);
-    void match(Matcher<TaskExecutor.ExecuteTask> matcher);
+    void findTask(OnTaskFind onTaskFind);
     Executor putListener(Listener listener,Matcher<Task> matcher,boolean notify);
     Executor removeListener(Listener listener);
 }

@@ -109,16 +109,16 @@ public class ConveyorActivityModel extends BaseModel implements
         mExecutor=executor;
         if (null!=executor){
             executor.putListener(this,null,false);
-            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.
-                    addTaskWithSort(null!=data?data.getTask():null));
-            for (int i = 0; i < 100; i++) {
-//                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
-//                        (new AndroidFileStream(new File("/sdcard/test.png")),
-//                                new AndroidFileStream(new File(
-//                                        "/sdcard/test"+i+".png")),null);
-//                mConveyorListAdapter.add(streamCopyTask);
-//                executor.execute(streamCopyTask,null);
-            }
+//            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.
+//                    addTaskWithSort(null!=data?data.getTask():null));
+//            for (int i = 0; i < 100; i++) {
+////                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
+////                        (new AndroidFileStream(new File("/sdcard/test.png")),
+////                                new AndroidFileStream(new File(
+////                                        "/sdcard/test"+i+".png")),null);
+////                mConveyorListAdapter.add(streamCopyTask);
+////                executor.execute(streamCopyTask,null);
+//            }
 
 
 //            FileCopyTask1 copyTask=new FileCopyTask1(LocalClient.createLocalFile
@@ -158,7 +158,7 @@ public class ConveyorActivityModel extends BaseModel implements
                         Confirm().setOnConfirm((boolean confirmed)-> confirmed?null:null).
                         setTitle(getString(R.string.delete)).setMessage(getString
                         (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
-                            if (cancelTask(obj, Executor.Option.DELETE)&&null!=obj&&obj instanceof Task) {
+                            if (cancelTask(obj, Option.DELETE)&&null!=obj&&obj instanceof Task) {
                                 mConveyorListAdapter.remove((Task) obj);
                             }
                             return null;
@@ -214,7 +214,7 @@ public class ConveyorActivityModel extends BaseModel implements
 
     private boolean executeTask(Object task){
         Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.execute(task, Option.NONE);
+        return null!=executor&&executor.execute(task, Option.EXECUTE);
     }
 
     public final ConveyorListAdapter getConveyorListAdapter() {

@@ -36,6 +36,7 @@
     <string name="whichSucceed">%1s Succeed</string>
     <string name="whichFailed">%1s Failed</string>
     <string name="succeed">Succeed</string>
+    <string name="restart">Restart</string>
     <string name="fail">Failed</string>
     <string name="share">Share</string>
     <string name="rename">Rename</string>

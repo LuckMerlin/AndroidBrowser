@@ -8,17 +8,26 @@ import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ButtonTextBinding;
 import com.luckmerlin.click.Listener;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DialogButtonBinding implements Binding {
-    private ViewBinding[] mBindings;
+    private List<ViewBinding> mBindings;
     private Listener mListener;
 
     public DialogButtonBinding(ViewBinding ...bindings){
-        setButton(bindings);
+        add(bindings);
     }
 
-    public final DialogButtonBinding setButton(ViewBinding ...bindings){
-        mBindings=bindings;
+    public final DialogButtonBinding add(ViewBinding ...bindingsArg){
+        if (null!=bindingsArg&&bindingsArg.length>0){
+            for (ViewBinding child:bindingsArg) {
+                if(null!=child){
+                    List<ViewBinding> bindings=mBindings;
+                    (null!=bindings?bindings:(mBindings=new ArrayList<>())).add(child);
+                }
+            }
+        }
         return this;
     }
 
@@ -32,7 +41,7 @@ public class DialogButtonBinding implements Binding {
         if (null==view||!(view instanceof ViewGroup)){
             return;
         }
-        ViewBinding[] bindings=mBindings;
+        List<ViewBinding> bindings=mBindings;
         if (null==bindings){
             return;
         }

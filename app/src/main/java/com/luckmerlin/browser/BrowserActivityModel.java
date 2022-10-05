@@ -45,6 +45,7 @@ import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.ClickableSpan;
@@ -482,7 +483,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                     }
                     return launchTask(new FileCopyTask((File)obj,folder,null).
                             enableDeleteSucceed(true).setName(getString(R.string.copy)),
-                            Executor.Option.NONE,true);
+                            Option.EXECUTE,true);
                 });
             case R.string.move:
                 if (null==obj||!(obj instanceof File)){
@@ -495,8 +496,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         return null;
                     }
                     return launchTask(new FileMoveTask((File)obj ,folder,null).
-                            enableDeleteSucceed(true).setName(getString(R.string.move)),
-                            Executor.Option.NONE,true);
+                            enableDeleteSucceed(true).setName(getString(R.string.move)), Option.EXECUTE,true);
                 });
         }
         if (null!=obj&&obj instanceof File){
@@ -622,7 +622,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Executor.Option.NONE,true);
+                return launchTask(uploadTask,Option.EXECUTE,true);
             });
         }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
@@ -634,7 +634,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Executor.Option.NONE,true);
+                return launchTask(uploadTask,Option.EXECUTE,true);
             });
         }
         return false;

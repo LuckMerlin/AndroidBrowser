@@ -83,7 +83,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
 
     public final boolean isCancelEnabled() {
         Runtime runtime=mRuntime;
-        return null!=runtime&&runtime.isCancelEnabled();
+        return null!=runtime&&Option.isOptionEnabled(runtime.getOption(),Option.CANCEL);
     }
 
     protected final String getString(Context context,int textId, Object... args){

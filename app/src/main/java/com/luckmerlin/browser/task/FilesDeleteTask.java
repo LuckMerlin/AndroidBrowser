@@ -1,26 +1,18 @@
 package com.luckmerlin.browser.task;
 
-import android.view.View;
-import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
-import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.BindingResult;
-import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
+import com.luckmerlin.task.TaskRestartEnabler;
 
-public class FilesDeleteTask extends FileTask{
+public class FilesDeleteTask extends FileTask {
     private final FileArrayList mFiles;
     private int mCursor;
 
@@ -41,19 +33,8 @@ public class FilesDeleteTask extends FileTask{
         }
         int size=files.size();
         File child=null;Client client;
-        mCursor=mCursor<=0?0:mCursor;Response<File> response=null;
-        final boolean[] canceled=new boolean[]{false};
-        final ViewBinding cancelViewBinding=ViewBinding.clickId(R.string.cancel).
-        setListener((OnClickListener)(View view, int clickId, int count, Object obj)->canceled[0]=true);
-        final Executor executor=null!=runtime?runtime.getExecutor():null;
-        final DialogButtonBinding cancelBinding=new DialogButtonBinding(cancelViewBinding);
-        final BindingResult failBindingResult=new BindingResult().setSucceed(false).
-        setBinding(new DialogButtonBinding(cancelViewBinding,ViewBinding.clickId(R.string.skip).
-        setListener((OnClickListener)(View view, int clickId, int count, Object obj)->
-            (null!=executor&&executor.execute(FilesDeleteTask.this, Option.NONE))||true
-        )));
-        Doing doing=new Doing().setDoingBinding(cancelBinding);
-        Progress progress=new Progress().setTotal(size).setPosition(mCursor).setDoing(doing);
+        Response<File> response=null;
+        Progress progress=new Progress().setTotal(size).setPosition(mCursor);
         for (; mCursor < size; mCursor++) {
             if (null==(child=files.get(mCursor))){
                 continue;
@@ -63,17 +44,14 @@ public class FilesDeleteTask extends FileTask{
                 return new Response<>(Code.CODE_FAIL,"File client invalid.");
             }
             if (null==(response=client.deleteFile(child,(int code, String msg, File file)-> {
-                doing.setSucceed(code==Code.CODE_SUCCEED).setDoingMode(Mode.MODE_DELETE).setFrom(file);
-                notifyProgress(progress);
-                return canceled[0];
-            }))){
-                return failBindingResult;
-            }else if (response.isAnyCode(Code.CODE_CANCEL)){
+                notifyProgress(progress.setDoing(new Doing().setDoingMode(Mode.MODE_DELETE).
+                        setSucceed(code==Code.CODE_SUCCEED).setFrom(file)));
+                return runtime.isCancelEnabled();
+            }))||(!response.isSucceed()&&!response.isAnyCode(Code.CODE_NOT_EXIST))){
                 return response;
-            }else if (!response.isSucceed()){
-                return failBindingResult;
             }
         }
+        notifyProgress(progress.setPosition(size).setTitle(child.getName()));
         return new Response<>(Code.CODE_SUCCEED,"Succeed");
     }
 }

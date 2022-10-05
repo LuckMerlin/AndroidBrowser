@@ -15,6 +15,7 @@ import com.luckmerlin.core.Matcher;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.task.TaskSaver;
@@ -167,8 +168,8 @@ public class ConveyorService extends Service {
         }
 
         @Override
-        public  void match(Matcher<TaskExecutor.ExecuteTask> matcher) {
-            mExecutor.match(matcher);
+        public void findTask(OnTaskFind onTaskFind) {
+            mExecutor.findTask(onTaskFind);
         }
 
         @Override

@@ -22,8 +22,9 @@ import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
+import com.luckmerlin.task.TaskRestartEnabler;
 
-public class DoingContent extends ConfirmContent implements Executor.OnStatusChangeListener, OnProgressChange {
+public class DoingContent extends ConfirmContent implements Executor.OnStatusChangeListener, OnProgressChange{
     private final ObservableField<String> mTitle=new ObservableField<>();
     private final ObservableField<CharSequence> mMessage=new ObservableField<>();
     private final ObservableField<Doing> mDoing=new ObservableField<>();
@@ -48,12 +49,18 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
         Object object=null!=progress?progress.getDoing():null;
         Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
         mDoing.set(doing);
-        mBinding.set(null!=doing?doing.getDoingBinding():null);
     }
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
         switch (status){
+            case Executor.STATUS_EXECUTING:
+                setConfirm(null);
+                setMessage(null);
+                setDoingBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.cancel).setListener(
+                        (OnClickListener)(View view, int clickId, int count, Object obj)->
+                                null!=executor&&executor.execute(task,Option.CANCEL))));
+                break;
             case Executor.STATUS_FINISH:
                 Result result=null!=task?task.getResult():null;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
@@ -69,13 +76,17 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                     post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss
                 }
                 setMessage(result instanceof MessageResult?((MessageResult)result).getMessage():null);
-                binding=null!=binding?binding:new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()?
-                    R.string.succeed:R.string.fail).setListener((OnClickListener)
-                    (View view, int clickId, int count, Object obj)-> removeFromParent()||true),
-                    ViewBinding.clickId(R.string.remove).setListener((OnClickListener)
-                        (View view, int clickId, int count, Object obj)->
-                    (null!=executor&&executor.execute(task, Option.DELETE)&&
-                            removeFromParent())||true));
+                if (null==binding){
+                    DialogButtonBinding buttonBinding=new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()? R.string.succeed:
+                            R.string.fail).setListener((OnClickListener) (View view, int clickId, int count, Object obj)-> removeFromParent()||true));
+                    if (null!=task&&task instanceof TaskRestartEnabler&&((TaskRestartEnabler)task).isTaskRestartEnable()){
+                        buttonBinding.add(ViewBinding.clickId(R.string.restart).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
+                                (null!=executor&&executor.execute(task, Option.EXECUTE))||true));
+                    }
+                    buttonBinding.add(ViewBinding.clickId(R.string.remove).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
+                            (null!=executor&&executor.execute(task, Option.DELETE)&& removeFromParent())||true));
+                    binding=buttonBinding;
+                }
                 setDoingBinding(binding);
                 break;
         }
