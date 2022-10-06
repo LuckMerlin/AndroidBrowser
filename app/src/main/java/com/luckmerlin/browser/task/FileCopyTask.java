@@ -14,6 +14,7 @@ import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.utils.Utils;
 
+@Deprecated
 public class FileCopyTask extends FileTask {
     private final File mFromFile;
     private final File mToFile;

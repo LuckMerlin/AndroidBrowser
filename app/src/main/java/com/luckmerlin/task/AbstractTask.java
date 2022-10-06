@@ -37,7 +37,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
     }
 
     @Override
-    public Result execute(Runtime runtime, OnProgressChange callback) {
+    public final Result execute(Runtime runtime, OnProgressChange callback) {
         mResult=null;
         mRuntime=runtime;
         mOnProgressChange=callback;

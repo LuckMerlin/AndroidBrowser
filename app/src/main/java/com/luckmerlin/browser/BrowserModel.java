@@ -8,6 +8,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -36,7 +39,9 @@ import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FileCopyTask;
 import com.luckmerlin.browser.task.FileMoveTask;
+import com.luckmerlin.browser.task.FilesCopyTask;
 import com.luckmerlin.browser.task.FilesDeleteTask;
+import com.luckmerlin.browser.task.FilesMoveTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
@@ -54,6 +59,7 @@ import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
+import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
@@ -70,8 +76,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         OnActivityNewIntent, OnActivityStart {
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
     private final ObservableField<String> mSearchInput=new ObservableField<>();
-    private ObservableField<String> mNotifyText=new ObservableField<>();
     private final ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
+    private final ObservableField<AlertText> mAlertText=new ObservableField<>();
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
 
@@ -93,7 +99,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
-        mNotifyText.set("LMBrowser");
         mContentAdapter.set(mBrowserAdapter);
         //
 //        showContentDialog(new DoingContent(),null);
@@ -156,13 +161,13 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return null!=obj&&obj instanceof File&&entryMode(new Mode(clickId).makeSureBinding(
                         (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
                     Folder folder=mBrowserAdapter.getFolder();
-                    if (null==folder||folder.isChild(obj,true)){
+                    if (null==folder||folder.isChild(obj,false,true)){
                         toast(R.string.canNotOperateHere,-1);
                         return true;
                     }
                     entryMode(null);
-                    return launchTask(new FileCopyTask((File)obj,folder,null).
-                            enableDeleteSucceed(true).setName(getString(R.string.copy)), Option.EXECUTE,true)||true;
+                    return launchTask(new FilesCopyTask(new FileArrayList((File)obj),folder).
+                            setName(getString(R.string.copy)), Option.EXECUTE,true)||true;
                 }));
             case R.string.delete:
                  return deleteFile(obj,true,false)||true;
@@ -175,8 +180,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                         return true;
                     }
                     entryMode(null);
-                    return launchTask(new FileMoveTask((File)obj ,folder,null).enableDeleteSucceed
-                                    (true).setName(getString(R.string.move)), Option.EXECUTE,true)||true;
+                    return launchTask(new FilesMoveTask(new FileArrayList((File)obj) ,folder).
+                            setName(getString(R.string.move)), Option.EXECUTE,true)||true;
                 }));
         }
         if (null!=obj&&obj instanceof File){
@@ -358,7 +363,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
-        mNotifyText.set(""+status+" "+(null!=task?task.getName():""));
+        showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")),1000);
         switch (status){
             case Executor.STATUS_FINISH:
                 checkDoingFileSucceed(null!=task?task.getProgress():null);
@@ -367,24 +372,28 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean checkDoingFileSucceed(Progress progress){
+        if (!isUiThread()){
+            return post(()->checkDoingFileSucceed(progress));
+        }
         BrowserListAdapter browserListAdapter=mBrowserAdapter;
-        Doing doing=null==progress||!progress.isSucceed()?null:progress.getDoing();
-        if (null==doing||null==browserListAdapter){
+        Doing doing=null!=progress?progress.getDoing():null;
+        if (null==doing||!doing.isSucceed()||null==browserListAdapter){
             return false;
         }
         if (doing.isDoingMode(Mode.MODE_DELETE)){
             Brief brief=doing.getFrom();
             brief=null!=brief?brief:doing.getTo();
             return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
+        }else if (doing.isDoingMode(Mode.MODE_COPY)){
+            Brief to=doing.getTo();
+            File toFile=null!=to&&to instanceof File?(File)to:null;
+            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&& null!=(toFile=toFile.getParentFile())&&
+                    showFolderFilesChangeAlert(toFile.getName());
+        }else if (doing.isDoingMode(Mode.MODE_MOVE)){
+            Brief brief=doing.getFrom();
+            brief=null!=brief?brief:doing.getTo();
+            return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
         }
-//        if (files.isDoingMode(Mode.MODE_MOVE)){
-//            browserListAdapter.removeIfInFolder(files.getFrom());
-//        }
-//        if (files.isDoingMode(Mode.MODE_COPY)||files.isDoingMode(Mode.MODE_MOVE)){
-//            File toFile=files.getTo();
-//            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&&null!=(toFile=toFile.getParentFile())&&
-//                    showFolderFilesChangeAlert(toFile.getName());
-//        }
         return false;
     }
 
@@ -392,6 +401,33 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
         return null!=file&&null!=adapter&&browserPath(new BrowseQuery(file,searchInput));
+    }
+
+    private boolean showFolderFilesChangeAlert(String name){
+        SpannableStringBuilder builder=new SpannableStringBuilder();
+        final int maxTitle=10;
+        name=null!=name&&name.length()>maxTitle?name.substring(0,maxTitle)+"...":name;
+        name=null!=name?name+" ":" ";
+        boolean nameEmpty=null==name||name.length()<=0;
+        String value=""+getString(R.string.contentChanged);
+        builder.append(name).append(nameEmpty?value:value.toLowerCase()).append(".");
+        int index=builder.length();
+        builder.append((" "+getText(R.string.refresh)).toLowerCase());
+        builder.setSpan(new ClickableSpan((View widget)->{
+            mBrowserAdapter.reset(null);
+            showAlertText(null,0);
+        }),index,builder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        return showAlertText(new AlertText().setMessage(builder).setMovementMethod
+                (LinkMovementMethod.getInstance()),-1);
+    }
+
+    private boolean showAlertText(AlertText alertText,int timeout){
+        mAlertText.set(alertText);
+        CharSequence msg=null!=alertText?alertText.getMessage():null;
+        if (null!=msg&&msg.length()>0&&(timeout=timeout>10000?10000:timeout)>0){
+            return post(()->showAlertText(null,0),timeout);
+        }
+        return true;
     }
 
     private boolean browserPath(BrowseQuery query){
@@ -436,7 +472,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             TestTask testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
-//            launchTask(testTask, Executor.Option.NONE,true);
+//            launchTask(testTask, Option.EXECUTE,true);
         }
     }
 
@@ -545,5 +581,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     public ObservableField<String> getSearchInput() {
         return mSearchInput;
+    }
+
+    public ObservableField<AlertText> getAlertText() {
+        return mAlertText;
     }
 }

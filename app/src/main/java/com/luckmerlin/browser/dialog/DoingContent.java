@@ -11,6 +11,7 @@ import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Canceled;
+import com.luckmerlin.core.CodeResult;
 import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
@@ -28,7 +29,6 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
     private final ObservableField<String> mTitle=new ObservableField<>();
     private final ObservableField<CharSequence> mMessage=new ObservableField<>();
     private final ObservableField<Doing> mDoing=new ObservableField<>();
-    private final ObservableField<Progress> mProgress=new ObservableField<>();
     private final ObservableField<Binding> mBinding=new ObservableField<>();
     private int mAutoDismiss;
 
@@ -45,10 +45,8 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
             post(()->onProgressChanged(task,progress));
             return;
         }
-        mProgress.set(progress);
         Object object=null!=progress?progress.getDoing():null;
-        Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
-        mDoing.set(doing);
+        mDoing.set(null!=object&&object instanceof Doing ?((Doing)object):null);
     }
 
     @Override
@@ -77,12 +75,21 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
                 }
                 setMessage(result instanceof MessageResult?((MessageResult)result).getMessage():null);
                 if (null==binding){
-                    DialogButtonBinding buttonBinding=new DialogButtonBinding(ViewBinding.clickId(result.isSucceed()? R.string.succeed:
-                            R.string.fail).setListener((OnClickListener) (View view, int clickId, int count, Object obj)-> removeFromParent()||true));
+                    int textResId=R.string.succeed;
+                    if (!result.isSucceed()){
+                        textResId=R.string.fail;
+                        if (result instanceof CodeResult&&((CodeResult)result).getCode(Code.CODE_UNKNOWN)==Code.CODE_CANCEL){
+                            textResId=R.string.cancel;
+                        }
+                    }
+                    DialogButtonBinding buttonBinding=new DialogButtonBinding(ViewBinding.clickId(textResId).setListener
+                            ((OnClickListener) (View view, int clickId, int count, Object obj)-> removeFromParent()||true));
+                    //
                     if (null!=task&&task instanceof TaskRestartEnabler&&((TaskRestartEnabler)task).isTaskRestartEnable()){
                         buttonBinding.add(ViewBinding.clickId(R.string.restart).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
                                 (null!=executor&&executor.execute(task, Option.EXECUTE))||true));
                     }
+                    //
                     buttonBinding.add(ViewBinding.clickId(R.string.remove).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
                             (null!=executor&&executor.execute(task, Option.DELETE)&& removeFromParent())||true));
                     binding=buttonBinding;
@@ -119,10 +126,6 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
     public final DoingContent setTitle(String name){
         mTitle.set(name);
         return this;
-    }
-
-    public final ObservableField<Progress> getProgress(){
-        return mProgress;
     }
 
     public final ObservableField<String> getTitle(){

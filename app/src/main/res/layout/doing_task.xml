@@ -31,14 +31,14 @@
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 <LinearLayout android:orientation="@{null==doing.doing.from||null==doing.doing.to?1:0}" android:layout_gravity="center" android:gravity="center"
                     android:layout_width="wrap_content" android:layout_height="wrap_content">
-                    <TextView android:text="@{doing.progress.intValue()+`%`}" android:gravity="center"
+                    <TextView android:text="@{doing.doing.progress+`%`}" android:gravity="center"
                         android:textSize="16sp" android:textColor="@color/textMainAnti" android:layout_gravity="center"
                         android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                     <ImageView android:layout_width="wrap_content" android:src="@drawable/progress_icon"
-                        android:rotation="@{doing.doing.from==null?90:-90}"
+                        android:rotation="@{doing.doing.to!=null?90:-90}"
                         android:visibility="@{null==doing.doing.from||null==doing.doing.to?View.GONE:View.VISIBLE}"
                         android:layout_height="40dp"/>
-                    <com.luckmerlin.view.MarqueeTextView android:text="@{doing.message??doing.progress.title??``}"
+                    <com.luckmerlin.view.MarqueeTextView android:text="@{doing.doing.title??``}"
                         android:textSize="12sp" android:textColor="@color/textMainAnti"
                         android:maxLines="1" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
                 </LinearLayout>

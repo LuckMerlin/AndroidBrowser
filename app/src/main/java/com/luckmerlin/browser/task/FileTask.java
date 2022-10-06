@@ -10,6 +10,7 @@ import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnInitialOption;
 import com.luckmerlin.task.Progress;
 
+@Deprecated
 public abstract class FileTask extends AbstractTask {
     private boolean mDeleteSucceedEnable;
 

@@ -31,8 +31,13 @@ public class Doing<F extends Brief,T extends Brief> {
         return this;
     }
 
-    public boolean isFinish(){
+    public boolean isSucceed(){
         return mProgress ==100;
+    }
+
+    @Deprecated
+    public boolean isFinish(){
+        return isSucceed();
     }
 
     public int getProgress() {

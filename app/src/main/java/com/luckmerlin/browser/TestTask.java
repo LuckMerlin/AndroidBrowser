@@ -7,6 +7,7 @@ import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.AbstractTask;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
@@ -35,13 +36,8 @@ public class TestTask extends AbstractTask {
             }
 //            return null;
 //        }
-        return new ConfirmResult1() {
-            @Override
-            protected Confirm onCreate(Context context) {
-                return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(
-                        ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
-            }
-        };
+        return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(
+                ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
 //        while (true){
 //            try {
 //
