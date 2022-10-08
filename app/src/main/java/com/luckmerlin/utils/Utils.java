@@ -1,5 +1,6 @@
 package com.luckmerlin.utils;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.security.ConfirmationCallback;
@@ -32,6 +33,16 @@ public class Utils {
             }
         }
     }
+
+    public static String getString(Context context,int resId,String def, Object... formatArgs){
+        return null!=context?context.getString(resId,formatArgs):def;
+    }
+
+
+    public static CharSequence getText(Context context,int resId,CharSequence def){
+        return null!=context?context.getText(resId):def;
+    }
+
 
     public static boolean isLandscape(Resources resources){
         return isOrientation(resources,Configuration.ORIENTATION_LANDSCAPE);

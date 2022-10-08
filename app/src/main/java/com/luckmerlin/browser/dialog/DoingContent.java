@@ -18,6 +18,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
@@ -67,6 +68,7 @@ public class DoingContent extends ConfirmContent implements
                 break;
             case Executor.STATUS_FINISH:
                 Result result=null!=task?task.getResult():null;
+                result=result instanceof ConfirmResult?((ConfirmResult)result).makeConfirm(getContext()):result;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
                 int autoDismiss=mAutoDismiss;
                 Binding binding=null;

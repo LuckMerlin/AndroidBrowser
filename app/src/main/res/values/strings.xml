@@ -59,6 +59,7 @@
     <string name="sure">Sure</string>
     <string name="delete">Delete</string>
     <string name="remove">Remove</string>
+    <string name="exist">Exist</string>
     <string name="alreadyWhich">Already %1s</string>
     <string name="summeryItemWhich">%1d Item(s)</string>
     <string name="finished">Finished</string>

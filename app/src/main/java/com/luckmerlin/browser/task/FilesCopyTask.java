@@ -1,5 +1,6 @@
 package com.luckmerlin.browser.task;
 
+import android.content.Context;
 import android.view.View;
 
 import com.luckmerlin.binding.ViewBinding;
@@ -19,6 +20,7 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
@@ -145,13 +147,16 @@ public class FilesCopyTask extends FilesTask{
                     if (null==executor){
                         return new Response<>(Code.CODE_ERROR,"Need confirm file copy cover,But not exist executor");
                     }
-                    return new Confirm().setTitle("确定覆盖").setName(" 已经存在了").setMessage(toFile.getName()).setBinding(new DialogButtonBinding(
-                            ViewBinding.clickId(R.string.replace).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-                                    (EnableCover(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)&&false),
-                            ViewBinding.clickId(R.string.append).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-                                    ((EnableAppend(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)||true)),
-                            ViewBinding.clickId(R.string.cancel)
-                    ));
+                    return (ConfirmResult)(Context context)->(Confirm)new Confirm().setTitle(Utils.getString(context,R.string.sureWhich,
+                                    null,Utils.getString(context,R.string.replace,null))).
+                            setName(Utils.getString(context,R.string.alreadyWhich,null,Utils.getString(context,R.string.exist,null))).
+                            setMessage(toFile.getName()).setBinding(new DialogButtonBinding(
+                                    ViewBinding.clickId(R.string.replace).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
+                                            ((EnableCover(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)||true)),
+                                    ViewBinding.clickId(R.string.append).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
+                                            ((EnableAppend(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)||true)),
+                                    ViewBinding.clickId(R.string.cancel)
+                            ));
                 }
                 Debug.D("To delete exist file while copy cover enable.");
                 Response<File> deleteExist=toClient.deleteFile(toFile,null);
