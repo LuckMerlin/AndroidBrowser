@@ -29,4 +29,5 @@ public interface Client {
     Response<OutputStream> openOutputStream(File file);
     boolean openFile(File file, Context context);
     Response<File> loadFile(String file);
+    Response<File> rename(String file,String name);
 }

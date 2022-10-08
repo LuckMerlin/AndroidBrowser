@@ -64,6 +64,11 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
+    public Response<File> rename(String file, String name) {
+        return null;
+    }
+
+    @Override
     public boolean openFile(File openFile, Context context) {
         String filePath=null!=openFile?openFile.getPath():null;
         String host=null!=openFile?openFile.getHost():null;

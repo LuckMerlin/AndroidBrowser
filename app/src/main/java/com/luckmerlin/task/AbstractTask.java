@@ -81,6 +81,11 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
         return null!=runtime?runtime.getExecutor():null;
     }
 
+    protected final boolean execute(Object task,int option){
+        Executor executor=getExecutor();
+        return null!=executor&&executor.execute(task,option);
+    }
+
     public final boolean isCancelEnabled() {
         Runtime runtime=mRuntime;
         return null!=runtime&&Option.isOptionEnabled(runtime.getOption(),Option.CANCEL);

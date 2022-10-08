@@ -7,7 +7,9 @@ public class AlertText {
     private CharSequence mMessage;
     private Drawable mBackground;
     private Drawable mMessageBg;
+    private AlertText mNext;
     private MovementMethod mMovementMethod;
+    private int mTimeout=0;
 
     public CharSequence getMessage() {
         return mMessage;
@@ -33,5 +35,19 @@ public class AlertText {
 
     public Drawable getMessageBackground() {
         return mMessageBg;
+    }
+
+    public AlertText setNext(AlertText alertText){
+        mNext=alertText;
+        return this;
+    }
+
+    public AlertText setTimeout(int timeout) {
+        this.mTimeout = timeout;
+        return this;
+    }
+
+    public int getTimeout() {
+        return mTimeout;
     }
 }

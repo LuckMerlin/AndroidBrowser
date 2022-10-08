@@ -69,6 +69,11 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
+    public Response<File> rename(String file, String name) {
+        return null;
+    }
+
+    @Override
     public Response<OutputStream> openOutputStream(File file) {
         return null;
     }

@@ -25,7 +25,8 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskRestartEnabler;
 
-public class DoingContent extends ConfirmContent implements Executor.OnStatusChangeListener, OnProgressChange{
+public class DoingContent extends ConfirmContent implements
+        Executor.OnStatusChangeListener, OnProgressChange,OnClickListener{
     private final ObservableField<String> mTitle=new ObservableField<>();
     private final ObservableField<CharSequence> mMessage=new ObservableField<>();
     private final ObservableField<Doing> mDoing=new ObservableField<>();
@@ -37,6 +38,11 @@ public class DoingContent extends ConfirmContent implements Executor.OnStatusCha
         DoingTaskBinding binding=inflate(context,R.layout.doing_task);
         binding.setDoing(this);
         return binding.getRoot();
+    }
+
+    @Override
+    public boolean onClick(View view, int clickId, int count, Object obj) {
+        return removeFromParent()||true;
     }
 
     @Override

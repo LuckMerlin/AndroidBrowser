@@ -23,6 +23,7 @@
                 <LinearLayout android:orientation="vertical" android:layout_marginLeft="5dp" android:layout_marginRight="5dp"
                     android:layout_width="wrap_content" android:layout_height="wrap_content">
                     <TextView  binding:bind="@{VB.clickId(R.string.open,content.file)}" style="@style/contextMenuTextView" />
+                    <TextView  binding:bind="@{VB.clickId(R.string.rename,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.copy,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.move,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.delete,content.file)}" style="@style/contextMenuTextView" />

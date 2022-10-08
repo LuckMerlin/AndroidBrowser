@@ -267,6 +267,33 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public Response<File> rename(String filePath, String name) {
+        if (null==filePath||filePath.length()<=0){
+            Debug.W("Fail rename local file while file path invalid.");
+            return new Response<>(Code.CODE_ARGS_INVALID,"File path invalid.");
+        }else if (null==name||name.length()<=0){
+            Debug.W("Fail rename local file while new name invalid.");
+            return new Response<>(Code.CODE_ARGS_INVALID,"New name invalid.");
+        }
+        java.io.File file=new java.io.File(filePath);
+        if (!file.exists()){
+            Debug.W("Fail rename local file while file not exist.");
+            return new Response<>(Code.CODE_NOT_EXIST,"File not exist.");
+        }
+        java.io.File targetFile=new java.io.File(file.getParentFile(),name);
+        if (targetFile.exists()){
+            Debug.W("Fail rename local file while target already exist."+targetFile);
+            return new Response<>(Code.CODE_EXIST,"File already exist.");
+        }
+        boolean succeed=file.renameTo(targetFile);
+        if (targetFile.exists()&&!file.exists()){
+            return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(targetFile));
+        }
+        Debug.W("Fail rename local file."+succeed);
+        return new Response<>(Code.CODE_FAIL,"File rename local file."+succeed);
+    }
+
+    @Override
     public boolean openFile(File openFile, Context context) {
         String filePath=null!=openFile?openFile.getPath():null;
         if (null==filePath||filePath.length()<=0){

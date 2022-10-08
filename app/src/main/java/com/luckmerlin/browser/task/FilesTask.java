@@ -9,6 +9,7 @@ import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Progress;
@@ -40,6 +41,7 @@ public abstract class FilesTask extends AbstractTask {
             }
             notifyProgress(progress.setPosition(mCursor).setTitle(child.getName()));
             if (null==(response=onExecuteFile(child,mCursor,runtime,progress))||(!response.isSucceed())){
+                Debug.W("Fail execute file."+response);
                 return response;
             }
         }

@@ -30,6 +30,7 @@ import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
+import com.luckmerlin.browser.dialog.RenameFileContent;
 import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.DoingFiles;
@@ -69,6 +70,7 @@ import com.merlin.model.OnActivityStart;
 import com.merlin.model.OnBackPress;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
         OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick,
@@ -134,6 +136,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return mBrowserAdapter.reset(null)||true;
             case R.string.create:
                 return createFile()||true;
+            case R.string.rename:
+                return renameFile(null!=obj&&obj instanceof File?(File)obj:null)||true;
             case R.string.multiChoose:
                 return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).setBinding(new DialogButtonBinding(
                         ViewBinding.clickId(R.string.move),ViewBinding.clickId(R.string.copy),
@@ -200,6 +204,30 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return toast(getString(R.string.whichFailed,getString(R.string.open)));
         }
         return false;
+    }
+
+    private Client getFileClient(Object obj){
+        return mBrowserAdapter.getClient();
+    }
+
+    private boolean renameFile(File file){
+        String path=null!=file?file.getPath():null;
+        Client client=null==path||path.length()<=0?null:getFileClient(file);
+        if(null==client){
+            return toast(getString(R.string.whichFailed,getString(R.string.rename)))&&false;
+        }
+        return null!=showContentDialog(new RenameFileContent(),null);
+//        return execute(()->{
+//            Response<File> response=client.rename(path,"");
+//            File newFile=null!=response&&response.isSucceed()?response.getData():null;
+//            post(()->{
+//                if (null!=newFile){
+//                    mBrowserAdapter.replace(file,newFile);
+//                }else{
+//                    toast(getString(R.string.whichFailed,getString(R.string.rename)));
+//                }
+//            });
+//        });
     }
 
     private boolean toggleSelectFile(File file){
@@ -363,7 +391,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
-        showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")),1000);
+        showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")).setTimeout(1000));
         switch (status){
             case Executor.STATUS_FINISH:
                 checkDoingFileSucceed(null!=task?task.getProgress():null);
@@ -415,17 +443,22 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         builder.append((" "+getText(R.string.refresh)).toLowerCase());
         builder.setSpan(new ClickableSpan((View widget)->{
             mBrowserAdapter.reset(null);
-            showAlertText(null,0);
+            showAlertText(null);
         }),index,builder.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
         return showAlertText(new AlertText().setMessage(builder).setMovementMethod
-                (LinkMovementMethod.getInstance()),-1);
+                (LinkMovementMethod.getInstance()).setTimeout(-1));
     }
 
-    private boolean showAlertText(AlertText alertText,int timeout){
-        mAlertText.set(alertText);
-        CharSequence msg=null!=alertText?alertText.getMessage():null;
-        if (null!=msg&&msg.length()>0&&(timeout=timeout>10000?10000:timeout)>0){
-            return post(()->showAlertText(null,0),timeout);
+    private boolean showAlertText(AlertText alertText){
+        AlertText current=mAlertText.get();
+        mAlertText.set(alertText);int timeout=-1;
+        if (null==alertText){
+//            if (null!=current)
+            return true;
+        }
+        CharSequence msg=alertText.getMessage();
+        if (null!=msg&&msg.length()>0&&(timeout=(timeout=alertText.getTimeout())>10000?10000:timeout)>0){
+            return post(()->showAlertText(null),timeout);
         }
         return true;
     }

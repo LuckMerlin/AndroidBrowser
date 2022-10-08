@@ -4,9 +4,15 @@ import com.luckmerlin.core.Brief;
 
 public class Confirm extends BindingResult implements Brief {
     private String mName;
+    private String mTitle;
 
-    public final BindingResult setName(String name) {
+    public final Confirm setName(String name) {
         mName = name;
+        return this;
+    }
+
+    public final Confirm setTitle(String title) {
+        mTitle = title;
         return this;
     }
 
@@ -25,4 +31,7 @@ public class Confirm extends BindingResult implements Brief {
         return null;
     }
 
+    public String getTitle() {
+        return mTitle;
+    }
 }

@@ -63,6 +63,7 @@ public class StreamTask extends AbstractTask {
                 outputStream.write(buffer,0,read);
                 notifyProgress(progress.setPosition(currentOutLength+=read));
                 lastTime=time;
+                Thread.sleep(5000);//Test
             }
             currentOutLength=outputStream.getTotal();
             if (currentOutLength!=inputTotalLength){
