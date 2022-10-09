@@ -33,6 +33,7 @@ public class FilesCopyTask extends FilesTask{
     private final Folder mToFolder;
     private boolean mCoverEnabled=false;
     private boolean mAppendEnable=false;
+    private boolean mDeleteSrcWhileSucceed=false;
 
     public FilesCopyTask(FileArrayList files,Folder toFolder) {
         super(files);
@@ -173,6 +174,9 @@ public class FilesCopyTask extends FilesTask{
             }
         });
         Utils.closeStream(fromStream, toStream);
+//        if (mDeleteSrcWhileSucceed&&null!=result&&result instanceof Response&&((Response)result).isSucceed()){
+//            fromClient.deleteFile(fromFile,);
+//        }
         return result;
     }
 }

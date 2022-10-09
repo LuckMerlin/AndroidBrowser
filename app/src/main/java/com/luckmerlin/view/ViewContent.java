@@ -204,6 +204,11 @@ public abstract class ViewContent implements Content {
         return null!=root&&(delay>0?root.postDelayed(runnable,delay):root.post(runnable));
     }
 
+    public final boolean removePost(Runnable runnable){
+        View root=null!=runnable?getRoot():null;
+        return null!=root&&root.removeCallbacks(runnable);
+    }
+
     public final boolean toast(int textId,int duration,Object...args){
         return toast(getString(textId,args),duration);
     }

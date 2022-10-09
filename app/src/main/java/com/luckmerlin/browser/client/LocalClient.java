@@ -333,6 +333,7 @@ public class LocalClient extends AbstractClient {
             java.io.File[] files=file.listFiles();
             total=null!=files?files.length:0;
         }
+        localFile.setReadable(file.canRead()).setWriteable(file.canWrite()).setExecutable(file.canExecute());
         return localFile.setTotal(total);
     }
 
@@ -340,10 +341,10 @@ public class LocalClient extends AbstractClient {
         Debug.D("Deleting android file."+file);
         Response response=doDeleteAndroidFile(file,update);
         if (null!=response&&!response.isSucceed()){
-            Debug.D("Fail delete android file."+file);
+            Debug.D("Fail delete android file while response fail."+response.getCode(Code.CODE_UNKNOWN)+" "+file);
             return response;
         }else if (file.exists()){
-            Debug.D("Fail delete android file."+file);
+            Debug.D("Fail delete android file while already exist."+file);
             return new Response(Code.CODE_FAIL,"Fail delete.");
         }
         Debug.D("Succeed delete android file."+file);
@@ -352,7 +353,7 @@ public class LocalClient extends AbstractClient {
 
     private Response doDeleteAndroidFile(java.io.File file, OnFileDeleteUpdate update){
         if (null==file||!file.exists()){
-            Debug.D("Fail delete android file."+file);
+            Debug.D("Fail delete android file while not exist."+file);
             return new Response(Code.CODE_ARGS_INVALID,"File not exist or invalid.");
         }
         File fileObj=LocalClient.createLocalFile(file);
@@ -377,10 +378,11 @@ public class LocalClient extends AbstractClient {
 //        } catch (InterruptedException e) {
 //            e.printStackTrace();
 //        }
-        file.delete();
-        boolean notExist=!file.exists();
-        notifyDeleteUpdate(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish delete.", fileObj,update);
-        return new Response(notExist?Code.CODE_SUCCEED:Code.CODE_FAIL,"Finish");
+        boolean ddd=file.delete();
+        Debug.D("EEEE "+ddd+" "+file);
+        int code=!file.exists()?Code.CODE_SUCCEED:Code.CODE_FAIL;
+        notifyDeleteUpdate(code,"Finish delete.", fileObj,update);
+        return new Response(code,"Finish");
     }
 
     private Bitmap loadFileBitmap(String filePath,int with,int height){

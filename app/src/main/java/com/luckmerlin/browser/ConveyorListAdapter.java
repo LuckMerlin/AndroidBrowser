@@ -113,7 +113,6 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         View itemView=null!=holder?holder.itemView:null;
         ViewDataBinding binding=null!=itemView? DataBindingUtil.getBinding(itemView):null;
         if (null!=binding){
-            Context context=itemView.getContext();
             Task item=getItem(position);
             Object result=null;
             Progress progress=null;

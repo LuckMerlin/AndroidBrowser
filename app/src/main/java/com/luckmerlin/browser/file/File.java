@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.util.logging.Handler;
 
-public class File extends JsonObject implements Brief {
+public class File extends JsonObject implements Brief,Permission {
 
     public File(){
         super();
@@ -92,6 +92,38 @@ public class File extends JsonObject implements Brief {
 
     public File setAvailableVolume(long children){
         return putSafe(this,Label.LABEL_AVAILABLE,children);
+    }
+
+    public File setReadable(boolean readable){
+        return setPermission(readable?getPermission()|PERMISSION_READ:getPermission()&~PERMISSION_READ);
+    }
+
+    public File setWriteable(boolean writeable){
+        return setPermission(writeable?getPermission()|PERMISSION_WRITE:getPermission()&~PERMISSION_WRITE);
+    }
+
+    public File setExecutable(boolean executable){
+        return setPermission(executable?getPermission()|PERMISSION_EXECUTE:getPermission()&~PERMISSION_EXECUTE);
+    }
+
+    public boolean isReadable(){
+        return (getPermission()&PERMISSION_READ)>0;
+    }
+
+    public boolean isExecutable(){
+        return (getPermission()&PERMISSION_EXECUTE)>0;
+    }
+
+    public boolean isWriteable(){
+        return (getPermission()&PERMISSION_WRITE)>0;
+    }
+
+    public File setPermission(int permission){
+        return putSafe(this,Label.LABEL_PERMISSION,permission);
+    }
+
+    public int getPermission(){
+        return optInt(Label.LABEL_PERMISSION,PERMISSION_NONE);
     }
 
     public File setTotalVolume(long children){

@@ -70,6 +70,7 @@ import com.merlin.model.OnActivityStart;
 import com.merlin.model.OnBackPress;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
@@ -82,6 +83,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     private final ObservableField<AlertText> mAlertText=new ObservableField<>();
     private ServiceConnection mServiceConnection;
     private BrowserExecutor mExecutor;
+    private Runnable mShowingAlert;
+    private final LinkedList<AlertText> mAlertTextLinkList=new LinkedList<>();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -106,6 +109,11 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 //        showContentDialog(new DoingContent(),null);
 //        startActivity(ConveyorActivity.class);
 //        showBrowserContextMenu(activity);
+//        showAlertText(new AlertText().setMessage("eeeeee").setTimeout(2000));
+//        showAlertText(new AlertText().setMessage("eeeeee1").setTimeout(2000));
+//        showAlertText(new AlertText().setMessage("eeeeee2").setTimeout(2000));
+//        showAlertText(new AlertText().setMessage("eeeeee3").setTimeout(2000));
+//        showAlertText(new AlertText().setMessage("确认").setTimeout(-1));
     }
 
     @Override
@@ -114,9 +122,12 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.drawable.selector_back:
                 return browserBack() || true;
             case R.drawable.selector_close:
-//                if (null != obj && obj instanceof AlertText) {
-//                    showAlertText(null, 0);
-//                }
+                if (null != obj && obj instanceof AlertText) {
+                    Runnable runnable=mShowingAlert;
+                    if (null!=runnable){
+                        runnable.run();
+                    }
+                }
                 return true;
             case R.layout.item_client_name:
                 return selectClients(view,null!=obj&&obj instanceof Client?(Client)obj:null)||true;
@@ -217,17 +228,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return toast(getString(R.string.whichFailed,getString(R.string.rename)))&&false;
         }
         return null!=showContentDialog(new RenameFileContent(),null);
-//        return execute(()->{
-//            Response<File> response=client.rename(path,"");
-//            File newFile=null!=response&&response.isSucceed()?response.getData():null;
-//            post(()->{
-//                if (null!=newFile){
-//                    mBrowserAdapter.replace(file,newFile);
-//                }else{
-//                    toast(getString(R.string.whichFailed,getString(R.string.rename)));
-//                }
-//            });
-//        });
     }
 
     private boolean toggleSelectFile(File file){
@@ -241,14 +241,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     public boolean entryMode(Object mode, OnConfirm<Object,Boolean> onConfirm, Object... args){
         return mBrowserAdapter.entryMode(mode,onConfirm,args);
-    }
-
-    private boolean makeModeSure(Object arg){
-        ObservableField<Mode> observable=mBrowserAdapter.getMode();
-        Mode mode=null!=observable?observable.get():null;
-        OnConfirm<Object,Boolean> onConfirm=null!=mode?mode.getOnConfirm():null;
-        Boolean confirmed=null!=onConfirm?onConfirm.onConfirm(arg):null;
-        return null!=confirmed&&confirmed&&entryMode(null);
     }
 
     private boolean deleteFile(Object obj,boolean showDialog,boolean confirmed){
@@ -450,15 +442,40 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean showAlertText(AlertText alertText){
-        AlertText current=mAlertText.get();
-        mAlertText.set(alertText);int timeout=-1;
-        if (null==alertText){
-//            if (null!=current)
+        if (null==alertText){//Clean all timeout alert
+            mAlertText.set(null);
+            return false;
+        }else if (!isUiThread()){
+            return post(()->showAlertText(alertText));
+        }
+        LinkedList<AlertText> list=mAlertTextLinkList;
+        if (null==list){
+            return false;
+        }
+        if (mShowingAlert==null){
+            int timeout=-1;
+            mAlertText.set(alertText);
+            Runnable showingRunnable=mShowingAlert=new Runnable() {
+                @Override
+                public void run() {
+                    Runnable runnable=mShowingAlert;
+                    if (null!=runnable&&runnable==this){
+                        removePost(this);
+                        mShowingAlert=null;
+                        showAlertText(list.size()<=0?null:list.removeLast());
+                    }
+                }
+            };
+            if (null!=alertText&&(timeout=(timeout=alertText.getTimeout())>10000?10000:timeout)>0){
+                return post(showingRunnable,timeout);
+            }
             return true;
         }
-        CharSequence msg=alertText.getMessage();
-        if (null!=msg&&msg.length()>0&&(timeout=(timeout=alertText.getTimeout())>10000?10000:timeout)>0){
-            return post(()->showAlertText(null),timeout);
+        list.remove(alertText);
+        if (alertText.getTimeout()>=0){
+            list.addLast(alertText);
+        }else{
+            list.addFirst(alertText);
         }
         return true;
     }

@@ -25,5 +25,6 @@ public interface Label {
     String LABEL_PATH = "path";
     String LABEL_SEP= "sep";
     String LABEL_AVAILABLE= "available";
+    String LABEL_PERMISSION= "permission";
     String LABEL_TOTAL= "total";
 }
