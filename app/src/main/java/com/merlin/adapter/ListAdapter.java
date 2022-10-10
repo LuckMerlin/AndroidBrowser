@@ -318,7 +318,19 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
 
     public final static GridLayoutManager createGridLayout(Context context, int spanCount,
                                                     int orientation, boolean reverseLayout){
-        return null!=context?new GridLayoutManager(context,spanCount,orientation,reverseLayout):null;
+        return null!=context?new GridLayoutManager(context,spanCount,orientation,reverseLayout){
+            @Override
+            public void onLayoutChildren(RecyclerView.Recycler recycler, RecyclerView.State state) {
+                super.onLayoutChildren(recycler, state);
+                View view=state.getItemCount()==1&&getChildCount()==1?getChildAt(0):null;
+                if (null!=view&&getItemViewType(view)==VIEW_TYPE_EMPTY){
+                    int vWidth=view.getWidth();
+                    int margin=(getWidth()-vWidth)>>1;
+                    int top=view.getTop();
+                    view.layout(margin,top,margin+vWidth,top+view.getHeight());
+                }
+            }
+        }:null;
     }
 
     public final ListAdapter<T> setLayoutManager(RecyclerView.LayoutManager manager){
