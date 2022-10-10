@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import com.luckmerlin.binding.ImageFetcher;
 import com.luckmerlin.browser.client.OnFileDeleteUpdate;
 import com.luckmerlin.browser.client.OnFileDoingUpdate;
 import com.luckmerlin.browser.file.File;
@@ -20,6 +21,7 @@ import com.luckmerlin.stream.OutputStream;
 public interface Client {
     String getName();
     String getHost();
+    Object getIcon();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnFileDeleteUpdate update);

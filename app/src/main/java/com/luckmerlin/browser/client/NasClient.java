@@ -9,6 +9,7 @@ import android.view.View;
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.Utils;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
@@ -46,6 +47,11 @@ public class NasClient extends AbstractClient{
     public NasClient(String host,String name){
         mHttp=new JavaHttp().setBaseUrl(mHost=host);
         mName=name;
+    }
+
+    @Override
+    public Object getIcon() {
+        return R.drawable.hidisk_icon_nas;
     }
 
     @Override

@@ -19,6 +19,7 @@ import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.ListAdapter;
 
+import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
@@ -26,8 +27,10 @@ import com.luckmerlin.browser.databinding.BrowserModelBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
+import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.browser.dialog.DialogContent;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.RenameFileContent;
@@ -150,7 +153,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.rename:
                 return renameFile(null!=obj&&obj instanceof File?(File)obj:null)||true;
             case R.string.multiChoose:
-                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).setBinding(new DialogButtonBinding(
+                return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).addArg(null!=obj&&obj instanceof File?(File)obj:null).
+                        setBinding(new DialogButtonBinding(
                         ViewBinding.clickId(R.string.move),ViewBinding.clickId(R.string.copy),
                         ViewBinding.clickId(R.string.delete)).setListener((OnClickListener)
                         (View view1, int clickId1, int count1, Object obj1)->{
@@ -278,25 +282,32 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null==client){
             return toast(getString(R.string.fail))&&false;
         }
-        return null!=showContentDialog(new CreateFileDialogContent(getCurrentFolder()) {
-            @Override
-            protected boolean onCreate(File parent, String name, boolean createDir) {
-                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
-                    boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
-                    BrowserModel.this.post(()->{
-                        toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
-                        if(succeed){
-                            mBrowserAdapter.reset(null);
-                        }
-                    });
-                };
-                if (client instanceof LocalClient){
-                    callback.onFinish(client.createFile(parent,name,createDir));
-                    return true;
-                }
-                return execute(()-> callback.onFinish(client.createFile(parent,name,createDir)));
-            }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter()).outsideDismiss(),
-                new FixedLayoutParams().fillParentAndCenter());
+        DialogButtonBinding binding=new DialogButtonBinding(ViewBinding.clickId(R.string.sure),
+                ViewBinding.clickId(R.string.cancel));
+        CreateFileContent createFileContent=new CreateFileContent();
+        return null!=showContentDialog(new DialogContent().setDialogContent(createFileContent).
+                setTitle(getString(R.string.createFile)).setButtonBinding(binding).
+               setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
+               setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
+//        return null!=showContentDialog(new CreateFileDialogContent(getCurrentFolder()) {
+//            @Override
+//            protected boolean onCreate(File parent, String name, boolean createDir) {
+//                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
+//                    boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
+//                    BrowserModel.this.post(()->{
+//                        toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
+//                        if(succeed){
+//                            mBrowserAdapter.reset(null);
+//                        }
+//                    });
+//                };
+//                if (client instanceof LocalClient){
+//                    callback.onFinish(client.createFile(parent,name,createDir));
+//                    return true;
+//                }
+//                return execute(()-> callback.onFinish(client.createFile(parent,name,createDir)));
+//            }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter()).outsideDismiss(),
+//                new FixedLayoutParams().fillParentAndCenter());
     }
 
     private boolean selectClients(View view,Client client){
@@ -519,8 +530,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
             //Test
-            TestTask testTask=new TestTask(getActivity());
-            testTask.setName("eeeeeeeee");
+//            TestTask testTask=new TestTask(getActivity());
+//            testTask.setName("eeeeeeeee");
+            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Option.EXECUTE,true);
         }

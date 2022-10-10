@@ -51,6 +51,11 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
+    public Object getIcon() {
+        return null;
+    }
+
+    @Override
     public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter) {
         size=size<=0?10:size;
         start=start<=0?0:start;

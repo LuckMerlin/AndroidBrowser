@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="content" type="com.luckmerlin.browser.dialog.DialogContent" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
+        <import type="com.luckmerlin.binding.LayoutBinding"/>
+    </data>
+    <FrameLayout android:background="@drawable/dialog_bg" android:layout_width="match_parent"
+        android:layout_height="match_parent" android:minHeight="70dp">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:paddingTop="5dp" android:paddingBottom="5dp">
+            <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle"
+                android:visibility="@{content.title==null?View.GONE:View.VISIBLE}" android:textStyle="bold"
+                android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+            <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:visibility="@{content.dialogBinding==null?View.GONE:View.VISIBLE}"
+                binding:bind="@{LayoutBinding.layout(content.dialogBinding).removeAll(true).toParent(false)}"/>
+
+            <LinearLayout android:visibility="@{content.buttonBinding==null?View.GONE:View.VISIBLE}" android:orientation="horizontal"
+                binding:bind="@{LayoutBinding.layout(content.buttonBinding).removeAll(true).toParent(false)}"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="5dp" android:layout_marginBottom="5dp"/>
+        </LinearLayout>
+        <ImageView binding:bind="@{VB.clickId(R.drawable.selector_close)}" android:padding="5dp"
+            android:layout_gravity="right|top" android:layout_width="40dp" android:layout_height="40dp"/>
+    </FrameLayout>
+</layout>

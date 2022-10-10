@@ -18,8 +18,7 @@
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
             <EditText android:text="@={content.mInputName}" android:hint="@string/name" style="@style/editText"
-                android:textColor="@color/textTitle" android:layout_marginBottom="5dp"
-                android:layout_marginLeft="15dp" android:layout_marginRight="15dp" />
+                android:layout_marginBottom="5dp" android:layout_marginLeft="15dp" android:layout_marginRight="15dp" />
 
             <CheckBox android:checked="@={content.mCreateDir}" android:text="@string/createFolder"
                 android:button="@drawable/selector_checkbox" android:layout_marginTop="5dp" android:drawablePadding="5dp"

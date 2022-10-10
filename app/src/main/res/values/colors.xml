@@ -2,8 +2,10 @@
 <resources>
     <color name="textNormal">#ffffff</color>
     <color name="modelBackground">#eef9f9f9</color>
+    <color name="edittextBackground">#66f9f9f9</color>
     <color name="normalBackground">#44483fe6</color>
     <color name="text">#fff</color>
+    <color name="dialogMessage">#fff</color>
     <color name="textFocus">#999999</color>
     <color name="textTitle">#fff</color>
     <color name="textMain">#284eeb</color>

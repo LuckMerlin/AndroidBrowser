@@ -29,6 +29,11 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
+    public Object getIcon() {
+        return null;
+    }
+
+    @Override
     public String getHost() {
         return "baidu";
     }

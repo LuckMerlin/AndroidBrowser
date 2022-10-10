@@ -84,7 +84,7 @@ public abstract class ViewContent implements Content {
     }
 
     public final ViewContent setContentBinding(Binding binding){
-        if (! isCreated()){
+        if (!isCreated()){
             mBinding=binding;
         }
         return this;

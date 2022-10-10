@@ -71,6 +71,7 @@
     <style name="editText">
         <item name="android:background">@drawable/edittext_background</item>
         <item name="android:paddingLeft">10dp</item>
+        <item name="android:textColor">@color/textMain</item>
         <item name="android:paddingRight">10dp</item>
         <item name="android:paddingTop">5dp</item>
         <item name="android:paddingBottom">5dp</item>
