@@ -225,15 +225,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return mBrowserAdapter.getClient();
     }
 
-    private boolean renameFile(File file){
-        String path=null!=file?file.getPath():null;
-        Client client=null==path||path.length()<=0?null:getFileClient(file);
-        if(null==client){
-            return toast(getString(R.string.whichFailed,getString(R.string.rename)))&&false;
-        }
-        return null!=showContentDialog(new RenameFileContent(),null);
-    }
-
     private boolean toggleSelectFile(File file){
         BrowserListAdapter listAdapter=null!=file?mBrowserAdapter:null;
         return null!=listAdapter&&listAdapter.isSelectedFile(file)?listAdapter.unSelectFile(file): listAdapter.selectFile(file);
@@ -279,35 +270,49 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     private boolean createFile(){
         Client client=mBrowserAdapter.getClient();
-        if (null==client){
-            return toast(getString(R.string.fail))&&false;
-        }
-        DialogButtonBinding binding=new DialogButtonBinding(ViewBinding.clickId(R.string.sure),
-                ViewBinding.clickId(R.string.cancel));
-        CreateFileContent createFileContent=new CreateFileContent();
-        return null!=showContentDialog(new DialogContent().setDialogContent(createFileContent).
-                setTitle(getString(R.string.createFile)).setButtonBinding(binding).
-               setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
+        Folder parent=getCurrentFolder();
+        return null!=parent&&null!=client&&null!=showContentDialog(new CreateFileContent(){
+            @Override
+            protected boolean onCreateFile(String inputName, boolean createDir) {
+                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
+                    boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
+                    BrowserModel.this.post(()->{
+                        toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
+                        if(succeed){
+                            mBrowserAdapter.reset(null);
+                        }
+                    });
+                };
+                if (client instanceof LocalClient){
+                    callback.onFinish(client.createFile(parent,inputName,createDir));
+                    return true;
+                }
+                return execute(()-> callback.onFinish(client.createFile(parent,inputName,createDir)));
+            }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
                setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
-//        return null!=showContentDialog(new CreateFileDialogContent(getCurrentFolder()) {
-//            @Override
-//            protected boolean onCreate(File parent, String name, boolean createDir) {
-//                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
-//                    boolean succeed=null!=reply&&reply.isSucceed()&&reply.getData()!=null;
-//                    BrowserModel.this.post(()->{
-//                        toast(getString(succeed?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
-//                        if(succeed){
-//                            mBrowserAdapter.reset(null);
-//                        }
-//                    });
-//                };
-//                if (client instanceof LocalClient){
-//                    callback.onFinish(client.createFile(parent,name,createDir));
-//                    return true;
-//                }
-//                return execute(()-> callback.onFinish(client.createFile(parent,name,createDir)));
-//            }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter()).outsideDismiss(),
-//                new FixedLayoutParams().fillParentAndCenter());
+    }
+
+    private boolean renameFile(File file){
+        final String path=null!=file?file.getPath():null;
+        Client client=null==path||path.length()<=0?null:getFileClient(file);
+        if(null==client){
+            return toast(getString(R.string.whichFailed,getString(R.string.rename)))&&false;
+        }
+        return null!=showContentDialog(new RenameFileContent(){
+            @Override
+            protected boolean onRenameFile(String inputName, boolean createDir) {
+                final OnFinish<Response<File>> callback=(Response<File> reply)-> {
+                    File newFile=null!=reply&&reply.isSucceed()?reply.getData():null;
+                    mBrowserAdapter.replace(file,newFile);
+                    toast(getString(null!=newFile?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
+                };
+                if (client instanceof LocalClient){
+                    callback.onFinish(client.rename(path,inputName));
+                    return true;
+                }
+                return execute(()-> callback.onFinish(client.rename(path,inputName)));
+        }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
+                setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }
 
     private boolean selectClients(View view,Client client){
@@ -532,7 +537,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             //Test
 //            TestTask testTask=new TestTask(getActivity());
 //            testTask.setName("eeeeeeeee");
-            createFile();
+//            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Option.EXECUTE,true);
         }

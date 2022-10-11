@@ -238,7 +238,11 @@ public abstract class ViewContent implements Content {
     }
 
     public final String getString(int resId, Object... formatArgs){
-        Context context=getContext();
+        return getString(null,resId,formatArgs);
+    }
+
+    public final String getString(Context context,int resId, Object... formatArgs){
+        context=null!=context?context:getContext();
         return null!=context?context.getString(resId,formatArgs):null;
     }
 

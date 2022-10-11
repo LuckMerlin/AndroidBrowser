@@ -12,6 +12,7 @@ import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 
+@Deprecated
 public abstract class CreateFileDialogContent extends BaseContent implements OnClickListener {
     public final ObservableField<Boolean> mCreateDir=new ObservableField<>();
     public final ObservableField<String> mInputName=new ObservableField<>();
