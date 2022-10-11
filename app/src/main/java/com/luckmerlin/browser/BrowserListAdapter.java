@@ -57,7 +57,6 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Boolean> mGridLayout=new ObservableField<>(true);
     private final static int VIEW_TYPE_DATA_GRID=2000;
     private final ObservableField<Mode> mMode=new ObservableField<>();
-//    private final static String PAYLOADS_MODE_CHANGED="ModeChanged";
     private final TimeInterpolator mInterpolator=new AccelerateInterpolator();
     private Executor mExecutor;
 

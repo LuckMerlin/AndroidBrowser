@@ -19,7 +19,7 @@ import java.util.List;
 public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefreshLayout.OnRefreshListener {
     private boolean mEmptyReset=true;
     private int mPageSize;
-    private A mArgs;
+    private A mCurrentArgs;
     private LoadingPage<A,T> mLoadingPage;
     private PageLoader<A,T> mPageLoader;
     private OnPageLoadListener<T> mOnPageLoadedListener;
@@ -76,7 +76,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     @Override
     public void onRefresh() {
         SwipeRefreshLayout refreshLayout=mRefreshLayout;
-        reset(mArgs,null!=refreshLayout?(boolean succeed, Page<T> page)->
+        reset(mCurrentArgs,null!=refreshLayout?(boolean succeed, Page<T> page)->
                 refreshLayout.setRefreshing(false):null);
     }
 
@@ -86,7 +86,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean reset(OnPageLoadListener<T> callback){
-        return reset(mArgs,callback);
+        return reset(mCurrentArgs,callback);
     }
 
     public final boolean reset(A args,OnPageLoadListener<T> callback){
@@ -98,15 +98,14 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final boolean cleanArgs(){
-        A arg=mArgs;
-        mArgs=null;
+        A arg=mCurrentArgs;
+        mCurrentArgs=null;
         return null!=arg;
     }
 
     public final boolean reset(A args, int pageSize, OnPageLoadListener<T> callback){
         mLoadingPage=null;
-        mArgs=null!=args?args:mArgs;
-        return load(0,null, pageSize, (boolean succeed, Page<T> page)-> {
+        return load(args,0,null, pageSize, (boolean succeed, Page<T> page)-> {
                 if (succeed){
                     setData(null!=page?page.getPageData():null);
                 }
@@ -117,11 +116,11 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
     }
 
     public final A getCurrent() {
-        return mArgs;
+        return mCurrentArgs;
     }
 
     public final boolean loadPre(int pageSize, OnPageLoadListener<T> callback){
-        return load(0,getItem(0),pageSize==0?10:pageSize>0?-pageSize:pageSize,(boolean succeed, Page<T> page)-> {
+        return load(mCurrentArgs,0,getItem(0),pageSize==0?10:pageSize>0?-pageSize:pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(0,null!=page?page.getPageData():null);
             }
@@ -133,7 +132,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
 
     public final boolean loadNext(int pageSize,OnPageLoadListener<T> callback){
         int index=getSize()-1;
-        return load(index<0?index:index+1,getItem(index), pageSize,(boolean succeed, Page<T> page)-> {
+        return load(mCurrentArgs,index<0?index:index+1,getItem(index), pageSize,(boolean succeed, Page<T> page)-> {
             if (succeed){
                 addAll(Integer.MAX_VALUE,null!=page?page.getPageData():null);
             }
@@ -151,7 +150,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
         //Do nothing
     }
 
-    private boolean load(int fromIndex,T from,int pageSize,OnPageLoadListener<T> callback){
+    private boolean load(A args,int fromIndex,T from,int pageSize,OnPageLoadListener<T> callback){
         pageSize=pageSize==0?10:pageSize > 0 ? pageSize : -pageSize;
         LoadingPage<A,T> loadingPage=mLoadingPage;
         if (null!=loadingPage){
@@ -160,7 +159,7 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
             }
             return false;
         }
-        A args=mArgs;
+        final A finalArgs=null!=args?args:mCurrentArgs;
         onPageLoadingChange(true);
         loadingPage=mLoadingPage=new LoadingPage<A,T>(args,from,pageSize,callback){
             @Override
@@ -175,6 +174,9 @@ public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefresh
                     currentLoadFinish=true;
                     mLoadingPage=null;
                     onPageLoadingChange(false);
+                    if (succeed){
+                        mCurrentArgs=finalArgs;
+                    }
                 }
                 super.onPageLoad(succeed, page);
                 PageListAdapter.this.onPageLoadFinish(succeed,page);

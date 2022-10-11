@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class LocalClient extends AbstractClient {
@@ -71,10 +72,13 @@ public class LocalClient extends AbstractClient {
         }else if (!browserFile.isDirectory()){
             Debug.W("Can't load client while query file not directory.");
             return new Response<Folder>().setCode(Code.CODE_ARGS_INVALID).setMsg("Query file not directory.");
+        }else if (!browserFile.canRead()){
+            Debug.W("Can't load client while directory none permission."+browserPath);
+            return new Response<Folder>().setCode(Code.CODE_NONE_PERMISSION).setMsg("Query file not directory.");
         }
         String filterName=null!=filter?filter.mSearchInput:null;
         Debug.D("Loading local client.name="+filterName+" from="+start+" path="+browserPath);
-        final ComparedList<File> files=new ComparedList<>((File file1, File file2)-> {
+        final ComparedList<java.io.File> files=new ComparedList<>((java.io.File file1, java.io.File file2)-> {
             boolean directory1=file1.isDirectory();
             boolean directory2=file2.isDirectory();
             if (directory1&&directory2){
@@ -88,21 +92,32 @@ public class LocalClient extends AbstractClient {
         },null);
         browserFile.listFiles((java.io.File file)-> {
             if (null!=file){
-                String fileName=file.getName();File child=null;
+                String fileName=file.getName();
                 if (null!=filterName&&filterName.length()>0&&(null==fileName||!fileName.contains(filterName))){
                     return false;
-                }else if (null!=(child=createLocalFile(file))){
-                    files.add(child);
                 }
+                files.add(file);
             }
             return false;
         });
-        List<File> fileList=files.getList();
+        List<java.io.File> fileList=files.getList();
         long total=null!=fileList?fileList.size():0;
-        Folder queryFiles=new Folder(createLocalFile(browserFile)).setFrom(start);
+        Folder queryFiles=new Folder(createLocalFile(browserFile,true)).setFrom(start);
         queryFiles.setTotal(total);
         queryFiles.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
-        List<File> subFiles=total>0&&start<total?fileList.subList((int)start,Math.min((int)(start+size),(int)total)):null;
+        int end=Math.min((int)(start+size),(int)total);
+        List<File> subFiles=null;
+        if (end>0&&start<end) {
+            subFiles = new ArrayList<File>(end-(int)start);
+            File child=null;
+            for (int i = (int) start; i < end; i++) {
+                if (null==(child=createLocalFile(fileList.get(i),true))) {
+                    Debug.W("Fail browser files while load child data file."+fileList.get(i));
+                    return new Response<Folder>().set(Code.CODE_FAIL,"Load child data fail."+fileList.get(i), queryFiles);
+                }
+                subFiles.add(child);
+            }
+        }
         return new Response<Folder>().set(Code.CODE_SUCCEED,"Succeed.", queryFiles.setChildren(subFiles));
     }
 
@@ -148,7 +163,8 @@ public class LocalClient extends AbstractClient {
             Debug.W("Fail create file while already exist.");
             boolean currentIsFile=file.isFile();
             boolean succeed=(isDir&&!currentIsFile)||(!isDir&&currentIsFile);
-            return new Response<File>().set(succeed? Code.CODE_ALREADY:Code.CODE_EXIST, "Already exist",succeed?createLocalFile(file):null);
+            return new Response<File>().set(succeed? Code.CODE_ALREADY:Code.CODE_EXIST,
+                    "Already exist",succeed?createLocalFile(file,true):null);
         }
         try {
             java.io.File parentFile=file.getParentFile();
@@ -157,7 +173,7 @@ public class LocalClient extends AbstractClient {
             }
             boolean succeed=isDir?file.mkdir():file.createNewFile();
             Response<File> reply=file.exists()?new Response<File>().set(Code.CODE_SUCCEED,null,
-                    createLocalFile(file)) :new Response<File>().set(Code.CODE_FAIL,"Fail",null);
+                    createLocalFile(file,true)) :new Response<File>().set(Code.CODE_FAIL,"Fail",null);
             Debug.D("Finish create file."+succeed+" "+file);
             return reply;
         }catch (Exception e){
@@ -268,7 +284,7 @@ public class LocalClient extends AbstractClient {
         if (null==file||file.length()<=0){
             return new Response<>(Code.CODE_FAIL,"File path invalid.");
         }
-        return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(new java.io.File(file)));
+        return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(new java.io.File(file),true));
     }
 
     @Override
@@ -292,7 +308,7 @@ public class LocalClient extends AbstractClient {
         }
         boolean succeed=file.renameTo(targetFile);
         if (targetFile.exists()&&!file.exists()){
-            return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(targetFile));
+            return new Response<>(Code.CODE_SUCCEED,"Succeed.",createLocalFile(targetFile,true));
         }
         Debug.W("Fail rename local file."+succeed);
         return new Response<>(Code.CODE_FAIL,"File rename local file."+succeed);
@@ -325,7 +341,7 @@ public class LocalClient extends AbstractClient {
         return null;
     }
 
-    public static File createLocalFile(java.io.File file){
+    public static File createLocalFile(java.io.File file,boolean countDir){
         if (null==file){
             return null;
         }
@@ -335,11 +351,11 @@ public class LocalClient extends AbstractClient {
                 setModifyTime(file.lastModified()).setParent(parent).setName(file.getName());
         long total=-1;
         if (file.isDirectory()){
-            java.io.File[] files=file.listFiles();
+            String[] files=countDir?file.list():null;
             total=null!=files?files.length:0;
         }
-        localFile.setReadable(file.canRead()).setWriteable(file.canWrite()).setExecutable(file.canExecute());
-        return localFile.setTotal(total);
+        return localFile.setReadable(file.canRead()).setWriteable(file.canWrite()).
+                setExecutable(file.canExecute()).setTotal(total);
     }
 
     private Response<File> deleteAndroidFile(java.io.File file,OnFileDeleteUpdate update){
@@ -361,7 +377,7 @@ public class LocalClient extends AbstractClient {
             Debug.D("Fail delete android file while not exist."+file);
             return new Response(Code.CODE_ARGS_INVALID,"File not exist or invalid.");
         }
-        File fileObj=LocalClient.createLocalFile(file);
+        File fileObj=LocalClient.createLocalFile(file,false);
         if (notifyDeleteUpdate(Mode.MODE_DELETE,"Start delete.", fileObj,update)){
             Debug.D("Fail delete android file while canceled.");
             return new Response(Code.CODE_CANCEL,"Canceled");

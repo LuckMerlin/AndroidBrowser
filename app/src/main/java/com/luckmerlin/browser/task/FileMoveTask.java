@@ -74,7 +74,7 @@ public class FileMoveTask extends FileTask{
             Debug.D("Succeed execute file move."+toPath);
             doingFiles.setProgress(100);
             notifyProgress(progress.setPosition(2));
-            return new Response(Code.CODE_SUCCEED,"Succeed.", LocalClient.createLocalFile(toLocalFile));
+            return new Response(Code.CODE_SUCCEED,"Succeed.", LocalClient.createLocalFile(toLocalFile,false));
         }
         Debug.D("To copy files while move task at first."+fromFile.getName());
         notifyProgress(progress.setPosition(1));
