@@ -8,7 +8,26 @@ import java.lang.reflect.Modifier;
 
 public class ObjectCreator {
 
-    public final <T> T createObject(Class<T> cls){
+    public static class Arg<T>{
+        private final T mValue;
+        private final Class<T> mClass;
+
+        public Arg(Class<T> cls,T value){
+            mClass=cls;
+            mValue=value;
+        }
+    }
+
+    public final Object createObject(String clsName){
+        try {
+            return null!=clsName&&clsName.length()>0?createObject(Class.forName(clsName)):null;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public final <T> T createObject(Class<T> cls,Arg ...args){
         if (null==cls){
             return null;
         }
@@ -20,7 +39,14 @@ public class ObjectCreator {
         if (null==constructors){
             return null;
         }
+
         T instance=null;
+        for (Constructor<T> child:constructors) {
+            if (null!=child&&null!=(instance=createObjectSafe(child,args))){
+                return instance;
+            }
+        }
+        //Try again
         for (Constructor<T> child:constructors) {
             if (null!=child&&null!=(instance=createObjectSafe(child))){
                 return instance;
@@ -29,9 +55,9 @@ public class ObjectCreator {
         return null;
     }
 
-    public final <T> T createObjectSafe(Constructor<T> constructor){
+    public final <T> T createObjectSafe(Constructor<T> constructor,Arg ...args){
         try {
-            return createObject(constructor);
+            return createObject(constructor,args);
         } catch (Exception e) {
             Debug.E("Exception create object.e="+e);
             e.printStackTrace();
@@ -39,23 +65,36 @@ public class ObjectCreator {
         }
     }
 
-    public final <T> T createObject(Constructor<T> constructor) throws InvocationTargetException, IllegalAccessException, InstantiationException {
+    public final <T> T createObject(Constructor<T> constructor,Arg ...inputArgs) throws InvocationTargetException, IllegalAccessException, InstantiationException {
         if (null==constructor){
             return null;
         }
         Class[] classes=constructor.getParameterTypes();
-        int count=null!=classes?classes.length:-1;
+        int count=null!=classes?classes.length:0;
+        int argCount=null!=inputArgs?inputArgs.length:0;
         if (count<=0){
-            constructor.setAccessible(true);
-            return constructor.newInstance();
+            if (argCount<=0){
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            }
+            return null;
+        }else if (argCount<=0){
+            inputArgs=new Arg[count];
+        }
+        argCount=null!=inputArgs?inputArgs.length:0;
+        if (argCount!=count){
+            return null;
         }
         Class childClass=null;
         Object[] args=new Object[count];
         for (int i = 0; i < count; i++) {
-            if (null==(childClass=classes[i])){
-                continue;
+            if (null==(childClass=classes[i])||null==inputArgs[i].mClass||
+                    !childClass.equals(inputArgs[i].mClass)){
+               return null;
             }
-            args[i]=getTypeDefault(childClass);
+            if (null==(args[i]=inputArgs[i].mValue)){
+                args[i]=getTypeDefault(childClass);
+            }
         }
         constructor.setAccessible(true);
         return constructor.newInstance(args);

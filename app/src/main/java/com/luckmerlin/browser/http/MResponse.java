@@ -7,7 +7,7 @@ import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.TextParser;
 import com.luckmerlin.json.JsonObject;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 
 import org.json.JSONObject;
 

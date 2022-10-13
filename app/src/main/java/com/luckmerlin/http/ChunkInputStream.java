@@ -1,7 +1,7 @@
 package com.luckmerlin.http;
 
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

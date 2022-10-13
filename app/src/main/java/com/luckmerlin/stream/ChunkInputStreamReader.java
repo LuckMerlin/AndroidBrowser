@@ -1,7 +1,7 @@
 package com.luckmerlin.stream;
 
 import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

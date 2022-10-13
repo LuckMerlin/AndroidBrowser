@@ -2,6 +2,8 @@ package com.luckmerlin.browser.file;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import com.luckmerlin.browser.R;
 
 import java.util.ArrayList;
@@ -16,6 +18,10 @@ public class FileArrayList extends ArrayList<File> {
                 }
             }
         }
+    }
+
+    public final File[] toArrays() {
+        return super.toArray(new File[size()]);
     }
 
     public final String makeDescription(Context context){

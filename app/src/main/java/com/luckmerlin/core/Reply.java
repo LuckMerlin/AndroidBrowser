@@ -3,7 +3,6 @@ package com.luckmerlin.core;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonObject;
-import com.luckmerlin.object.Parser;
 
 import java.util.List;
 

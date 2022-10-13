@@ -1,18 +1,21 @@
 package com.luckmerlin.browser.file;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.json.JsonArray;
-import com.luckmerlin.object.Parser;
 import com.merlin.adapter.PageListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class Folder extends File implements PageListAdapter.Page<File> {
+public class Folder extends File implements PageListAdapter.Page<File>, Parcelable {
     private long mFrom;
-    private List<File> mFiles;
+    private ArrayList<File> mFiles;
 
     public Folder(JSONObject jsonObject){
         super(jsonObject);
@@ -25,7 +28,7 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         super(file);
     }
 
-    public Folder setChildren(List<File> files){
+    public Folder setChildren(ArrayList<File> files){
         mFiles=files;
         return this;
     }
@@ -67,4 +70,34 @@ public class Folder extends File implements PageListAdapter.Page<File> {
     public List<File> getPageData() {
         return getChildren();
     }
+
+    /////////////////////////////
+    private Folder(Parcel in) {
+        mFrom = in.readLong();
+        mFiles=in.readArrayList(in.getClass().getClassLoader());
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(mFrom);
+        ArrayList<File> files=mFiles;
+        dest.writeParcelableArray(null!=files?files.toArray(new File[files.size()]):null,0);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Folder> CREATOR = new Creator<Folder>() {
+        @Override
+        public Folder createFromParcel(Parcel in) {
+            return new Folder(in);
+        }
+
+        @Override
+        public Folder[] newArray(int size) {
+            return new Folder[size];
+        }
+    };
 }

@@ -1,6 +1,6 @@
 package com.luckmerlin.json;
 
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

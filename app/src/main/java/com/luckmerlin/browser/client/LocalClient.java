@@ -106,7 +106,7 @@ public class LocalClient extends AbstractClient {
         queryFiles.setTotal(total);
         queryFiles.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
         int end=Math.min((int)(start+size),(int)total);
-        List<File> subFiles=null;
+        ArrayList<File> subFiles=null;
         if (end>0&&start<end) {
             subFiles = new ArrayList<File>(end-(int)start);
             File child=null;
@@ -118,7 +118,8 @@ public class LocalClient extends AbstractClient {
                 subFiles.add(child);
             }
         }
-        return new Response<Folder>().set(Code.CODE_SUCCEED,"Succeed.", queryFiles.setChildren(subFiles));
+        return new Response<Folder>().set(Code.CODE_SUCCEED,"Succeed.", queryFiles.
+                setChildren(subFiles));
     }
 
     @Override

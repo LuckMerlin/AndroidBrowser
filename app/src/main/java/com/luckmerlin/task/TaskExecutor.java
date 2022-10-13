@@ -8,12 +8,16 @@ import android.os.Parcelable;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.MatcherInvoker;
+import com.luckmerlin.core.OnInvoke;
+import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.luckmerlin.object.ObjectCreator;
 import com.luckmerlin.task.Option;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,6 +33,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
+    private final ParcelObject.Parceler mParcelParser=new ParcelObject.Parceler();
     private final TaskSaver mTaskSaver;
 
     public TaskExecutor(Context context,TaskSaver taskSaver){
@@ -133,12 +138,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             //Do nothing
         }
         //Check save
-        if (executeTask.isNeedSave()){
-            if (Option.isOptionEnabled(optionArg,Option.DELETE)){
-                deleteSaveTask(executeTask);
-            }else{
-                saveTask(task,optionArg);
-            }
+        if (Option.isOptionEnabled(optionArg,Option.DELETE)){
+            deleteSaveTask(executeTask);
+        }else{
+            boolean saved=saveTask(task,optionArg);
+            executeTask.mSaved=saved;
         }
         //Check pending
         if (!Option.isOptionEnabled(optionArg, Option.PENDING)){
@@ -176,21 +180,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return collector.getFirstMatched();
     }
 
-    private Task executeWithTaskBytes(byte[] taskBytes){
-        Parcel parcel=Parcel.obtain();
-        parcel.unmarshall(taskBytes,0,taskBytes.length);
-        parcel.setDataPosition(0);
-        int option=parcel.readInt();
-        parcel.readString();//Version
-        Parcelable parcelable=parcel.readParcelable(getClass().getClassLoader());
-        parcel.recycle();
-        if (null==parcelable||!(parcelable instanceof Task)){
-            return null;
-        }
-        Task task=(Task)parcelable;
-        return TaskExecutor.this.execute(task,option)?task:null;
-    }
-
     private boolean deleteSaveTask(ExecuteTask executeTask){
         if (null==executeTask){
             return false;
@@ -202,14 +191,32 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return succeed;
     }
 
+    private Task executeWithTaskBytes(byte[] taskBytes){
+        if (null==taskBytes){
+            return null;
+        }
+        Parcel parcel=Parcel.obtain();
+        parcel.unmarshall(taskBytes,0,taskBytes.length);
+        parcel.setDataPosition(0);
+        int option=parcel.readInt();
+        parcel.readString();//Version
+        ParcelObject parcelObject=mParcelParser.read(parcel);
+        parcel.recycle();
+        if (null==parcelObject||!(parcelObject instanceof Task)){
+            return null;
+        }
+        Task task=(Task)parcelObject;
+        return TaskExecutor.this.execute(task,option)?task:null;
+    }
+
     private boolean saveTask(Task task,int option){
         TaskSaver taskSaver=null!=task?mTaskSaver:null;
-        if (null!=taskSaver&&task instanceof Parcelable){
+        if (null!=taskSaver&&task instanceof ParcelObject){
             Parcel parcel=Parcel.obtain();
             parcel.setDataPosition(0);
             parcel.writeInt(option);
             parcel.writeString("");//Version
-            parcel.writeParcelable((Parcelable)task,0);
+            mParcelParser.write(parcel,task);
             byte[] bytes=parcel.marshall();
             boolean succeed=taskSaver.write(task,bytes);
             parcel.recycle();
@@ -223,12 +230,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         match(mQueue,(ExecuteTask data)-> null!=data&&!isInnerTask(data.mTask)&&
         onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false);
     }
-
-//    @Override
-//    public void match(Matcher<ExecuteTask> matcher) {
-//        match(mQueue,null!=matcher?(ExecuteTask data)->
-//                null!=data&&!isInnerTask(data.mTask)?matcher.match(data):(Boolean)false:null);
-//    }
 
     public final boolean post(Runnable runnable, int delay){
         return null!=runnable&mHandler.post(runnable);
@@ -244,6 +245,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         protected final Task mTask;
         protected final boolean mFromSaved;
         protected final Executor mExecutor;
+        private boolean mSaved;
 
         protected ExecuteTask(Executor executor, Task task, Context context,int option, Handler handler, boolean fromSaved){
             super(option,handler,context);
@@ -274,8 +276,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Progress progress=null;
             if (deleteSucceed&&null!=(progress=mTask.getProgress())&&progress.isSucceed()){
                 deleteSaveTask(this);
-            }else if (isNeedSave()&&!Option.isOptionEnabled(getOption(),Option.DELETE)){
+            }else if (!Option.isOptionEnabled(getOption(),Option.DELETE)){
                 saveTask(mTask,getOption());
+            }else if (mSaved){
+                deleteSaveTask(this);
             }
             post(()->{
                 List<ExecuteTask> waitingQueue=mQueue;//Check waiting
@@ -300,11 +304,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         public final boolean isTask(Task task){
             Task current=mTask;
             return null!=current&&null!=task&&current==task;
-        }
-
-        private boolean isNeedSave(){
-            Task current=mTask;
-            return null!=current&&current instanceof Parcelable;
         }
 
         public final Task getTask() {

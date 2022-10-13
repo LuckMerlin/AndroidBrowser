@@ -9,6 +9,7 @@ import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.Result;
 
+@Deprecated
 public abstract class ConfirmResult1 implements Result {
     private Confirm mConfirm;
 

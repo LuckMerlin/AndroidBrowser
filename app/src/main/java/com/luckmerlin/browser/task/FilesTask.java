@@ -1,5 +1,8 @@
 package com.luckmerlin.browser.task;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.luckmerlin.browser.BrowserExecutor;
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.Code;
@@ -16,15 +19,57 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
 public abstract class FilesTask extends AbstractTask {
-    private final FileArrayList mFiles;
+    private FileArrayList mFiles;
     private int mCursor;
+
+    public FilesTask(File[] files) {
+        this(null!=files?new FileArrayList(files):null);
+    }
 
     public FilesTask(FileArrayList files) {
         super(null);
         mFiles=null!=files?files:new FileArrayList();
     }
 
-    protected abstract Result onExecuteFile(File file,int index,Runtime runtime,Progress progress);
+    protected final FileArrayList getFiles(){
+        return mFiles;
+    }
+
+    public final FilesTask setCursor(int cursor) {
+        this.mCursor = cursor;
+        return this;
+    }
+
+    protected final int getCursor() {
+        return mCursor;
+    }
+
+    protected abstract Result onExecuteFile(File file, int index, Runtime runtime, Progress progress);
+
+    @Override
+    public void onParcelWrite(Parcel parcel) {
+        super.onParcelWrite(parcel);
+        parcel.writeInt(mCursor);
+        FileArrayList files=mFiles;
+        parcel.writeParcelableArray(null!=files?files.toArrays():null,0);
+    }
+
+    @Override
+    public void onParcelRead(Parcel parcel) {
+        super.onParcelRead(parcel);
+        mCursor=parcel.readInt();
+        Parcelable[] files=parcel.readParcelableArray(getClass().getClassLoader());
+        FileArrayList arrayList=null;
+        if (null!=files){
+            arrayList=new FileArrayList();
+            for (Parcelable child:files) {
+                if (null!=child&&child instanceof File){
+                    arrayList.add((File) child);
+                }
+            }
+        }
+        mFiles=arrayList;
+    }
 
     @Override
     protected final Result onExecute(Runtime runtime) {

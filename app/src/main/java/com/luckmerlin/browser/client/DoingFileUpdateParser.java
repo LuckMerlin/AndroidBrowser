@@ -4,7 +4,7 @@ import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.json.JsonObject;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 import org.json.JSONException;
 import org.json.JSONObject;
 

@@ -14,6 +14,7 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 
+@Deprecated
 public class FileMoveTask extends FileTask{
     private final File mFromFile;
     private final File mToFile;

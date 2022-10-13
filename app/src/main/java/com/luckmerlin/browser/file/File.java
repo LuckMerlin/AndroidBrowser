@@ -1,5 +1,7 @@
 package com.luckmerlin.browser.file;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
@@ -14,7 +16,7 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.util.logging.Handler;
 
-public class File extends JsonObject implements Brief,Permission {
+public class File extends JsonObject implements Brief,Permission, Parcelable {
 
     public File(){
         super();
@@ -275,4 +277,32 @@ public class File extends JsonObject implements Brief,Permission {
         }
         return super.equals(obj);
     }
+
+
+/////////////////////
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(toString());
+    }
+
+    protected File(Parcel in) {
+        this(JsonObject.makeJson(in.readString()));
+    }
+
+    public static final Creator<File> CREATOR = new Creator<File>() {
+        @Override
+        public File createFromParcel(Parcel in) {
+            return new File(in);
+        }
+
+        @Override
+        public File[] newArray(int size) {
+            return new File[size];
+        }
+    };
 }

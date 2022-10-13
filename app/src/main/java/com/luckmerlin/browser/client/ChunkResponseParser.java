@@ -4,7 +4,7 @@ import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.json.JsonObject;
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 
 public class ChunkResponseParser<T> implements Parser<byte[], Response<T>> {
     private Parser<Object,T> mDataParser;

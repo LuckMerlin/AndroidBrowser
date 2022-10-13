@@ -1,12 +1,8 @@
 package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.Utils;
-import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.object.Parser;
-import com.luckmerlin.stream.Convertor;
 import com.luckmerlin.stream.InputStream;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class CloudFileInputStream<T> extends InputStream {

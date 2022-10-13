@@ -129,9 +129,8 @@
                 </FrameLayout>
                 </FrameLayout>
                 <LinearLayout android:visibility="@{vm.browserAdapter.mode.binding==null?View.GONE:View.VISIBLE}"
-                    android:paddingLeft="50dp" android:paddingRight="50dp" android:paddingBottom="2dp"
-                    android:paddingTop="2dp" android:layout_marginBottom="10dp" android:orientation="horizontal"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:paddingLeft="50dp" android:paddingRight="50dp" android:orientation="horizontal"
+                    android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
                     binding:bind="@{LayoutBinding.layout(vm.browserAdapter.mode.binding).removeAll(true).toParent(false)}" />
             </LinearLayout>
 

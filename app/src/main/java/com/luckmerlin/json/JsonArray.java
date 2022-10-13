@@ -1,13 +1,12 @@
 package com.luckmerlin.json;
 
-import com.luckmerlin.object.Parser;
+import com.luckmerlin.core.Parser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class JsonArray {
     private JSONArray mArray;
@@ -28,11 +27,11 @@ public class JsonArray {
         return mArray.length();
     }
 
-    public final <T> List<T> getList(Parser<Object,T> parser) {
+    public final <T> ArrayList<T> getList(Parser<Object,T> parser) {
         JSONArray array=null!=parser?mArray:null;
         int length=null!=array?array.length():-1;
         if (length>0){
-            List<T> collection=new ArrayList<>();
+            ArrayList<T> collection=new ArrayList<>();
             T child=null;
             for (int i = 0; i < length; i++) {
                 if (null!=(child=parser.onParse(array.opt(i)))){

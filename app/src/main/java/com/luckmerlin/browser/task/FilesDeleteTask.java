@@ -12,46 +12,29 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.TaskRestartEnabler;
 
-public class FilesDeleteTask extends FileTask {
-    private final FileArrayList mFiles;
-    private int mCursor;
+public class FilesDeleteTask extends FilesTask {
 
     public FilesDeleteTask(File... files) {
         this(null!=files&&files.length>0?new FileArrayList(files):null);
     }
 
     public FilesDeleteTask(FileArrayList files) {
-        super(null);
-        mFiles=files;
+        super(files);
     }
 
     @Override
-    protected Result onExecute(Runtime runtime) {
-        FileArrayList files=mFiles;
-        if (null==files||files.size()<=0){
-            return new Response<>(Code.CODE_SUCCEED,"Empty",null);
+    protected Result onExecuteFile(File childFile, int index, Runtime runtime, Progress progress) {
+        if (null==childFile){
+            return new Response<>(Code.CODE_FAIL,"File invalid",null);
         }
-        int size=files.size();
-        File child=null;Client client;
-        Response<File> response=null;
-        Progress progress=new Progress().setTotal(size).setPosition(mCursor);
-        for (; mCursor < size; mCursor++) {
-            if (null==(child=files.get(mCursor))){
-                continue;
-            }
-            notifyProgress(progress.setPosition(mCursor).setTitle(child.getName()));
-            if(null==(client=getFileClient(child))){
-                return new Response<>(Code.CODE_FAIL,"File client invalid.");
-            }
-            if (null==(response=client.deleteFile(child,(int code, String msg, File file)-> {
-                notifyProgress(progress.setDoing(new Doing().setDoingMode(Mode.MODE_DELETE).
-                        setSucceed(code==Code.CODE_SUCCEED).setFrom(file)));
-                return runtime.isCancelEnabled();
-            }))||(!response.isSucceed()&&!response.isAnyCode(Code.CODE_NOT_EXIST))){
-                return response;
-            }
+        Client client;
+        if(null==(client=getFileClient(childFile))){
+            return new Response<>(Code.CODE_FAIL,"File client invalid.");
         }
-        notifyProgress(progress.setPosition(size).setTitle(child.getName()));
-        return new Response<>(Code.CODE_SUCCEED,"Succeed");
+        return client.deleteFile(childFile,(int code, String msg, File file)-> {
+            notifyProgress(progress.setDoing(new Doing().setDoingMode(Mode.MODE_DELETE).
+                    setSucceed(code==Code.CODE_SUCCEED).setFrom(file)));
+            return runtime.isCancelEnabled();
+        });
     }
 }

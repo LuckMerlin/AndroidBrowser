@@ -1,22 +1,38 @@
 package com.luckmerlin.task;
 
 import android.content.Context;
+import android.os.Parcel;
 
 import com.luckmerlin.core.ChangeUpdater;
-import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnChangeUpdate;
+import com.luckmerlin.core.OnInvoke;
+import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask extends ChangeUpdater implements Task {
+public abstract class AbstractTask extends ChangeUpdater implements Task, ParcelObject {
     private String mName;
     private Progress mProgress;
-    private OnProgressChange mNotifier;
     private Result mResult;
-    private Runtime mRuntime;
-    private OnProgressChange mOnProgressChange;
+    private transient OnProgressChange mNotifier;
+    private transient Runtime mRuntime;
+    private transient OnProgressChange mOnProgressChange;
 
     public AbstractTask(Progress progress){
         mProgress=progress;
+    }
+
+    @Override
+    public void onParcelWrite(Parcel parcel) {
+        parcel.writeString(mName);
+        parcel.writeParcelable(mProgress,0);
+        Parceler.write(parcel,mResult);
+    }
+
+    @Override
+    public void onParcelRead(Parcel parcel) {
+        mName=parcel.readString();
+        mProgress=parcel.readParcelable(getClass().getClassLoader());
+        mResult=Parceler.read(parcel);
     }
 
     public final AbstractTask setName(String name) {
@@ -74,7 +90,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task {
     public final Result getResult() {
         return mResult;
     }
-
 
     public final Executor getExecutor() {
         Runtime runtime=mRuntime;

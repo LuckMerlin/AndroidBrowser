@@ -1,6 +1,8 @@
 package com.luckmerlin.browser.task;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 
 import com.luckmerlin.binding.ViewBinding;
@@ -27,10 +29,13 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.utils.Utils;
+
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
-public class FilesCopyTask extends FilesTask{
-    private final Folder mToFolder;
+public class FilesCopyTask extends FilesTask {
+    private Folder mToFolder;
     private boolean mCoverEnabled=false;
     private boolean mAppendEnable=false;
     private boolean mDeleteSrcWhileSucceed=false;
@@ -38,6 +43,25 @@ public class FilesCopyTask extends FilesTask{
     public FilesCopyTask(FileArrayList files,Folder toFolder) {
         super(files);
         mToFolder=toFolder;
+    }
+
+    @Override
+    public void onParcelWrite(Parcel parcel) {
+        super.onParcelWrite(parcel);
+        parcel.writeParcelable(mToFolder,0);
+        parcel.writeInt(mCoverEnabled?1:0);
+        parcel.writeInt(mAppendEnable?1:0);
+        parcel.writeInt(mDeleteSrcWhileSucceed?1:0);
+    }
+
+    @Override
+    public void onParcelRead(Parcel parcel) {
+        super.onParcelRead(parcel);
+        Parcelable toFolder=parcel.readParcelable(getClass().getClassLoader());
+        mToFolder=null!=toFolder&&toFolder instanceof Folder?(Folder)toFolder:null;
+        mCoverEnabled=parcel.readInt()==1;
+        mAppendEnable=parcel.readInt()==1;
+        mDeleteSrcWhileSucceed=parcel.readInt()==1;
     }
 
     public final boolean EnableCover(boolean enable){
