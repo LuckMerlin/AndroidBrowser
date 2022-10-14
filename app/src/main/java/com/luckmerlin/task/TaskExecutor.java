@@ -229,11 +229,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     @Override
     public void findTask(OnTaskFind onTaskFind) {
-        match(mQueue,(ExecuteTask data)-> {
-            Debug.D("EEEEEE "+data.mTask);
-            return null!=data&&!isInnerTask(data.mTask)&&
-                    onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false;
-        });
+        match(mQueue,(ExecuteTask data)-> null!=data&&!isInnerTask(data.mTask)&&
+                onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false);
     }
 
     public final boolean post(Runnable runnable, int delay){
