@@ -40,7 +40,7 @@ public abstract class FilesTask extends AbstractTask {
         return this;
     }
 
-    protected final int getCursor() {
+    public final int getCursor() {
         return mCursor;
     }
 

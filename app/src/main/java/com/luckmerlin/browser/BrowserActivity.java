@@ -8,8 +8,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
 
+import com.luckmerlin.browser.client.LocalClient;
+import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.core.OnInvoke;
+import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Parser;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.object.ObjectCreator;
@@ -34,6 +37,16 @@ public class BrowserActivity extends ContentActivity {
 //        Object DDD= new ObjectCreator().createObject(FilesDeleteTask.class.getName());
 //        Debug.D("eeeeeee "+DDD);
         return new BrowserModel();
+        //
+//        FilesDeleteTask filesDeleteTask=new FilesDeleteTask(new File(LocalClient.createLocalFile
+//                (new java.io.File("/sdcard"),true)));
+//        filesDeleteTask.setName("我爱你是第发散发");
+//        filesDeleteTask.setCursor(3333);
+//        byte[] bytes= ParcelObject.Parceler.write(filesDeleteTask);
+//        Debug.D("EEEEEE "+bytes.length);
+//        FilesDeleteTask ddd=ParcelObject.Parceler.read(bytes,null);
+//        Debug.D("EEEEEE "+ddd.getName()+" "+ddd.getCursor()+" "+ddd.getFiles());
+        //
 //        return null;
     }
 }

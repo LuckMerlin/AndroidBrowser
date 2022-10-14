@@ -53,6 +53,7 @@ import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
+import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
@@ -108,7 +109,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
-        //
 //        showContentDialog(new DoingContent(),null);
 //        startActivity(ConveyorActivity.class);
 //        showBrowserContextMenu(activity);
@@ -264,6 +264,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
+        filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.EXECUTE);
         return (showDialog&&showTaskDialog(filesDeleteTask,null))||true;
     }
