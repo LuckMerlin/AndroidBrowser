@@ -202,7 +202,9 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         parcel.readString();//Version
         ParcelObject parcelObject=mParcelParser.read(parcel);
         parcel.recycle();
-        if (null==parcelObject||!(parcelObject instanceof Task)){
+        if (null==parcelObject){
+            return null;
+        }else if (!(parcelObject instanceof Task)){
             return null;
         }
         Task task=(Task)parcelObject;
@@ -227,8 +229,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     @Override
     public void findTask(OnTaskFind onTaskFind) {
-        match(mQueue,(ExecuteTask data)-> null!=data&&!isInnerTask(data.mTask)&&
-        onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false);
+        match(mQueue,(ExecuteTask data)-> {
+            Debug.D("EEEEEE "+data.mTask);
+            return null!=data&&!isInnerTask(data.mTask)&&
+                    onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false;
+        });
     }
 
     public final boolean post(Runnable runnable, int delay){

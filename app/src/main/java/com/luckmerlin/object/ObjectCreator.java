@@ -80,6 +80,9 @@ public class ObjectCreator {
             return null;
         }else if (argCount<=0){
             inputArgs=new Arg[count];
+            for (int i = 0; i < count; i++) {
+                inputArgs[i]=new Arg(classes[i],null);
+            }
         }
         argCount=null!=inputArgs?inputArgs.length:0;
         if (argCount!=count){

@@ -8,9 +8,11 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Base64;
 
+import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.core.OnInvoke;
 import com.luckmerlin.core.Parser;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.object.ObjectCreator;
 import com.luckmerlin.view.Content;
 import com.merlin.model.ContentActivity;
 
@@ -29,6 +31,8 @@ public class BrowserActivity extends ContentActivity {
     @Override
     public Content onResolveContent() {
 //        return new BrowserActivityModel();
+//        Object DDD= new ObjectCreator().createObject(FilesDeleteTask.class.getName());
+//        Debug.D("eeeeeee "+DDD);
         return new BrowserModel();
 //        return null;
     }

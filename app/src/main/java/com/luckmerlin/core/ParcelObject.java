@@ -27,6 +27,9 @@ public interface ParcelObject {
                 data=null!=parser?parser.onParse(className):null;
                 data=null!=data?data: (T) new ObjectCreator().createObject(className);
                 parcel2.recycle();
+                if (null!=data&&data instanceof ParcelObject){
+                    ((ParcelObject)data).onParcelRead(parcel);
+                }
             }
             return data;
         }

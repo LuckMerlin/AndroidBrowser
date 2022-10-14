@@ -12,12 +12,15 @@ import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
+import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
+import com.luckmerlin.object.ObjectCreator;
 import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
@@ -34,53 +37,6 @@ public class ConveyorActivityModel extends BaseModel implements
 
     @Override
     protected View onCreateContent(Context context) {
-        //
-//        new File("/sdcard/test2.png").delete();
-//        streamCopyTask.setName("测司法所大发送");
-//        streamCopyTask.setConvertor(new CoderConvertor());
-        //
-//        FileDeleteTask deleteTask=new FileDeleteTask(LocalClient.createLoadFile
-//                (new File("/sdcard/test.png")),null);
-//        deleteTask.setName("删除文件 ");
-//        mConveyorListAdapter.add(deleteTask);
-//        deleteTask.execute(null);
-//        //
-//        new FileCopyTask1(LocalClient.createLoadFile(new File("/sdcard/test.png")),
-//                LocalClient.createLoadFile(new File("/sdcard/test2.png")),null);
-//        //
-//        new Thread(()->streamCopyTask.execute(null)).start();
-
-//        try {
-//            byte[] src="我和我的祖国一刻也不能分离".getBytes("utf-8");
-//            byte[] test = "我们的".getBytes("utf-8");
-//            byte[] target=new byte[src.length];
-//            //
-//            for (int i = 0; i < src.length; i++) {
-//                int sec=i%test.length;
-//                target[i]=src[i];
-//                if (sec%2==0){
-//                    target[i]=(byte) (~src[i]);
-//                    target[i]=(byte)(~target[i]);
-//                }
-//            }
-//            Debug.D("jieguo="+new String(target,"utf-8"));
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-        //
-//        for (int i = 0; i < 100; i++) {
-//            AbstractTask task=null;
-//            if (i%8<4){
-//                mConveyorListAdapter.add((task=new TestTask((Activity) context)).setName("单 "+i));
-//            }else{
-//                mConveyorListAdapter.add(task=new TaskGroup(null).setName("多 "+i));
-//            }
-//            final Task finalTask=task;
-//            new Thread(()->{
-//                finalTask.execute(null,null);
-//            }).start();
-//        }
-        //
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
             ((ConveyorActivityBinding)binding).setVm(this);
@@ -109,26 +65,8 @@ public class ConveyorActivityModel extends BaseModel implements
         mExecutor=executor;
         if (null!=executor){
             executor.putListener(this,null,false);
-//            executor.match((TaskExecutor.ExecuteTask data)-> null!=mConveyorListAdapter.
-//                    addTaskWithSort(null!=data?data.getTask():null));
-//            for (int i = 0; i < 100; i++) {
-////                StreamSourceCopyTask streamCopyTask=new StreamSourceCopyTask
-////                        (new AndroidFileStream(new File("/sdcard/test.png")),
-////                                new AndroidFileStream(new File(
-////                                        "/sdcard/test"+i+".png")),null);
-////                mConveyorListAdapter.add(streamCopyTask);
-////                executor.execute(streamCopyTask,null);
-//            }
-
-
-//            FileCopyTask1 copyTask=new FileCopyTask1(LocalClient.createLocalFile
-////                    (new File("/sdcard/Test")),LocalClient.createLocalFile
-//                    (new File("/sdcard/TestNew")),LocalClient.createLocalFile
-//                    (new File("/sdcard/Test2")),null);
-//            copyTask.setName("任务名字");
-//        FileCopyTask1 copyTask=null;
-//        copyTask=new FileCopyTask1(LocalClient.createLocalFile
-//                    (new File("/sdcard/Test")),LocalClient.createLocalFile
+            executor.findTask((Task task, int status, int option)->
+                    null!=task&&null!=mConveyorListAdapter.addTaskWithSort(task));
         }
     }
 
