@@ -26,10 +26,10 @@
             android:layout_width="match_parent" android:layout_height="match_parent">
 
             <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
-                android:layout_width="60dp" android:layout_height="60dp">
+                android:layout_width="60dp" android:layout_height="60dp" android:padding="3dp">
                 <ImageView android:src="@drawable/hidisk_icon_html"
                     android:layout_width="match_parent" android:layout_height="match_parent"/>
-                <TextView android:textColor="@color/textTitle" android:text="@{task.progress.speed??``}" android:background="#33000000"
+                <TextView android:textColor="@color/textMain" android:text="@{task.progress.speed??``}" android:background="#33000000"
                     android:gravity="center" android:maxLines="1" android:textSize="10sp"
                     android:layout_width="match_parent" android:layout_height="match_parent"/>
             </FrameLayout>

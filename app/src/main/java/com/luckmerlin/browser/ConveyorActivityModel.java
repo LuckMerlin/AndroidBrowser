@@ -8,9 +8,13 @@ import android.os.IBinder;
 import android.view.View;
 
 import androidx.databinding.ViewDataBinding;
+
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
+import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
+import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
 import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.click.OnClickListener;
@@ -18,6 +22,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.object.ObjectCreator;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnTaskFind;
@@ -84,25 +89,36 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_checkbox:
                 return mConveyorListAdapter.toggleSelect(obj)||true;
             case R.drawable.selector_confirm:
-                Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
-                Result result=null!=task?task.getResult():null;
-                ConfirmResult1.Confirm confirm=null!=result&&result instanceof ConfirmResult1 ?
-                        ((ConfirmResult1)result).make(getContext()):null;
-                return null!=showContentDialog(new ConfirmDialogContent(confirm).setOnConfirmFinish(
-                        (boolean confirmed, Object confirmObj)-> executeTask(confirmObj)),null);
+//                Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
+//                Result result=null!=task?task.getResult():null;
+//                ConfirmResult1.Confirm confirm=null!=result&&result instanceof ConfirmResult1 ?
+//                        ((ConfirmResult1)result).make(getContext()):null;
+//                return null!=showContentDialog(new ConfirmDialogContent(confirm).setOnConfirmFinish(
+//                        (boolean confirmed, Object confirmObj)-> executeTask(confirmObj)),null);
+                return true;
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
-                return null!=showContentDialog(new ConfirmDialogContent(new ConfirmResult1.
-                        Confirm().setOnConfirm((boolean confirmed)-> confirmed?null:null).
-                        setTitle(getString(R.string.delete)).setMessage(getString
-                        (R.string.areYourSureWhich,getText(R.string.delete)))).setOnConfirmFinish((boolean confirmed, Object confirmObj)-> {
-                            if (cancelTask(obj, Option.DELETE)&&null!=obj&&obj instanceof Task) {
-                                mConveyorListAdapter.remove((Task) obj);
-                            }
-                            return null;
-                        }),null);
+                return deleteTask(null!=obj&&obj instanceof Task?(Task)obj:null)||true;
         }
         return false;
+    }
+
+    private boolean deleteTask(Task task){
+        if (null==task){
+            return false;
+        }
+        final ConfirmContent confirmContent=new ConfirmContent();
+        String title=getString(R.string.sureWhich,getString(R.string.delete));
+        Confirm confirm=new Confirm();
+        confirm.setName(title).setMessage(task.getName());
+        confirm.setBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.sure).
+                setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
+                        ((confirmContent.removeFromParent()||true)&&cancelTask(task, Option.DELETE)&&
+                                mConveyorListAdapter.remove(task))||true),
+                ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
+                        confirmContent.removeFromParent()||true)));
+        confirmContent.setConfirm(confirm);
+        return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
     }
 
     private boolean showMenusDialog(){

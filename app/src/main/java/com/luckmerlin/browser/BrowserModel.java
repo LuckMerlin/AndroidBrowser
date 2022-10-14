@@ -110,7 +110,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
 //        showContentDialog(new DoingContent(),null);
-//        startActivity(ConveyorActivity.class);
+       post(()-> startActivity(ConveyorActivity.class),1000);
+       //
+       startTask(new TestTask(activity),Option.EXECUTE|Option.DELETE);
 //        showBrowserContextMenu(activity);
 //        showAlertText(new AlertText().setMessage("eeeeee").setTimeout(2000));
 //        showAlertText(new AlertText().setMessage("eeeeee1").setTimeout(2000));

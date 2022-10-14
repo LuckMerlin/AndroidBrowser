@@ -25,7 +25,7 @@
         android:background="#33000000" android:layout_width="match_parent" android:layout_height="match_parent">
 
         <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
-            android:layout_width="60dp" android:layout_height="60dp">
+            android:layout_width="60dp" android:layout_height="60dp" android:padding="3dp">
             <ImageView android:src="@drawable/hidisk_icon_exe"
                 android:layout_width="match_parent" android:layout_height="match_parent"/>
         </FrameLayout>

@@ -38,6 +38,15 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         return enableMultiSelect(!(null!=enable&&enable));
     }
 
+    public final boolean removeTask(Object task){
+        if (null==task){
+            return false;
+        }else if (task instanceof Task){
+            return super.remove((Task)task);
+        }
+        return false;
+    }
+
     public boolean enableMultiSelect(boolean enable){
         Boolean current=mMultiChooseEnabled.get();
         if (enable!=(null!=current&&current)){

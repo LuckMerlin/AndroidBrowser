@@ -306,6 +306,7 @@ public abstract class ViewContent implements Content {
     public final boolean startActivity(Object intent,Bundle options){
         Context context=null!=intent?getContext():null;
         if (null==context){
+            Debug.D("Fail start activity while context invalid.");
             return false;
         }else if (intent instanceof Class){
             return startActivity(new Intent(context,(Class<?>) intent),options);
@@ -316,15 +317,19 @@ public abstract class ViewContent implements Content {
                 if (null==context){
                     return false;
                 }else if (null==options){
+                    Debug.D("Start activity with intent."+intent);
                     context.startActivity((Intent)intent);
                     return true;
                 }
+                Debug.D("Start activity with bundle."+intent);
                 context.startActivity((Intent)intent,options);
                 return true;
             }catch (Exception e){
                 Debug.E("Exception start activity.e="+e,e);
+                return false;
             }
         }
+        Debug.D("Fail start activity while not support.");
         return false;
     }
 
