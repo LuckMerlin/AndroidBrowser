@@ -599,27 +599,29 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null!=action&&action.equals(Intent.ACTION_SEND)){
             Parcelable parcelable=intent.getParcelableExtra(Intent.EXTRA_STREAM);
             intent.removeExtra(Intent.EXTRA_STREAM);
-            return null!=parcelable&&entryMode(Mode.MODE_UPLOAD, (Object data) ->{
+            return null!=parcelable&&entryMode(new Mode(Mode.MODE_UPLOAD).makeSureBinding((OnClickListener) (View view, int clickId, int count, Object obj)-> {
                 Folder folder=mBrowserAdapter.getFolder();
                 if (null==folder||folder.isLocalFile()){
                     toast(getString(R.string.canNotOperateHere));
+                    return true;
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Option.EXECUTE,true);
-            });
+                return launchTask(uploadTask,Option.EXECUTE,true)&&false;
+            }));
         }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
             intent.removeExtra(Intent.EXTRA_STREAM);
-            return entryMode(Mode.MODE_UPLOAD, (Object data)-> {
+            return entryMode(new Mode(Mode.MODE_UPLOAD).makeSureBinding((OnClickListener) (View view, int clickId, int count, Object obj)-> {
                 Folder folder=mBrowserAdapter.getFolder();
                 if (null==folder||folder.isLocalFile()){
                     toast(getString(R.string.canNotOperateHere));
+                    return true;
                 }
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Option.EXECUTE,true);
-            });
+                return launchTask(uploadTask,Option.EXECUTE,true)&&false;
+            }));
         }
         return false;
     }
