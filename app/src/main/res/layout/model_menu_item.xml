@@ -3,8 +3,8 @@
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
-        <variable name="imageBinding" type="com.luckmerlin.binding.Binding" />
+        <variable name="model" type="com.luckmerlin.browser.dialog.ModelMenuItemModel" />
     </data>
-    <ImageView binding:bind="@{imageBinding}" android:padding="5dp"
+    <ImageView binding:bind="@{model.menuBinding}" android:padding="5dp" android:rotation="@{model.rotate}"
         android:layout_width="40dp" android:layout_height="40dp"/>
 </layout>

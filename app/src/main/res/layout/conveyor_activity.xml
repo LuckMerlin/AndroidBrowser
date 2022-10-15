@@ -15,7 +15,8 @@
        android:paddingLeft="10dp" android:paddingRight="10dp"
        android:layout_width="match_parent" android:layout_height="match_parent">
 
-       <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+       <LinearLayout android:orientation="vertical" android:layout_width="match_parent"
+           android:layout_height="match_parent">
            <include layout="@layout/model_statusbar"  binding:model="@{vm}"
                android:layout_marginBottom="5dp" android:layout_marginTop="5dp"
                android:layout_width="match_parent" android:layout_height="wrap_content"/>

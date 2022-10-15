@@ -50,7 +50,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             notifyAttachedItemChanged();
             return true;
         }
-        return true;
+        return false;
     }
 
     public boolean toggleSelect(Object obj){

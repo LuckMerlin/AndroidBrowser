@@ -15,6 +15,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.ListAdapter;
@@ -29,22 +30,15 @@ import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
-import com.luckmerlin.browser.dialog.CreateFileDialogContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
-import com.luckmerlin.browser.dialog.DialogContent;
-import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
-import com.luckmerlin.browser.dialog.ModelMenuItemBind;
+import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.RenameFileContent;
-import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.Doing;
-import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.task.FileCopyTask;
-import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.browser.task.FilesCopyTask;
 import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.browser.task.FilesMoveTask;
@@ -55,14 +49,12 @@ import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
-import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
@@ -74,10 +66,8 @@ import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityNewIntent;
 import com.merlin.model.OnActivityStart;
 import com.merlin.model.OnBackPress;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
         OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick,
@@ -103,22 +93,28 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     @Override
     public final boolean onBackPressed() {
-        return browserBack();
+        Mode mode=mBrowserAdapter.getCurrentMode();
+        return (null!=mode&&mode.isMode(Mode.MODE_MULTI_CHOOSE)&&entryMode(null))||browserBack();
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
-        setRightMenuBinding(new BindingGroup(new ModelMenuItemBind(R.drawable.selector_transport).
-                setRotate(90),new ModelMenuItemBind(R.drawable.selector_menu)));
+        final ModelMenuItemModel rightMenu=new ModelMenuItemModel(R.drawable.selector_menu);
+        setRightMenuBinding(new BindingGroup(new ModelMenuItemModel(R.drawable.selector_transport).
+                setRotate(90),rightMenu));
+        final Observable.OnPropertyChangedCallback changedCallback=new Observable.OnPropertyChangedCallback() {
+            @Override
+            public void onPropertyChanged(Observable sender, int propertyId) {
+                rightMenu.setMenuBinding(ViewBinding.clickId(mBrowserAdapter.getCurrentMode()!=null?
+                        R.drawable.selector_cancel: R.drawable.selector_menu));
+            }
+        };
+        mBrowserAdapter.getMode().addOnPropertyChangedCallback(changedCallback);
+        changedCallback.onPropertyChanged(null,0);
 //        showContentDialog(new DoingContent(),null);
 //        showBrowserContextMenu(activity);
-//        showAlertText(new AlertText().setMessage("eeeeee").setTimeout(2000));
-//        showAlertText(new AlertText().setMessage("eeeeee1").setTimeout(2000));
-//        showAlertText(new AlertText().setMessage("eeeeee2").setTimeout(2000));
-//        showAlertText(new AlertText().setMessage("eeeeee3").setTimeout(2000));
-//        showAlertText(new AlertText().setMessage("确认").setTimeout(-1));
     }
 
     @Override
@@ -309,6 +305,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     mBrowserAdapter.replace(file,newFile);
                     toast(getString(null!=newFile?R.string.succeed:R.string.fail)+" "+(null!=reply?reply.getMessage():""));
                 };
+                removeFromParent();
                 if (client instanceof LocalClient){
                     callback.onFinish(client.rename(path,inputName));
                     return true;
@@ -355,19 +352,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         popupWindow.setContentView((Context context1, ViewIterator iterator)-> linearLayout);
         return popupWindow.showAsDropDown(view,0,0, Gravity.CENTER);
     }
-
-//    private boolean showTaskDialog(Task task, DoingContent dialogContent){
-//        Executor executor=mExecutor;
-//        if (null==executor|null==task){
-//            return false;
-//        }
-//        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
-//        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
-//        content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
-//        executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
-//        content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
-//        return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
-//    }
 
     private boolean showFileContextMenu(View view, File file){
         return null!=view&&null!=file&&null!=showContentDialog(new FileContextDialogContent(file).
@@ -527,7 +511,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 }
                 return false;
             });
-//            mClientCount.set(count[0]);
             return null!=clients[0]&&mBrowserAdapter.setClient(clients[0]);
         }
         return false;
@@ -539,8 +522,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
             //Test
-            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
-            post(()-> startActivity(ConveyorActivity.class),1000);
+//            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
+//            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
 //            TestTask testTask=new TestTask(getActivity());
 //            testTask.setName("eeeeeeeee");

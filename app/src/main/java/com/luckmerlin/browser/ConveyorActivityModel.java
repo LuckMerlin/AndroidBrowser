@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.view.View;
+
+import androidx.databinding.Observable;
+import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 
 import com.luckmerlin.binding.BindingGroup;
@@ -13,23 +16,16 @@ import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmContent;
-import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
-import com.luckmerlin.browser.dialog.ModelMenuItemBind;
+import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
-import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
-import com.luckmerlin.object.ObjectCreator;
 import com.luckmerlin.task.Confirm;
-import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.merlin.model.OnBackPress;
@@ -46,7 +42,18 @@ public class ConveyorActivityModel extends BaseModel implements
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
             ((ConveyorActivityBinding)binding).setVm(this);
-            setRightMenuBinding(new BindingGroup(new ModelMenuItemBind(R.drawable.selector_menu)));
+            final ModelMenuItemModel menuItem=new ModelMenuItemModel(R.drawable.selector_menu);
+            setRightMenuBinding(new BindingGroup(menuItem));
+            final Observable.OnPropertyChangedCallback changedCallback=new Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(Observable sender, int propertyId) {
+                    ObservableField<Boolean> field=mConveyorListAdapter.getMultiChooseEnabled();
+                    Boolean multiChoose=null!=field?field.get():null;
+                    menuItem.setMenuBinding(ViewBinding.clickId(multiChoose!=null&&multiChoose?
+                            R.drawable.selector_cancel: R.drawable.selector_menu));
+                }
+            };
+            mConveyorListAdapter.getMultiChooseEnabled().addOnPropertyChangedCallback(changedCallback);
             return binding.getRoot();
         }
         return null;
@@ -116,7 +123,7 @@ public class ConveyorActivityModel extends BaseModel implements
 
     @Override
     public boolean onBackPressed() {
-        return finishActivity();
+        return mConveyorListAdapter.enableMultiSelect(false)||finishActivity();
     }
 
     @Override
