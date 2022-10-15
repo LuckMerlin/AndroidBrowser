@@ -110,9 +110,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
 //        showContentDialog(new DoingContent(),null);
-       post(()-> startActivity(ConveyorActivity.class),1000);
-       //
-       startTask(new TestTask(activity),Option.EXECUTE|Option.DELETE);
 //        showBrowserContextMenu(activity);
 //        showAlertText(new AlertText().setMessage("eeeeee").setTimeout(2000));
 //        showAlertText(new AlertText().setMessage("eeeeee1").setTimeout(2000));
@@ -537,6 +534,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null!=conveyorBinder) {
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
+            //Test
+            startTask(new TestTask(getActivity()),Option.EXECUTE_NOT_SAVE);
+            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
 //            TestTask testTask=new TestTask(getActivity());
 //            testTask.setName("eeeeeeeee");

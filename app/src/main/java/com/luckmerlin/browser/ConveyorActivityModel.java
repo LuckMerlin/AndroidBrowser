@@ -52,14 +52,7 @@ public class ConveyorActivityModel extends BaseModel implements
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
-        switch (status){
-            case Executor.STATUS_ADD:
-                mConveyorListAdapter.addTaskWithSort(task);
-                break;
-            case Executor.STATUS_DELETE:
-                mConveyorListAdapter.remove(task);
-                break;
-        }
+        mConveyorListAdapter.replaceTask(task,status==Executor.STATUS_REMOVE);
     }
 
     private void setTaskExecutor(Executor executor){
@@ -69,9 +62,7 @@ public class ConveyorActivityModel extends BaseModel implements
         }
         mExecutor=executor;
         if (null!=executor){
-            executor.putListener(this,null,false);
-            executor.findTask((Task task, int status, int option)->
-                    null!=task&&null!=mConveyorListAdapter.addTaskWithSort(task));
+            executor.putListener(this,null,true);
         }
     }
 

@@ -100,8 +100,19 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         return super.onCreateViewTypeHolder(viewType, parent);
     }
 
+    public final ConveyorListAdapter replaceTask(Task task,boolean remove){
+        if (remove){
+            removeTask(task);
+        }else{
+            addTaskWithSort(task);
+        }
+        return this;
+    }
+
     public final ConveyorListAdapter addTaskWithSort(Task task){
-        add(task);
+        if (null!=task&&indexPosition(task)<0){
+            add(task);
+        }
         return this;
     }
 

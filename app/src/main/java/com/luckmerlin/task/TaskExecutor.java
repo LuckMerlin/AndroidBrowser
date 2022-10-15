@@ -90,11 +90,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             }
             if (notify&&listener instanceof OnStatusChangeListener){
                 match(mQueue,(ExecuteTask data)-> {
-                        Boolean matched=null!=matcher&&null!=data?matcher.match(data.mTask):null;
-                        if (null!=matched&&matched){
-                            updateStatusChange(data.getStatus(),data.mTask,(OnStatusChangeListener)listener);
-                        }
-                        return matched;
+                    Boolean matched=null!=matcher?null!=data?!isInnerTask(data.mTask)&&matcher.match(data.mTask):null:true;
+                    if (null!=matched&&matched){
+                        updateStatusChange(data.getStatus(),data.mTask,(OnStatusChangeListener)listener);
+                    }
+                    return matched;
                 });
             }
         }
@@ -126,11 +126,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             return false;
         }
         final Task task=(Task)taskObj;
+        final boolean innerTask=isInnerTask(task);
         ExecuteTask executeTask=findFirst((ExecuteTask data)-> null!=data&&data.isTask(task)?true:false);
         if (null==executeTask){
             executeTask=new ExecuteTask(this,task,getContext(), optionArg,mHandler, fromSaved);
             mQueue.add(executeTask);
-            setStatusChange(STATUS_ADD,executeTask,mListeners);
+            if (!innerTask){
+                setStatusChange(STATUS_ADD,executeTask,mListeners);
+            }
         }
         executeTask.setOption(Option.isOptionEnabled(optionArg,Option.RESET)?(optionArg&~Option.RESET): executeTask.getOption()|optionArg);
         //Check cancel
@@ -138,11 +141,13 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             //Do nothing
         }
         //Check save
-        if (Option.isOptionEnabled(optionArg,Option.DELETE)){
-            deleteSaveTask(executeTask);
-        }else{
-            boolean saved=saveTask(task,optionArg);
-            executeTask.mSaved=saved;
+        if (!innerTask){
+            if (Option.isOptionEnabled(optionArg,Option.NOT_SAVE)){
+                deleteSaveTask(executeTask);
+            }else{
+                boolean saved=saveTask(task,optionArg);
+                executeTask.mSaved=saved;
+            }
         }
         //Check pending
         if (!Option.isOptionEnabled(optionArg, Option.PENDING)){
@@ -181,14 +186,16 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     private boolean deleteSaveTask(ExecuteTask executeTask){
-        if (null==executeTask){
-            return false;
+        if (null!=executeTask){
+            TaskSaver taskSaver=mTaskSaver;
+            boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
+            if (executeTask.isBackgroundEnabled()){
+                removeFromQueue(executeTask);
+                updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
+            }
+            return succeed;
         }
-        removeFromQueue(executeTask);
-        TaskSaver taskSaver=mTaskSaver;
-        boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
-        updateStatusChange(STATUS_DELETE,executeTask.mTask,mListeners);
-        return succeed;
+        return false;
     }
 
     private Task executeWithTaskBytes(byte[] taskBytes){
@@ -278,7 +285,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Progress progress=null;
             if (deleteSucceed&&null!=(progress=mTask.getProgress())&&progress.isSucceed()){
                 deleteSaveTask(this);
-            }else if (!Option.isOptionEnabled(getOption(),Option.DELETE)){
+            }else if (!Option.isOptionEnabled(getOption(),Option.NOT_SAVE)){
                 saveTask(mTask,getOption());
             }else if (mSaved){
                 deleteSaveTask(this);
@@ -296,6 +303,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     }
                 }
             },-1);
+        }
+
+        private boolean isBackgroundEnabled(){
+            return Option.isOptionEnabled(getOption(),Option.BACKGROUND);
         }
 
         @Override
@@ -355,7 +366,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
     }
 
     private void updateStatusChange(int status,Task task,OnStatusChangeListener listener){
-        if (null==listener){
+        if (null==listener||isInnerTask(task)){
             return;
         }else if (listener instanceof UiListener&&!isUiThread()){
             post(()->updateStatusChange(status,task,listener),-1);
