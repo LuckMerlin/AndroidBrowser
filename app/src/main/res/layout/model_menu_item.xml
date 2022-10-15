@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <variable name="imageBinding" type="com.luckmerlin.binding.Binding" />
+    </data>
+    <ImageView binding:bind="@{imageBinding}" android:padding="5dp"
+        android:layout_width="40dp" android:layout_height="40dp"/>
+</layout>

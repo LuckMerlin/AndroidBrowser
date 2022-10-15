@@ -20,6 +20,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.ListAdapter;
 
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.BindingGroup;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
@@ -33,6 +34,7 @@ import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DialogContent;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
+import com.luckmerlin.browser.dialog.ModelMenuItemBind;
 import com.luckmerlin.browser.dialog.RenameFileContent;
 import com.luckmerlin.browser.dialog.TaskContent;
 import com.luckmerlin.browser.file.Doing;
@@ -82,7 +84,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         OnViewDetachedFromWindow, OnClickListener, OnLongClickListener, OnBackPress,
         OnActivityNewIntent, OnActivityStart {
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
-    private final ObservableField<String> mSearchInput=new ObservableField<>();
     private final ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private final ObservableField<AlertText> mAlertText=new ObservableField<>();
     private ServiceConnection mServiceConnection;
@@ -109,6 +110,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     public void onCreate(Bundle savedInstanceState, Activity activity) {
         mBrowserAdapter.setOnPathSpanClick(this);
         mContentAdapter.set(mBrowserAdapter);
+        setRightMenuBinding(new BindingGroup(new ModelMenuItemBind(R.drawable.selector_transport).
+                setRotate(90),new ModelMenuItemBind(R.drawable.selector_menu)));
 //        showContentDialog(new DoingContent(),null);
 //        showBrowserContextMenu(activity);
 //        showAlertText(new AlertText().setMessage("eeeeee").setTimeout(2000));
@@ -435,7 +438,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     private boolean browserPath(File file){
         BrowserListAdapter adapter=mBrowserAdapter;
-        String searchInput=mSearchInput.get();
+        ObservableField<String> field=getSearchInput();
+        String searchInput=null!=field?field.get():null;
         return null!=file&&null!=adapter&&browserPath(new BrowseQuery(file,searchInput));
     }
 
@@ -647,10 +651,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     public BrowserListAdapter getBrowserAdapter() {
         return mBrowserAdapter;
-    }
-
-    public ObservableField<String> getSearchInput() {
-        return mSearchInput;
     }
 
     public ObservableField<AlertText> getAlertText() {

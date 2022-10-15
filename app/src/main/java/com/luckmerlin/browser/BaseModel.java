@@ -5,6 +5,9 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.databinding.ObservableField;
+
+import com.luckmerlin.binding.Binding;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.core.Canceler;
@@ -29,6 +32,8 @@ public abstract class BaseModel extends BaseContent {
     private final Http mHttp=new JavaHttp().setBaseUrl("http://192.168.0.9:5001");
     private WindowContentDialog mWindowDialog;
     private PopupWindow mPopupWindow;
+    private final ObservableField<String> mSearchInput=new ObservableField<>();
+    private final ObservableField<Binding> mRightMenuBinding=new ObservableField<>();
 
     private static ExecutorService mExecutor= Executors.newCachedThreadPool((Runnable r)-> {
         Thread thread = new Thread(r);
@@ -50,7 +55,11 @@ public abstract class BaseModel extends BaseContent {
         return ()->false;
     }
 
-    public final <T> T call(Request request,OnHttpParse<T> parser){
+    public final void setRightMenuBinding(Binding binding) {
+        mRightMenuBinding.set(binding);
+    }
+
+    public final <T> T call(Request request, OnHttpParse<T> parser){
         return mHttp.call(request,parser);
     }
 
@@ -110,5 +119,13 @@ public abstract class BaseModel extends BaseContent {
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
         content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
         return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
+    }
+
+    public final ObservableField<String> getSearchInput() {
+        return mSearchInput;
+    }
+
+    public final ObservableField<Binding> getRightMenuBinding(){
+        return mRightMenuBinding;
     }
 }

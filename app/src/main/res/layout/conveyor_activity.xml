@@ -12,18 +12,13 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
     </data>
    <FrameLayout android:fitsSystemWindows="true" android:background="@color/modelBackground"
+       android:paddingLeft="10dp" android:paddingRight="10dp"
        android:layout_width="match_parent" android:layout_height="match_parent">
 
        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-          <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-              <ImageView binding:bind="@{VB.clickId(R.drawable.selector_back)}"
-                  android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize" android:padding="1dp"
-                  android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
-              <ImageView binding:bind="@{VB.clickId(vm.conveyorListAdapter.multiChooseEnabled?R.drawable.selector_cancel:R.drawable.selector_menu)}"
-                  android:layout_width="@dimen/titleIconSize" android:layout_height="@dimen/titleIconSize"
-                  android:layout_alignParentRight="true" android:padding="1dp"
-                  android:layout_marginLeft="5dp" android:layout_marginRight="10dp"/>
-          </RelativeLayout>
+           <include layout="@layout/model_statusbar"  binding:model="@{vm}"
+               android:layout_marginBottom="5dp" android:layout_marginTop="5dp"
+               android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
            <androidx.recyclerview.widget.RecyclerView android:layout_marginTop="8dp"
                android:layout_width="match_parent" android:overScrollMode="always"

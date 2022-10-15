@@ -7,12 +7,15 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.view.View;
 import androidx.databinding.ViewDataBinding;
+
+import com.luckmerlin.binding.BindingGroup;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.ConfirmDialogContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.browser.dialog.ModelMenuItemBind;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
 import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.click.OnClickListener;
@@ -43,6 +46,7 @@ public class ConveyorActivityModel extends BaseModel implements
         ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.conveyor_activity);
         if (null!= binding&&binding instanceof ConveyorActivityBinding){
             ((ConveyorActivityBinding)binding).setVm(this);
+            setRightMenuBinding(new BindingGroup(new ModelMenuItemBind(R.drawable.selector_menu)));
             return binding.getRoot();
         }
         return null;
