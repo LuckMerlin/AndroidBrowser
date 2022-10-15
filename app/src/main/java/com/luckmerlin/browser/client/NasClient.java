@@ -76,8 +76,10 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> rename(String file, String name) {
-        return null;
+    public Response<File> rename(String filePath, String name) {
+        return mHttp.call(new Request().url("/file/rename").headerEncode(Label.LABEL_PATH,filePath).
+                        headerEncode(Label.LABEL_NAME,name).post(),
+                new MResponse<File>((Object from)->null!=from&&from instanceof JSONObject? new File((JSONObject) from):null));
     }
 
     @Override
