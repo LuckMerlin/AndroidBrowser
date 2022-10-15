@@ -13,6 +13,7 @@ import android.provider.MediaStore;
 import android.view.View;
 
 import com.luckmerlin.browser.BrowseQuery;
+import com.luckmerlin.browser.ClientMeta;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.DoingFiles;
@@ -40,6 +41,11 @@ import java.util.List;
 
 public class LocalClient extends AbstractClient {
     private String mRootPath="/sdcard";
+
+    @Override
+    public ClientMeta getMeta() {
+        return new ClientMeta().setName("Local").setHost(null);
+    }
 
     @Override
     public String getName() {
@@ -104,7 +110,8 @@ public class LocalClient extends AbstractClient {
         long total=null!=fileList?fileList.size():0;
         Folder queryFiles=new Folder(createLocalFile(browserFile,true)).setFrom(start);
         queryFiles.setTotal(total);
-        queryFiles.setAvailableVolume(browserFile.getFreeSpace()).setTotalVolume(browserFile.getTotalSpace());
+        long totalVolume=browserFile.getTotalSpace();
+        queryFiles.setUsedVolume(totalVolume-browserFile.getUsableSpace()).setTotalVolume(totalVolume);
         int end=Math.min((int)(start+size),(int)total);
         ArrayList<File> subFiles=null;
         if (end>0&&start<end) {

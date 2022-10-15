@@ -38,6 +38,14 @@ public class Folder extends File implements PageListAdapter.Page<File>, Parcelab
         return this;
     }
 
+    public int getVolumePercent(){
+        long total=getTotalVolume();
+        long used=getUsedVolume();
+        used=used>=0?used:0;
+        total=total>=0?total:0;
+        return total>0?(int)(used*100.0d/total):0;
+    }
+
     public long getFrom() {
         return mFrom;
     }

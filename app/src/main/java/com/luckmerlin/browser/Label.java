@@ -24,7 +24,8 @@ public interface Label {
     String LABEL_FOLDER = "folder";
     String LABEL_PATH = "path";
     String LABEL_SEP= "sep";
-    String LABEL_AVAILABLE= "available";
+    String LABEL_USED_VOLUME= "usedVolume";
+    String LABEL_TOTAL_VOLUME= "totalVolume";
     String LABEL_PERMISSION= "permission";
     String LABEL_TOTAL= "total";
 }

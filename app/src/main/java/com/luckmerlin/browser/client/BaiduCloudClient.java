@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.luckmerlin.browser.BrowseQuery;
+import com.luckmerlin.browser.ClientMeta;
+import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.http.JavaHttp;
@@ -26,6 +28,11 @@ public class BaiduCloudClient extends AbstractClient{
     public String getName() {
 ///rest/2.0/xpan/nas?method=uinfo
         return null; 
+    }
+
+    @Override
+    public ClientMeta getMeta() {
+        return new ClientMeta().setName("Baidu").setHost("baidu");
     }
 
     @Override

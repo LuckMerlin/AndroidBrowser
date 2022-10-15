@@ -49,12 +49,12 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
         return getHost()==null;
     }
 
-    public final long getAvailableVolume(){
-        return optLong(Label.LABEL_AVAILABLE);
+    public final long getUsedVolume(){
+        return optLong(Label.LABEL_USED_VOLUME);
     }
 
     public final long getTotalVolume(){
-        return optLong(Label.LABEL_TOTAL);
+        return optLong(Label.LABEL_TOTAL_VOLUME);
     }
 
     public File getParentFile(){
@@ -92,8 +92,8 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
         return new File(this).setParent(parent).setName(name);
     }
 
-    public File setAvailableVolume(long children){
-        return putSafe(this,Label.LABEL_AVAILABLE,children);
+    public File setUsedVolume(long children){
+        return putSafe(this,Label.LABEL_USED_VOLUME,children);
     }
 
     public File setReadable(boolean readable){

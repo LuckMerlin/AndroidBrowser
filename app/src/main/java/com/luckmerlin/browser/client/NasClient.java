@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.view.View;
 
 import com.luckmerlin.browser.BrowseQuery;
+import com.luckmerlin.browser.ClientMeta;
 import com.luckmerlin.browser.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.R;
@@ -47,6 +48,11 @@ public class NasClient extends AbstractClient{
     public NasClient(String host,String name){
         mHttp=new JavaHttp().setBaseUrl(mHost=host);
         mName=name;
+    }
+
+    @Override
+    public ClientMeta getMeta() {
+        return new ClientMeta().setName(mName).setHost(mHost).setIcon(R.drawable.hidisk_icon_nas);
     }
 
     @Override

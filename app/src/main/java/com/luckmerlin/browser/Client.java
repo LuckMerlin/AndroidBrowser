@@ -19,9 +19,13 @@ import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 
 public interface Client {
+    @Deprecated
     String getName();
+    @Deprecated
     String getHost();
+    @Deprecated
     Object getIcon();
+    ClientMeta getMeta();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnFileDeleteUpdate update);
