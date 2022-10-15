@@ -337,8 +337,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Matcher<Task> matcher=null;Boolean matched=null;
             for (Listener listener:set) {
                 if (null!=listener&&listener instanceof OnStatusChangeListener&&null!=
-                        (matcher=listeners.get(listener))&&null!=
-                        (matched=matcher.match(task))&&matched){
+                        (matcher=listeners.get(listener))&&null!= (matched=matcher.match(task))&&matched){
                     updateStatusChange(status,task,(OnStatusChangeListener)listener);
                 }
             }

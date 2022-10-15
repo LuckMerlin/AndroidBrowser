@@ -19,28 +19,29 @@
         <import type="android.view.View"/>
     </data>
     <FrameLayout binding:bind="@{VB.clickId(R.layout.item_conveyor_single,task)}"
-        android:paddingBottom="4dp" android:paddingTop="4dp"
-        android:paddingLeft="15dp" android:paddingRight="5dp" android:background="#33000000"
+        android:background="@drawable/selector_item_browser_file_bg"
+        android:paddingBottom="2dp" android:paddingTop="2dp"
         android:layout_width="match_parent" android:layout_height="match_parent">
         <LinearLayout android:orientation="horizontal" android:gravity="center_vertical"
             android:layout_width="match_parent" android:layout_height="match_parent">
 
-            <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
-                android:layout_width="60dp" android:layout_height="60dp" android:padding="3dp">
+            <LinearLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:padding="3dp" android:orientation="vertical" android:gravity="center">
                 <ImageView android:src="@drawable/hidisk_icon_html"
-                    android:layout_width="match_parent" android:layout_height="match_parent"/>
-                <TextView android:textColor="@color/textMain" android:text="@{task.progress.speed??``}" android:background="#33000000"
-                    android:gravity="center" android:maxLines="1" android:textSize="10sp"
-                    android:layout_width="match_parent" android:layout_height="match_parent"/>
-            </FrameLayout>
+                    android:layout_width="50dp" android:layout_height="50dp"/>
+                <TextView android:textColor="@color/textMain" android:text="@{task.progress.speed??``}"
+                    android:gravity="center" android:maxLines="1" android:textSize="10sp" android:autoSizeMaxTextSize="5dp"
+                    android:layout_width="50dp" android:layout_height="wrap_content"/>
+            </LinearLayout>
 
             <LinearLayout android:orientation="vertical" android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_weight="1"
                 android:layout_width="0dp" android:layout_height="wrap_content" android:layout_gravity="center_vertical">
 
-                <TextView android:text="@{task.name??``}" android:textColor="@color/textTitle" android:textSize="14sp"
+                <TextView android:text="@{task.name??``}" android:textColor="@color/textMain" android:textSize="14sp"
                     android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold"/>
 
-                <TextView android:text="@{task.progress.title??``}" android:textColor="@color/textTitleSub"
+                <TextView android:text="@{task.progress.title??``}" android:textColor="@color/textMainSub"
                     android:textSize="12sp" android:layout_marginLeft="5dp" android:paddingTop="2dp"
                     android:paddingBottom="2dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

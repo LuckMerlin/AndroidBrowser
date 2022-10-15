@@ -265,7 +265,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.EXECUTE);
-        return (showDialog&&showTaskDialog(filesDeleteTask,null))||true;
+        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,null))||true;
     }
 
     private boolean createFile(){
@@ -353,18 +353,18 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return popupWindow.showAsDropDown(view,0,0, Gravity.CENTER);
     }
 
-    private boolean showTaskDialog(Task task, DoingContent dialogContent){
-        Executor executor=mExecutor;
-        if (null==executor|null==task){
-            return false;
-        }
-        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
-        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
-        content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
-        executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
-        content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
-        return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
-    }
+//    private boolean showTaskDialog(Task task, DoingContent dialogContent){
+//        Executor executor=mExecutor;
+//        if (null==executor|null==task){
+//            return false;
+//        }
+//        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
+//        content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
+//        content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
+//        executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));
+//        content.addOnAttachStateChangeListener((OnViewDetachedFromWindow)(View v)->executor.removeListener(content));
+//        return null!=showContentDialog(content, new FixedLayoutParams().fillParentAndCenter());
+//    }
 
     private boolean showFileContextMenu(View view, File file){
         return null!=view&&null!=file&&null!=showContentDialog(new FileContextDialogContent(file).
@@ -535,7 +535,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
             //Test
-            startTask(new TestTask(getActivity()),Option.EXECUTE_NOT_SAVE);
+            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
             post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
 //            TestTask testTask=new TestTask(getActivity());
@@ -576,7 +576,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean launchTask(Task task,int option,boolean showDialog){
-        return null!=task&&startTask(task,option)&&showDialog&&showTaskDialog(task,null);
+        return null!=task&&startTask(task,option)&&showDialog&&showTaskDialog(mExecutor,task,null);
     }
 
     private boolean startTask(Task task, int option){

@@ -6,9 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.view.View;
-
 import androidx.databinding.ViewDataBinding;
-
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
@@ -80,13 +78,8 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_checkbox:
                 return mConveyorListAdapter.toggleSelect(obj)||true;
             case R.drawable.selector_confirm:
-//                Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
-//                Result result=null!=task?task.getResult():null;
-//                ConfirmResult1.Confirm confirm=null!=result&&result instanceof ConfirmResult1 ?
-//                        ((ConfirmResult1)result).make(getContext()):null;
-//                return null!=showContentDialog(new ConfirmDialogContent(confirm).setOnConfirmFinish(
-//                        (boolean confirmed, Object confirmObj)-> executeTask(confirmObj)),null);
-                return true;
+                Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
+                return showTaskDialog(mExecutor,task,null);
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
                 return deleteTask(null!=obj&&obj instanceof Task?(Task)obj:null)||true;

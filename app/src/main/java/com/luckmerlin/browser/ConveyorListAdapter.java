@@ -1,20 +1,16 @@
 package com.luckmerlin.browser;
 
-import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
 import com.luckmerlin.task.Confirm;
-import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
@@ -122,6 +118,8 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             FrameLayout.LayoutParams params=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
             params.bottomMargin=2;
             params.topMargin=2;
+            params.leftMargin=5;
+            params.rightMargin=5;
             return params;
         }
         return super.onCreateViewHolderLayoutParams(parent, viewType, viewHolder);

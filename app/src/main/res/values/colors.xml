@@ -9,6 +9,7 @@
     <color name="textFocus">#999999</color>
     <color name="textTitle">#fff</color>
     <color name="textMain">#284eeb</color>
+    <color name="textMainSub">#99284eeb</color>
     <color name="hintColor">#55000000</color>
     <color name="textMainAnti">#fff</color>
     <color name="dialogBg">#ee444444</color>
