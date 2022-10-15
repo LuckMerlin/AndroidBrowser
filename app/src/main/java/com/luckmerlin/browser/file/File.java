@@ -129,7 +129,7 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public File setTotalVolume(long children){
-        return putSafe(this,Label.LABEL_TOTAL,children);
+        return putSafe(this,Label.LABEL_TOTAL_VOLUME,children);
     }
 
     public String getName() {

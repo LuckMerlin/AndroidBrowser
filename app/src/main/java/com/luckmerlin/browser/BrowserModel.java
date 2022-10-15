@@ -173,33 +173,15 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.share:
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
             case Mode.MODE_COPY:
+                return launchCopyFile(obj,clickId,getString(R.string.copy),Option.EXECUTE);
             case Mode.MODE_UPLOAD:
+                return launchCopyFile(obj,clickId,getString(R.string.upload),Option.EXECUTE);
             case Mode.MODE_DOWNLOAD:
-                return null!=obj&&obj instanceof File&&entryMode(new Mode(clickId).makeSureBinding(
-                        (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
-                    Folder folder=mBrowserAdapter.getFolder();
-                    if (null==folder||folder.isChild(obj,false,true)){
-                        toast(R.string.canNotOperateHere,-1);
-                        return true;
-                    }
-                    entryMode(null);
-                    return launchTask(new FilesCopyTask(new FileArrayList((File)obj),folder).
-                            setName(getString(R.string.copy)), Option.EXECUTE,true)||true;
-                }));
+                return launchCopyFile(obj,clickId,getString(R.string.download),Option.EXECUTE);
+            case Mode.MODE_MOVE:
+                return launchCopyFile(obj,clickId,getString(R.string.move),Option.EXECUTE);
             case R.string.delete:
                  return deleteFile(obj,true,false)||true;
-            case R.string.move:
-                return null!=obj&&obj instanceof File&&entryMode(new Mode(Mode.MODE_MOVE).makeSureBinding(
-                        (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
-                    Folder folder=mBrowserAdapter.getFolder();
-                    if (null==folder||folder.isChild(obj,true)){
-                        toast(R.string.canNotOperateHere,-1);
-                        return true;
-                    }
-                    entryMode(null);
-                    return launchTask(new FilesMoveTask(new FileArrayList((File)obj) ,folder).
-                            setName(getString(R.string.move)), Option.EXECUTE,true)||true;
-                }));
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -209,6 +191,20 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return openFile(file);
         }
         return false;
+    }
+
+    private boolean launchCopyFile(Object fileObj,int clickId,String taskName,int option){
+        return null!=fileObj&&fileObj instanceof File&&entryMode(new Mode(clickId).makeSureBinding(
+            (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
+                Folder folder=mBrowserAdapter.getFolder();
+                if (null==folder||folder.isChild(fileObj,false,true)){
+                    toast(R.string.canNotOperateHere,-1);
+                    return true;
+                }
+                entryMode(null);
+                return launchTask(new FilesCopyTask(new FileArrayList((File) fileObj),folder).
+                        setName(null!=taskName?taskName:getString(R.string.copy)),
+                        option,true)||true;}));
     }
 
     private boolean openFile(File openFile){

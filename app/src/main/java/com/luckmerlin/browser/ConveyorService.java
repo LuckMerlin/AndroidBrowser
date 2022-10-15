@@ -35,7 +35,7 @@ public class ConveyorService extends Service {
         List<Client> clients=new ArrayList<>();
 //        clients.add(new NasClient("http://192.168.0.2:6666","NAS"));
         clients.add(new NasClient("http://192.168.0.7:6666","NAS"));
-//        clients.add(new LocalClient());
+        clients.add(new LocalClient());
 //        clients.add(new NasClient("http://192.168.0.10:6666","DEV"));
         ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
 //        taskSaver=null;
