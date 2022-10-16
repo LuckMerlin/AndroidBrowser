@@ -113,7 +113,7 @@ public abstract class BaseModel extends BaseContent {
         if (null==executor|null==task){
             return false;
         }
-        final DoingContent content=null!=dialogContent?dialogContent:new DoingContent().setTitle(task.getName());
+        final DoingContent content=(null!=dialogContent?dialogContent:new DoingContent()).setTitle(task.getName());
         content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->
                 executor.putListener(content, (Task data)-> null!=data&&data.equals(task),true));

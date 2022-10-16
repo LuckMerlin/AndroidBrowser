@@ -31,6 +31,7 @@ import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.RenameFileContent;
@@ -52,6 +53,7 @@ import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Parser;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
@@ -187,7 +189,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case Mode.MODE_MOVE:
                 return launchCopyFile(obj,clickId,getString(R.string.move),Option.EXECUTE);
             case R.string.delete:
-                 return deleteFile(obj,true,false)||true;
+                 return deleteFile(obj, true, false, (Result result)->
+                         null!=result&&result.isSucceed()?1000:-1)||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -238,15 +241,15 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return mBrowserAdapter.entryMode(mode,onConfirm,args);
     }
 
-    private boolean deleteFile(Object obj,boolean showDialog,boolean confirmed){
+    private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingContent.AutoDismiss autoDismiss){
         Executor executor=mExecutor;
         if (null==executor||null==obj){
             toast(getString(R.string.whichFailed,getString(R.string.delete)));
             return false;
         }else if (obj instanceof File){
-            return deleteFile(new FileArrayList((File) obj),showDialog,confirmed);
+            return deleteFile(new FileArrayList((File) obj),showDialog,confirmed,autoDismiss);
         }else if (!(obj instanceof FileArrayList)||((FileArrayList)obj).size()<=0){
-            return deleteFile(null,showDialog,confirmed);
+            return deleteFile(null,showDialog,confirmed,autoDismiss);
         }
         final FileArrayList files=(FileArrayList)obj;
         if (!confirmed){
@@ -257,7 +260,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             confirm.setName(title).setMessage(message);
             confirm.setBinding(new DialogButtonBinding(
             ViewBinding.clickId(R.string.sure).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
-                    ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true))||true),
+                    ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true,autoDismiss))||true),
             ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                     confirmContent.removeFromParent()||true)));
             confirmContent.setConfirm(confirm);
@@ -266,7 +269,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.EXECUTE);
-        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,null))||true;
+        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingContent().setAutoDismiss(autoDismiss)))||true;
     }
 
     private boolean createFile(){

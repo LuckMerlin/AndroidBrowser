@@ -32,7 +32,11 @@ public class DoingContent extends ConfirmContent implements
     private final ObservableField<CharSequence> mMessage=new ObservableField<>();
     private final ObservableField<Doing> mDoing=new ObservableField<>();
     private final ObservableField<Binding> mBinding=new ObservableField<>();
-    private int mAutoDismiss;
+    private AutoDismiss mAutoDismiss;
+
+    public interface AutoDismiss{
+        int onResolveAutoDismiss(Result result);
+    }
 
     @Override
     protected View onCreateContent(Context context) {
@@ -70,7 +74,6 @@ public class DoingContent extends ConfirmContent implements
                 Result result=null!=task?task.getResult():null;
                 result=result instanceof ConfirmResult?((ConfirmResult)result).makeConfirm(getContext()):result;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
-                int autoDismiss=mAutoDismiss;
                 Binding binding=null;
                 if (result instanceof BindingResult){
                     binding=((BindingResult)result).getBinding();
@@ -78,8 +81,11 @@ public class DoingContent extends ConfirmContent implements
                 if (result instanceof Confirm){
                     setConfirm(((Confirm)result));
                     return;
-                }else if (autoDismiss>0){
-                    post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss
+                }
+                AutoDismiss autoDismiss=mAutoDismiss;
+                int autoDismissDelay=null!=autoDismiss?autoDismiss.onResolveAutoDismiss(result):-1;
+                if (autoDismissDelay>=0){
+                    post(()->removeFromParent(),autoDismissDelay>10000?10000:autoDismissDelay);//Auto dismiss
                 }
                 setMessage(result instanceof MessageResult?((MessageResult)result).getMessage():null);
                 if (null==binding){
@@ -125,8 +131,7 @@ public class DoingContent extends ConfirmContent implements
         return this;
     }
 
-
-    public final DoingContent setAutoDismiss(int autoDismiss) {
+    public final DoingContent setAutoDismiss(AutoDismiss autoDismiss) {
         this.mAutoDismiss = autoDismiss;
         return this;
     }
