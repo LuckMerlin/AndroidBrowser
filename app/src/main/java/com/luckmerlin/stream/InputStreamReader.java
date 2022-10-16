@@ -25,7 +25,22 @@ public class InputStreamReader {
 
     public final InputStreamReader setInputStream(InputStream inputStream,long contentLength){
         mContentLength=contentLength;
-        mInputStream=null!=inputStream?inputStream:null;
+        mInputStream=inputStream;
+//        BufferedReader reader=null==inputStream?null:new BufferedReader(new java.io.InputStreamReader(inputStream));
+//        String line=null;
+//        StringBuffer buffer=new StringBuffer();
+//        while (null!=reader){
+//            try {
+//                if (null!=(line=reader.readLine())){
+//                    buffer.append(line);
+//                    continue;
+//                }
+//                break;
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        Debug.D("EEEEEE "+buffer);
         return this;
     }
 

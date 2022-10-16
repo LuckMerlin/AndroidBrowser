@@ -27,12 +27,17 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public static File fromJson(Object json){
+        return fromJson(json,null);
+    }
+
+    public static File fromJson(Object json,String name){
         if (null==json){
             return null;
         }else if(json instanceof JSONObject){
+            json=null!=name&&name.length()>0?((JSONObject)json).optJSONObject(name):json;
             return new File((JSONObject)json);
         }
-        return fromJson(JsonObject.makeJson(json));
+        return fromJson(JsonObject.makeJson(json),name);
     }
 
     public String getHost() {

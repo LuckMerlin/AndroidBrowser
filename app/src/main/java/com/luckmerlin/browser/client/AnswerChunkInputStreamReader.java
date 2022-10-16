@@ -6,7 +6,6 @@ import com.luckmerlin.http.Connection;
 import com.luckmerlin.http.Headers;
 import com.luckmerlin.http.Requested;
 import com.luckmerlin.stream.ChunkInputStreamReader;
-import com.luckmerlin.stream.InputStreamReader;
 
 public class AnswerChunkInputStreamReader extends ChunkInputStreamReader {
     private static final String CUSTOM_CONTENT_LENGTH_KEY="MerlinContentLength";
@@ -25,6 +24,7 @@ public class AnswerChunkInputStreamReader extends ChunkInputStreamReader {
         setInputStream(null!=answerBody?answerBody.getInputStream():null,contentLength);
         String flag= null!=headers?headers.get(CUSTOM_CHUNK_FLAG):null;
         setChunkFlag(null!=flag?flag.getBytes():null);
+
     }
 
     public Connection getConnection() {

@@ -47,12 +47,15 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.MatchedCollector;
+import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
+import com.luckmerlin.core.Parser;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
+import com.luckmerlin.stream.ChunkInputStreamReader;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
@@ -66,6 +69,9 @@ import com.merlin.model.OnActivityCreate;
 import com.merlin.model.OnActivityNewIntent;
 import com.merlin.model.OnActivityStart;
 import com.merlin.model.OnBackPress;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -278,6 +284,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                         }
                     });
                 };
+                removeFromParent();
                 if (client instanceof LocalClient){
                     callback.onFinish(client.createFile(parent,inputName,createDir));
                     return true;

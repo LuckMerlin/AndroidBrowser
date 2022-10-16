@@ -31,7 +31,7 @@ public class FilesDeleteTask extends FilesTask {
         if(null==(client=getFileClient(childFile))){
             return new Response<>(Code.CODE_FAIL,"File client invalid.");
         }
-        return client.deleteFile(childFile,(int code, String msg, File file)-> {
+        return client.deleteFile(childFile,(int code, CharSequence msg, File file)-> {
             notifyProgress(progress.setDoing(new Doing().setDoingMode(Mode.MODE_DELETE).
                     setSucceed(code==Code.CODE_SUCCEED).setFrom(file)));
             return runtime.isCancelEnabled();

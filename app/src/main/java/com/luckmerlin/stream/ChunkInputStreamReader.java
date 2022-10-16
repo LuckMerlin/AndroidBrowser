@@ -2,6 +2,7 @@ package com.luckmerlin.stream;
 
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Parser;
+import com.luckmerlin.debug.Debug;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,26 +39,26 @@ public class ChunkInputStreamReader extends InputStreamReader{
         final ByteArrayOutputStream outputStream=new ByteArrayOutputStream(size<=0?1024:size);
         int read;byte[] chunk=null;
         while ((read=read())!=-1){
-            outputStream.write(read);
             if (mChunked){
+                mChunked=false;
                 chunk=outputStream.toByteArray();
                 outputStream.reset();
                 if (null!=chunkUpdate&&!chunkUpdate.onChangeUpdated(chunk)){
                     break;
                 }
             }
+            outputStream.write(read);
         }
         return null!=parser2?parser2.onParse(outputStream.toByteArray()):null;
     }
 
     protected int onRead() throws IOException {
-        mChunked=false;
         InputStream inputStream=mInputStream;
         if (null==inputStream){
             return -1;
         }
         byte[] chunkFlag=mChunkFlag;
-        if (null==chunkFlag){
+        if (null==chunkFlag||chunkFlag.length<=0){
             return inputStream.read();
         }
         int read=-1;

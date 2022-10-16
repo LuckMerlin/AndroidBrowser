@@ -19,6 +19,7 @@ import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.http.MResponse;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
+import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
@@ -137,8 +138,32 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<File> deleteFile(File file, OnFileDeleteUpdate update) {
-        return null;
+    public Response<File> deleteFile(File file, OnFileDeleteUpdate deleteUpdate) {
+        String filePath=null!=file?file.getPath():null;
+        Request request=new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post();
+        Connection connection=mHttp.connect(request);
+        if (null==connection){
+            Debug.E("Fail delete file while connect http invalid.");
+            return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
+        }
+        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
+        try {
+            return reader.readAllChunk(null==deleteUpdate?(byte[] newData)->true:(byte[] newData)-> {
+                   Response<File> response=MResponse.parse(newData, (data) -> File.fromJson(data,"from"));
+                   if (null==response){
+                       Debug.W("Interrupt file delete while chunk read error."+(null!=newData?new String(newData):null));
+                       return false;
+                   }
+                   deleteUpdate.onFileDeleteUpdate(response.getCode(Code.CODE_UNKNOWN),response.getMessage(),response.getData());
+                   return true;
+           }, (byte[] bytes) -> MResponse.parse(bytes, (data) -> File.fromJson(data)), 1024);
+        } catch (IOException e) {
+            Debug.E("Exception delete file.e="+e,e);
+            e.printStackTrace();
+            return null;
+        }finally {
+            Utils.closeStream(connection);
+        }
     }
 
 //    @Override
