@@ -32,6 +32,7 @@ import com.luckmerlin.http.OnHttpParse;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Requested;
+import com.luckmerlin.json.Json;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.InputStreamReader;
 import com.luckmerlin.stream.OutputStream;
@@ -123,7 +124,8 @@ public class NasClient extends AbstractClient{
         return mHttp.call(new Request().url("/file/browser").
                 headerEncode(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
                 header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).post(),
-                new MResponse<Folder>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null));
+                new MResponse<Folder>((Object data)-> null!=data&&data instanceof JSONObject?
+                        new Folder((JSONObject) data):null));
     }
 
     @Override
@@ -134,7 +136,7 @@ public class NasClient extends AbstractClient{
     @Override
     public Response<File> loadFile(String file) {
         return mHttp.call(new Request().headerEncode(Label.LABEL_PATH, file).url("/file/detail").post().post(),
-                new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null));
+                new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new File((JSONObject)data):null));
     }
 
     @Override
@@ -151,7 +153,7 @@ public class NasClient extends AbstractClient{
             return reader.readAllChunk(null==deleteUpdate?(byte[] newData)->true:(byte[] newData)-> {
                    Response<File> response=MResponse.parse(newData, (data) -> File.fromJson(data,"from"));
                    if (null==response){
-                       Debug.W("Interrupt file delete while chunk read error."+(null!=newData?new String(newData):null));
+                       Debug.W("Interrupt file delete while chunk read error."+(null!=newData?new String(newData):""));
                        return false;
                    }
                    deleteUpdate.onFileDeleteUpdate(response.getCode(Code.CODE_UNKNOWN),response.getMessage(),response.getData());

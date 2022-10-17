@@ -206,7 +206,7 @@ public class ViewBinding extends ObjectBinding {
 
     private static Object getResource(Context context,int resId){
         Resources resources=null!=context?context.getResources():null;
-        if (null==resources){
+        if (null==resources||resId==Resources.ID_NULL){
             return null;
         }
         try {

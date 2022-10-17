@@ -13,7 +13,8 @@
             android:paddingTop="5dp" android:paddingBottom="15dp"
             android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
-            <com.luckmerlin.view.MarqueeTextView android:text="@{content.title??content.file.name??``}"
+            <TextView android:text="@{content.title??content.file.name??``}"
+                android:singleLine="true" android:textStyle="bold"
                 android:textColor="@color/textTitle" android:textSize="@dimen/textTitle" android:gravity="center"
                 android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
                 android:layout_width="180dp" android:layout_height="wrap_content"/>
@@ -27,7 +28,6 @@
                     <TextView  binding:bind="@{VB.clickId(R.string.copy,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.move,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.delete,content.file)}" style="@style/contextMenuTextView" />
-                    <TextView  binding:bind="@{VB.clickId(content.file.localFile?R.string.upload:R.string.download,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.multiChoose,content.file)}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.share,content.file)}" android:visibility="@{!content.file.localFile||content.file.directory?View.GONE:View.VISIBLE}" style="@style/contextMenuTextView" />
                     <TextView  binding:bind="@{VB.clickId(R.string.attr,content.file)}" style="@style/contextMenuTextView" />

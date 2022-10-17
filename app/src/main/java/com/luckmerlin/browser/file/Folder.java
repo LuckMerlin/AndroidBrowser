@@ -17,15 +17,36 @@ public class Folder extends File implements PageListAdapter.Page<File> {
     private long mFrom;
     private ArrayList<File> mFiles;
 
-    public Folder(JSONObject jsonObject){
-        super(jsonObject);
-        JSONArray jsonArray=null!=jsonObject?jsonObject.optJSONArray(Label.LABEL_CHILDREN):null;
-        setChildren(null!=jsonArray?new JsonArray(jsonArray).getList((Object from)->
-                null!=from&&from instanceof JSONObject?new File((JSONObject)from ):null):null);
+    public Folder(){
+        this(null);
     }
 
-    public Folder(File file){
-        super(file);
+    public Folder(Object obj){
+        super(obj);
+        apply(obj);
+    }
+
+    private void apply(Object obj){
+        if (null==obj){
+
+        }else if (obj instanceof Folder){
+            mFrom=((Folder)obj).mFrom;
+            mFiles=((Folder)obj).mFiles;
+        }else if (obj instanceof JSONObject){
+            JSONObject json=(JSONObject)obj;
+            mFrom=json.optLong(Label.LABEL_FROM,-1);
+            JSONArray array=json.optJSONArray(Label.LABEL_CHILDREN);
+            if (null!=array){
+                int length=array.length();
+                ArrayList files=mFiles=length<=0?null:new ArrayList<>(length);
+                JSONObject jsonObject=null;
+                for (int i = 0; i < length; i++) {
+                    if (null!=(jsonObject=array.optJSONObject(i))){
+                        files.add(new File(jsonObject));
+                    }
+                }
+            }
+        }
     }
 
     public Folder setChildren(ArrayList<File> files){

@@ -182,14 +182,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return finishActivity()||true;
             case R.string.share:
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
-            case Mode.MODE_COPY:
-                return launchCopyFile(obj,clickId,getString(R.string.copy),Option.LAUNCH);
-            case Mode.MODE_UPLOAD:
-                return launchCopyFile(obj,clickId,getString(R.string.upload),Option.LAUNCH);
-            case Mode.MODE_DOWNLOAD:
-                return launchCopyFile(obj,clickId,getString(R.string.download),Option.LAUNCH);
-            case Mode.MODE_MOVE:
-                return launchCopyFile(obj,clickId,getString(R.string.move),Option.LAUNCH);
+            case R.string.copy:
+                return launchCopyFile(obj,Mode.MODE_COPY,getString(R.string.copy),Option.LAUNCH);
+            case R.string.move:
+                return launchCopyFile(obj,Mode.MODE_MOVE,getString(R.string.move),Option.LAUNCH);
             case R.string.delete:
                  return deleteFile(obj, true, false, (Result result)->
                          null!=result&&result.isSucceed()?1000:-1)||true;
@@ -204,18 +200,21 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return false;
     }
 
-    private boolean launchCopyFile(Object fileObj,int clickId,String taskName,int option){
-        return null!=fileObj&&fileObj instanceof File&&entryMode(new Mode(clickId).makeSureBinding(
+    private boolean launchCopyFile(Object fileObj,int mode,String taskName,int option){
+        final File file=null!=fileObj&&fileObj instanceof File?(File)fileObj:null;
+        return null!=file&&entryMode(new Mode(mode).makeSureBinding(
             (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
                 Folder folder=mBrowserAdapter.getFolder();
                 if (null==folder||folder.isChild(fileObj,false,true)){
                     toast(R.string.canNotOperateHere,-1);
                     return true;
                 }
+                String name=taskName;
+                name=null!=name?name:folder.isLocalFile()?getString(file.isLocalFile()?R.string.copy:
+                        R.string.download): getString(file.isLocalFile()?R.string.upload:R.string.copy);
                 entryMode(null);
                 return launchTask(new FilesCopyTask(new FileArrayList((File) fileObj),folder).
-                        setName(null!=taskName?taskName:getString(R.string.copy)),
-                        option,true)||true;}));
+                        setName(name), option,true)||true;}));
     }
 
     private boolean openFile(File openFile){

@@ -31,24 +31,33 @@ public class File implements Brief,Permission, ParcelObject {
     private String mParent;
     private String mSep;
 
-    public File(File file){
-        Parcel parcel=null!=file?Parceler.readParcel(Parceler.write(file)):null;
-        if (null!=parcel){
-            file.onParcelWrite(parcel);
-            parcel.recycle();
-        }
-    }
-
     public File(){
-
+        this(null);
     }
 
-    public File(JSONObject json){
-        applyJson(json);
+    public File(Object obj){
+        apply(obj);
     }
 
-    public final File applyJson(JSONObject json){
-        if (null!=json&&json.length()>0){
+    private void apply(Object obj){
+        if (null==obj){
+
+        }else if(obj instanceof File){
+            File file=(File)obj;
+            mHost=file.mHost;
+            mUsedVolume=file.mUsedVolume;
+            mTotalVolume=file.mTotalVolume;
+            mModifyTime=file.mModifyTime;
+            mLength=file.mLength;
+            mThumb=file.mThumb;
+            mName=file.mName;
+            mMime=file.mMime;
+            mPermission=file.mPermission;
+            mTotal=file.mTotal;
+            mParent=file.mParent;
+            mSep=file.mSep;
+        }else if(obj instanceof JSONObject){
+            JSONObject json=(JSONObject)obj;
             mHost=json.optString(Label.LABEL_HOST,mHost);
             mUsedVolume=json.optLong(Label.LABEL_USED_VOLUME,mUsedVolume);
             mTotalVolume=json.optLong(Label.LABEL_TOTAL_VOLUME,mTotalVolume);
@@ -62,7 +71,6 @@ public class File implements Brief,Permission, ParcelObject {
             mParent=json.optString(Label.LABEL_PARENT,mParent);
             mSep=json.optString(Label.LABEL_SEP,mSep);
         }
-        return this;
     }
 
     public static File fromJson(Object json){

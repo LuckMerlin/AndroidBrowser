@@ -97,9 +97,8 @@ public interface ParcelObject {
 
         public static void writeList(Parcel parcel,Collection<?extends ParcelObject> collection){
             int count=null!=collection?collection.size():0;
-            if (count<=0){
-                parcel.writeInt(count);
-            }else{
+            parcel.writeInt(count);
+            if (count>0){
                 byte[] childBytes;
                 for (ParcelObject child:collection) {
                     if (null==(childBytes=(null!=child?Parceler.write(child):null))||childBytes.length<=0){

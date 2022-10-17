@@ -24,6 +24,7 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.RestartEnabler;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
@@ -94,8 +95,14 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
                 return deleteTask(null!=obj&&obj instanceof Task?(Task)obj:null)||true;
+            case R.drawable.selector_succeed:
+                return ((null!=obj&&obj instanceof Task&&restartTask((Task)obj,true)))||true;
         }
         return false;
+    }
+
+    private boolean restartTask(Task task,boolean enable){
+        return null!=task&&task instanceof RestartEnabler&&((RestartEnabler)task).enableRestart(enable);
     }
 
     private boolean deleteTask(Task task){
