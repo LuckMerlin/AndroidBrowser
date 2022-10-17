@@ -30,8 +30,16 @@
 
                 <LinearLayout android:layout_weight="1" android:layout_marginRight="5dp"
                     android:orientation="horizontal" android:layout_width="0dp" android:layout_height="wrap_content">
+
                     <ImageView android:padding="1dp" android:background="@drawable/round_client_logo_bg" android:layout_marginRight="5dp"
                         android:src="@mipmap/ic_launcher" android:layout_width="55dp" android:layout_height="55dp"/>
+
+                    <com.google.android.material.imageview.ShapeableImageView android:src="@mipmap/ic_launcher"
+                        android:padding="1dp" android:background="@drawable/round_client_logo_bg"
+                        android:layout_marginRight="5dp" android:layout_width="55dp" android:layout_height="55dp"
+                        android:elevation="4dp" binding:shapeAppearanceOverlay="@style/circleImageStyle"
+                        binding:strokeColor="#FFFFFF" binding:strokeWidth="5dp" />
+
                     <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
                         android:layout_width="match_parent" android:layout_height="wrap_content">
 
