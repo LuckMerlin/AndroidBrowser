@@ -10,7 +10,7 @@ import java.lang.ref.WeakReference;
 
 public abstract class Runtime {
     private int mOption;
-    private int mStatus=Executor.STATUS_PENDING;
+    private int mStatus=Executor.STATUS_IDLE;
     private Handler mHandler;
     private final WeakReference<Context> mContextReference;
 

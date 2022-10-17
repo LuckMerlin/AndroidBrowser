@@ -28,4 +28,5 @@ public interface Label {
     String LABEL_TOTAL_VOLUME= "totalVolume";
     String LABEL_PERMISSION= "permission";
     String LABEL_TOTAL= "total";
+    String LABEL_THUMB= "thumb";
 }

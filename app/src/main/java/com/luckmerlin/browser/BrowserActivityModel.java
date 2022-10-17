@@ -481,9 +481,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return launchTask(new FileCopyTask((File)obj,folder,null).
-                            enableDeleteSucceed(true).setName(getString(R.string.copy)),
-                            Option.EXECUTE,true);
+//                    return launchTask(new FileCopyTask((File)obj,folder,null).
+//                            enableDeleteSucceed(true).setName(getString(R.string.copy)),
+//                            Option.EXECUTE,true);
+                    return true;
                 });
             case R.string.move:
                 if (null==obj||!(obj instanceof File)){
@@ -495,8 +496,9 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
                         toast(R.string.canNotOperateHere,-1);
                         return null;
                     }
-                    return launchTask(new FileMoveTask((File)obj ,folder,null).
-                            enableDeleteSucceed(true).setName(getString(R.string.move)), Option.EXECUTE,true);
+//                    return launchTask(new FileMoveTask((File)obj ,folder,null).
+//                            enableDeleteSucceed(true).setName(getString(R.string.move)), Option.EXECUTE,true);
+                    return true;
                 });
         }
         if (null!=obj&&obj instanceof File){

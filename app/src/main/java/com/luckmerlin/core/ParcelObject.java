@@ -2,7 +2,12 @@ package com.luckmerlin.core;
 
 import android.os.Parcel;
 
+import com.luckmerlin.browser.file.File;
 import com.luckmerlin.object.ObjectCreator;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public interface ParcelObject {
     void onParcelRead(Parcel parcel);
@@ -10,13 +15,21 @@ public interface ParcelObject {
 
     final static class Parceler{
 
-        public static <T extends ParcelObject> T read(byte[] bytes, Parser<String,T> parser){
-            if (null==bytes||bytes.length<=0){
+        public static Parcel readParcel(byte[] bytes) {
+            if (null == bytes || bytes.length <= 0) {
                 return null;
             }
             Parcel parcel=Parcel.obtain();
             parcel.unmarshall(bytes,0,bytes.length);
             parcel.setDataPosition(0);
+            return parcel;
+        }
+
+        public static <T extends ParcelObject> T read(byte[] bytes, Parser<String,T> parser){
+            Parcel parcel=readParcel(bytes);
+            if (null==parcel){
+                return null;
+            }
             T data=read(parcel,parser);
             parcel.recycle();
             return data;
@@ -46,7 +59,60 @@ public interface ParcelObject {
             return data;
         }
 
-        public static byte[] write(Object obj){
+        public static <T extends ParcelObject> void readList(Parcel parcel,Collection<T> result, Parser<String,T> parser){
+            readList(parcel, (byte[] newData)-> {
+                T data=Parceler.read(newData,parser);
+                if (null!=data&&null!=result){
+                    result.add(data);
+                }
+                return false;
+            });
+        }
+
+        public static void readList(Parcel parcel,OnChangeUpdate<byte[]> update){
+            int count=parcel.readInt();
+            int bytesLength=0;boolean interrupted=false;
+            for (int i = 0; i < count; i++) {
+                if ((bytesLength=parcel.readInt())<=0){
+                    continue;
+                }
+                byte[] bytes=new byte[bytesLength];
+                parcel.readByteArray(bytes);
+                if (!interrupted&&null!=update&&(interrupted=update.onChangeUpdated(bytes))){
+                    update.onChangeUpdated(bytes);
+                }
+            }
+        }
+
+        public static byte[] writeList(Collection<?extends ParcelObject> collection){
+            if (null==collection){
+                return null;
+            }
+            Parcel objParcel=Parcel.obtain();
+            writeList(objParcel,collection);
+            byte[] bytes=objParcel.marshall();
+            objParcel.recycle();
+            return bytes;
+        }
+
+        public static void writeList(Parcel parcel,Collection<?extends ParcelObject> collection){
+            int count=null!=collection?collection.size():0;
+            if (count<=0){
+                parcel.writeInt(count);
+            }else{
+                byte[] childBytes;
+                for (ParcelObject child:collection) {
+                    if (null==(childBytes=(null!=child?Parceler.write(child):null))||childBytes.length<=0){
+                        parcel.writeInt(0);
+                    }else{
+                        parcel.writeInt(childBytes.length);
+                        parcel.writeByteArray(childBytes);
+                    }
+                }
+            }
+        }
+
+        public static byte[] write(ParcelObject obj){
             if (null==obj){
                 return null;
             }
@@ -57,19 +123,19 @@ public interface ParcelObject {
             return bytes;
         }
 
-        public static void write(Parcel parcel,Object obj){
+        public static void write(Parcel parcel,ParcelObject parcelObject){
             byte[] bytes=null;
-            if (null!=obj&&obj instanceof ParcelObject){
+            if (null!=parcelObject){
                 Parcel objParcel=Parcel.obtain();
                 objParcel.setDataPosition(0);
-                ((ParcelObject)obj).onParcelWrite(objParcel);
+                parcelObject.onParcelWrite(objParcel);
                 bytes=objParcel.marshall();
                 objParcel.recycle();
             }
             int length=null!=bytes?bytes.length:0;
             parcel.writeInt(length);
             if (length>0){
-                parcel.writeString(obj.getClass().getName());
+                parcel.writeString(parcelObject.getClass().getName());
                 parcel.writeByteArray(bytes);
             }
         }

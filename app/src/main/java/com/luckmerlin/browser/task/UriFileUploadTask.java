@@ -19,7 +19,6 @@ import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnExecuteFinish;
 import com.luckmerlin.task.OnProgressChange;
-import com.luckmerlin.task.OnTaskSave;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
@@ -31,7 +30,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UriFileUploadTask extends FileTask implements OnTaskSave, OnExecuteFinish {
+public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
     private ArrayList<Parcelable> mUris;
     private final Folder mFolder;
 
@@ -177,11 +176,6 @@ public class UriFileUploadTask extends FileTask implements OnTaskSave, OnExecute
         }finally {
             Utils.closeStream(inputStream,outputStream);
         }
-    }
-
-    @Override
-    public boolean onTaskSave(Executor executor) {
-        return false;//Not need save
     }
 
     @Override

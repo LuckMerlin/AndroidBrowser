@@ -82,6 +82,7 @@ public class ConveyorService extends Service {
             }
             Object childObj=null;
             SharedPreferences.Editor editor=preferences.edit();
+            Debug.D("Loading saved tasK."+set.size());
             for (String taskId:set) {
                 if (null==taskId||!taskId.endsWith(POSTFIX)){
                     continue;
@@ -117,12 +118,12 @@ public class ConveyorService extends Service {
             if (null==task||null==taskBytes||taskBytes.length<=0||null==preferences){
                 return false;
             }
-            Debug.D("Saving tasK."+task);
             String id=generateTaskId(task);
             if (null==id||id.length()<=0){
                 Debug.W("Fail save tasK while generate task id invalid."+task);
                 return false;
             }
+            Debug.D("Saving tasK."+task);
             return preferences.edit().putString(id,Base64.encodeToString(taskBytes, Base64.URL_SAFE)).commit();
         }
 

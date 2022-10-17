@@ -1,8 +1,11 @@
 package com.luckmerlin.core;
 
-public class Response<T> implements MessageResult ,CodeResult<T> {
-    private Integer mCode=0;
-    private CharSequence mMsg;
+import android.os.Parcel;
+import com.luckmerlin.browser.Code;
+
+public class Response<T> implements MessageResult ,CodeResult<T>,ParcelObject {
+    private int mCode= Code.CODE_UNKNOWN;
+    private String mMsg;
     private T mData;
 
     public Response(){
@@ -17,7 +20,7 @@ public class Response<T> implements MessageResult ,CodeResult<T> {
         this(code,msg,null);
     }
 
-    public Response(int code,CharSequence msg,T data){
+    public Response(int code,String msg,T data){
         set(code,msg,data);
     }
 
@@ -26,7 +29,7 @@ public class Response<T> implements MessageResult ,CodeResult<T> {
         return this;
     }
 
-    public final Response<T> setMsg(CharSequence msg) {
+    public final Response<T> setMsg(String msg) {
         this.mMsg = msg;
         return this;
     }
@@ -49,7 +52,7 @@ public class Response<T> implements MessageResult ,CodeResult<T> {
         return set(code,msg,mData);
     }
 
-    public final Response<T> set(int code,CharSequence msg,T data){
+    public final Response<T> set(int code,String msg,T data){
         return setCode(code).setMsg(msg).setData(data);
     }
 
@@ -60,7 +63,7 @@ public class Response<T> implements MessageResult ,CodeResult<T> {
     }
 
     @Override
-    public final CharSequence getMessage() {
+    public final String getMessage() {
         return mMsg;
     }
 
@@ -76,5 +79,20 @@ public class Response<T> implements MessageResult ,CodeResult<T> {
                 ", mMsg='" + mMsg + '\'' +
                 ", mData=" + mData +
                 '}';
+    }
+
+    @Override
+    public void onParcelRead(Parcel parcel) {
+        mCode=parcel.readInt();
+        mMsg=parcel.readString();
+        mData=Parceler.read(parcel);
+    }
+
+    @Override
+    public void onParcelWrite(Parcel parcel) {
+         parcel.writeInt(mCode);
+         parcel.writeString(mMsg);
+         T data=mData;
+         Parceler.write(null!=data&&data instanceof ParcelObject?(ParcelObject) data:null);
     }
 }

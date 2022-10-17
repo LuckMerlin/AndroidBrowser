@@ -72,7 +72,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                     updateStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
                     return null;
                 }
-            }, Option.EXECUTE);
+            }, Option.LAUNCH_NOT_SAVE);
         }
     }
 
@@ -132,14 +132,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             executeTask=new ExecuteTask(this,task,getContext(), optionArg,mHandler, fromSaved);
             mQueue.add(executeTask);
             if (!innerTask){
-                setStatusChange(STATUS_ADD,executeTask,mListeners);
+                updateStatusChange(STATUS_ADD,task,mListeners);
             }
         }
         executeTask.setOption(Option.isOptionEnabled(optionArg,Option.RESET)?(optionArg&~Option.RESET): executeTask.getOption()|optionArg);
-        //Check cancel
-        if (Option.isOptionEnabled(optionArg, Option.CANCEL)){
-            //Do nothing
-        }
         //Check save
         if (!innerTask){
             if (Option.isOptionEnabled(optionArg,Option.NOT_SAVE)){
@@ -152,7 +148,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         //Check pending
         if (!Option.isOptionEnabled(optionArg, Option.PENDING)){
             return true;
-        }else if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
+        }
+        if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
             return true;
         }
         if (executeTask.isRunning()){
@@ -160,6 +157,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
         //Check execute
         if (!Option.isOptionEnabled(optionArg, Option.EXECUTE)){
+            Debug.D("Task just option pending."+task);
             return true;
         }
         //Clean cancel option while execute
@@ -215,6 +213,9 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             return null;
         }
         Task task=(Task)parcelObject;
+        option=Option.enableOption(option,Option.EXECUTE,false);
+        option=Option.enableOption(option,Option.CANCEL,false);
+        option=Option.enableOption(option,Option.PENDING,false);
         return TaskExecutor.this.execute(task,option)?task:null;
     }
 
@@ -225,7 +226,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             parcel.setDataPosition(0);
             parcel.writeInt(option);
             parcel.writeString("");//Version
-            mParcelParser.write(parcel,task);
+            mParcelParser.write(parcel,(ParcelObject) task);
             byte[] bytes=parcel.marshall();
             boolean succeed=taskSaver.write(task,bytes);
             parcel.recycle();

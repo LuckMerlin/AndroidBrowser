@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Folder extends File implements PageListAdapter.Page<File>, Parcelable {
+public class Folder extends File implements PageListAdapter.Page<File> {
     private long mFrom;
     private ArrayList<File> mFiles;
 
@@ -79,33 +79,19 @@ public class Folder extends File implements PageListAdapter.Page<File>, Parcelab
         return getChildren();
     }
 
-    /////////////////////////////
-    private Folder(Parcel in) {
-        mFrom = in.readLong();
-        mFiles=in.readArrayList(in.getClass().getClassLoader());
+    @Override
+    public void onParcelRead(Parcel parcel) {
+        super.onParcelRead(parcel);
+        mFrom=parcel.readLong();
+        ArrayList<File> files=new ArrayList<>();
+        Parceler.readList(parcel,files,null);
+        mFiles=files;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(mFrom);
-        ArrayList<File> files=mFiles;
-        dest.writeParcelableArray(null!=files?files.toArray(new File[files.size()]):null,0);
+    public void onParcelWrite(Parcel parcel) {
+        super.onParcelWrite(parcel);
+        parcel.writeLong(mFrom);
+        Parceler.writeList(parcel,mFiles);
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<Folder> CREATOR = new Creator<Folder>() {
-        @Override
-        public Folder createFromParcel(Parcel in) {
-            return new Folder(in);
-        }
-
-        @Override
-        public Folder[] newArray(int size) {
-            return new Folder[size];
-        }
-    };
 }

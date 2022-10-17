@@ -48,7 +48,7 @@ public class FilesCopyTask extends FilesTask {
     @Override
     public void onParcelWrite(Parcel parcel) {
         super.onParcelWrite(parcel);
-        parcel.writeParcelable(mToFolder,0);
+        Parceler.write(parcel,mToFolder);
         parcel.writeInt(mCoverEnabled?1:0);
         parcel.writeInt(mAppendEnable?1:0);
         parcel.writeInt(mDeleteSrcWhileSucceed?1:0);
@@ -57,8 +57,7 @@ public class FilesCopyTask extends FilesTask {
     @Override
     public void onParcelRead(Parcel parcel) {
         super.onParcelRead(parcel);
-        Parcelable toFolder=parcel.readParcelable(getClass().getClassLoader());
-        mToFolder=null!=toFolder&&toFolder instanceof Folder?(Folder)toFolder:null;
+        mToFolder=Parceler.read(parcel);
         mCoverEnabled=parcel.readInt()==1;
         mAppendEnable=parcel.readInt()==1;
         mDeleteSrcWhileSucceed=parcel.readInt()==1;

@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.utils.FileSize;
 import com.luckmerlin.core.Brief;
+import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.json.Json;
 import com.luckmerlin.json.JsonObject;
@@ -16,14 +17,52 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.util.logging.Handler;
 
-public class File extends JsonObject implements Brief,Permission, Parcelable {
+public class File implements Brief,Permission, ParcelObject {
+    private String mHost;
+    private long mUsedVolume;
+    private long mTotalVolume;
+    private long mModifyTime;
+    private long mLength;
+    private String mThumb;
+    private String mName;
+    private String mMime;
+    private int mPermission=PERMISSION_NONE;
+    private long mTotal;
+    private String mParent;
+    private String mSep;
+
+    public File(File file){
+        Parcel parcel=null!=file?Parceler.readParcel(Parceler.write(file)):null;
+        if (null!=parcel){
+            file.onParcelWrite(parcel);
+            parcel.recycle();
+        }
+    }
 
     public File(){
-        super();
+
     }
 
     public File(JSONObject json){
-        super(json);
+        applyJson(json);
+    }
+
+    public final File applyJson(JSONObject json){
+        if (null!=json&&json.length()>0){
+            mHost=json.optString(Label.LABEL_HOST,mHost);
+            mUsedVolume=json.optLong(Label.LABEL_USED_VOLUME,mUsedVolume);
+            mTotalVolume=json.optLong(Label.LABEL_TOTAL_VOLUME,mTotalVolume);
+            mThumb=json.optString(Label.LABEL_THUMB,mThumb);
+            mPermission=json.optInt(Label.LABEL_PERMISSION,mPermission);
+            mName=json.optString(Label.LABEL_NAME,mName);
+            mMime=json.optString(Label.LABEL_MIME,mMime);
+            mModifyTime=json.optLong(Label.LABEL_MODIFY_TIME,mModifyTime);
+            mLength=json.optLong(Label.LABEL_LENGTH,mLength);
+            mTotal=json.optLong(Label.LABEL_SIZE,mTotal);
+            mParent=json.optString(Label.LABEL_PARENT,mParent);
+            mSep=json.optString(Label.LABEL_SEP,mSep);
+        }
+        return this;
     }
 
     public static File fromJson(Object json){
@@ -41,13 +80,14 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public String getHost() {
-        String host= optString(Label.LABEL_HOST,null);
+        String host= mHost;
         host=null!=host?host.trim():null;
         return null!=host&&host.length()>0&&Character.isDigit(host.charAt(0))?"http://"+host:host;
     }
 
     public File setHost(String host){
-        return putSafe(this,Label.LABEL_HOST,host);
+        mHost=host;
+        return this;
     }
 
     public final boolean isLocalFile(){
@@ -55,11 +95,11 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public final long getUsedVolume(){
-        return optLong(Label.LABEL_USED_VOLUME);
+        return mUsedVolume;
     }
 
     public final long getTotalVolume(){
-        return optLong(Label.LABEL_TOTAL_VOLUME);
+        return mTotalVolume;
     }
 
     public File getParentFile(){
@@ -67,11 +107,12 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public String getThumb(){
-        return optString("thumb",null);
+        return mThumb;
     }
 
     public File setThumb(String thumb){
-        return putSafe(this,"thumb",thumb);
+        mThumb=thumb;
+        return this;
     }
 
     public String getExtension(boolean include){
@@ -97,8 +138,9 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
         return new File(this).setParent(parent).setName(name);
     }
 
-    public File setUsedVolume(long children){
-        return putSafe(this,Label.LABEL_USED_VOLUME,children);
+    public File setUsedVolume(long usedVolume){
+        mUsedVolume=usedVolume;
+        return this;
     }
 
     public File setReadable(boolean readable){
@@ -126,23 +168,26 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public File setPermission(int permission){
-        return putSafe(this,Label.LABEL_PERMISSION,permission);
+        mPermission=permission;
+        return this;
     }
 
     public int getPermission(){
-        return optInt(Label.LABEL_PERMISSION,PERMISSION_NONE);
+        return mPermission;
     }
 
-    public File setTotalVolume(long children){
-        return putSafe(this,Label.LABEL_TOTAL_VOLUME,children);
+    public File setTotalVolume(long totalVolume){
+        mTotalVolume=totalVolume;
+        return this;
     }
 
     public String getName() {
-        return optString(Label.LABEL_NAME,null);
+        return mName;
     }
 
     public File setName(String name){
-        return putSafe(this,Label.LABEL_NAME,name);
+        mName=name;
+        return this;
     }
 
     public boolean isHostEquals(String host){
@@ -153,7 +198,7 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public String getMime(){
-        String mime=optString(Label.LABEL_MIME,null);
+        String mime=mMime;
         if (!isDirectory()&&(null==mime||mime.length()<=0)){
             mime=getExtension(false);
             mime=null!=mime&&mime.length()>0?MimeTypeMap.getSingleton().getMimeTypeFromExtension(mime):null;
@@ -167,31 +212,35 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public File setMime(String mime){
-        return putSafe(this,Label.LABEL_MIME,mime);
+        mMime=mime;
+        return this;
     }
 
     public long getModifyTime() {
-        return optLong(Label.LABEL_MODIFY_TIME,0);
+        return mModifyTime;
     }
 
     public File setModifyTime(long modifyTime){
-        return putSafe(this,Label.LABEL_MODIFY_TIME,modifyTime);
+        mModifyTime=modifyTime;
+        return this;
     }
 
     public long getLength() {
-        return optLong(Label.LABEL_LENGTH,0);
+        return mLength;
     }
 
     public File setLength(long length){
-        return putSafe(this,Label.LABEL_LENGTH,length);
+        mLength=length;
+        return this;
     }
 
     public long getTotal() {
-        return optLong(Label.LABEL_SIZE,-1);
+        return mTotal;
     }
 
     public File setTotal(long total){
-        return putSafe(this,Label.LABEL_SIZE,total);
+        mTotal=total;
+        return this;
     }
 
     public boolean isDirectory(){
@@ -199,19 +248,21 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
     }
 
     public String getParent(){
-        return optString(Label.LABEL_PARENT,null);
+        return mParent;
     }
 
     public File setParent(String parent){
-        return putSafe(this,Label.LABEL_PARENT,parent);
+        mParent=parent;
+        return this;
     }
 
     public String getSep(){
-        return optString(Label.LABEL_SEP,null);
+        return mSep;
     }
 
     public File setSep(String sep){
-        return putSafe(this,Label.LABEL_SEP,sep);
+        mSep=sep;
+        return this;
     }
 
     public final boolean isChild(Object pathObj,boolean parent){
@@ -282,32 +333,36 @@ public class File extends JsonObject implements Brief,Permission, Parcelable {
         }
         return super.equals(obj);
     }
-
-
 /////////////////////
     @Override
-    public int describeContents() {
-        return 0;
+    public void onParcelRead(Parcel parcel) {
+        mHost=parcel.readString();
+        mThumb=parcel.readString();
+        mParent=parcel.readString();
+        mSep=parcel.readString();
+        mName=parcel.readString();
+        mMime=parcel.readString();
+        mPermission=parcel.readInt();
+        mUsedVolume=parcel.readLong();
+        mTotalVolume=parcel.readLong();
+        mModifyTime=parcel.readLong();
+        mLength=parcel.readLong();
+        mTotal=parcel.readLong();
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(toString());
+    public void onParcelWrite(Parcel parcel) {
+        parcel.writeString(mHost);
+        parcel.writeString(mThumb);
+        parcel.writeString(mParent);
+        parcel.writeString(mSep);
+        parcel.writeString(mName);
+        parcel.writeString(mMime);
+        parcel.writeLong(mPermission);
+        parcel.writeLong(mUsedVolume);
+        parcel.writeLong(mTotalVolume);
+        parcel.writeLong(mModifyTime);
+        parcel.writeLong(mLength);
+        parcel.writeLong(mTotal);
     }
-
-    protected File(Parcel in) {
-        this(JsonObject.makeJson(in.readString()));
-    }
-
-    public static final Creator<File> CREATOR = new Creator<File>() {
-        @Override
-        public File createFromParcel(Parcel in) {
-            return new File(in);
-        }
-
-        @Override
-        public File[] newArray(int size) {
-            return new File[size];
-        }
-    };
 }

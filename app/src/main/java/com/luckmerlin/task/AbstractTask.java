@@ -26,7 +26,8 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     public void onParcelWrite(Parcel parcel) {
         parcel.writeString(mName);
         parcel.writeParcelable(mProgress,0);
-        Parceler.write(parcel,mResult);
+        Result result=mResult;
+        Parceler.write(parcel,null!=result&&result instanceof ParcelObject?(ParcelObject) result:null);
     }
 
     @Override

@@ -10,6 +10,8 @@ import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
+import com.luckmerlin.core.OnChangeUpdate;
+import com.luckmerlin.core.Parser;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
@@ -50,24 +52,15 @@ public abstract class FilesTask extends AbstractTask {
     public void onParcelWrite(Parcel parcel) {
         super.onParcelWrite(parcel);
         parcel.writeInt(mCursor);
-        FileArrayList files=mFiles;
-        parcel.writeParcelableArray(null!=files?files.toArrays():null,0);
+        Parceler.writeList(parcel,mFiles);
     }
 
     @Override
     public void onParcelRead(Parcel parcel) {
         super.onParcelRead(parcel);
         mCursor=parcel.readInt();
-        Parcelable[] files=parcel.readParcelableArray(getClass().getClassLoader());
-        FileArrayList arrayList=null;
-        if (null!=files){
-            arrayList=new FileArrayList();
-            for (Parcelable child:files) {
-                if (null!=child&&child instanceof File){
-                    arrayList.add((File) child);
-                }
-            }
-        }
+        FileArrayList arrayList=new FileArrayList();
+        Parceler.readList(parcel, arrayList,null);
         mFiles=arrayList;
     }
 
@@ -90,7 +83,7 @@ public abstract class FilesTask extends AbstractTask {
                 return response;
             }
         }
-        notifyProgress(progress.setPosition(size).setTitle(child.getName()));
+        notifyProgress(progress.setPosition(size).setTitle(null!=child?child.getName():null));
         return new Response<>(Code.CODE_SUCCEED,"Succeed");
     }
 

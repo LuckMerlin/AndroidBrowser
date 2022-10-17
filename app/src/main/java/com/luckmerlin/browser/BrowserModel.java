@@ -15,10 +15,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.Observable;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.ListAdapter;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.BindingGroup;
@@ -181,13 +183,13 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.share:
                 return null!=obj&&obj instanceof File&&shareFile((File)obj);
             case Mode.MODE_COPY:
-                return launchCopyFile(obj,clickId,getString(R.string.copy),Option.EXECUTE);
+                return launchCopyFile(obj,clickId,getString(R.string.copy),Option.LAUNCH);
             case Mode.MODE_UPLOAD:
-                return launchCopyFile(obj,clickId,getString(R.string.upload),Option.EXECUTE);
+                return launchCopyFile(obj,clickId,getString(R.string.upload),Option.LAUNCH);
             case Mode.MODE_DOWNLOAD:
-                return launchCopyFile(obj,clickId,getString(R.string.download),Option.EXECUTE);
+                return launchCopyFile(obj,clickId,getString(R.string.download),Option.LAUNCH);
             case Mode.MODE_MOVE:
-                return launchCopyFile(obj,clickId,getString(R.string.move),Option.EXECUTE);
+                return launchCopyFile(obj,clickId,getString(R.string.move),Option.LAUNCH);
             case R.string.delete:
                  return deleteFile(obj, true, false, (Result result)->
                          null!=result&&result.isSucceed()?1000:-1)||true;
@@ -268,7 +270,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
-        startTask(filesDeleteTask, Option.EXECUTE);
+        startTask(filesDeleteTask, Option.LAUNCH);
         return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingContent().setAutoDismiss(autoDismiss)))||true;
     }
 
