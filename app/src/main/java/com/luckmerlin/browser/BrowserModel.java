@@ -190,6 +190,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                          null!=result&&result.isSucceed()?1000:-1)||true;
             case R.string.goTo:
                 return goToFolder()||true;
+            case R.string.settings:
+                return toast(getString(R.string.settings))||true;
+
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -446,10 +449,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }else if (fileObj instanceof File){
             return browserPath(((File)fileObj).getPath());
         }else if (fileObj instanceof String){
-            BrowserListAdapter adapter=mBrowserAdapter;
             ObservableField<String> field=getSearchInput();
-            String searchInput=null!=field?field.get():null;
-            return null!=adapter&&browserPath(new BrowseQuery((String)fileObj,searchInput));
+            return browserPath(new BrowseQuery((String)fileObj,null!=field?field.get():null));
         }else if (fileObj instanceof BrowseQuery){
             BrowserListAdapter adapter=mBrowserAdapter;
             return null!=adapter&&adapter.reset((BrowseQuery) fileObj,null);

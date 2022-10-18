@@ -401,11 +401,6 @@ public class LocalClient extends AbstractClient {
                 }
             }
         }
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         boolean ddd=file.delete();
         Debug.D("EEEE "+ddd+" "+file);
         int code=!file.exists()?Code.CODE_SUCCEED:Code.CODE_FAIL;

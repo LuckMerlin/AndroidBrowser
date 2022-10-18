@@ -24,6 +24,7 @@
                 <TextView  binding:bind="@{VB.clickId(R.string.create)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.multiChoose)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.goTo)}" style="@style/contextMenuTextView" />
+                <TextView  binding:bind="@{VB.clickId(R.string.settings)}" style="@style/contextMenuTextView" />
                 <TextView  binding:bind="@{VB.clickId(R.string.exit)}" style="@style/contextMenuTextView" />
             </LinearLayout>
         </ScrollView>
