@@ -343,7 +343,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     if (null!=binding){
                         binding.setClient(data);
                         binding.setListener((OnClickListener)(View view, int clickId, int count, Object obj)-> {
-                            mBrowserAdapter.setClient(data);
+                            selectClient(data);
                             popupWindow.dismiss();
                             return true;
                         });
@@ -414,7 +414,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             Brief brief=doing.getFrom();
             brief=null!=brief?brief:doing.getTo();
             return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
-        }else if (doing.isDoingMode(Mode.MODE_COPY)){
+        }else if (doing.isDoingMode(Mode.MODE_COPY)||doing.isDoingMode(Mode.MODE_UPLOAD)||doing.isDoingMode(Mode.MODE_DOWNLOAD)){
             Brief to=doing.getTo();
             File toFile=null!=to&&to instanceof File?(File)to:null;
             return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&& null!=(toFile=toFile.getParentFile())&&
@@ -518,7 +518,16 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 }
                 return false;
             });
-            return null!=clients[0]&&mBrowserAdapter.setClient(clients[0]);
+            return null!=clients[0]&&selectClient(clients[0]);
+        }
+        return false;
+    }
+
+    private boolean selectClient(Client client){
+        if (null!=client&&mBrowserAdapter.setClient(client)){
+//            return client.loadMeta(getExecutor(), (Response<ClientMeta> data)-> {
+//                mBrowserAdapter.setClient(client);
+//            });
         }
         return false;
     }
@@ -616,9 +625,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     toast(getString(R.string.canNotOperateHere));
                     return true;
                 }
+                entryMode(null);
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Option.EXECUTE,true)&&false;
+                return launchTask(uploadTask,Option.LAUNCH,true)&&false;
             }));
         }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
@@ -629,9 +639,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     toast(getString(R.string.canNotOperateHere));
                     return true;
                 }
+                entryMode(null);
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Option.EXECUTE,true)&&false;
+                return launchTask(uploadTask,Option.LAUNCH,true)&&false;
             }));
         }
         return false;

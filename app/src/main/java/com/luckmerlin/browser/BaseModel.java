@@ -47,7 +47,11 @@ public abstract class BaseModel extends BaseContent {
         }
     }
 
-    public final <T> Canceler request(Request request, OnHttpParse<T> parser,OnFinish<T> onFinish){
+    public final ExecutorService getExecutor() {
+        return mExecutor;
+    }
+
+    public final <T> Canceler request(Request request, OnHttpParse<T> parser, OnFinish<T> onFinish){
         execute(()->{
             T data=call(request,parser);
             post(()->notifyFinish(data,onFinish));

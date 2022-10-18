@@ -110,4 +110,14 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="cutImageStyle">
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">15dp</item>
+    </style>
+    <!-- 圆角图片 -->
+    <style name="roundedCornerStyle">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">8dp</item>
+    </style>
 </resources>

@@ -115,7 +115,8 @@ public class ConveyorActivityModel extends BaseModel implements
         confirm.setName(title).setMessage(task.getName());
         confirm.setBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.sure).
                 setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
-                        ((confirmContent.removeFromParent()||true)&&cancelTask(task, Option.DELETE)&&
+                        ((confirmContent.removeFromParent()||true)&&executeTask(task,
+                                Option.DELETE|Option.CANCEL)&&
                                 mConveyorListAdapter.remove(task))||true),
                 ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                         confirmContent.removeFromParent()||true)));
@@ -163,14 +164,9 @@ public class ConveyorActivityModel extends BaseModel implements
         }
     }
 
-    private boolean cancelTask(Object task, int option){
+    private boolean executeTask(Object task,int option){
         Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.execute(task, option|Option.CANCEL);
-    }
-
-    private boolean executeTask(Object task){
-        Executor executor=null!=task?mExecutor:null;
-        return null!=executor&&executor.execute(task, Option.EXECUTE);
+        return null!=executor&&executor.execute(task, option);
     }
 
     public final ConveyorListAdapter getConveyorListAdapter() {

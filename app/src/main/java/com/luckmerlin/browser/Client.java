@@ -18,6 +18,8 @@ import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 
+import java.util.concurrent.ExecutorService;
+
 public interface Client {
     @Deprecated
     String getName();

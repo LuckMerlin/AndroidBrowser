@@ -138,7 +138,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         executeTask.setOption(Option.isOptionEnabled(optionArg,Option.RESET)?(optionArg&~Option.RESET): executeTask.getOption()|optionArg);
         //Check save
         if (!innerTask){
-            if (Option.isOptionEnabled(optionArg,Option.NOT_SAVE)){
+            if (Option.isOptionEnabled(optionArg,Option.DELETE)){
                 deleteSaveTask(executeTask);
             }else{
                 boolean saved=saveTask(task,optionArg);
@@ -187,10 +187,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         if (null!=executeTask){
             TaskSaver taskSaver=mTaskSaver;
             boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
-            if (executeTask.isBackgroundEnabled()){
-                removeFromQueue(executeTask);
-                updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
-            }
+            removeFromQueue(executeTask);
+            updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
             return succeed;
         }
         return false;
@@ -286,7 +284,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Progress progress=null;
             if (deleteSucceed&&null!=(progress=mTask.getProgress())&&progress.isSucceed()){
                 deleteSaveTask(this);
-            }else if (!Option.isOptionEnabled(getOption(),Option.NOT_SAVE)){
+            }else if (!Option.isOptionEnabled(getOption(),Option.DELETE)){
                 saveTask(mTask,getOption());
             }else if (mSaved){
                 deleteSaveTask(this);

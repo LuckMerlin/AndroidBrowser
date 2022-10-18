@@ -32,7 +32,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
+public class UriFileUploadTask extends FileTask {
     private ArrayList<Parcelable> mUris;
     private final Folder mFolder;
 
@@ -85,7 +85,7 @@ public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
         final List<Parcelable> uploadList=new ArrayList<>();
         final OnProgressChange onProgressChange=(Task task, Progress progress1)-> {
             if (null!=progress1){
-                notifyProgress(progress.setSubProgress(progress1).setData(progress1.getData()));
+                notifyProgress(progress.setSubProgress(progress1).setDoing(progress1.getDoing()));
             }
         };
         Result childResult=null;
@@ -100,6 +100,7 @@ public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
             uploadList.add(parcelable);
         }
         uris.removeAll(uploadList);
+        notifyProgress(progress);
         return childResult;
     }
 
@@ -166,11 +167,12 @@ public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
                 public void close() throws IOException {
                     Utils.closeStream(finalInputStream,finalOutputStream);
                 }
-            }, outputStream).execute(runtime,(Task task, Progress progress)-> {
+            }, outputStream).execute(runtime,null!=callback?(Task task, Progress progress)-> {
                 if (null!=progress){
-                    notifyProgress(progress.setData(doingFiles));
+                    notifyProgress(progress.setDoing(doingFiles.setProgress(progress.intValue())));
                 }
-            });
+                callback.onProgressChanged(task,progress);
+            }:null);
         } catch (FileNotFoundException e) {
             Debug.D("Exception execute uri upload.e="+e+" "+this);
             e.printStackTrace();
@@ -178,10 +180,5 @@ public class UriFileUploadTask extends FileTask implements OnExecuteFinish {
         }finally {
             Utils.closeStream(inputStream,outputStream);
         }
-    }
-
-    @Override
-    public boolean onExecuteFinish(TaskExecutor executor) {
-        return true;//Remove succeed.
     }
 }
