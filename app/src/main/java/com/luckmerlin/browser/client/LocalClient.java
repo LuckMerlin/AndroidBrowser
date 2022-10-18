@@ -63,10 +63,9 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter) {
+    public Response<Folder> listFiles(String pathValue, long start, int size, BrowseQuery filter) {
         size=size<=0?10:size;
         start=start<=0?0:start;
-        String pathValue=null!=folder?folder.getPath():null;
         String browserPath=null!=pathValue&&pathValue.length()>0?pathValue:mRootPath;
         final java.io.File browserFile=null!=browserPath&&browserPath.length()>0?new java.io.File(browserPath):null;
         if (null==browserFile){

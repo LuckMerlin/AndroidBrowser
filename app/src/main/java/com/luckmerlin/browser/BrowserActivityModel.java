@@ -193,7 +193,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
     private boolean browserPath(File file){
         BrowserListAdapter adapter=mBrowserAdapter;
         String searchInput=mSearchInput.get();
-        return null!=file&&null!=adapter&&adapter.reset(new BrowseQuery(file,searchInput),null);
+        return null!=file&&null!=adapter&&adapter.reset(new BrowseQuery(file.getPath(),searchInput),null);
     }
 
     private boolean selectNextClient(){

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="content" type="com.luckmerlin.browser.dialog.GoToFolderContent" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
+    </data>
+    <LinearLayout android:orientation="vertical" android:layout_marginTop="5dp" android:layout_marginBottom="5dp"
+        android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <EditText android:text="@={content.inputPath}" android:hint="@{content.hint??``}" style="@style/editText"
+            android:layout_marginBottom="5dp" android:layout_marginLeft="15dp" android:layout_marginRight="15dp" />
+    </LinearLayout>
+</layout>

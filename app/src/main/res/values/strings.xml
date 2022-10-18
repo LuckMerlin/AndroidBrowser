@@ -47,6 +47,7 @@
     <string name="inputEmpty">Input empty</string>
     <string name="inputWhich">Input %1s</string>
     <string name="name">Name</string>
+    <string name="path">Path</string>
     <string name="executing">Executing</string>
     <string name="timeoutWhich">%1s timeout</string>
     <string name="prepare">Prepare</string>

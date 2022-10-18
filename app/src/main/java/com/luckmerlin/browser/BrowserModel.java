@@ -35,6 +35,7 @@ import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
+import com.luckmerlin.browser.dialog.GoToFolderContent;
 import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.RenameFileContent;
 import com.luckmerlin.browser.file.Doing;
@@ -171,8 +172,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                         entryMode(null);
                         return (null!=args&&args.size()>0&&BrowserModel.this.onClick(view1,clickId1,count,args))||true;
                 })));
-            case R.string.goTo:
-                return true;
             case R.drawable.selector_checkbox:
                 return null!=obj&&obj instanceof File&&toggleSelectFile((File)obj);
             case R.drawable.selector_cancel:
@@ -189,6 +188,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.delete:
                  return deleteFile(obj, true, false, (Result result)->
                          null!=result&&result.isSucceed()?1000:-1)||true;
+            case R.string.goTo:
+                return goToFolder()||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -322,6 +323,18 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }
 
+
+    private boolean goToFolder(){
+        return null!=showContentDialog(new GoToFolderContent(){
+            @Override
+            protected boolean onGoToFolder(String inputPath) {
+                removeFromParent();
+                return browserPath(inputPath);
+            }
+        }.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
+                setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
+    }
+
     private boolean selectClients(View view,Client client){
         BrowserExecutor executor=mExecutor;
         if (null==view||null==executor){
@@ -427,11 +440,21 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return false;
     }
 
-    private boolean browserPath(File file){
-        BrowserListAdapter adapter=mBrowserAdapter;
-        ObservableField<String> field=getSearchInput();
-        String searchInput=null!=field?field.get():null;
-        return null!=file&&null!=adapter&&browserPath(new BrowseQuery(file,searchInput));
+    private boolean browserPath(Object fileObj){
+        if (null==fileObj){
+            return false;
+        }else if (fileObj instanceof File){
+            return browserPath(((File)fileObj).getPath());
+        }else if (fileObj instanceof String){
+            BrowserListAdapter adapter=mBrowserAdapter;
+            ObservableField<String> field=getSearchInput();
+            String searchInput=null!=field?field.get():null;
+            return null!=adapter&&browserPath(new BrowseQuery((String)fileObj,searchInput));
+        }else if (fileObj instanceof BrowseQuery){
+            BrowserListAdapter adapter=mBrowserAdapter;
+            return null!=adapter&&adapter.reset((BrowseQuery) fileObj,null);
+        }
+        return false;
     }
 
     private boolean showFolderFilesChangeAlert(String name){
@@ -489,11 +512,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             list.addFirst(alertText);
         }
         return true;
-    }
-
-    private boolean browserPath(BrowseQuery query){
-        BrowserListAdapter adapter=mBrowserAdapter;
-        return null!=adapter&&adapter.reset(query,null);
     }
 
     private boolean selectNextClient(){

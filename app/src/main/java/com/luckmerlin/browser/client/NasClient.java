@@ -119,8 +119,7 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter){
-        String folderPath=null!=folder?folder.getPath():null;
+    public Response<Folder> listFiles(String folderPath, long start, int size, BrowseQuery filter){
         return mHttp.call(new Request().url("/file/browser").
                 headerEncode(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
                 header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).post(),

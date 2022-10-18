@@ -31,7 +31,7 @@ public interface Client {
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);
     Response<File> deleteFile(File file, OnFileDeleteUpdate update);
-    Response<Folder> listFiles(File folder,long start,int size,BrowseQuery filter);
+    Response<Folder> listFiles(String folder,long start,int size,BrowseQuery filter);
     Drawable loadThumb(View root, File file, Canceled canceled);
     Response<InputStream> openInputStream(long skip,File file);
     Response<OutputStream> openOutputStream(File file);

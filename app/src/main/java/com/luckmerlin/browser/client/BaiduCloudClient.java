@@ -91,7 +91,7 @@ public class BaiduCloudClient extends AbstractClient{
     }
 
     @Override
-    public Response<Folder> listFiles(File folder, long start, int size, BrowseQuery filter) {
+    public Response<Folder> listFiles(String folder, long start, int size, BrowseQuery filter) {
         return null;
     }
 }

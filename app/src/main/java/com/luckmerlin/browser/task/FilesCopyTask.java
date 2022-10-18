@@ -121,7 +121,7 @@ public class FilesCopyTask extends FilesTask {
                     Debug.E("Canceled copy directory.");
                     return new Response<>(Code.CODE_CANCEL,"Canceled.");
                 }
-                if (null == (folderResponse = fromClient.listFiles(fromFile, browseStart, 20,
+                if (null == (folderResponse = fromClient.listFiles(fromFile.getPath(), browseStart, 20,
                         null)) || !folderResponse.isSucceed()) {
                     Debug.E("Fail copy directory while browse directory fail."+folderResponse);
                     return folderResponse;//Browser folder fail
