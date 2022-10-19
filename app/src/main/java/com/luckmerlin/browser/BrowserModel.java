@@ -82,8 +82,7 @@ import java.util.LinkedList;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
         OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick,
-        OnViewDetachedFromWindow, OnClickListener, OnLongClickListener, OnBackPress,
-        OnActivityNewIntent, OnActivityStart {
+        OnViewDetachedFromWindow, OnClickListener, OnLongClickListener, OnBackPress, OnActivityNewIntent, OnActivityStart {
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
     private final ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private final ObservableField<AlertText> mAlertText=new ObservableField<>();
@@ -557,6 +556,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
             //Test
+            startActivity(SettingsActivity.class);
 //            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test

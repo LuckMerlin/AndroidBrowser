@@ -26,6 +26,7 @@ import com.luckmerlin.browser.databinding.ItemBrowserFileGirdBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
+import com.luckmerlin.browser.settings.Settings;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnConfirm;
@@ -120,9 +121,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         }
         boolean[] canceled=new boolean[]{false};
         execute(()->{
-            Response<Folder> response=client.listFiles(null!=args?args.mFolder:null,fromIndex,pageSize,args);
+            String browserPath=null!=args?args.mFolder:null;
+            browserPath=null!=browserPath&&browserPath.length()>0?browserPath:Settings.getInstance().getClientLatestBrowserPath(client);
+            Response<Folder> response=client.listFiles(browserPath,fromIndex,pageSize,args);
             if (!canceled[0]){
-                callback.onPageLoad(null!=response&&response.isSucceed(),null!=response?response.getData():null);
+                boolean succeed=null!=response&&response.isSucceed();
+                callback.onPageLoad(succeed,null!=response?response.getData():null);
+                if (succeed&&Settings.getInstance().insertClientBrowserPath(client,browserPath)){//Save client latest browser path
+                    Settings.getInstance().save(getContext());
+                }
             }
         });
         return ()->canceled[0]=true;

@@ -402,7 +402,6 @@ public class LocalClient extends AbstractClient {
             }
         }
         boolean ddd=file.delete();
-        Debug.D("EEEE "+ddd+" "+file);
         int code=!file.exists()?Code.CODE_SUCCEED:Code.CODE_FAIL;
         notifyDeleteUpdate(code,"Finish delete.", fileObj,update);
         return new Response(code,"Finish");

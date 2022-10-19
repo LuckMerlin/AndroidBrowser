@@ -33,6 +33,7 @@ public abstract class BaseModel extends BaseContent {
     private WindowContentDialog mWindowDialog;
     private PopupWindow mPopupWindow;
     private final ObservableField<String> mSearchInput=new ObservableField<>();
+    private final ObservableField<String> mTitle=new ObservableField<>();
     private final ObservableField<Binding> mRightMenuBinding=new ObservableField<>();
 
     private static ExecutorService mExecutor= Executors.newCachedThreadPool((Runnable r)-> {
@@ -57,6 +58,10 @@ public abstract class BaseModel extends BaseContent {
             post(()->notifyFinish(data,onFinish));
         });
         return ()->false;
+    }
+
+    public final void setTitle(String title) {
+        mTitle.set(title);
     }
 
     public final void setRightMenuBinding(Binding binding) {
@@ -131,5 +136,9 @@ public abstract class BaseModel extends BaseContent {
 
     public final ObservableField<Binding> getRightMenuBinding(){
         return mRightMenuBinding;
+    }
+
+    public final ObservableField<String> getTitle() {
+        return mTitle;
     }
 }

@@ -19,6 +19,8 @@
     <string name="contentChanged">Content changed</string>
     <string name="exit">Exit</string>
     <string name="attr">Attribute</string>
+    <string name="search">Search</string>
+    <string name="general">General</string>
     <string name="cancel">Cancel</string>
     <string name="append">Append</string>
     <string name="time">Time</string>

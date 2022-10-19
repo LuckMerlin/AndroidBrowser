@@ -15,9 +15,16 @@
         <ImageView binding:bind="@{VB.clickId(R.drawable.selector_back)}" android:padding="5dp"
             android:layout_width="40dp" android:layout_height="40dp"/>
 
+        <TextView android:visibility="@{model.title.length()>0?View.VISIBLE:View.GONE}" android:textSize="18sp"
+            android:text="@{model.title??``}" android:textStyle="bold" android:textColor="@color/textMain"
+            android:gravity="center" android:paddingBottom="5dp" android:paddingTop="5dp"
+            android:layout_weight="1" android:paddingLeft="10dp" android:paddingRight="10dp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
         <LinearLayout android:background="@drawable/edit_round_bg" android:layout_weight="1"
             android:layout_width="wrap_content" android:layout_height="wrap_content"
             android:paddingLeft="10dp" android:paddingRight="10dp"
+            android:visibility="@{model.title.length()>0?View.GONE:View.VISIBLE}"
             android:paddingBottom="5dp" android:paddingTop="5dp" android:gravity="center">
             <ImageView binding:bind="@{VB.clickId(R.drawable.selector_search)}" android:padding="5dp"
                 android:layout_width="30dp" android:layout_height="30dp"/>
