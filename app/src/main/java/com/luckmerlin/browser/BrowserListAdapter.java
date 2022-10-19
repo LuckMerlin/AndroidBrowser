@@ -122,13 +122,13 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         boolean[] canceled=new boolean[]{false};
         execute(()->{
             String browserPath=null!=args?args.mFolder:null;
-            browserPath=null!=browserPath&&browserPath.length()>0?browserPath:Settings.getInstance().getClientLatestBrowserPath(client);
+            browserPath=null!=browserPath&&browserPath.length()>0?browserPath:Settings.I().getClientLatestBrowserPath(client);
             Response<Folder> response=client.listFiles(browserPath,fromIndex,pageSize,args);
             if (!canceled[0]){
                 boolean succeed=null!=response&&response.isSucceed();
                 callback.onPageLoad(succeed,null!=response?response.getData():null);
-                if (succeed&&Settings.getInstance().insertClientBrowserPath(client,browserPath)){//Save client latest browser path
-                    Settings.getInstance().save(getContext());
+                if (succeed&&Settings.I().insertClientBrowserPath(client,browserPath)){//Save client latest browser path
+                    //Do nothing
                 }
             }
         });

@@ -10,6 +10,7 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="android.text.method.LinkMovementMethod"/>
         <import type="com.luckmerlin.binding.LayoutBinding"/>
+        <import type="com.luckmerlin.browser.settings.Settings"/>
     </data>
 
     <FrameLayout android:paddingLeft="10dp" android:paddingRight="10dp" android:background="@color/modelBackground"
@@ -22,9 +23,16 @@
                 android:layout_marginBottom="5dp" android:layout_marginTop="5dp"
                 android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
-            <TextView android:text="@string/general" android:textColor="@color/textMain"
-                android:textStyle="bold" android:textSize="12sp"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="5dp">
+                <TextView android:text="@string/general" android:textColor="@color/textMain"
+                    android:textStyle="bold" android:textSize="15sp" android:layout_marginBottom="5dp"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <CheckBox android:button="@drawable/selector_checkbox" android:text="@string/browserLastPath"
+                    android:textColor="@color/textMain" android:textSize="12sp"
+                    android:checked="@={Settings.I().isBrowserLastPathEnable()}"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            </LinearLayout>
 
         </LinearLayout>
     </FrameLayout>

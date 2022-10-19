@@ -190,7 +190,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.goTo:
                 return goToFolder()||true;
             case R.string.settings:
-                return toast(getString(R.string.settings))||true;
+                return startActivity(SettingsActivity.class)||true;
 
         }
         if (null!=obj&&obj instanceof File){
@@ -556,7 +556,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             conveyorBinder.putListener(this, null, false);
             selectNextClient();
             //Test
-            startActivity(SettingsActivity.class);
+//            startActivity(SettingsActivity.class);
 //            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
