@@ -48,21 +48,6 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public String getName() {
-        return "Local";
-    }
-
-    @Override
-    public String getHost() {
-        return null;
-    }
-
-    @Override
-    public Object getIcon() {
-        return null;
-    }
-
-    @Override
     public Response<Folder> listFiles(String pathValue, long start, int size, BrowseQuery filter) {
         size=size<=0?10:size;
         start=start<=0?0:start;

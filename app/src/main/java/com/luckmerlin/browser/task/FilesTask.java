@@ -20,7 +20,7 @@ import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
-public abstract class FilesTask extends AbstractTask {
+public abstract class FilesTask extends FileTask {
     private FileArrayList mFiles;
     private int mCursor;
 
@@ -85,20 +85,6 @@ public abstract class FilesTask extends AbstractTask {
         }
         notifyProgress(progress.setPosition(size).setTitle(null!=child?child.getName():null));
         return new Response<>(Code.CODE_SUCCEED,"Succeed");
-    }
-
-    public final Client getFileClient(File file){
-        if (null==file){
-            return null;
-        }
-        MatchedCollector<Client> collector=new MatchedCollector<Client>(1).
-                setMatcher((obj)->null!=obj&&file.isHostEquals(obj.getHost())?true:false);
-        return client(collector)?collector.getFirstMatched():null;
-    }
-
-    public final boolean client(Matcher<Client> matcher){
-        Executor executor=getExecutor();
-        return null!=executor&&executor instanceof BrowserExecutor &&((BrowserExecutor)executor).client(matcher);
     }
 
 }

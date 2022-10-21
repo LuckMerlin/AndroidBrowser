@@ -21,12 +21,6 @@ import com.luckmerlin.stream.OutputStream;
 import java.util.concurrent.ExecutorService;
 
 public interface Client {
-    @Deprecated
-    String getName();
-    @Deprecated
-    String getHost();
-    @Deprecated
-    Object getIcon();
     ClientMeta getMeta();
     Canceler setHome(File file, OnFinish<Reply<File>> onFinish);
     Response<File> createFile(File parent,String name,boolean isDir);

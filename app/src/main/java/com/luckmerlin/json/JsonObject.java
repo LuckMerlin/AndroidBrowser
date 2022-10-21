@@ -1,5 +1,8 @@
 package com.luckmerlin.json;
 
+import androidx.annotation.NonNull;
+
+import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Parser;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,36 +78,38 @@ public class JsonObject extends JSONObject{
 
     public final JsonObject putSafe(String key,Object value){
         try {
-            return put(key,value);
+            return put(this,key,value);
         } catch (JSONException e) {
             e.printStackTrace();
             return this;
         }
     }
 
-    public final <T extends JsonObject> T putSafe(T json,String key,Object value) {
+    public final <T extends JSONObject> T putSafe(T json,String key,Object value) {
         if (null!=json){
-            json.putSafe(key,value);
-        }
-        return json;
-    }
-
-    public final <T extends JsonObject> T put(T json,String key,Object value) throws JSONException {
-        if (null!=json){
-            json.put(key,value);
-        }
-        return json;
-    }
-
-    public final JsonObject put(String key,Object value) throws JSONException {
-        if (null!=key){
-            if (null==value){
-                super.remove(key);
-            }else{
-                super.put(key,value);
+            try {
+                put(json,key,value);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
-        return this;
+        return json;
+    }
+
+    public final <T extends JSONObject> T put(T json, String key, Object value) throws JSONException {
+        if (null!=json){
+            if (null!=key){
+                if (null==value){
+                    json.remove(key);
+                }else{
+                    json.put(key,value);
+                }
+                if (json instanceof OnJsonUpdate){
+                    ((OnJsonUpdate)json).onChangeUpdated(key);
+                }
+            }
+        }
+        return json;
     }
 
     public static JSONObject makeJson(Object json){

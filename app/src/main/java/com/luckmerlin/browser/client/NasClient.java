@@ -58,21 +58,6 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Object getIcon() {
-        return R.drawable.hidisk_icon_nas;
-    }
-
-    @Override
-    public String getName() {
-        return mName;
-    }
-
-    @Override
-    public String getHost() {
-        return mHost;
-    }
-
-    @Override
     public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
         return null;
     }
