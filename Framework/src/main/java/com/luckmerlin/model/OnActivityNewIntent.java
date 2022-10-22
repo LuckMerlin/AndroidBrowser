@@ -1,4 +1,4 @@
-package com.merlin.model;
+package com.luckmerlin.model;
 
 import android.app.Activity;
 import android.content.Intent;

@@ -2,12 +2,11 @@ package com.luckmerlin.browser.task;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.View;
 
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.Client;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.file.Doing;
@@ -30,8 +29,6 @@ import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.utils.Utils;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class FilesCopyTask extends FilesTask {

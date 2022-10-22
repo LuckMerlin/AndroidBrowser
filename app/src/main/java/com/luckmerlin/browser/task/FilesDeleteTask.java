@@ -1,7 +1,7 @@
 package com.luckmerlin.browser.task;
 
 import com.luckmerlin.browser.Client;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
@@ -10,7 +10,6 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
-import com.luckmerlin.task.TaskRestartEnabler;
 
 public class FilesDeleteTask extends FilesTask {
 

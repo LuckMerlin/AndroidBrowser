@@ -11,15 +11,13 @@ import android.view.ViewParent;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import androidx.databinding.ViewDataBinding;
-
 import com.luckmerlin.click.Listener;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
+import com.luckmerlin.model.ContentActivity;
 import com.luckmerlin.view.ViewIterate;
 import com.luckmerlin.view.ViewIterator;
-import com.merlin.model.ContentActivity;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -258,7 +256,7 @@ public class ViewBinding extends ObjectBinding {
                 if (context instanceof Activity){
                     if (makeIterate(context,iterator,iterated)){
                         return true;
-                    }else if (context instanceof ContentActivity&&makeIterate(((ContentActivity)context).getContent(),iterator,iterated)){
+                    }else if (context instanceof ContentActivity &&makeIterate(((ContentActivity)context).getContent(),iterator,iterated)){
                         return true;
                     }
                 }

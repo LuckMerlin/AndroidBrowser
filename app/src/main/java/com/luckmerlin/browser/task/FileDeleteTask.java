@@ -2,7 +2,7 @@
 //
 //import android.content.Context;
 //import com.luckmerlin.browser.Client;
-//import com.luckmerlin.browser.Code;
+//import com.luckmerlin.core.Code;
 //import com.luckmerlin.browser.R;
 //import com.luckmerlin.browser.file.DoingFiles;
 //import com.luckmerlin.browser.file.File;

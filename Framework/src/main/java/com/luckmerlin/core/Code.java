@@ -1,0 +1,20 @@
+package com.luckmerlin.core;
+
+public interface Code {
+    int CODE_UNKNOWN=1100000;
+    int CODE_FAIL=-1100099;
+    int CODE_SUCCEED=-1100100;
+    int CODE_ARGS_INVALID=-1100101;
+    int CODE_NOT_EXIST=-1100102;
+    int CODE_EMPTY=-1100103;
+    int CODE_ERROR=-1100104;
+    int CODE_CANCEL=-1100105;
+    int CODE_ALREADY=-1100106;
+    int CODE_EXIST=-1100107;
+    int CODE_CHANGE=-1100108;
+    int CODE_FINISH=-1100109;
+    int CODE_NONE_PERMISSION=-1100110;
+    int CODE_OUT_OF_BOUNDS=-1100111;
+    int CODE_SKIP=-1100112;
+    int CODE_INTERRUPT=-1100113;
+}

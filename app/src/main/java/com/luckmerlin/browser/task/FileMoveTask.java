@@ -1,6 +1,6 @@
 package com.luckmerlin.browser.task;
 
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
@@ -45,7 +45,7 @@ public class FileMoveTask extends FileTask{
         }
         final DoingFiles doingFiles=new DoingFiles();
         doingFiles.setDoingMode(Mode.MODE_MOVE).setProgress(0).setFrom(fromFile).setTo(toFile);
-        final Progress progress=new Progress().setPosition(0).setTotal(2).setData(doingFiles);
+        final Progress progress=new Progress().setPosition(0).setTotal(2).setDoing(doingFiles);
         notifyProgress(progress);
         if (fromFile.isLocalFile()&&toFile.isLocalFile()){//Move local file to local
             java.io.File fromLocalFile=new java.io.File(fromPath);
@@ -82,7 +82,7 @@ public class FileMoveTask extends FileTask{
         FileCopyTask fileCopyTask=new FileCopyTask(fromFile,toFile,null);
         final OnProgressChange progressChange=(Task task, Progress progress1)-> {
             Object progressData=progress1.getData();
-            notifyProgress(null==progressData?progress:progress.setData(progressData));
+            notifyProgress(null==progressData?progress:progress.setDoing(progressData));
         };
         Result result=fileCopyTask.execute(runtime, progressChange);
         if (!(result=null!=result?result:new Response(Code.CODE_UNKNOWN,"Copy task unknown error.")).isSucceed()){

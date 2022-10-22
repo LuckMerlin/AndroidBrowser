@@ -8,7 +8,7 @@ import android.os.Parcelable;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.luckmerlin.browser.Client;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Utils;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
@@ -18,13 +18,10 @@ import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.OutputStream;
-import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnExecuteFinish;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskExecutor;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -85,7 +82,7 @@ public class UriFileUploadTask extends FileTask {
         final List<Parcelable> uploadList=new ArrayList<>();
         final OnProgressChange onProgressChange=(Task task, Progress progress1)-> {
             if (null!=progress1){
-                notifyProgress(progress.setSubProgress(progress1).setDoing(progress1.getDoing()));
+                notifyProgress(progress.setDoing(progress1.getDoing()));
             }
         };
         Result childResult=null;

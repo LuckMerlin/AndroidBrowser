@@ -4,7 +4,7 @@ import android.content.Context;
 import android.view.View;
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ViewBinding;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.browser.file.Doing;

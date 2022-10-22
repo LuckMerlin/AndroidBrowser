@@ -2,12 +2,8 @@ package com.luckmerlin.core;
 
 import android.os.Parcel;
 
-import com.luckmerlin.browser.file.File;
 import com.luckmerlin.object.ObjectCreator;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public interface ParcelObject {
     void onParcelRead(Parcel parcel);

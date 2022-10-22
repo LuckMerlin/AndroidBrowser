@@ -2,7 +2,7 @@ package com.luckmerlin.core;
 
 import android.os.Parcel;
 
-public class Response<T> implements MessageResult ,CodeResult<T>,ParcelObject {
+public class Response<T> implements MessageResult ,ParcelObject {
     private int mCode;
     private String mMsg;
     private T mData;
@@ -55,7 +55,6 @@ public class Response<T> implements MessageResult ,CodeResult<T>,ParcelObject {
         return setCode(code).setMsg(msg).setData(data);
     }
 
-    @Override
     public final int getCode(int def) {
         Integer code=mCode;
         return null!=code?code:def;
@@ -66,7 +65,6 @@ public class Response<T> implements MessageResult ,CodeResult<T>,ParcelObject {
         return mMsg;
     }
 
-    @Override
     public final T getData() {
         return mData;
     }

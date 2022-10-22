@@ -6,14 +6,11 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import androidx.databinding.ViewDataBinding;
-
-import com.luckmerlin.binding.BindingGroup;
 import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.SettingsModelBinding;
-import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.settings.Settings;
 import com.luckmerlin.click.OnClickListener;
-import com.merlin.model.OnActivityCreate;
+import com.luckmerlin.model.OnActivityCreate;
 
 public class SettingsModel extends BaseModel implements OnActivityCreate, OnClickListener {
     private Settings mSettings;

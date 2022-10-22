@@ -15,19 +15,9 @@ import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-
-import com.luckmerlin.browser.client.LocalClient;
-import com.luckmerlin.browser.file.File;
-import com.luckmerlin.browser.task.FilesDeleteTask;
-import com.luckmerlin.core.OnInvoke;
-import com.luckmerlin.core.ParcelObject;
-import com.luckmerlin.core.Parser;
-import com.luckmerlin.debug.Debug;
-import com.luckmerlin.object.ObjectCreator;
 import com.luckmerlin.view.Content;
-import com.merlin.model.ContentActivity;
 
-public class BrowserActivity extends ContentActivity {
+public class BrowserActivity extends BrowserContentActivity {
     private final static int REQUEST_PERMISSION_CODE=1099;
 
     @Override

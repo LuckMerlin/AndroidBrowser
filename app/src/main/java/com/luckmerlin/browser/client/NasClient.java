@@ -5,41 +5,31 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.View;
-
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.ClientMeta;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.Utils;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
-import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.browser.http.MResponse;
 import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
-import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.AnswerBody;
 import com.luckmerlin.http.Connection;
 import com.luckmerlin.http.Headers;
-import com.luckmerlin.http.OnHttpParse;
 import com.luckmerlin.http.Request;
 import com.luckmerlin.http.Http;
 import com.luckmerlin.http.Requested;
-import com.luckmerlin.json.Json;
 import com.luckmerlin.stream.InputStream;
-import com.luckmerlin.stream.InputStreamReader;
 import com.luckmerlin.stream.OutputStream;
-
 import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class NasClient extends AbstractClient{
@@ -58,7 +48,7 @@ public class NasClient extends AbstractClient{
     }
 
     @Override
-    public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
+    public Canceler setHome(File file, OnFinish<Response<File>> onFinish) {
         return null;
     }
 

@@ -4,13 +4,10 @@ import android.content.Context;
 import android.view.View;
 import androidx.databinding.ObservableField;
 import com.luckmerlin.browser.BaseContent;
-import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.CreateFileContentDialogBinding;
 import com.luckmerlin.browser.file.File;
-import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Response;
 
 @Deprecated
 public abstract class CreateFileDialogContent extends BaseContent implements OnClickListener {

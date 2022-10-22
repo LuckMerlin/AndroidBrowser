@@ -2,6 +2,7 @@ package com.luckmerlin.browser.utils;
 
 import java.math.BigDecimal;
 
+@Deprecated
 public final class FileSize {
 
     public static String formatSizeText(Object fileSize){

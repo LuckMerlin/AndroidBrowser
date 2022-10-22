@@ -22,6 +22,7 @@ import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
+import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.RestartEnabler;
@@ -29,7 +30,6 @@ import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
-import com.merlin.model.OnBackPress;
 
 public class ConveyorActivityModel extends BaseModel implements
         OnViewAttachedToWindow, OnViewDetachedFromWindow, OnBackPress, OnClickListener,

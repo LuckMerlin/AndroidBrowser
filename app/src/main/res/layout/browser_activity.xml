@@ -5,7 +5,7 @@
         <variable name="vm" type="com.luckmerlin.browser.BrowserActivityModel" />
         <import type="android.text.Html"/>
         <import type="android.view.View"/>
-        <import type="com.luckmerlin.browser.utils.FileSize"/>
+        <import type="com.luckmerlin.utils.Utils"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.text.method.LinkMovementMethod"/>
@@ -34,7 +34,7 @@
                 <LinearLayout android:layout_width="match_parent" android:orientation="horizontal" android:layout_height="wrap_content">
                     <ImageView android:src="@drawable/switch_thumb_activated" android:layout_gravity="center_vertical"
                         android:layout_marginRight="5dp" android:layout_width="10dp" android:layout_height="10dp"/>
-                    <TextView android:text='@{""+FileSize.formatSizeText(vm.browserAdapter.currentFolder.usedVolume)+"/"+FileSize.formatSizeText(vm.browserAdapter.currentFolder.totalVolume)}'
+                    <TextView android:text='@{""+Utils.formatSizeText(vm.browserAdapter.currentFolder.usedVolume)+"/"+Utils.formatSizeText(vm.browserAdapter.currentFolder.totalVolume)}'
                         style="@style/titleSubNormalTextView" android:layout_width="wrap_content"
                         android:visibility="@{null==vm.browserAdapter.browserClient?View.GONE:View.VISIBLE}" android:singleLine="true" android:layout_height="wrap_content"/>
                     <Space android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content"/>

@@ -1,9 +1,8 @@
 package com.luckmerlin.browser;
 
 import com.luckmerlin.view.Content;
-import com.merlin.model.ContentActivity;
 
-public class SettingsActivity extends ContentActivity {
+public class SettingsActivity extends BrowserContentActivity {
 
     @Override
     public Content onResolveContent() {

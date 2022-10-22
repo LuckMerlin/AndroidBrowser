@@ -1,6 +1,6 @@
 package com.luckmerlin.task;
 
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.Response;

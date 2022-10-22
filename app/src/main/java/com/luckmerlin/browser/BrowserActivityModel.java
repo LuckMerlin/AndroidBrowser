@@ -29,13 +29,10 @@ import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
-import com.luckmerlin.browser.task.FileCopyTask;
-import com.luckmerlin.browser.task.FileMoveTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
-import com.luckmerlin.core.Reply;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
 import com.luckmerlin.core.Response;
@@ -43,8 +40,11 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
 import com.luckmerlin.http.Request;
+import com.luckmerlin.model.OnActivityCreate;
+import com.luckmerlin.model.OnActivityNewIntent;
+import com.luckmerlin.model.OnActivityStart;
+import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
@@ -53,16 +53,12 @@ import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
 import com.merlin.adapter.ListAdapter;
-import com.merlin.model.OnActivityCreate;
-import com.merlin.model.OnActivityNewIntent;
-import com.merlin.model.OnActivityStart;
-import com.merlin.model.OnBackPress;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
 public class BrowserActivityModel extends BaseModel implements OnActivityCreate, PathSpanClick.OnPathSpanClick,
-        OnClickListener, OnLongClickListener, OnBackPress , OnViewAttachedToWindow,
+        OnClickListener, OnLongClickListener, OnBackPress, OnViewAttachedToWindow,
         OnViewDetachedFromWindow, Executor.OnStatusChangeListener, OnActivityStart, OnActivityNewIntent {
     private ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
     private ObservableField<String> mNotifyText=new ObservableField<>();
@@ -693,7 +689,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         if (null==client||null==folder){
             return false;
         }
-        return null!=client.setHome(folder,(Reply<File> data)-> toast(getString(null!=data&&data.isSucceed()
+        return null!=client.setHome(folder,(Response<File> data)-> toast(getString(null!=data&&data.isSucceed()
                 ?R.string.whichSucceed: R.string.whichFailed,getString(R.string.setAsHome))));
     }
 

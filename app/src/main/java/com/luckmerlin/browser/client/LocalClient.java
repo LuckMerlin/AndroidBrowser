@@ -14,15 +14,11 @@ import android.view.View;
 
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.ClientMeta;
-import com.luckmerlin.browser.Code;
-import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.file.DoingFiles;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Canceled;
-import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.core.Reply;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
@@ -33,7 +29,6 @@ import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.utils.Utils;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -329,7 +324,7 @@ public class LocalClient extends AbstractClient {
     }
 
     @Override
-    public Canceler setHome(File file, OnFinish<Reply<File>> onFinish) {
+    public Canceler setHome(File file, OnFinish<Response<File>> onFinish) {
         return null;
     }
 

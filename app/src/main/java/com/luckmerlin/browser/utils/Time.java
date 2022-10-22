@@ -2,7 +2,7 @@ package com.luckmerlin.browser.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+@Deprecated
 public class Time {
 
     public static String formatMediaDuration(long mills){

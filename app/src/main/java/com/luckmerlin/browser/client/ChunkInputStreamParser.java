@@ -1,6 +1,6 @@
 //package com.luckmerlin.browser.client;
 //
-//import com.luckmerlin.browser.Code;
+//import com.luckmerlin.core.Code;
 //import com.luckmerlin.core.Response;
 //import com.luckmerlin.debug.Debug;
 //import com.luckmerlin.http.Answer;

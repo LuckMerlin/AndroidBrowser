@@ -60,6 +60,10 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
+import com.luckmerlin.model.OnActivityCreate;
+import com.luckmerlin.model.OnActivityNewIntent;
+import com.luckmerlin.model.OnActivityStart;
+import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.stream.ChunkInputStreamReader;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
@@ -70,13 +74,6 @@ import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
-import com.merlin.model.OnActivityCreate;
-import com.merlin.model.OnActivityNewIntent;
-import com.merlin.model.OnActivityStart;
-import com.merlin.model.OnBackPress;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -421,7 +418,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             return post(()->checkDoingFileSucceed(progress));
         }
         BrowserListAdapter browserListAdapter=mBrowserAdapter;
-        Doing doing=null!=progress?progress.getDoing():null;
+        Object doingObj=null!=progress?progress.getDoing():null;
+        Doing doing=null!=doingObj&&doingObj instanceof Doing?(Doing)doingObj:null;
         if (null==doing||!doing.isSucceed()||null==browserListAdapter){
             return false;
         }

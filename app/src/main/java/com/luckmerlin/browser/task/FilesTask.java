@@ -1,22 +1,13 @@
 package com.luckmerlin.browser.task;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
-import com.luckmerlin.browser.BrowserExecutor;
-import com.luckmerlin.browser.Client;
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
-import com.luckmerlin.core.MatchedCollector;
-import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.core.Parser;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.AbstractTask;
-import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 

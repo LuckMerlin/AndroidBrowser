@@ -2,17 +2,14 @@ package com.luckmerlin.task;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.utils.Utils;
 
-public final class Progress implements Parcelable {
+public final class Progress<T> implements Parcelable {
     private long mTotal;
     private long mPosition;
     private String mTitle;
     private String mSpeed;
-    private Progress mSubProgress;
-    private transient Doing mDoing;
+    private transient T  mDoing;
 
     public Progress() {
 
@@ -23,7 +20,6 @@ public final class Progress implements Parcelable {
         mPosition = in.readLong();
         mTitle = in.readString();
         mSpeed = in.readString();
-        mSubProgress = in.readParcelable(Progress.class.getClassLoader());
     }
 
     public static final Creator<Progress> CREATOR = new Creator<Progress>() {
@@ -74,23 +70,9 @@ public final class Progress implements Parcelable {
         return this;
     }
 
-    public Progress getSubProgress(){
-        return mSubProgress;
-    }
-
-    public Progress setSubProgress(Progress progress){
-        mSubProgress=progress;
-        return this;
-    }
-
-    public Progress setDoing(Doing doing) {
+    public Progress setDoing(T doing) {
         mDoing=doing;
         return this;
-    }
-
-    @Deprecated
-    public Progress setData(Object data) {
-        return setDoing(null!=data&&data instanceof Doing?(Doing)data:null);
     }
 
     @Deprecated
@@ -98,7 +80,7 @@ public final class Progress implements Parcelable {
         return mDoing;
     }
 
-    public Doing getDoing() {
+    public T getDoing() {
         return mDoing;
     }
 
@@ -116,7 +98,6 @@ public final class Progress implements Parcelable {
         Progress progress=(Progress)o;
         return progress.mPosition==mPosition&&
             Utils.isEqualed(progress.mSpeed,mSpeed,false)&&
-            Utils.isEqualed(progress.mSubProgress,mSubProgress,false)&&
             Utils.isEqualed(progress.mDoing,mDoing,false)&&
             Utils.isEqualed(progress.mTitle,mTitle,false)&&
             progress.mTotal==mTotal;
@@ -138,7 +119,6 @@ public final class Progress implements Parcelable {
         dest.writeLong(mPosition);
         dest.writeString(mTitle);
         dest.writeString(mSpeed);
-        dest.writeParcelable(mSubProgress, flags);
     }
 
     @Override
@@ -148,7 +128,6 @@ public final class Progress implements Parcelable {
                 ", mPosition=" + mPosition +
                 ", mTitle='" + mTitle + '\'' +
                 ", mSpeed='" + mSpeed + '\'' +
-                ", mSubProgress=" + mSubProgress +
                 ", mDoing=" + mDoing +
                 '}';
     }

@@ -1,8 +1,5 @@
 package com.luckmerlin.json;
 
-import androidx.annotation.NonNull;
-
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.Parser;
 import org.json.JSONArray;
 import org.json.JSONException;

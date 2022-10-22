@@ -1,11 +1,9 @@
 package com.luckmerlin.http;
 
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Code;
 import com.luckmerlin.debug.Debug;
-
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 public abstract class ChunkParser<R> implements OnHttpParse<R> {
