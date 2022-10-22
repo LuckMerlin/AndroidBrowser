@@ -373,4 +373,9 @@ public class File implements Brief,Permission, ParcelObject {
         parcel.writeLong(mLength);
         parcel.writeLong(mTotal);
     }
+
+    @Override
+    public String toString() {
+        return "File{"+getPath()+"}";
+    }
 }

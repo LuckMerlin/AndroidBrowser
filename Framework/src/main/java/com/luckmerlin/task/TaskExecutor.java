@@ -61,19 +61,24 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             }
         });
         mExecutor=poolExecutor;
-        if (null!=taskSaver){
-            poolExecutor.setMaximumPoolSize(1);
-            execute(new InnerTask(){
-                @Override
-                public Result execute(Runtime runtime, OnProgressChange callback) {
-                    updateStatusChange(STATUS_START_LOAD_SAVED,null,mListeners);
-                    taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
-                    poolExecutor.setMaximumPoolSize(maxPoolSize);
-                    updateStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
-                    return null;
-                }
-            }, Option.LAUNCH_NOT_SAVE);
-        }
+        //Preload
+        poolExecutor.setMaximumPoolSize(1);
+        execute(new InnerTask(){
+            @Override
+            public Result execute(Runtime runtime, OnProgressChange callback) {
+                onExecutorPrepare();
+                updateStatusChange(STATUS_START_LOAD_SAVED,null,mListeners);
+                taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
+                poolExecutor.setMaximumPoolSize(maxPoolSize);
+                updateStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
+                return null;
+            }
+        }, Option.LAUNCH_NOT_SAVE);
+    }
+
+
+    protected void onExecutorPrepare(){
+        //Do nothing
     }
 
     public final Context getContext(){

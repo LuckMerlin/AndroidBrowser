@@ -136,6 +136,7 @@ public class NasClient extends AbstractClient{
         try {
             return reader.readAllChunk(null==deleteUpdate?(byte[] newData)->true:(byte[] newData)-> {
                    Response<File> response=MResponse.parse(newData, (data) -> File.fromJson(data,"from"));
+                   Debug.D("WWWWWWWW "+response);
                    if (null==response){
                        Debug.W("Interrupt file delete while chunk read error."+(null!=newData?new String(newData):""));
                        return false;

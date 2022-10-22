@@ -23,7 +23,7 @@
             <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
                 <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
                     android:layout_width="wrap_content" android:layout_height="wrap_content">
-                    <ImageView android:imageDrawable="@{thumb}" android:padding="5dp"
+                    <ImageView android:imageDrawable="@{thumb}" android:padding="5dp" android:scaleType="centerCrop"
                         android:layout_width="50dp" android:layout_height="50dp"/>
                 </FrameLayout>
                 <LinearLayout android:orientation="vertical"

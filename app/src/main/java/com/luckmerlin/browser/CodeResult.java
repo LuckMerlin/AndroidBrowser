@@ -1,8 +1,8 @@
-package com.luckmerlin.core;
+package com.luckmerlin.browser;
 
-import com.luckmerlin.browser.Code;
+import com.luckmerlin.core.Result;
 
-public interface CodeResult<T> extends Result{
+public interface CodeResult<T> extends Result {
     int getCode(int def);
     String getMessage();
     T getData();

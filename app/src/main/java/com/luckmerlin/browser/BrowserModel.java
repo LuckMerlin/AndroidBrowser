@@ -425,6 +425,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null==doing||!doing.isSucceed()||null==browserListAdapter){
             return false;
         }
+        Debug.D("AAAAAAAAA "+doing);
         if (doing.isDoingMode(Mode.MODE_DELETE)){
             Brief brief=doing.getFrom();
             brief=null!=brief?brief:doing.getTo();

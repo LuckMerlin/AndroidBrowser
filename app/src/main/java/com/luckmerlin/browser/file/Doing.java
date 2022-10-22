@@ -95,4 +95,15 @@ public class Doing<F extends Brief,T extends Brief> {
                Utils.isEqualed(mTo,doing.mTo,false)&&
                Utils.isEqualed(mMode,doing.mMode,false);
     }
+
+    @Override
+    public String toString() {
+        return "Doing{" +
+                "mFrom=" + mFrom +
+                ", mTo=" + mTo +
+                ", mProgress=" + mProgress +
+                ", mMode=" + mMode +
+                ", mBinding=" + mBinding +
+                '}';
+    }
 }

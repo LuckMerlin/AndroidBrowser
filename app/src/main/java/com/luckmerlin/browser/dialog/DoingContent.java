@@ -1,7 +1,6 @@
 package com.luckmerlin.browser.dialog;
 
 import android.content.Context;
-import android.os.Message;
 import android.view.View;
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ViewBinding;
@@ -10,12 +9,10 @@ import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Canceled;
-import com.luckmerlin.core.CodeResult;
+import com.luckmerlin.browser.CodeResult;
 import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.BindingResult;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.ConfirmResult;

@@ -1,10 +1,9 @@
 package com.luckmerlin.core;
 
 import android.os.Parcel;
-import com.luckmerlin.browser.Code;
 
 public class Response<T> implements MessageResult ,CodeResult<T>,ParcelObject {
-    private int mCode= Code.CODE_UNKNOWN;
+    private int mCode;
     private String mMsg;
     private T mData;
 
