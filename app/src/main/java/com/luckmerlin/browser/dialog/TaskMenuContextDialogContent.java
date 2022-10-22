@@ -5,13 +5,10 @@ import android.view.View;
 
 import androidx.databinding.ObservableField;
 
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.databinding.BrowserContentMenusBinding;
-import com.luckmerlin.browser.databinding.TaskContentDialogBinding;
 import com.luckmerlin.browser.databinding.TaskContentMenusBinding;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.view.ViewContent;
 
 public class TaskMenuContextDialogContent extends ViewContent implements OnClickListener {
@@ -30,7 +27,7 @@ public class TaskMenuContextDialogContent extends ViewContent implements OnClick
 
     @Override
     protected View onCreateContent(Context context) {
-        TaskContentMenusBinding binding=DataBindingUtil.inflate(context, R.layout.task_content_menus);
+        TaskContentMenusBinding binding= DataBindingUtil.inflate(context, R.layout.task_content_menus);
         if (null!=binding){
             binding.setContent(this);
             return binding.getRoot();

@@ -8,9 +8,8 @@
         <variable name="position" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <variable name="clickBinding" type="com.luckmerlin.binding.ViewBinding" />
-        <import type="com.luckmerlin.browser.utils.Time"/>
+        <import type="com.luckmerlin.utils.Utils"/>
         <import type="com.luckmerlin.browser.R"/>
-        <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.BrowserBinding" alias="BB"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
@@ -33,7 +32,7 @@
                         android:textColor="@color/textTitleSub" android:textSize="10sp"
                         android:visibility="@{path.directory?View.GONE:View.VISIBLE}"
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
-                    <TextView android:text="@{path.total>=0?`(`+path.total+`)`:FileSize.formatSizeText(path.length)}"
+                    <TextView android:text="@{path.total>=0?`(`+path.total+`)`:Utils.formatSizeText(path.length)}"
                         android:textColor="@color/textTitleSub" android:textSize="10sp"
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
                 </LinearLayout>
@@ -41,7 +40,7 @@
             <TextView android:text="@{path.name??``}" android:textColor="@color/itemFileName" android:textSize="11sp"
                 android:textStyle="bold" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:maxLines="1"/>
-            <TextView android:text="@{Time.formatTime(path.modifyTime)??``}"
+            <TextView android:text="@{Utils.formatTime(path.modifyTime)??``}"
                 android:textColor="@color/textTitleSub" android:textSize="9sp" android:maxLines="1"
                 android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
         </LinearLayout>

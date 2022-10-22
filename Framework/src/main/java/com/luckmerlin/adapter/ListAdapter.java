@@ -1,4 +1,4 @@
-package com.merlin.adapter;
+package com.luckmerlin.adapter;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.databinding.ViewDataBinding;
@@ -18,19 +17,16 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.core.Canceler;
+
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.core.ChangeUpdate;
 import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.debug.Debug;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,RecyclerView.ViewHolder> {
     private List<T> mDataList;
@@ -511,7 +507,7 @@ public class ListAdapter<T> extends androidx.recyclerview.widget.ListAdapter<T,R
                     return inflateViewHolder(context,resources.getDrawable((Integer)viewHolder));
                 }else if (name.equals("layout")){
                     try{
-                        ViewDataBinding binding=DataBindingUtil.inflate(LayoutInflater.from(context),(Integer)viewHolder,null,true);
+                        ViewDataBinding binding= DataBindingUtil.inflate(LayoutInflater.from(context),(Integer)viewHolder,null,true);
                         return inflateViewHolder(context,binding);
                     }catch (Exception e){
                         //Do nothing

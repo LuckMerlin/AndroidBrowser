@@ -5,7 +5,6 @@
         <variable name="vm" type="com.luckmerlin.browser.ConveyorActivityModel" />
         <import type="android.text.Html"/>
         <import type="android.view.View"/>
-        <import type="com.luckmerlin.browser.utils.FileSize"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.text.method.LinkMovementMethod"/>

@@ -3,9 +3,9 @@ package com.luckmerlin.browser.dialog;
 import android.view.View;
 import android.view.ViewGroup;
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ButtonTextBinding;
 import com.luckmerlin.click.Listener;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class DialogButtonBinding implements Binding {
             return;
         }
         for (ViewBinding child:bindings) {
-            ButtonTextBinding binding=DataBindingUtil.inflate(view.getContext(),
+            ButtonTextBinding binding= DataBindingUtil.inflate(view.getContext(),
                     R.layout.button_text,(ViewGroup)view,true);
             binding.setBinding(null==child?null:(null!=mListener?child.setListener(mListener):child));
         }

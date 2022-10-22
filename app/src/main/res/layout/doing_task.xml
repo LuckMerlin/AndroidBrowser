@@ -7,7 +7,6 @@
         <import type="com.luckmerlin.binding.LayoutBinding"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>
-        <import type="com.luckmerlin.browser.utils.FileSize"/>
     </data>
     <LinearLayout android:orientation="vertical" android:background="@drawable/dialog_bg"
         android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_width="wrap_content"

@@ -3,8 +3,9 @@ package com.luckmerlin.browser.dialog;
 import android.content.Context;
 import android.view.View;
 import androidx.databinding.ObservableField;
+
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.BrowserContentMenusBinding;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
@@ -31,7 +32,7 @@ public class BrowserMenuContextDialogContent extends ViewContent implements OnCl
 
     @Override
     protected View onCreateContent(Context context) {
-        BrowserContentMenusBinding binding=DataBindingUtil.inflate(context, R.layout.browser_content_menus);
+        BrowserContentMenusBinding binding= DataBindingUtil.inflate(context, R.layout.browser_content_menus);
         if (null!=binding){
             binding.setContent(this);
             return binding.getRoot();

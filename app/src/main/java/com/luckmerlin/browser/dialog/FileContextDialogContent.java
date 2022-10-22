@@ -5,9 +5,8 @@ import android.view.View;
 
 import androidx.databinding.ObservableField;
 
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
-import com.luckmerlin.browser.databinding.BrowserContentMenusBinding;
 import com.luckmerlin.browser.databinding.FileContentMenusBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.click.OnClickListener;
@@ -44,7 +43,7 @@ public class FileContextDialogContent extends ViewContent implements OnClickList
 
     @Override
     protected View onCreateContent(Context context) {
-        FileContentMenusBinding binding=DataBindingUtil.inflate(context, R.layout.file_content_menus);
+        FileContentMenusBinding binding= DataBindingUtil.inflate(context, R.layout.file_content_menus);
         if (null!=binding){
             binding.setContent(this);
             return binding.getRoot();

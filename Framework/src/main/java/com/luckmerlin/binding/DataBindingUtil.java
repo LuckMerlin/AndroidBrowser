@@ -1,9 +1,10 @@
-package com.luckmerlin.browser.binding;
+package com.luckmerlin.binding;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.databinding.ViewDataBinding;
 
 public class DataBindingUtil {

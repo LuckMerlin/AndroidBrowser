@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.CheckBox;
 import androidx.databinding.ViewDataBinding;
-import com.luckmerlin.browser.binding.DataBindingUtil;
+
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.SettingsModelBinding;
 import com.luckmerlin.browser.settings.Settings;
 import com.luckmerlin.click.OnClickListener;

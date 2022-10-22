@@ -12,8 +12,8 @@ import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 
 import com.luckmerlin.binding.BindingGroup;
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.binding.ViewBinding;
-import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ConveyorActivityBinding;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;

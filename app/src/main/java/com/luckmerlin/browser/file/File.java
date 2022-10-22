@@ -5,12 +5,12 @@ import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
-import com.luckmerlin.browser.utils.FileSize;
 import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.json.Json;
 import com.luckmerlin.json.JsonObject;
+import com.luckmerlin.utils.Utils;
 
 import org.json.JSONObject;
 
@@ -322,7 +322,7 @@ public class File implements Brief,Permission, ParcelObject {
 
     @Override
     public CharSequence getNote() {
-        return FileSize.formatSizeText(getLength());
+        return Utils.formatSizeText(getLength());
     }
 
     @Override

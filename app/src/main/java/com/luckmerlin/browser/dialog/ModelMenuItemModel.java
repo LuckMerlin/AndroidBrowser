@@ -7,9 +7,9 @@ import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
 
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.ModelMenuItemBinding;
 
 public class ModelMenuItemModel implements Binding {
@@ -45,7 +45,7 @@ public class ModelMenuItemModel implements Binding {
     @Override
     public void onBind(View view) {
         if (null!=view&&(view instanceof ViewGroup)){
-            ViewDataBinding binding=DataBindingUtil.inflate(view, R.layout.model_menu_item,true);
+            ViewDataBinding binding= DataBindingUtil.inflate(view, R.layout.model_menu_item,true);
             if (null!=binding&&binding instanceof ModelMenuItemBinding){
                 ((ModelMenuItemBinding)binding).setModel(this);
             }

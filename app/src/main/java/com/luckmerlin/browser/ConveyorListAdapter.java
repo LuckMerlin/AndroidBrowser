@@ -14,9 +14,8 @@ import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
-import com.merlin.adapter.PageListAdapter;
-import com.merlin.adapter.Query;
-
+import com.luckmerlin.adapter.PageListAdapter;
+import com.luckmerlin.adapter.Query;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.merlin.adapter;
+package com.luckmerlin.adapter;
 
 import android.view.ViewParent;
 
@@ -8,12 +8,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.luckmerlin.core.Canceler;
-import com.luckmerlin.debug.Debug;
-import com.luckmerlin.http.Headers;
-
-import java.util.HashMap;
 import java.util.List;
 
 public class PageListAdapter<A,T> extends ListAdapter<T> implements SwipeRefreshLayout.OnRefreshListener {

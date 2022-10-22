@@ -1,4 +1,4 @@
-package com.merlin.adapter;
+package com.luckmerlin.adapter;
 
 public class Query<T> {
     private String mName;

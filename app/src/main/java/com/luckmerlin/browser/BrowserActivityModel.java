@@ -17,7 +17,8 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import androidx.databinding.ObservableField;
 import androidx.databinding.ViewDataBinding;
-import com.luckmerlin.browser.binding.DataBindingUtil;
+
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserActivityBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
@@ -52,7 +53,7 @@ import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
 import com.luckmerlin.view.OnViewDetachedFromWindow;
 import com.luckmerlin.view.ViewIterator;
-import com.merlin.adapter.ListAdapter;
+import com.luckmerlin.adapter.ListAdapter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -72,7 +73,7 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
 
     @Override
     protected View onCreateContent(Context context) {
-        ViewDataBinding binding=DataBindingUtil.inflate(context,R.layout.browser_activity);
+        ViewDataBinding binding= DataBindingUtil.inflate(context,R.layout.browser_activity);
         if (null!= binding&&binding instanceof BrowserActivityBinding){
             ((BrowserActivityBinding)binding).setVm(this);
             return binding.getRoot();

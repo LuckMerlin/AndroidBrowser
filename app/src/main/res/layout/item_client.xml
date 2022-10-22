@@ -6,7 +6,7 @@
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
         <import type="android.view.View"/>
-        <import type="com.luckmerlin.browser.utils.FileSize"/>
+        <import type="com.luckmerlin.utils.Utils"/>
     </data>
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_marginBottom="5dp"
         android:layout_height="wrap_content" android:gravity="center_vertical">

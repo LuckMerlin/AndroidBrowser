@@ -1,15 +1,11 @@
 package com.luckmerlin.browser.file;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 
+import com.luckmerlin.adapter.PageListAdapter;
 import com.luckmerlin.browser.Label;
-import com.luckmerlin.json.JsonArray;
-import com.merlin.adapter.PageListAdapter;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 

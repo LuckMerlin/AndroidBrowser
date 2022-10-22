@@ -8,10 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.databinding.ObservableField;
@@ -19,7 +15,6 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileGirdBinding;
@@ -33,20 +28,14 @@ import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.Task;
-import com.luckmerlin.task.TaskGroup;
 import com.luckmerlin.utils.Utils;
-import com.merlin.adapter.PageListAdapter;
-
+import com.luckmerlin.adapter.PageListAdapter;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
 public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
     private ObservableField<Long> mCurrentSelectSize=new ObservableField<Long>();

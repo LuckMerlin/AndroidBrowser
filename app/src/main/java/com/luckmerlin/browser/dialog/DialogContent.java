@@ -5,9 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.binding.DataBindingUtil;
 import com.luckmerlin.browser.databinding.DialogContentBinding;
 import com.luckmerlin.browser.databinding.DialogMessageBinding;
 import com.luckmerlin.click.OnClickListener;
@@ -66,7 +66,7 @@ public class DialogContent extends BaseContent implements OnClickListener{
             mDialogBinding.set((Binding)object);
             return this;
         }else if (object instanceof CharSequence){
-            return setDialogContent((Binding)(View view)->((DialogMessageBinding)DataBindingUtil.inflate((ViewGroup)view,
+            return setDialogContent((Binding)(View view)->((DialogMessageBinding) DataBindingUtil.inflate((ViewGroup)view,
                     R.layout.dialog_message,true)).setMessage((CharSequence)object));
         }else if (object instanceof View){
             return setDialogContent((Content)(Context context, ViewIterator iterator)->(View)object);
