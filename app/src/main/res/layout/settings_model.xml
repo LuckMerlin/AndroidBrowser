@@ -28,8 +28,9 @@
                 <TextView android:text="@string/general" android:textColor="@color/textMain"
                     android:textStyle="bold" android:textSize="15sp" android:layout_marginBottom="5dp"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <CheckBox android:button="@drawable/selector_checkbox"
-                    binding:bind="@{VB.clickId(R.string.browserLastPath)}"
+                <CheckBox binding:bind="@{VB.clickId(R.string.saveLatestPath)}"
+                    android:button="@drawable/selector_checkbox"
+                    android:layout_marginLeft="@dimen/indentPadding" android:paddingLeft="5dp"
                     android:textColor="@color/textMain" android:textSize="12sp"
                     android:checked="@{Settings.I().isBrowserLastPathEnable()}"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>

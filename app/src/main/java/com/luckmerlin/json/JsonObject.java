@@ -85,7 +85,7 @@ public class JsonObject extends JSONObject{
         }
     }
 
-    public final <T extends JSONObject> T putSafe(T json,String key,Object value) {
+    public final static  <T extends JSONObject> T putSafe(T json,String key,Object value) {
         if (null!=json){
             try {
                 put(json,key,value);
@@ -96,7 +96,7 @@ public class JsonObject extends JSONObject{
         return json;
     }
 
-    public final <T extends JSONObject> T put(T json, String key, Object value) throws JSONException {
+    public final static <T extends JSONObject> T put(T json, String key, Object value) throws JSONException {
         if (null!=json){
             if (null!=key){
                 if (null==value){

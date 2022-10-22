@@ -17,4 +17,5 @@
     <dimen name="iconSizeLarge">50dp</dimen>
     <dimen name="contentGap">5dp</dimen>
     <dimen name="gridListChildSize">100dp</dimen>
+    <dimen name="indentPadding">10dp</dimen>
 </resources>

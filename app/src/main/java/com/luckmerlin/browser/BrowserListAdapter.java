@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -122,13 +123,15 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         boolean[] canceled=new boolean[]{false};
         execute(()->{
             String browserPath=null!=args?args.mFolder:null;
-            browserPath=null!=browserPath&&browserPath.length()>0?browserPath:Settings.Instance().getClientLatestBrowserPath(client);
+            Settings settings=Settings.Instance();
+            browserPath=null!=browserPath&&browserPath.length()>0?browserPath:settings.getClientLatestBrowserPath(client);
             Response<Folder> response=client.listFiles(browserPath,fromIndex,pageSize,args);
             if (!canceled[0]){
                 boolean succeed=null!=response&&response.isSucceed();
                 Folder folder=null!=response?response.getData():null;
                 callback.onPageLoad(succeed,folder);
-                if (succeed&&null!=folder&&Settings.Instance().insertClientBrowserPath(client,folder.getPath())){//Save client latest browser path
+                if (succeed&&null!=folder&&settings.insertClientBrowserPath(client,folder.getPath())&&
+                        settings.saveLatestChanged(getContext())){//Save client latest browser path
                     //Do nothing
                 }
             }
