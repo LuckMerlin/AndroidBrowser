@@ -55,6 +55,12 @@ public class Response<T> implements MessageResult ,ParcelObject {
         return setCode(code).setMsg(msg).setData(data);
     }
 
+    @Override
+    public boolean isSucceed() {
+        int code=mCode;
+        return code==Code.CODE_ALREADY||code==Code.CODE_SUCCEED;
+    }
+
     public final int getCode(int def) {
         Integer code=mCode;
         return null!=code?code:def;
