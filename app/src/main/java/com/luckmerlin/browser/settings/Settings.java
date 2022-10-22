@@ -110,7 +110,7 @@ public class Settings extends ObservableArrayMap<String,Object> {
         JSONObject clientPaths=getJsonObject(LABEL_CLIENT_BROWSE_PATH,null);
         clientPaths=null!=clientPaths?clientPaths:new JSONObject();
         JsonObject.putSafe(clientPaths,host,path);
-        put(LABEL_CLIENT_BROWSE_PATH,clientPaths);
+        put(LABEL_CLIENT_BROWSE_PATH,clientPaths,true);
         return true;
     }
 
@@ -155,8 +155,12 @@ public class Settings extends ObservableArrayMap<String,Object> {
 
     @Override
     public Object put(String k, Object v) {
+        return put(k,v,false);
+    }
+
+    private Object put(String k, Object v,boolean changed) {
         Object current=get(k);
-        if ((null==v&&null==current)||(null!=v&&null!=current&&v.equals(current))){
+        if (!changed&&((null==v&&null==current)||(null!=v&&null!=current&&v.equals(current)))){
             return current;
         }
         mLatestChangedKey=k;
