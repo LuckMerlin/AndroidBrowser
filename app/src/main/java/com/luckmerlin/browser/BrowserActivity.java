@@ -1,20 +1,23 @@
 package com.luckmerlin.browser;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.provider.Settings;
-import android.util.Base64;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.luckmerlin.debug.Debug;
+import com.luckmerlin.plugin.PluginApkContext;
+import com.luckmerlin.plugin.PluginContext;
+import com.luckmerlin.plugin.PluginFileContext;
 import com.luckmerlin.view.Content;
 
 public class BrowserActivity extends BrowserContentActivity {
@@ -94,13 +97,18 @@ public class BrowserActivity extends BrowserContentActivity {
         }
     }
 
-
     @Override
-    public Content onResolveContent() {
+    public Content onResolveContent(Context context) {
 //        return new BrowserActivityModel();
 //        Object DDD= new ObjectCreator().createObject(FilesDeleteTask.class.getName());
 //        Debug.D("eeeeeee "+DDD);
-        return new BrowserModel();
+//        new PluginLoader().loadInstalled(this);
+//        PluginContext context=new TestPlugin().test(this,"com.browser.dark");
+//        Debug.D("DDDDDDDDDD "+context.sss());
+//        return null;
+        PluginApkContext pluginApkContext=new PluginApkContext(context,"com.browser.dark");
+        Content content=null!=pluginApkContext?pluginApkContext.createPluginContent(getClass()):null;
+        return null!=content?content:new BrowserModel();
         //
 //        FilesDeleteTask filesDeleteTask=new FilesDeleteTask(new File(LocalClient.createLocalFile
 //                (new java.io.File("/sdcard"),true)));

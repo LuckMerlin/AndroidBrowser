@@ -1,13 +1,13 @@
-package com.luckmerlin.browser;
+package com.browser.dark;
 
 import android.content.Context;
 
+import com.luckmerlin.model.ContentActivity;
 import com.luckmerlin.view.Content;
 
-public class SettingsActivity extends BrowserContentActivity {
-
+public class TestActivity extends ContentActivity {
     @Override
     public Content onResolveContent(Context context) {
-        return new SettingsModel();
+        return null;
     }
 }

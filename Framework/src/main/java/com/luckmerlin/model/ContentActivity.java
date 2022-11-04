@@ -1,26 +1,26 @@
 package com.luckmerlin.model;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import androidx.core.graphics.ColorUtils;
+import com.luckmerlin.plugin.PluginActivity;
+import com.luckmerlin.plugin.PluginApkContext;
 import com.luckmerlin.view.Content;
 import com.luckmerlin.view.ContentResolver;
 import com.luckmerlin.view.ViewIterate;
 
-public abstract class ContentActivity extends Activity implements ContentResolver {
+public abstract class ContentActivity extends PluginActivity implements ContentResolver {
     private Content mModel=null;
 
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(newBase);
-        mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent():null;
+        mModel=this instanceof ContentResolver ?((ContentResolver)this).onResolveContent(this):null;
     }
 
     @Override
