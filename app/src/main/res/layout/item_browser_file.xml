@@ -15,19 +15,20 @@
         <import type="com.luckmerlin.browser.file.Mode"/>
         <import type="android.view.View"/>
     </data>
-    <LinearLayout binding:bind="@{clickBinding.enableLongClick(true)}"
+    <FrameLayout binding:bind="@{clickBinding.enableLongClick(true)}"
         android:background="@drawable/selector_item_browser_file_bg"
-        android:paddingBottom="2dp" android:paddingTop="2dp" android:orientation="horizontal"
+        android:paddingBottom="2dp" android:paddingTop="2dp"
         android:layout_width="match_parent" android:layout_height="match_parent">
 
-        <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
-            android:layout_width="wrap_content" android:layout_height="wrap_content">
-<!--        <ImageView binding:bind="@{VB.create(path).img(BB.instance)}"-->
-            <ImageView android:imageDrawable="@{thumb}" android:padding="5dp" android:scaleType="centerCrop"
-                android:layout_width="50dp" android:layout_height="50dp"/>
-        </FrameLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <FrameLayout android:layout_alignParentLeft="true" android:layout_gravity="center_vertical"
+                android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <!--        <ImageView binding:bind="@{VB.create(path).img(BB.instance)}"-->
+                <ImageView android:imageDrawable="@{thumb}" android:padding="5dp" android:scaleType="centerCrop"
+                    android:layout_width="50dp" android:layout_height="50dp"/>
+            </FrameLayout>
 
-        <FrameLayout android:layout_weight="1" android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
                 android:layout_marginLeft="5dp" android:layout_marginRight="5dp" android:gravity="center_vertical"
                 android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -43,10 +44,11 @@
                         android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp"/>
                 </LinearLayout>
             </LinearLayout>
-            <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,path)}" android:button="@drawable/selector_checkbox"
-                android:layout_gravity="center_vertical|right" android:checked="@{selected}"
-                android:visibility="@{mode.isMode(Mode.MODE_MULTI_CHOOSE)?View.VISIBLE:View.INVISIBLE}"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        </FrameLayout>
-    </LinearLayout>
+        </LinearLayout>
+
+        <CheckBox binding:bind="@{VB.clickId(R.drawable.selector_checkbox,path)}" android:button="@drawable/selector_checkbox"
+            android:layout_gravity="center_vertical|right" android:checked="@{selected}"  android:gravity="center"
+            android:visibility="@{mode.isMode(Mode.MODE_MULTI_CHOOSE)?View.VISIBLE:View.INVISIBLE}"
+            android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="5dp"/>
+    </FrameLayout>
 </layout>
