@@ -98,8 +98,7 @@ public class NasClient extends AbstractClient{
         return mHttp.call(new Request().url("/file/browser").
                 headerEncode(Label.LABEL_BROWSER_FOLDER,folderPath).header(Label.LABEL_FROM,start).
                 header(Label.LABEL_DATA,null!=filter?filter:"").header(Label.LABEL_PAGE_SIZE,size).post(),
-                new MResponse<Folder>((Object data)-> null!=data&&data instanceof JSONObject?
-                        new Folder((JSONObject) data):null));
+                new MResponse<Folder>((Object data)-> null!=data? new Folder(data):null));
     }
 
     @Override
@@ -110,7 +109,7 @@ public class NasClient extends AbstractClient{
     @Override
     public Response<File> loadFile(String file) {
         return mHttp.call(new Request().headerEncode(Label.LABEL_PATH, file).url("/file/detail").post().post(),
-                new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new File((JSONObject)data):null));
+                new MResponse<File>((Object data)-> null!=data?new Folder(data):null));
     }
 
     @Override

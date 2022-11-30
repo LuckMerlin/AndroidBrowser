@@ -23,9 +23,9 @@ import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskRestartEnabler;
 
+@Deprecated
 public class DoingContent extends ConfirmContent implements
         Executor.OnStatusChangeListener, OnProgressChange,OnClickListener{
-    private final ObservableField<String> mTitle=new ObservableField<>();
     private final ObservableField<CharSequence> mMessage=new ObservableField<>();
     private final ObservableField<Doing> mDoing=new ObservableField<>();
     private final ObservableField<Binding> mBinding=new ObservableField<>();
@@ -131,15 +131,6 @@ public class DoingContent extends ConfirmContent implements
     public final DoingContent setAutoDismiss(AutoDismiss autoDismiss) {
         this.mAutoDismiss = autoDismiss;
         return this;
-    }
-
-    public final DoingContent setTitle(String name){
-        mTitle.set(name);
-        return this;
-    }
-
-    public final ObservableField<String> getTitle(){
-        return mTitle;
     }
 
     public final ObservableField<Doing> getDoing() {

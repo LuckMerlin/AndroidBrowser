@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="content" type="com.luckmerlin.browser.dialog.DoingTaskContent" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+        <import type="com.luckmerlin.binding.LayoutBinding"/>
+        <import type="com.luckmerlin.browser.R"/>
+        <import type="android.view.View"/>
+    </data>
+    <LinearLayout android:orientation="vertical" android:background="@drawable/dialog_bg"
+        android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:gravity="center_horizontal"
+        android:paddingTop="5dp" android:paddingBottom="5dp" android:minWidth="220dp">
+
+        <TextView android:text="@{content.confirm.title??content.title??@string/task}"
+            android:maxLines="1" android:textColor="@color/textMain"
+            android:textSize="18sp" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:textStyle="bold" android:paddingLeft="5dp" android:paddingRight="5dp"/>
+
+        <LinearLayout android:layout_width="wrap_content" android:gravity="center"
+            android:layout_marginTop="10dp" android:layout_marginBottom="10dp"
+            android:layout_height="wrap_content" android:orientation="horizontal">
+
+            <LinearLayout android:orientation="vertical" android:gravity="center"
+                android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageView android:src="@mipmap/ic_launcher"
+                    android:layout_width="60dp" android:layout_height="60dp"/>
+                <TextView android:textColor="@color/textMain" android:text="sfasfdasfasfasdfasdas"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:maxWidth="90dp" android:maxLines="3" android:ellipsize="end"
+                    android:gravity="center"/>
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:gravity="center"
+                android:layout_marginLeft="5dp" android:layout_marginRight="5dp">
+                <TextView android:text="80% " android:textColor="@color/textMain" android:gravity="center"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"/>
+                <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal" android:progress="10"
+                    android:layout_width="match_parent" android:layout_height="8dp"
+                    android:layout_marginLeft="1dp" android:layout_marginRight="1dp" android:maxWidth="80dp"/>
+                <TextView android:text="dangqianzhengzaiceshi " android:textColor="@color/textMain"
+                    android:maxLines="2" android:ellipsize="end" android:gravity="center"
+                    android:layout_width="90dp" android:layout_height="wrap_content"/>
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:gravity="center"
+                android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <ImageView android:src="@mipmap/ic_launcher"
+                    android:layout_width="60dp" android:layout_height="60dp"/>
+                <TextView android:textColor="@color/textMain" android:text="sfasfdasfasfasdfasdas"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"
+                    android:maxWidth="90dp" android:maxLines="3" android:ellipsize="end"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout android:orientation="horizontal" android:paddingLeft="15dp" android:paddingRight="15dp"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="5dp"
+            binding:bind="@{LayoutBinding.layout(null!=content.confirm?content.confirm.binding:(content.doing.doingBinding??content.doingBinding)).removeAll(true).toParent(false)}" />
+    </LinearLayout>
+</layout>

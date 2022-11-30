@@ -31,6 +31,8 @@ import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.DoingContent;
+import com.luckmerlin.browser.dialog.DoingTaskContent;
+import com.luckmerlin.browser.dialog.DoingTaskContent1;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.GoToFolderContent;
 import com.luckmerlin.browser.dialog.ModelMenuItemModel;
@@ -113,8 +115,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         };
         mBrowserAdapter.getMode().addOnPropertyChangedCallback(changedCallback);
         changedCallback.onPropertyChanged(null,0);
-//        showContentDialog(new DoingContent(),null);
+//        showContentDialog(new DoingTaskContent1(),null);
 //        showBrowserContextMenu(activity);
+//        launchTask(new TestTask(),Option.EXECUTE,true);
     }
 
     @Override
@@ -263,7 +266,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.LAUNCH);
-        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingContent().setAutoDismiss(autoDismiss)))||true;
+        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingTaskContent1()))||true;
     }
 
     private boolean createFile(){
@@ -550,6 +553,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             //Test
 //            startActivity(SettingsActivity.class);
 //            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
+//            launchTask(new TestTask(),Option.LAUNCH_NOT_SAVE,true);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
 //            TestTask testTask=new TestTask(getActivity());
@@ -557,6 +561,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 //            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Option.EXECUTE,true);
+            showContentDialog(new DoingTaskContent().setDoingBinding(new DialogButtonBinding().
+                    add(ViewBinding.clickId(R.string.cancel))),null);
         }
     }
 
@@ -639,7 +645,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 entryMode(null);
                 UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
                 uploadTask.setName(getString(R.string.upload));
-                return launchTask(uploadTask,Option.LAUNCH,true)&&false;
+                return launchTask(uploadTask,Option.LAUNCH_NOT_SAVE,true)&&false;
             }));
         }else if (null!=action&&action.equals(Intent.ACTION_SEND_MULTIPLE)){
             ArrayList<Parcelable> parcelables=intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);

@@ -32,9 +32,10 @@ public class Folder extends File implements PageListAdapter.Page<File> {
             JSONObject json=(JSONObject)obj;
             mFrom=json.optLong(Label.LABEL_FROM,-1);
             JSONArray array=json.optJSONArray(Label.LABEL_CHILDREN);
+            ArrayList files=null;
             if (null!=array){
                 int length=array.length();
-                ArrayList files=mFiles=length<=0?null:new ArrayList<>(length);
+                files=(length<=0?null:new ArrayList<>(length));
                 JSONObject jsonObject=null;
                 for (int i = 0; i < length; i++) {
                     if (null!=(jsonObject=array.optJSONObject(i))){
@@ -42,6 +43,7 @@ public class Folder extends File implements PageListAdapter.Page<File> {
                     }
                 }
             }
+            mFiles=files;
         }
     }
 

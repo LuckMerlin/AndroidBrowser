@@ -11,6 +11,7 @@ import com.luckmerlin.browser.file.File;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
@@ -23,6 +24,7 @@ public class TestTask extends AbstractTask {
 
     @Override
     protected Result onExecute(Runtime runtime) {
+        Debug.D("DDDDDDD "+this);
         Progress progress=new Progress().setTitle("Title进度").setSpeed("333.44MB/S").setPosition(0).setTotal(100);
         File fromFile=new File().setName("FromName").setLength(100000);
         File toFile=new File().setName("ToName").setLength(100000);

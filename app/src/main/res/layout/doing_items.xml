@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="brief" type="com.luckmerlin.core.Brief" />
+        <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
+    </data>
+    <LinearLayout android:orientation="vertical" android:gravity="center"
+        android:layout_marginLeft="1dp" android:layout_marginRight="1dp"
+        android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <ImageView binding:bind="@{VB.create(brief.icon)}"
+            android:layout_width="30dp" android:layout_height="30dp"/>
+        <TextView android:text="@{brief.name??``}" android:textColor="@color/textTitle" android:textSize="12sp"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    </LinearLayout>
+</layout>

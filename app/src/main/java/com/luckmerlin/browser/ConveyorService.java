@@ -33,8 +33,8 @@ public class ConveyorService extends Service {
         super.onCreate();
         Debug.D("EEEE onCreate "+this);
         List<Client> clients=new ArrayList<>();
-        clients.add(new NasClient("http://192.168.0.2:89","NAS"));
-        clients.add(new NasClient("http://192.168.0.8:89","Dev"));
+//        clients.add(new NasClient("http://192.168.0.2:89","NAS"));
+//        clients.add(new NasClient("http://192.168.0.6:89","Dev"));
         clients.add(new LocalClient());
 //        clients.add(new NasClient("http://192.168.0.10:6666","DEV"));
         ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());

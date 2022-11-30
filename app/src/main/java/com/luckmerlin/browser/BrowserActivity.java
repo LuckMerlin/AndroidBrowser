@@ -106,9 +106,10 @@ public class BrowserActivity extends BrowserContentActivity {
 //        PluginContext context=new TestPlugin().test(this,"com.browser.dark");
 //        Debug.D("DDDDDDDDDD "+context.sss());
 //        return null;
-        PluginApkContext pluginApkContext=new PluginApkContext(context,"com.browser.dark");
-        Content content=null!=pluginApkContext?pluginApkContext.createPluginContent(getClass()):null;
-        return null!=content?content:new BrowserModel();
+//        PluginApkContext pluginApkContext=new PluginApkContext(context,"com.browser.dark");
+//        Content content=null!=pluginApkContext?pluginApkContext.createPluginContent(getClass()):null;
+//        return null!=content?content:new BrowserModel();
+        return new BrowserModel();
         //
 //        FilesDeleteTask filesDeleteTask=new FilesDeleteTask(new File(LocalClient.createLocalFile
 //                (new java.io.File("/sdcard"),true)));

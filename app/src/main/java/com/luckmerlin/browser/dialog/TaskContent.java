@@ -25,7 +25,6 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
     private final ObservableField<DoingFiles> mDoingFiles=new ObservableField<>();
     private final ObservableField<Result> mResult=new ObservableField<>();
     private final ObservableField<Integer> mTaskProgress=new ObservableField<>();
-    private final ObservableField<String> mTitle=new ObservableField<>();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -90,15 +89,6 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
         return this;
     }
 
-    public final TaskContent setTitle(String title){
-        if (!isUiThread()){
-            post(()->setTitle(title));
-            return this;
-        }
-        mTitle.set(title);
-        return this;
-    }
-
     public TaskContent setAutoDismiss(int autoDismiss) {
         this.mAutoDismiss = autoDismiss;
         return this;
@@ -106,10 +96,6 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
 
     public final ObservableField<String> getNotify() {
         return mNotify;
-    }
-
-    public ObservableField<String> getTitle() {
-        return mTitle;
     }
 
     public ObservableField<DoingFiles> getDoingFiles() {
