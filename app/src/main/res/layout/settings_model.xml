@@ -27,12 +27,15 @@
                 <TextView android:text="@string/general" android:textColor="@color/textMain"
                     android:textStyle="bold" android:textSize="15sp" android:layout_marginBottom="5dp"
                     android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-                <CheckBox binding:bind="@{VB.clickId(R.string.saveLatestPath)}"
-                    android:button="@drawable/selector_checkbox"
+                <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/indentPadding" android:paddingLeft="5dp"
-                    android:textColor="@color/textMain" android:textSize="12sp"
-                    android:checked="@{Settings.I().isBrowserLastPathEnable()}"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                    android:orientation="vertical" android:background="@drawable/round_corner_gray">
+                    <CheckBox binding:bind="@{VB.clickId(R.string.saveLatestPath)}"
+                        android:button="@drawable/selector_checkbox"
+                        android:textColor="@color/textMain" android:textSize="12sp"
+                        android:checked="@{Settings.I().isBrowserLastPathEnable()}"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>
