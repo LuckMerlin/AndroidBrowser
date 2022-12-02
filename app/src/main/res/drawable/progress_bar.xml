@@ -5,7 +5,7 @@
         android:height="5dp" android:gravity="center_vertical">
         <shape>
             <corners android:radius="5dp" />
-            <solid android:color="@color/iconDisable" />
+            <solid android:color="@color/progressBackground" />
         </shape>
     </item>
 

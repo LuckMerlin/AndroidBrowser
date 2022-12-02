@@ -266,7 +266,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.LAUNCH);
-        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingTaskContent()))||true;
+        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingTaskContent1()))||true;
     }
 
     private boolean createFile(){
@@ -317,6 +317,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
                 setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }
+
 
     private boolean goToFolder(){
         return null!=showContentDialog(new GoToFolderContent(){
@@ -555,13 +556,13 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 //            launchTask(new TestTask(),Option.LAUNCH_NOT_SAVE,true);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
-            TestTask testTask=new TestTask(getActivity());
-            testTask.setName("eeeeeeeee");
+//            TestTask testTask=new TestTask(getActivity());
+//            testTask.setName("eeeeeeeee");
 //            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
-            launchTask(testTask, Option.LAUNCH_NOT_SAVE,true);
-//            showContentDialog(new DoingTaskContent().setDoingBinding(new DialogButtonBinding().
-//                    add(ViewBinding.clickId(R.string.cancel))),null);
+//            launchTask(testTask, Option.EXECUTE,true);
+            showContentDialog(new DoingTaskContent().setDoingBinding(new DialogButtonBinding().
+                    add(ViewBinding.clickId(R.string.cancel))),null);
         }
     }
 

@@ -12,7 +12,7 @@ import com.luckmerlin.task.ConfirmResult1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
-public class TestTask extends AbstractTask{
+public class TestTask extends AbstractTask {
     Activity activity;
 
     public TestTask(Activity activity){
@@ -23,23 +23,17 @@ public class TestTask extends AbstractTask{
     @Override
     protected Result onExecute(Runtime runtime) {
 //        if (System.currentTimeMillis()%2!=0){
-        Confirm confirm=new Confirm();
-        confirm.setMessage("确认消息").setBinding(new DialogButtonBinding(
-                ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
-        setDoing(confirm);
-        //
-        Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
-                setSpeed("666MB/S");
-        notifyProgress(progress);
-        while (progress.getPosition()<progress.getTotal()){
-            progress.setPosition(progress.getPosition()+1);
-            notifyProgress(progress);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
+                    setSpeed("666MB/S");
+            while (progress.getPosition()<progress.getTotal()){
+                progress.setPosition(progress.getPosition()+1);
+                notifyProgress(progress);
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
-        }
 //            return null;
 //        }
         return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="textNormal">#ffffff</color>
-    <color name="modelBackground">#eef9f9f9</color>
+    <color name="modelBackground">#eeF5F5F5</color>
     <color name="edittextBackground">#66f9f9f9</color>
     <color name="normalBackground">#44483fe6</color>
     <color name="text">#fff</color>
@@ -12,7 +12,7 @@
     <color name="textMainSub">#99284eeb</color>
     <color name="hintColor">#55000000</color>
     <color name="textMainAnti">#fff</color>
-    <color name="dialogBg">#aaFFFAFA</color>
+    <color name="dialogBg">#f9f9f9</color>
     <color name="browserBackground">#55000000</color>
     <color name="textTitleSub">#a000</color>
     <color name="syncNull">@android:color/transparent</color>
@@ -28,7 +28,5 @@
     <color name="buttonNormal">#88ffffff</color>
     <color name="buttonPressed">#33ffffff</color>
     <color name="buttonDisable">#11ffffff</color>
-    <color name="progressBg">#22ffffff</color>
-    <color name="progressColor">@color/iconNormal</color>
-    <color name="progressSecondColor">@color/iconPressed</color>
+    <color name="progressBackground">#e6e6e6</color>
 </resources>

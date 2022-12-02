@@ -11,7 +11,6 @@ import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -48,22 +47,16 @@ public class DoingTaskContent extends ConfirmContent implements
         Object object=null!=progress?progress.getDoing():null;
         Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
         mDoing.set(doing);
-//        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
+        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
     }
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
-        Debug.D("AAAAA "+status+" "+task);
-        com.luckmerlin.task.Doing doing=task.getDoing();
-        setConfirm(null!=doing&&doing instanceof Confirm?(Confirm)doing:null);
-
+//        task.getProgress();
+        Debug.D("AAAAA "+status+" "+executor);
         switch (status){
             case Executor.STATUS_FINISH:
-                break;
-            default:
-                task.getProgress();
 
-                break;
         }
 //        switch (status){
 //            case Executor.STATUS_EXECUTING:
