@@ -37,9 +37,12 @@
                 android:layout_marginLeft="5dp" android:layout_marginRight="5dp">
                 <TextView android:text="80% " android:textColor="@color/textMain" android:gravity="center"
                     android:layout_width="match_parent" android:layout_height="wrap_content"/>
-                <ProgressBar style="@android:style/Widget.ProgressBar.Horizontal" android:progress="10"
-                    android:layout_width="match_parent" android:layout_height="8dp"
-                    android:layout_marginLeft="1dp" android:layout_marginRight="1dp" android:maxWidth="80dp"/>
+
+                <ProgressBar android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:progress="10" style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_marginTop="2dp" android:layout_marginBottom="2dp"
+                    android:progressDrawable="@drawable/progress_bar"/>
+
                 <TextView android:text="dangqianzhengzaiceshi " android:textColor="@color/textMain"
                     android:maxLines="2" android:ellipsize="end" android:gravity="center"
                     android:layout_width="90dp" android:layout_height="wrap_content"/>

@@ -2,7 +2,7 @@ package com.luckmerlin.task;
 
 import com.luckmerlin.core.Brief;
 
-public class Confirm extends BindingResult implements Brief {
+public class Confirm extends BindingResult implements Brief,Doing {
     private String mName;
     private String mTitle;
 

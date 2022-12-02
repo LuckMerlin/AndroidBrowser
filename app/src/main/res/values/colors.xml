@@ -12,7 +12,7 @@
     <color name="textMainSub">#99284eeb</color>
     <color name="hintColor">#55000000</color>
     <color name="textMainAnti">#fff</color>
-    <color name="dialogBg">#eeffffff</color>
+    <color name="dialogBg">#aaFFFAFA</color>
     <color name="browserBackground">#55000000</color>
     <color name="textTitleSub">#a000</color>
     <color name="syncNull">@android:color/transparent</color>
@@ -28,4 +28,7 @@
     <color name="buttonNormal">#88ffffff</color>
     <color name="buttonPressed">#33ffffff</color>
     <color name="buttonDisable">#11ffffff</color>
+    <color name="progressBg">#22ffffff</color>
+    <color name="progressColor">@color/iconNormal</color>
+    <color name="progressSecondColor">@color/iconPressed</color>
 </resources>

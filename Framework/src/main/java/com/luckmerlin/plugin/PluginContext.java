@@ -71,7 +71,7 @@ public abstract class PluginContext extends ContextWrapper {
         Class cls=null!=contentClass?loadPluginClass(contentClass.getName()):null;
         if (null!=cls&&ContentResolver.class.isAssignableFrom(cls)){
             Debug.D("AAAAA "+cls);
-            return ((ContentResolver)new ObjectCreator().createObject(cls)).onResolveContent(this);
+//            return ((ContentResolver)new ObjectCreator().createObject(cls)).onResolveContent(this);
         }
         return null;
     }

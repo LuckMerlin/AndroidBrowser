@@ -16,6 +16,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     private Result mResult;
     private transient OnProgressChange mNotifier;
     private transient Runtime mRuntime;
+    private transient Doing mDoing;
     private transient OnProgressChange mOnProgressChange;
 
     public AbstractTask(Progress progress){
@@ -40,6 +41,16 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     public final AbstractTask setName(String name) {
         this.mName = name;
         return this;
+    }
+
+    public final AbstractTask setDoing(Doing doing) {
+        this.mDoing = doing;
+        return this;
+    }
+
+    @Override
+    public final Doing getDoing() {
+        return mDoing;
     }
 
     protected abstract Result onExecute(Runtime runtime);

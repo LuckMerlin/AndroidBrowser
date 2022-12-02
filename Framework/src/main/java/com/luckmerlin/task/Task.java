@@ -7,4 +7,7 @@ public interface Task{
     String getName();
     Progress getProgress();
     Result getResult();
+    default Doing getDoing(){
+        return null;
+    }
 }

@@ -27,15 +27,14 @@ public class PluginApkContext extends PluginContext {
                 Context base=getBaseContext();
                 String packageName=mPackageName;
                 if (null!=base&&null!=packageName&&packageName.length()>0){
-                   mPluginContext=base.createPackageContext(packageName,
-                            Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
+                   mPluginContext=base.createPackageContext(packageName, Context.CONTEXT_INCLUDE_CODE | Context.CONTEXT_IGNORE_SECURITY);
                 }
             }
         } catch (PackageManager.NameNotFoundException e) {
             Debug.E("Exception create apk plugin context.e="+e);
-            e.printStackTrace();
+//            e.printStackTrace();
         }
-        return mPluginContext;
+        return null!=mPluginContext?mPluginContext:super.getBaseContext();
     }
 
     @Override
