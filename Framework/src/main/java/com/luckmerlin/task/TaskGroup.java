@@ -29,11 +29,12 @@ public class TaskGroup extends AbstractTask{
             Task next= next();
             if (null==next){
                 Task task=findFirstFail();
-                Result result=null!=task?task.getResult():null;
+                Ongoing ongoing=null!=task?task.getOngoing():null;
+                Result result=null!=ongoing?ongoing.getResult():null;
                 return null!=result?result:new Response().set(Code.CODE_SUCCEED,"None next.",null);
             }
-            final OnProgressChange innerProgress=(Task task, Progress progress)-> {
-                notifyProgress(task,progress);
+            final OnProgressChange innerProgress=(Task task)-> {
+                notifyProgress(task);
             };
             mQueue.put(next,true);
             mExecuting=next;
@@ -62,8 +63,8 @@ public class TaskGroup extends AbstractTask{
         Map<Task,Boolean> queue=mQueue;
         return null!=queue?findFirst((Task data)-> {
             Boolean isExecute=null!=data?queue.get(data):null;
-            Progress progress=null!=isExecute&&!isExecute?data.getProgress():null;
-            return null==progress||!progress.isSucceed();
+            Ongoing ongoing=null!=isExecute&&!isExecute?data.getOngoing():null;
+            return null==ongoing||!ongoing.isSucceed();
         }):null;
     }
 

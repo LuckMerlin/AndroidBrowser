@@ -5,5 +5,5 @@ import android.content.Context;
 import com.luckmerlin.core.Result;
 
 public interface ConfirmResult extends Result {
-    Confirm makeConfirm(Context context);
+    Confirm1 makeConfirm(Context context);
 }

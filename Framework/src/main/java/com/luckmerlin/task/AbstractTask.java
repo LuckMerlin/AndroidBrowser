@@ -2,40 +2,39 @@ package com.luckmerlin.task;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.luckmerlin.core.ChangeUpdater;
 import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.core.OnInvoke;
 import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.debug.Debug;
 
 public abstract class AbstractTask extends ChangeUpdater implements Task, ParcelObject {
     private String mName;
-    private Progress mProgress;
-    private Result mResult;
+    private Ongoing mOngoing;
     private transient OnProgressChange mNotifier;
     private transient Runtime mRuntime;
-    private transient Doing mDoing;
     private transient OnProgressChange mOnProgressChange;
 
+    public AbstractTask(){
+
+    }
+
     public AbstractTask(Progress progress){
-        mProgress=progress;
+
     }
 
     @Override
     public void onParcelWrite(Parcel parcel) {
+        Ongoing doing=mOngoing;
         parcel.writeString(mName);
-        parcel.writeParcelable(mProgress,0);
-        Result result=mResult;
-        Parceler.write(parcel,null!=result&&result instanceof ParcelObject?(ParcelObject) result:null);
+        parcel.writeParcelable(null!=doing&&doing instanceof Parcelable?(Parcelable)doing:null,0);
     }
 
     @Override
     public void onParcelRead(Parcel parcel) {
         mName=parcel.readString();
-        mProgress=parcel.readParcelable(getClass().getClassLoader());
-        mResult=Parceler.read(parcel);
+        mOngoing=parcel.readParcelable(getClass().getClassLoader());
     }
 
     public final AbstractTask setName(String name) {
@@ -43,46 +42,56 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
         return this;
     }
 
-    public final AbstractTask setDoing(Doing doing) {
-        this.mDoing = doing;
+    public final AbstractTask setOnDoing(Ongoing doing) {
+        return setOnDoing(this,doing);
+    }
+
+    public final AbstractTask setOnDoing(Task task,Ongoing doing) {
+        if (null!=task){
+            if (task instanceof AbstractTask){
+                ((AbstractTask)task).mOngoing=doing;
+            }
+            OnProgressChange notifier=mNotifier;
+            if (null!=notifier){
+                notifier.onProgressChanged(task);
+            }
+        }
         return this;
     }
 
     @Override
-    public final Doing getDoing() {
-        return mDoing;
+    public final Ongoing getOngoing() {
+        return mOngoing;
     }
 
     protected abstract Result onExecute(Runtime runtime);
 
     protected final AbstractTask setProgress(Progress progress){
-        mProgress=progress;
+//        mProgress=progress;
         return this;
     }
 
     protected final AbstractTask setResult(Result result){
-        mResult=result;
+//        mResult=result;
         return this;
     }
 
     @Override
     public final Result execute(Runtime runtime, OnProgressChange callback) {
-        mResult=null;
+        mOngoing=null;
         mRuntime=runtime;
         mOnProgressChange=callback;
-        mNotifier=(Task task, Progress progress)-> {
-            mProgress=progress;
-            iterateUpdaters((OnChangeUpdate data)-> null!=data&&data.onChangeUpdated(progress));
+        mNotifier=(Task task)-> {
+            iterateUpdaters((OnChangeUpdate data)-> null!=data&&data.onChangeUpdated(task));
             if (null!=callback){
-                callback.onProgressChanged(null!=task?task:this,progress);
+                callback.onProgressChanged(null!=task?task:this);
             }
         };
-        Result result= onExecute(runtime);
-        notifyProgress(mProgress);
+        Result result = onExecute(runtime);
         mNotifier=null;
         mRuntime=null;
         mOnProgressChange=null;
-        return mResult=result;
+        return result;
     }
 
     public final OnProgressChange getOnProgressChange() {
@@ -92,16 +101,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     @Override
     public final String getName() {
         return mName;
-    }
-
-    @Override
-    public final Progress getProgress() {
-        return mProgress;
-    }
-
-    @Override
-    public final Result getResult() {
-        return mResult;
     }
 
     public final Executor getExecutor() {
@@ -123,21 +122,13 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
         return null!=context?context.getString(textId,args):null;
     }
 
-    protected final boolean notifyProgress(){
-        return notifyProgress(this,mProgress);
+    @Deprecated
+    protected void notifyProgress(Task progress){
+
     }
 
-    protected final boolean notifyProgress(Progress progress){
-        return notifyProgress(this,progress);
-    }
+    @Deprecated
+    protected void notifyProgress(Progress progress){
 
-    protected final boolean notifyProgress(Task task,Progress progress){
-        OnProgressChange notifier=null!=task?mNotifier:null;
-        if (null!=notifier){
-            mProgress=task==this?progress:mProgress;
-            notifier.onProgressChanged(task,progress);
-            return true;
-        }
-        return false;
     }
 }

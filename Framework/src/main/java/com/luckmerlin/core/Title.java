@@ -1,2 +1,5 @@
-package com.luckmerlin.core;public class Title {
+package com.luckmerlin.core;
+
+public interface Title {
+    String getTitle();
 }

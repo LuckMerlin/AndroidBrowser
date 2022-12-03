@@ -271,10 +271,10 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         public void run() {
             setStatusChange(STATUS_EXECUTING,this,mListeners);
             if (!(mTask instanceof OnExecuteStart)||!((OnExecuteStart)mTask).onExecuteStart(TaskExecutor.this)){
-                mTask.execute(this, (Task task, Progress progress)->
+                mTask.execute(this, (Task task)->
                 iterateListener(task,(Listener data)->{
                     if (null!=data&&data instanceof OnProgressChange){
-                        ((OnProgressChange)data).onProgressChanged(task,progress);
+                        ((OnProgressChange)data).onProgressChanged(task);
                     }
                     return false;
                 }));
@@ -286,8 +286,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
                 deleteSucceed=true;
             }
             deleteSucceed=deleteSucceed||Option.isOptionEnabled(getOption(),Option.DELETE_SUCCEED);
-            Progress progress=null;
-            if (deleteSucceed&&null!=(progress=mTask.getProgress())&&progress.isSucceed()){
+            Ongoing ongoing=null;
+            if (deleteSucceed&&null!=(ongoing=mTask.getOngoing())&&ongoing.isSucceed()){
                 deleteSaveTask(this);
             }else if (!Option.isOptionEnabled(getOption(),Option.DELETE)){
                 saveTask(mTask,getOption());
@@ -389,12 +389,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         }
 
         @Override
-        public Progress getProgress() {
-            return null;
-        }
-
-        @Override
-        public Result getResult() {
+        public Ongoing getOngoing() {
             return null;
         }
     }
