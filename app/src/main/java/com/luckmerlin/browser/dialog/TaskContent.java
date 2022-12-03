@@ -4,14 +4,14 @@ import android.content.Context;
 import android.view.View;
 import androidx.databinding.ObservableField;
 
+import com.luckmerlin.browser.databinding.TaskContentDialogBinding;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.databinding.TaskContentDialogBinding;
 import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Progress;
@@ -49,15 +49,15 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
     }
 
     @Override
-    public void onProgressChanged(Task task, Progress progress) {
-        if (null!=progress){
-            mTaskProgress.set(progress.intValue());
-            Object object=progress.getData();
-            if (null!=object&&object instanceof DoingFiles){
-                mDoingFiles.set((DoingFiles) object);
-                mDoingFiles.notifyChange();
-            }
-        }
+    public void onProgressChanged(Task task) {
+//        if (null!=progress){
+//            mTaskProgress.set(progress.intValue());
+//            Object object=progress.getData();
+//            if (null!=object&&object instanceof DoingFiles){
+//                mDoingFiles.set((DoingFiles) object);
+//                mDoingFiles.notifyChange();
+//            }
+//        }
     }
 
     @Override
@@ -65,11 +65,12 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
         setConfirm(null);//Clean
         switch (status){
             case Executor.STATUS_FINISH:
-                Result result=null!=task?task.getResult():null;
+//                Result result=null!=task?task.getResult():null;
+                Result result=null;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
                 int autoDismiss=mAutoDismiss;
-                if (result instanceof Confirm){
-                    setConfirm((Confirm)result);
+                if (result instanceof Confirm1){
+                    setConfirm((Confirm1)result);
                     return;
                 }else if (autoDismiss>0){
                     post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss

@@ -23,7 +23,7 @@ import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.model.OnBackPress;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.RestartEnabler;
 import com.luckmerlin.task.Option;
@@ -111,7 +111,7 @@ public class ConveyorActivityModel extends BaseModel implements
         }
         final ConfirmContent confirmContent=new ConfirmContent();
         String title=getString(R.string.sureWhich,getString(R.string.delete));
-        Confirm confirm=new Confirm();
+        Confirm1 confirm=new Confirm1();
         confirm.setName(title).setMessage(task.getName());
         confirm.setBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.sure).
                 setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->

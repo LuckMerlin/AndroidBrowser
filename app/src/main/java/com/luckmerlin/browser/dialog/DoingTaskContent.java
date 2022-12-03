@@ -39,15 +39,15 @@ public class DoingTaskContent extends ConfirmContent implements
     }
 
     @Override
-    public void onProgressChanged(Task task, Progress progress) {
+    public void onProgressChanged(Task task) {
         if (!isUiThread()){
-            post(()->onProgressChanged(task,progress));
+            post(()->onProgressChanged(task));
             return;
         }
-        Object object=null!=progress?progress.getDoing():null;
-        Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
-        mDoing.set(doing);
-        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
+//        Object object=null!=progress?progress.getDoing():null;
+//        Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
+//        mDoing.set(doing);
+//        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
     }
 
     @Override
@@ -74,8 +74,8 @@ public class DoingTaskContent extends ConfirmContent implements
 //                if (result instanceof BindingResult){
 //                    binding=((BindingResult)result).getBinding();
 //                }
-//                if (result instanceof Confirm){
-//                    setConfirm(((Confirm)result));
+//                if (result instanceof Confirm1){
+//                    setConfirm(((Confirm1)result));
 //                    return;
 //                }
 //                AutoDismiss autoDismiss=mAutoDismiss;

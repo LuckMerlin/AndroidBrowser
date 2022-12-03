@@ -8,7 +8,7 @@
         <variable name="selectEnable" type="boolean" />
         <variable name="position" type="int" />
         <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
-        <variable name="confirm" type="com.luckmerlin.task.Confirm" />
+        <variable name="confirm" type="com.luckmerlin.task.Confirm1" />
         <variable name="iconResId" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <import type="com.luckmerlin.utils.Utils"/>
@@ -29,7 +29,7 @@
                 android:padding="3dp" android:orientation="vertical" android:gravity="center">
                 <ImageView android:src="@drawable/hidisk_icon_html"
                     android:layout_width="50dp" android:layout_height="50dp"/>
-                <TextView android:textColor="@color/textMain" android:text="@{task.progress.speed??``}"
+                <TextView android:textColor="@color/textMain" android:text="@{task.ongoing.speed??``}"
                     android:gravity="center" android:maxLines="1" android:textSize="10sp" android:autoSizeMaxTextSize="5dp"
                     android:layout_width="50dp" android:layout_height="wrap_content"/>
             </LinearLayout>
@@ -41,7 +41,7 @@
                     android:ellipsize="middle" android:singleLine="true"
                     android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold"/>
 
-                <TextView android:text="@{task.progress.title??``}" android:textColor="@color/textMainSub"
+                <TextView android:text="@{task.ongoing.doing.title??``}" android:textColor="@color/textMainSub"
                     android:textSize="12sp" android:layout_marginLeft="5dp" android:paddingTop="1dp"
                     android:ellipsize="middle" android:singleLine="true"
                     android:paddingBottom="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
@@ -134,16 +134,16 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             Object result=null;
             Progress progress=null;
             if (null!=item){
-                result=item.getResult();
-                progress=item.getProgress();
+//                result=item.getResult();
+//                progress=item.getProgress();
             }
             int iconRes;
-            Confirm confirm=null;
+            Confirm1 confirm=null;
             if (null==result){
                 iconRes=null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
-            }else if (result instanceof Confirm){
+            }else if (result instanceof Confirm1){
                 iconRes=R.drawable.selector_confirm;
-                confirm=((Confirm)result);
+                confirm=((Confirm1)result);
             }else{
                 iconRes=null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
             }
@@ -154,7 +154,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             if (binding instanceof ItemConveyorGroupBinding){
                 ItemConveyorGroupBinding groupBinding=(ItemConveyorGroupBinding)binding;
                 groupBinding.setPosition(position);
-                groupBinding.setConfirm(confirm);
+//                groupBinding.setConfirm(confirm);
                 groupBinding.setSelected(selected);
                 groupBinding.setSelectEnable(selectEnabled);
                 groupBinding.setIconBinding(ViewBinding.clickId(iconRes,item));

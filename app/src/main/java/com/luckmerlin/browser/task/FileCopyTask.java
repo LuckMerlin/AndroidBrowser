@@ -57,7 +57,8 @@ public class FileCopyTask extends FileTask {
             Utils.closeStream(toStream);
             return new Response(Code.CODE_FAIL,"From stream invalid.");
         }
-        Result result= new StreamTask(fromStream,toStream).execute(runtime, (Task task, Progress progress)-> setProgress(progress));
+        Result result=null;
+//        = new StreamTask(fromStream,toStream).execute(runtime, (Task task)-> setProgress(progress));
         Utils.closeStream(fromStream,toStream);
         return result;
     }

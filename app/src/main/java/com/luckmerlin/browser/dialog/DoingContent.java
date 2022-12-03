@@ -4,9 +4,9 @@ import android.content.Context;
 import android.view.View;
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.R;
-import com.luckmerlin.browser.databinding.DoingTaskBinding;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.browser.CodeResult;
@@ -14,7 +14,7 @@ import com.luckmerlin.core.MessageResult;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.BindingResult;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
@@ -48,13 +48,13 @@ public class DoingContent extends ConfirmContent implements
     }
 
     @Override
-    public void onProgressChanged(Task task, Progress progress) {
+    public void onProgressChanged(Task task) {
         if (!isUiThread()){
-            post(()->onProgressChanged(task,progress));
+//            post(()->onProgressChanged(task,progress));
             return;
         }
-        Object object=null!=progress?progress.getDoing():null;
-        mDoing.set(null!=object&&object instanceof Doing ?((Doing)object):null);
+//        Object object=null!=progress?progress.getDoing():null;
+//        mDoing.set(null!=object&&object instanceof Doing ?((Doing)object):null);
     }
 
     @Override
@@ -68,15 +68,16 @@ public class DoingContent extends ConfirmContent implements
                                 null!=executor&&executor.execute(task,Option.CANCEL))));
                 break;
             case Executor.STATUS_FINISH:
-                Result result=null!=task?task.getResult():null;
+//                Result result=null!=task?task.getResult():null;
+                Result result=null;
                 result=result instanceof ConfirmResult?((ConfirmResult)result).makeConfirm(getContext()):result;
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
                 Binding binding=null;
                 if (result instanceof BindingResult){
                     binding=((BindingResult)result).getBinding();
                 }
-                if (result instanceof Confirm){
-                    setConfirm(((Confirm)result));
+                if (result instanceof Confirm1){
+                    setConfirm(((Confirm1)result));
                     return;
                 }
                 AutoDismiss autoDismiss=mAutoDismiss;

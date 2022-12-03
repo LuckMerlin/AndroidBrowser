@@ -20,7 +20,7 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.ConfirmResult;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
@@ -99,7 +99,7 @@ public class FilesCopyTask extends FilesTask {
                 if (null != data && data.isDirectory()){
                     response=new Response<File>(Code.CODE_SUCCEED, null, data);
                 }else {
-                    return new Confirm().setMessage("需要删除存在的文件才能继续.\n"+toFile.getName()).
+                    return new Confirm1().setMessage("需要删除存在的文件才能继续.\n"+toFile.getName()).
                     setBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.cancel).
                             setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
                             execute(FilesCopyTask.this, Option.CANCEL)&&false)));
@@ -168,7 +168,7 @@ public class FilesCopyTask extends FilesTask {
                     if (null==executor){
                         return new Response<>(Code.CODE_ERROR,"Need confirm file copy cover,But not exist executor");
                     }
-                    return (ConfirmResult)(Context context)->(Confirm)new Confirm().setTitle(Utils.getString(context,R.string.sureWhich,
+                    return (ConfirmResult)(Context context)->(Confirm1)new Confirm1().setTitle(Utils.getString(context,R.string.sureWhich,
                                     null,Utils.getString(context,R.string.replace,null))).
                             setName(Utils.getString(context,R.string.alreadyWhich,null,Utils.getString(context,R.string.exist,null))).
                             setMessage(toFile.getName()).setBinding(new DialogButtonBinding(
@@ -188,10 +188,10 @@ public class FilesCopyTask extends FilesTask {
                 return copyFile(fromFile,toFolder, runtime, progress);
             }
         }
-        Result result = new StreamTask(fromStream, toStream).execute(runtime, (Task task, Progress progress1) -> {
-            if (null != progress1) {
-                notifyProgress(progress.setDoing(doing.setProgress(progress1.intValue())));
-            }
+        Result result = new StreamTask(fromStream, toStream).execute(runtime, (Task task) -> {
+//            if (null != progress1) {
+//                notifyProgress(progress.setDoing(doing.setProgress(progress1.intValue())));
+//            }
         });
         Utils.closeStream(fromStream, toStream);
 //        if (mDeleteSrcWhileSucceed&&null!=result&&result instanceof Response&&((Response)result).isSucceed()){

@@ -1,4 +1,2 @@
-package com.luckmerlin.task;
-
-public interface Doing {
+package com.luckmerlin.task;public class Doing {
 }

@@ -1,14 +1,14 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
-import android.content.Context;
 
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Confirm;
-import com.luckmerlin.task.ConfirmResult1;
+import com.luckmerlin.task.Confirm1;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
@@ -22,12 +22,15 @@ public class TestTask extends AbstractTask {
 
     @Override
     protected Result onExecute(Runtime runtime) {
+        Ongoing ongoing= new Ongoing();
+        ongoing.set(new Confirm().setTitle("queding").setMessage("zheshiyitiao"));
+        setOnDoing(ongoing);
 //        if (System.currentTimeMillis()%2!=0){
             Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
                     setSpeed("666MB/S");
             while (progress.getPosition()<progress.getTotal()){
                 progress.setPosition(progress.getPosition()+1);
-                notifyProgress(progress);
+//                setOnDoing(progress);
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -36,7 +39,7 @@ public class TestTask extends AbstractTask {
             }
 //            return null;
 //        }
-        return new Confirm().setMessage("确认消息").setBinding(new DialogButtonBinding(
+        return new Confirm1().setMessage("确认消息").setBinding(new DialogButtonBinding(
                 ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
 //        while (true){
 //            try {

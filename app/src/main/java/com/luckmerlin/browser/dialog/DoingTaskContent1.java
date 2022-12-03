@@ -22,6 +22,11 @@ public class DoingTaskContent1 extends ConfirmContent implements
     private final ObservableField<Binding> mBinding=new ObservableField<>();
     private AutoDismiss mAutoDismiss;
 
+    @Override
+    public void onProgressChanged(Task task) {
+
+    }
+
     public interface AutoDismiss{
         int onResolveAutoDismiss(Result result);
     }
@@ -38,17 +43,17 @@ public class DoingTaskContent1 extends ConfirmContent implements
         return removeFromParent()||true;
     }
 
-    @Override
-    public void onProgressChanged(Task task, Progress progress) {
-        if (!isUiThread()){
-            post(()->onProgressChanged(task,progress));
-            return;
-        }
-        Object object=null!=progress?progress.getDoing():null;
-        Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
-        mDoing.set(doing);
-        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
-    }
+//    @Override
+//    public void onProgressChanged(Task task, Progress progress) {
+//        if (!isUiThread()){
+//            post(()->onProgressChanged(task,progress));
+//            return;
+//        }
+//        Object object=null!=progress?progress.getDoing():null;
+//        Doing doing=null!=object&&object instanceof Doing ?((Doing)object):null;
+//        mDoing.set(doing);
+//        Debug.D("SSSSS "+doing+" "+(null!=doing?doing.getDoingBinding():null));
+//    }
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
@@ -73,8 +78,8 @@ public class DoingTaskContent1 extends ConfirmContent implements
 //                if (result instanceof BindingResult){
 //                    binding=((BindingResult)result).getBinding();
 //                }
-//                if (result instanceof Confirm){
-//                    setConfirm(((Confirm)result));
+//                if (result instanceof Confirm1){
+//                    setConfirm(((Confirm1)result));
 //                    return;
 //                }
 //                AutoDismiss autoDismiss=mAutoDismiss;

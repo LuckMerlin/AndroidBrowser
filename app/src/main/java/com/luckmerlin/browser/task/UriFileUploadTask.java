@@ -80,10 +80,10 @@ public class UriFileUploadTask extends FileTask {
         int uploadCount=0;
         final Progress progress=new Progress().setTotal(totalSize).setPosition(uploadCount);
         final List<Parcelable> uploadList=new ArrayList<>();
-        final OnProgressChange onProgressChange=(Task task, Progress progress1)-> {
-            if (null!=progress1){
-                notifyProgress(progress.setDoing(progress1.getDoing()));
-            }
+        final OnProgressChange onProgressChange=(Task task)-> {
+//            if (null!=progress1){
+//                notifyProgress(progress.setDoing(progress1.getDoing()));
+//            }
         };
         Result childResult=null;
         for (Parcelable parcelable:uris) {
@@ -164,11 +164,11 @@ public class UriFileUploadTask extends FileTask {
                 public void close() throws IOException {
                     Utils.closeStream(finalInputStream,finalOutputStream);
                 }
-            }, outputStream).execute(runtime,null!=callback?(Task task, Progress progress)-> {
-                if (null!=progress){
-                    notifyProgress(progress.setDoing(doingFiles.setProgress(progress.intValue())));
-                }
-                callback.onProgressChanged(task,progress);
+            }, outputStream).execute(runtime,null!=callback?(Task task)-> {
+//                if (null!=progress){
+//                    notifyProgress(progress.setDoing(doingFiles.setProgress(progress.intValue())));
+//                }
+                callback.onProgressChanged(task);
             }:null);
         } catch (FileNotFoundException e) {
             Debug.D("Exception execute uri upload.e="+e+" "+this);

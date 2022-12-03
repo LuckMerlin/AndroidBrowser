@@ -80,9 +80,9 @@ public class FileMoveTask extends FileTask{
         Debug.D("To copy files while move task at first."+fromFile.getName());
         notifyProgress(progress.setPosition(1));
         FileCopyTask fileCopyTask=new FileCopyTask(fromFile,toFile,null);
-        final OnProgressChange progressChange=(Task task, Progress progress1)-> {
-            Object progressData=progress1.getData();
-            notifyProgress(null==progressData?progress:progress.setDoing(progressData));
+        final OnProgressChange progressChange=(Task task)-> {
+//            Object progressData=progress1.getData();
+//            notifyProgress(null==progressData?progress:progress.setDoing(progressData));
         };
         Result result=fileCopyTask.execute(runtime, progressChange);
         if (!(result=null!=result?result:new Response(Code.CODE_UNKNOWN,"Copy task unknown error.")).isSucceed()){

@@ -360,11 +360,11 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
         mNotifyText.set(""+status+" "+(null!=task?task.getName():""));
         switch (status){
             case Executor.STATUS_FINISH:
-                Progress progress=null!=task?task.getProgress():null;
-                Object object=null!=progress?progress.getData():null;
-                if (null!=object&&object instanceof DoingFiles){
-                    checkDoingFileSucceed((DoingFiles)object);
-                }
+//                Progress progress=null!=task?task.getProgress():null;
+//                Object object=null!=progress?progress.getData():null;
+//                if (null!=object&&object instanceof DoingFiles){
+//                    checkDoingFileSucceed((DoingFiles)object);
+//                }
                 break;
         }
     }

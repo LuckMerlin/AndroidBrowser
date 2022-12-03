@@ -38,7 +38,7 @@
                 android:layout_marginLeft="5dp" android:paddingTop="2dp" android:paddingBottom="2dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-            <ProgressBar android:progress="@{Utils.progress(task.progress)}"
+            <ProgressBar android:progress="@{task.ongoing.progress}"
                 style="@android:style/Widget.ProgressBar.Horizontal"
                 android:progressDrawable="@drawable/progress_bar"
                 android:layout_width="match_parent" android:layout_height="2dp"/>

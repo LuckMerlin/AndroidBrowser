@@ -60,7 +60,7 @@ import com.luckmerlin.model.OnActivityCreate;
 import com.luckmerlin.model.OnActivityNewIntent;
 import com.luckmerlin.model.OnActivityStart;
 import com.luckmerlin.model.OnBackPress;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
@@ -253,7 +253,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             String message=files.makeDescription(getContext());
             final ConfirmContent confirmContent=new ConfirmContent();
             String title=getString(R.string.sureWhich,getString(R.string.delete));
-            Confirm confirm=new Confirm();
+            Confirm1 confirm=new Confirm1();
             confirm.setName(title).setMessage(message);
             confirm.setBinding(new DialogButtonBinding(
             ViewBinding.clickId(R.string.sure).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
@@ -404,7 +404,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")).setTimeout(1000));
         switch (status){
             case Executor.STATUS_FINISH:
-                checkDoingFileSucceed(null!=task?task.getProgress():null);
+//                checkDoingFileSucceed(null!=task?task.getProgress():null);
                 break;
         }
     }

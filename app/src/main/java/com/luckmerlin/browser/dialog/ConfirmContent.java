@@ -6,11 +6,11 @@ import androidx.databinding.ObservableField;
 import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.ConfirmContentBinding;
-import com.luckmerlin.task.Confirm;
+import com.luckmerlin.task.Confirm1;
 
 public class ConfirmContent extends BaseContent {
     private final ObservableField<String> mTitle=new ObservableField<>();
-    private final ObservableField<Confirm> mConfirm=new ObservableField<>();
+    private final ObservableField<Confirm1> mConfirm=new ObservableField<>();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -32,7 +32,7 @@ public class ConfirmContent extends BaseContent {
     }
 
 
-    public final ConfirmContent setConfirm(Confirm confirm){
+    public final ConfirmContent setConfirm(Confirm1 confirm){
         if (!isUiThread()){
             post(()->setConfirm(confirm));
             return this;
@@ -41,7 +41,7 @@ public class ConfirmContent extends BaseContent {
         return this;
     }
 
-    public final ObservableField<Confirm> getConfirm() {
+    public final ObservableField<Confirm1> getConfirm() {
         return mConfirm;
     }
 }

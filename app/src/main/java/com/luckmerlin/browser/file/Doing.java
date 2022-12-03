@@ -98,7 +98,7 @@ public class Doing<F extends Brief,T extends Brief> {
 
     @Override
     public String toString() {
-        return "Doing{" +
+        return "Ongoing{" +
                 "mFrom=" + mFrom +
                 ", mTo=" + mTo +
                 ", mProgress=" + mProgress +
