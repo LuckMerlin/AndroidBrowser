@@ -14,7 +14,7 @@
         android:minWidth="300dp" android:paddingTop="5dp" android:paddingBottom="15dp"
         android:paddingLeft="@dimen/contentGap" android:paddingRight="@dimen/contentGap">
 
-        <TextView android:text="@{null!=content.confirm?content.confirm.name:content.title??``}" android:textColor="@color/textTitle"
+        <TextView android:text="@{null!=content.confirm?content.confirm.title:content.title??``}" android:textColor="@color/textTitle"
             android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="20dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 

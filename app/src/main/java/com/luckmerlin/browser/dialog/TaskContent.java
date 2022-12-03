@@ -70,7 +70,7 @@ public class TaskContent extends ConfirmContent implements OnClickListener,
                 result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
                 int autoDismiss=mAutoDismiss;
                 if (result instanceof Confirm1){
-                    setConfirm((Confirm1)result);
+//                    setConfirm((Confirm1)result);
                     return;
                 }else if (autoDismiss>0){
                     post(()->removeFromParent(),autoDismiss>10000?10000:autoDismiss);//Auto dismiss

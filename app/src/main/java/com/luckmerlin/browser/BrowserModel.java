@@ -260,7 +260,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true,autoDismiss))||true),
             ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                     confirmContent.removeFromParent()||true)));
-            confirmContent.setConfirm(confirm);
+//            confirmContent.setConfirm(confirm);
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);

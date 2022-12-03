@@ -77,7 +77,7 @@ public class DoingContent extends ConfirmContent implements
                     binding=((BindingResult)result).getBinding();
                 }
                 if (result instanceof Confirm1){
-                    setConfirm(((Confirm1)result));
+//                    setConfirm(((Confirm)result));
                     return;
                 }
                 AutoDismiss autoDismiss=mAutoDismiss;

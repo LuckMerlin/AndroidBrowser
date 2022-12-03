@@ -11,8 +11,10 @@ import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnProgressChange;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 
@@ -52,6 +54,9 @@ public class DoingTaskContent extends ConfirmContent implements
 
     @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
+        Ongoing ongoing=null!=task?task.getOngoing():null;
+//        setConfirm();
+        Confirm confirm=null!=ongoing?ongoing.getConfirm():null;
 //        task.getProgress();
         Debug.D("AAAAA "+status+" "+executor);
         switch (status){

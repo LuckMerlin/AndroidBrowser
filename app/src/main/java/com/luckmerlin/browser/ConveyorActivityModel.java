@@ -120,7 +120,7 @@ public class ConveyorActivityModel extends BaseModel implements
                                 mConveyorListAdapter.remove(task))||true),
                 ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                         confirmContent.removeFromParent()||true)));
-        confirmContent.setConfirm(confirm);
+//        confirmContent.setConfirm(confirm);
         return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
     }
 
