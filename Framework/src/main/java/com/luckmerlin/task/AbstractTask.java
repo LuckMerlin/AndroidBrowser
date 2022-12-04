@@ -11,6 +11,7 @@ import com.luckmerlin.core.Result;
 public abstract class AbstractTask extends ChangeUpdater implements Task, ParcelObject {
     private String mName;
     private Ongoing mOngoing;
+    private Result mResult;
     private transient OnProgressChange mNotifier;
     private transient Runtime mRuntime;
     private transient OnProgressChange mOnProgressChange;
@@ -73,10 +74,16 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
             }
         };
         Result result = onExecute(runtime);
+        mResult=result;
         mNotifier=null;
         mRuntime=null;
         mOnProgressChange=null;
         return result;
+    }
+
+    @Override
+    public final Result getResult() {
+        return mResult;
     }
 
     public final OnProgressChange getOnProgressChange() {

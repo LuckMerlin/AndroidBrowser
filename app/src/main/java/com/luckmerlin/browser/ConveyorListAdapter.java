@@ -10,8 +10,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorGroupBinding;
 import com.luckmerlin.browser.databinding.ItemConveyorSingleBinding;
+import com.luckmerlin.core.Result;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Confirm1;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskGroup;
@@ -132,21 +134,16 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
         ViewDataBinding binding=null!=itemView? DataBindingUtil.getBinding(itemView):null;
         if (null!=binding){
             Task item=getItem(position);
-            Object result=null;
-            Progress progress=null;
-            if (null!=item){
-//                result=item.getResult();
-//                progress=item.getProgress();
-            }
+            Result result=null!=item?item.getResult():null;
+            Ongoing ongoing=null!=item?item.getOngoing():null;
+            Confirm confirm=null!=ongoing?ongoing.getConfirm():null;
             int iconRes;
-            Confirm confirm=null;
-            if (null==result){
-                iconRes=null!=progress?R.drawable.selector_pause:R.drawable.selector_start;
-            }else if (result instanceof Confirm){
+            if (null!=confirm){
                 iconRes=R.drawable.selector_confirm;
-                confirm=((Confirm)result);
+            }else if (null==result){
+                iconRes=R.drawable.selector_start;
             }else{
-                iconRes=null==progress||progress.intValue()!=100? R.drawable.selector_fail:R.drawable.selector_succeed;
+                iconRes=null==ongoing||!ongoing.isSucceed()? R.drawable.selector_fail:R.drawable.selector_succeed;
             }
             List<Task> selectList=mSelectedList;
             Boolean selectEnabled=mMultiChooseEnabled.get();
@@ -155,7 +152,7 @@ public class ConveyorListAdapter extends PageListAdapter<Query<Task>, Task> {
             if (binding instanceof ItemConveyorGroupBinding){
                 ItemConveyorGroupBinding groupBinding=(ItemConveyorGroupBinding)binding;
                 groupBinding.setPosition(position);
-//                groupBinding.setConfirm(confirm);
+                groupBinding.setConfirm(confirm);
                 groupBinding.setSelected(selected);
                 groupBinding.setSelectEnable(selectEnabled);
                 groupBinding.setIconBinding(ViewBinding.clickId(iconRes,item));

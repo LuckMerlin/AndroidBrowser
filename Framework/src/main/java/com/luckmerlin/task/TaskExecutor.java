@@ -392,6 +392,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         public Ongoing getOngoing() {
             return null;
         }
+
+        @Override
+        public Result getResult() {
+            return null;
+        }
     }
 
 }
