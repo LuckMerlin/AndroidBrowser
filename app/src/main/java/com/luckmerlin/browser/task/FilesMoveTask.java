@@ -14,8 +14,8 @@ public class FilesMoveTask extends FilesCopyTask{
     }
 
     @Override
-    protected Result onExecuteFile(File fromFile, int index, Runtime runtime, Progress progress) {
-        Result result= super.onExecuteFile(fromFile, index, runtime,progress);
+    protected Result onExecuteFile(File fromFile, int index, Runtime runtime, OngoingUpdate onGoingUpdate) {
+        Result result=  super.onExecuteFile(fromFile, index, runtime, onGoingUpdate);
         return result;
     }
 }

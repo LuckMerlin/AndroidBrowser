@@ -4,9 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Parcelable;
-
 import androidx.documentfile.provider.DocumentFile;
-
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Utils;
@@ -19,22 +17,20 @@ import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.OnProgressChange;
-import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UriFileUploadTask extends FileTask {
+public class UriFileUploadTask extends AbstractFileTask {
     private ArrayList<Parcelable> mUris;
     private final Folder mFolder;
 
     public UriFileUploadTask(Folder folder) {
-        super(null);
         mFolder=folder;
     }
 
@@ -56,9 +52,10 @@ public class UriFileUploadTask extends FileTask {
     protected Result onExecute(Runtime runtime) {
         ArrayList<Parcelable> uris=mUris;
         final int totalSize=null!=uris?uris.size():-1;
+        final Ongoing ongoing=new Ongoing();
         if (totalSize<=0){
             Debug.D("Not need execute task while uris size empty."+this);
-            setProgress(new Progress().setPosition(100).setTotal(100));
+            notifyProgress(ongoing.setProgressSucceed(true));
             return new Response<>(Code.CODE_ALREADY,"Uris size empty");
         }
         final Folder folder=mFolder;
@@ -78,16 +75,16 @@ public class UriFileUploadTask extends FileTask {
             return new Response<>(Code.CODE_FAIL,"Content resolver invalid");
         }
         int uploadCount=0;
-        final Progress progress=new Progress().setTotal(totalSize).setPosition(uploadCount);
         final List<Parcelable> uploadList=new ArrayList<>();
         final OnProgressChange onProgressChange=(Task task)-> {
-//            if (null!=progress1){
-//                notifyProgress(progress.setDoing(progress1.getDoing()));
-//            }
+            Ongoing childOngoing=null!=task?task.getOngoing():null;
+            ongoing.setSpeed(null!=childOngoing?childOngoing.getSpeed():null).
+                    setProgress(null!=childOngoing?childOngoing.getProgress():0);
+            notifyProgress(ongoing);
         };
         Result childResult=null;
         for (Parcelable parcelable:uris) {
-            notifyProgress(progress.setPosition(++uploadCount));
+            notifyProgress(ongoing.setProgress(Utils.progress(++uploadCount,totalSize)));
             if (null==(childResult=upload(parcelable,folder,client,runtime,context,contentResolver,onProgressChange))){
                 uploadList.add(parcelable);
                 continue;
@@ -97,7 +94,7 @@ public class UriFileUploadTask extends FileTask {
             uploadList.add(parcelable);
         }
         uris.removeAll(uploadList);
-        notifyProgress(progress);
+        notifyProgress(ongoing.setProgress(Utils.progress(uploadCount,totalSize)));
         return childResult;
     }
 
@@ -164,12 +161,7 @@ public class UriFileUploadTask extends FileTask {
                 public void close() throws IOException {
                     Utils.closeStream(finalInputStream,finalOutputStream);
                 }
-            }, outputStream).execute(runtime,null!=callback?(Task task)-> {
-//                if (null!=progress){
-//                    notifyProgress(progress.setDoing(doingFiles.setProgress(progress.intValue())));
-//                }
-                callback.onProgressChanged(task);
-            }:null);
+            }, outputStream).execute(runtime,null!=callback?(Task task)->callback.onProgressChanged(task):null);
         } catch (FileNotFoundException e) {
             Debug.D("Exception execute uri upload.e="+e+" "+this);
             e.printStackTrace();

@@ -20,14 +20,16 @@ public class DoingTaskContent extends ConfirmContent implements
     private final ObservableField<Doing> mDoing=new ObservableField<>();
     private final ObservableField<Binding> mBinding=new ObservableField<>();
     private final ObservableField<Integer> mProgress=new ObservableField<>();
+    private final ObservableField<Integer> mSecondProgress=new ObservableField<>();
     private final ObservableField<String> mDoingName=new ObservableField<>();
     private final ObservableField<Brief> mFromBrief=new ObservableField<>();
     private final ObservableField<Brief> mToBrief=new ObservableField<>();
     private final ObservableField<String> mSpeed=new ObservableField<>();
     private AutoDismiss mAutoDismiss;
+    private final Runnable mAutoDismissRunnable=()->removeFromParent();
 
     public interface AutoDismiss{
-        int onResolveAutoDismiss(Result result);
+        int onResolveAutoDismiss(Task task);
     }
 
     @Override
@@ -42,16 +44,16 @@ public class DoingTaskContent extends ConfirmContent implements
         return removeFromParent()||true;
     }
 
-    @Override
-    public void onProgressChanged(Task task) {
+    private void updateTask(Task task){
         if (!isUiThread()){
-            post(()->onProgressChanged(task));
+            post(()->updateTask(task));
             return;
         }
         Ongoing ongoing=null!=task?task.getOngoing():null;
         mDoing.set(null!=ongoing?ongoing.getDoing():null);
         mBinding.set(null!=ongoing?ongoing.getBinding():null);
         mProgress.set(null!=ongoing?ongoing.getProgress():0);
+        mSecondProgress.set(null!=ongoing?ongoing.getSecondProgress():0);
         mDoingName.set(null!=ongoing?ongoing.getTitle():null);
         mSpeed.set(null!=ongoing?ongoing.getSpeed():null);
         setConfirm(null!=ongoing?ongoing.getConfirm():null);
@@ -63,19 +65,22 @@ public class DoingTaskContent extends ConfirmContent implements
     }
 
     @Override
+    public void onProgressChanged(Task task) {
+        updateTask(task);
+    }
+
+    @Override
     public void onStatusChanged(int status, Task task, Executor executor) {
-        Ongoing ongoing=null!=task?task.getOngoing():null;
-        mDoing.set(null!=ongoing?ongoing.getDoing():null);
-        mBinding.set(null!=ongoing?ongoing.getBinding():null);
-        mProgress.set(null!=ongoing?ongoing.getProgress():0);
-        mDoingName.set(null!=ongoing?ongoing.getTitle():null);
-        mSpeed.set(null!=ongoing?ongoing.getSpeed():null);
-        setConfirm(null!=ongoing?ongoing.getConfirm():null);
-        FromTo fromTo=null!=ongoing?ongoing.getFromTo():null;
-        Object from=null!=fromTo?fromTo.getFrom():null;
-        mFromBrief.set(null!=from&&from instanceof Brief?(Brief) from:null);
-        Object to=null!=fromTo?fromTo.getTo():null;
-        mToBrief.set(null!=to&&to instanceof Brief?(Brief) to:null);
+        updateTask(task);
+        switch (status){
+            case Executor.STATUS_FINISH:
+                AutoDismiss autoDismiss=mAutoDismiss;
+                int delay=null!=autoDismiss?autoDismiss.onResolveAutoDismiss(task):-1;
+                if (delay>=0){
+                    post(mAutoDismissRunnable,delay);
+                }
+                break;
+        }
     }
 
     public final DoingTaskContent setDoingBinding(Binding binding){
@@ -86,7 +91,6 @@ public class DoingTaskContent extends ConfirmContent implements
         mBinding.set(binding);
         return this;
     }
-
 
     public final DoingTaskContent setAutoDismiss(AutoDismiss autoDismiss) {
         this.mAutoDismiss = autoDismiss;
@@ -115,6 +119,10 @@ public class DoingTaskContent extends ConfirmContent implements
 
     public ObservableField<Brief> getFromBrief() {
         return mFromBrief;
+    }
+
+    public ObservableField<Integer> getSecondProgress() {
+        return mSecondProgress;
     }
 
     public ObservableField<Brief> getToBrief() {

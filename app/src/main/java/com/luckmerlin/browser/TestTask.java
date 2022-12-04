@@ -18,7 +18,6 @@ public class TestTask extends AbstractTask {
     Activity activity;
 
     public TestTask(Activity activity){
-        super(null);
         this.activity=activity;
     }
 

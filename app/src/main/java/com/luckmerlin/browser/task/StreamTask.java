@@ -7,15 +7,15 @@ import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.AbstractTask;
-import com.luckmerlin.task.Progress;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Runtime;
+import com.luckmerlin.utils.Utils;
 
 public class StreamTask extends AbstractTask {
     private final InputStream mInputStream;
     private final OutputStream mOutputStream;
 
     public StreamTask(InputStream inputStream,OutputStream outputStream) {
-        super(null);
         mInputStream=inputStream;
         mOutputStream=outputStream;
     }
@@ -48,8 +48,8 @@ public class StreamTask extends AbstractTask {
         byte[] buffer=new byte[1024*8];int read=0;
         Debug.D("Copy stream."+currentOutLength+"/"+inputTotalLength);
         try {
-            final Progress progress=new Progress().setPosition(currentOutLength).setTotal(inputTotalLength);
-            notifyProgress(progress);
+            Ongoing ongoing=new Ongoing();
+            notifyProgress(ongoing.setProgress(Utils.progress(currentOutLength,inputTotalLength)));
             long time=System.currentTimeMillis();long lastTime=System.currentTimeMillis();
             while ((read=inputStream.read(buffer))>=0){
                 if (isCancelEnabled()){
@@ -61,7 +61,7 @@ public class StreamTask extends AbstractTask {
                 }
                 time=System.currentTimeMillis();
                 outputStream.write(buffer,0,read);
-                notifyProgress(progress.setPosition(currentOutLength+=read));
+                notifyProgress(ongoing.setProgress(Utils.progress(currentOutLength+=read,inputTotalLength)));
                 lastTime=time;
 //                Thread.sleep(1000);//Test
             }
@@ -71,7 +71,7 @@ public class StreamTask extends AbstractTask {
                 return new Response(Code.CODE_FAIL,"Length NOT matched."+currentOutLength+"/"+inputTotalLength);
             }
             Debug.D("Succeed copy stream."+currentOutLength);
-            notifyProgress(progress.setPosition(currentOutLength).setTotal(currentOutLength));
+            notifyProgress(ongoing.setProgress(Utils.progress(currentOutLength,currentOutLength)));
             return new Response(Code.CODE_SUCCEED,"Succeed");
         }catch (Exception e){
             Debug.W("Exception execute stream task.e="+e);

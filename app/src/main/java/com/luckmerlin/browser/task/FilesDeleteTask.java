@@ -1,6 +1,7 @@
 package com.luckmerlin.browser.task;
 
 import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
@@ -8,6 +9,7 @@ import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
@@ -22,7 +24,7 @@ public class FilesDeleteTask extends FilesTask {
     }
 
     @Override
-    protected Result onExecuteFile(File childFile, int index, Runtime runtime, Progress progress) {
+    protected Result onExecuteFile(File childFile, int index, Runtime runtime, OngoingUpdate onGoingUpdate) {
         if (null==childFile){
             return new Response<>(Code.CODE_FAIL,"File invalid",null);
         }
@@ -30,9 +32,13 @@ public class FilesDeleteTask extends FilesTask {
         if(null==(client=getFileClient(childFile))){
             return new Response<>(Code.CODE_FAIL,"File client invalid.");
         }
+        final FileFromTo fileFromTo=new FileFromTo().setMode(Mode.MODE_DELETE);
+        fileFromTo.setFrom(childFile);
+        final Ongoing ongoing=new Ongoing().setTitle(childFile.getName()).setProgress(0).set(fileFromTo);
         return client.deleteFile(childFile,(int code, CharSequence msg, File file)-> {
-            notifyProgress(progress.setDoing(new Doing().setDoingMode(Mode.MODE_DELETE).
-                    setSucceed(code==Code.CODE_SUCCEED).setFrom(file)));
+            ongoing.setTitle(null!=file?file.getName():null).set(fileFromTo.setFrom(file)).
+                    setProgressSucceed(code==Code.CODE_SUCCEED);
+            updateOnGoing(ongoing,onGoingUpdate);
             return runtime.isCancelEnabled();
         });
     }

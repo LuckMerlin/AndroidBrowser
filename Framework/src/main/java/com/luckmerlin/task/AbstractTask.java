@@ -3,7 +3,6 @@ package com.luckmerlin.task;
 import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.luckmerlin.core.ChangeUpdater;
 import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.ParcelObject;
@@ -17,10 +16,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     private transient OnProgressChange mOnProgressChange;
 
     public AbstractTask(){
-
-    }
-
-    public AbstractTask(Progress progress){
 
     }
 
@@ -66,16 +61,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
 
     protected abstract Result onExecute(Runtime runtime);
 
-    protected final AbstractTask setProgress(Progress progress){
-//        mProgress=progress;
-        return this;
-    }
-
-    protected final AbstractTask setResult(Result result){
-//        mResult=result;
-        return this;
-    }
-
     @Override
     public final Result execute(Runtime runtime, OnProgressChange callback) {
         mOngoing=null;
@@ -120,15 +105,5 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
 
     protected final String getString(Context context,int textId, Object... args){
         return null!=context?context.getString(textId,args):null;
-    }
-
-    @Deprecated
-    protected void notifyProgress(Task progress){
-
-    }
-
-    @Deprecated
-    protected void notifyProgress(Progress progress){
-
     }
 }

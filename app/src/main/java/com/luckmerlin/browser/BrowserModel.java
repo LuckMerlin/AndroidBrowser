@@ -60,6 +60,7 @@ import com.luckmerlin.model.OnActivityCreate;
 import com.luckmerlin.model.OnActivityNewIntent;
 import com.luckmerlin.model.OnActivityStart;
 import com.luckmerlin.model.OnBackPress;
+import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Option;
@@ -556,7 +557,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 //            launchTask(new TestTask(),Option.LAUNCH_NOT_SAVE,true);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
             //Test
-            TestTask testTask=new TestTask(getActivity());
+            AbstractTask testTask=null;
+            testTask=new TestTask(getActivity());
             testTask.setName("eeeeeeeee");
 //            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);

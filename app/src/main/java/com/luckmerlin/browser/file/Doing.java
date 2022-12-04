@@ -4,6 +4,7 @@ import com.luckmerlin.binding.Binding;
 import com.luckmerlin.core.Brief;
 import com.luckmerlin.utils.Utils;
 
+@Deprecated
 public class Doing<F extends Brief,T extends Brief> {
     private F mFrom;
     private T mTo;

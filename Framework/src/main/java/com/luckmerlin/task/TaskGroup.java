@@ -15,14 +15,6 @@ public class TaskGroup extends AbstractTask{
     private final Map<Task,Boolean> mQueue=new HashMap<>();
     private Task mExecuting;
 
-    public TaskGroup() {
-        this(null);
-    }
-
-    public TaskGroup(Progress progress) {
-        super(progress);
-    }
-
     @Override
     protected Result onExecute(Runtime runtime) {
         while (true){
@@ -34,7 +26,7 @@ public class TaskGroup extends AbstractTask{
                 return null!=result?result:new Response().set(Code.CODE_SUCCEED,"None next.",null);
             }
             final OnProgressChange innerProgress=(Task task)-> {
-                notifyProgress(task);
+//                notifyProgress(task);
             };
             mQueue.put(next,true);
             mExecuting=next;

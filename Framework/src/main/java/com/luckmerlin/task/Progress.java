@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import com.luckmerlin.utils.Utils;
 
+@Deprecated
 public final class Progress<T> implements Parcelable {
     private long mTotal;
     private long mPosition;

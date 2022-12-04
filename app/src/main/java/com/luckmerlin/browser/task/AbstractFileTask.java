@@ -8,14 +8,8 @@ import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnInitialOption;
-import com.luckmerlin.task.Progress;
 
-public abstract class FileTask extends AbstractTask {
-
-    public FileTask(Progress progress) {
-        super(progress);
-    }
+public abstract class AbstractFileTask extends AbstractTask {
 
     public final Client getFileClient(File file){
         if (null==file){

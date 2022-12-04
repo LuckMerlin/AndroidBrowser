@@ -18,10 +18,6 @@ import com.luckmerlin.task.Runtime;
 
 public class TestTask extends AbstractTask {
 
-    public TestTask() {
-        super(null);
-    }
-
     @Override
     protected Result onExecute(Runtime runtime) {
         Debug.D("DDDDDDD "+this);
@@ -36,7 +32,7 @@ public class TestTask extends AbstractTask {
                 })));
         while (progress.getPosition()<10){
             progress.setDoing(doing.setFrom(fromFile).setTo(toFile).setProgress(progress.intValue()));
-            notifyProgress(progress);
+//            notifyProgress(progress);
             try {
                 if (canceled[0]){
 //                    return (MessageResult)(Context context)-> (null!=context?context.getString(R.string.cancel):"Cancel")+".";

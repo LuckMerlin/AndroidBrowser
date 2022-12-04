@@ -7,6 +7,7 @@ import com.luckmerlin.core.Result;
 
 public class Ongoing implements Parcelable {
     private int mProgress;
+    private int mSecondProgress;
     private String mSpeed;
     private Object mDoing;
     private Binding mBinding;
@@ -18,6 +19,7 @@ public class Ongoing implements Parcelable {
 
     private Ongoing(Parcel in) {
         mProgress = in.readInt();
+        mSecondProgress = in.readInt();
         mSpeed = in.readString();
         mTitle = in.readString();
         mDoing=in.readParcelable(getClass().getClassLoader());
@@ -27,6 +29,7 @@ public class Ongoing implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeInt(mProgress);
+        dest.writeInt(mSecondProgress);
         dest.writeString(mSpeed);
         dest.writeString(mTitle);
         Object doing=mDoing;
@@ -35,13 +38,22 @@ public class Ongoing implements Parcelable {
         dest.writeParcelable(null!=binding&&binding instanceof Parcelable?(Parcelable)binding:null,flags);
     }
 
-    public Ongoing set(Parcelable doing) {
+    public Ongoing set(Object doing) {
         this.mDoing = doing;
         return this;
     }
 
     public Ongoing setProgress(int progress) {
         this.mProgress = progress;
+        return this;
+    }
+
+    public int getSecondProgress() {
+        return mSecondProgress;
+    }
+
+    public Ongoing setSecondProgress(int secondProgress) {
+        this.mSecondProgress = secondProgress;
         return this;
     }
 
@@ -85,6 +97,11 @@ public class Ongoing implements Parcelable {
 
     public final boolean isSucceed(){
         return mProgress==100;
+    }
+
+    public final Ongoing setProgressSucceed(boolean succeed){
+        mProgress=succeed?100:0;
+        return this;
     }
 
     public int getProgress() {
