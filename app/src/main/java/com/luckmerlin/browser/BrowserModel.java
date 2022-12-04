@@ -61,8 +61,10 @@ import com.luckmerlin.model.OnActivityNewIntent;
 import com.luckmerlin.model.OnActivityStart;
 import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.task.AbstractTask;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
@@ -179,8 +181,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.move:
                 return launchCopyFile(obj,Mode.MODE_MOVE,getString(R.string.move),Option.LAUNCH);
             case R.string.delete:
-                 return deleteFile(obj, true, false, (Result result)->
-                         null!=result&&result.isSucceed()?1000:-1)||true;
+                 return deleteFile(obj, true, false, (Task task)->{
+                     Ongoing ongoing=null!=task?task.getOngoing():null;
+                     return null!=ongoing&&ongoing.isSucceed()?1000:-1;
+                 })||true;
             case R.string.goTo:
                 return goToFolder()||true;
             case R.string.settings:
@@ -239,7 +243,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return mBrowserAdapter.entryMode(mode,onConfirm,args);
     }
 
-    private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingContent.AutoDismiss autoDismiss){
+    private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingTaskContent.AutoDismiss autoDismiss){
         Executor executor=mExecutor;
         if (null==executor||null==obj){
             toast(getString(R.string.whichFailed,getString(R.string.delete)));
@@ -253,15 +257,14 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (!confirmed){
             String message=files.makeDescription(getContext());
             final ConfirmContent confirmContent=new ConfirmContent();
-            String title=getString(R.string.sureWhich,getString(R.string.delete));
-            Confirm1 confirm=new Confirm1();
-            confirm.setName(title).setMessage(message);
+            Confirm confirm=new Confirm();
+            confirm.setTitle(getString(R.string.sureWhich,getString(R.string.delete))).setMessage(message);
             confirm.setBinding(new DialogButtonBinding(
             ViewBinding.clickId(R.string.sure).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                     ((confirmContent.removeFromParent()||true)&&deleteFile(obj,showDialog,true,autoDismiss))||true),
             ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                     confirmContent.removeFromParent()||true)));
-//            confirmContent.setConfirm(confirm);
+            confirmContent.setConfirm(confirm);
             return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
         }
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
@@ -562,7 +565,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             testTask.setName("eeeeeeeee");
 //            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
-            launchTask(testTask, Option.LAUNCH_NOT_SAVE,true);
+//            launchTask(testTask, Option.LAUNCH_NOT_SAVE,true);
 //            showContentDialog(new DoingTaskContent().setDoingBinding(new DialogButtonBinding().
 //                    add(ViewBinding.clickId(R.string.cancel))),null);
         }
