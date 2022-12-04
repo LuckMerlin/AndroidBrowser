@@ -26,6 +26,7 @@ import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserModelBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
+import com.luckmerlin.browser.dialog.AutoDismissSucceedTask;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
@@ -182,10 +183,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             case R.string.move:
                 return launchCopyFile(obj,Mode.MODE_MOVE,getString(R.string.move),Option.LAUNCH);
             case R.string.delete:
-                 return deleteFile(obj, true, false, (Task task)->{
-                     Ongoing ongoing=null!=task?task.getOngoing():null;
-                     return null!=ongoing&&ongoing.isSucceed()?1000:-1;
-                 })||true;
+                 return deleteFile(obj, true, false,
+                         new AutoDismissSucceedTask())||true;
             case R.string.goTo:
                 return goToFolder()||true;
             case R.string.settings:
@@ -323,6 +322,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
                 setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }
+
     private boolean goToFolder(){
         return null!=showContentDialog(new GoToFolderContent(){
             @Override
@@ -601,7 +601,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean launchTask(Task task,int option,boolean showDialog){
-        return null!=task&&startTask(task,option)&&showDialog&&showTaskDialog(mExecutor,task,null);
+        return null!=task&&startTask(task,option)&&showDialog&&
+                showTaskDialog(mExecutor,task,new DoingTaskContent().
+                        setAutoDismiss( new AutoDismissSucceedTask()));
     }
 
     private boolean startTask(Task task, int option){
