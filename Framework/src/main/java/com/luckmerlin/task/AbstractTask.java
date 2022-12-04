@@ -42,11 +42,11 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
         return this;
     }
 
-    public final AbstractTask setOnDoing(Ongoing doing) {
-        return setOnDoing(this,doing);
+    public final AbstractTask notifyProgress(Ongoing doing) {
+        return notifyProgress(this,doing);
     }
 
-    public final AbstractTask setOnDoing(Task task,Ongoing doing) {
+    public final AbstractTask notifyProgress(Task task,Ongoing doing) {
         if (null!=task){
             if (task instanceof AbstractTask){
                 ((AbstractTask)task).mOngoing=doing;

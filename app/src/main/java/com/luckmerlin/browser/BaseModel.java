@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.databinding.ObservableField;
 
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.browser.dialog.DoingTaskContent;
 import com.luckmerlin.browser.dialog.DoingTaskContent1;
 import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.core.Canceler;
@@ -118,11 +119,11 @@ public abstract class BaseModel extends BaseContent {
         return null!=dialog&&dialog.dismiss();
     }
 
-    protected final boolean showTaskDialog(Executor executor,Task task, DoingTaskContent1 dialogContent){
+    protected final boolean showTaskDialog(Executor executor,Task task, DoingTaskContent dialogContent){
         if (null==executor|null==task){
             return false;
         }
-        final DoingTaskContent1 content=(null!=dialogContent?dialogContent:new DoingTaskContent1());
+        final DoingTaskContent content=(null!=dialogContent?dialogContent:new DoingTaskContent());
         content.setTitle(task.getName());
         content.outsideDismiss().setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().setMaxHeight(0.5f).setWidth(0.6f));
         content.addOnAttachStateChangeListener((OnViewAttachedToWindow)(View v)->

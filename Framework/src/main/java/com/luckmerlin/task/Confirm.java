@@ -3,9 +3,12 @@ package com.luckmerlin.task;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.luckmerlin.binding.Binding;
+
 public class Confirm implements Parcelable {
     private String mMessage;
     private String mTitle;
+    private Binding mBinding;
 
     public Confirm() {
 
@@ -14,12 +17,15 @@ public class Confirm implements Parcelable {
     private Confirm(Parcel in) {
         mMessage = in.readString();
         mTitle = in.readString();
+        mBinding=in.readParcelable(getClass().getClassLoader());
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mMessage);
         dest.writeString(mTitle);
+        Binding binding=mBinding;
+        dest.writeParcelable(null!=binding&&binding instanceof Parcelable?(Parcelable)binding:null,flags);
     }
 
     public Confirm setMessage(String message) {
@@ -38,6 +44,15 @@ public class Confirm implements Parcelable {
 
     public String getMessage() {
         return mMessage;
+    }
+
+    public Binding getBinding() {
+        return mBinding;
+    }
+
+    public Confirm setBinding(Binding binding) {
+        this.mBinding = binding;
+        return this;
     }
 
     @Override

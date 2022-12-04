@@ -1,13 +1,15 @@
 package com.luckmerlin.browser;
 
 import android.app.Activity;
-
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
+import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.AbstractTask;
+import com.luckmerlin.task.Brief;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Confirm1;
+import com.luckmerlin.task.FromTo;
 import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
@@ -23,22 +25,57 @@ public class TestTask extends AbstractTask {
     @Override
     protected Result onExecute(Runtime runtime) {
         Ongoing ongoing= new Ongoing();
-        ongoing.set(new Confirm().setTitle("queding").setMessage("zheshiyitiao"));
-        setOnDoing(ongoing);
+//        ongoing.set(new Confirm().setTitle("queding").setMessage("zheshiyitiao").
+//                setBinding(new DialogButtonBinding().add(ViewBinding.clickId(R.string.app_name))));
+        notifyProgress(ongoing);
 //        if (System.currentTimeMillis()%2!=0){
             Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
                     setSpeed("666MB/S");
-            while (progress.getPosition()<progress.getTotal()){
-                progress.setPosition(progress.getPosition()+1);
-//                setOnDoing(progress);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        DialogButtonBinding buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.scanCurrent));
+        FromTo fromTo=new FromTo();
+        fromTo.setFrom(new Brief() {
+            @Override
+            public String getLogoUrl() {
+                return null;
             }
+
+            @Override
+            public String getTitle() {
+                return "dddd1";
+            }
+        });
+        fromTo.setTo(new Brief() {
+            @Override
+            public String getLogoUrl() {
+                return null;
+            }
+
+            @Override
+            public String getTitle() {
+                return "dddd2";
+            }
+        });
+        while (true){
+            if (progress.getPosition()>=progress.getTotal()){
+                progress.setPosition(0);
+//                buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.copy));
+            }
+//            buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.download));
+            progress.setPosition(progress.getPosition()+1);
+            notifyProgress(ongoing.set(fromTo).setProgress(progress.intValue()).
+                    setTitle("wocha"+progress.getPosition()).setBinding(buttonBinding));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
 //            return null;
 //        }
+        ongoing.set(new Confirm().setTitle("rrrrr").setMessage("bbbbbb").
+                setBinding(new DialogButtonBinding().add(ViewBinding.clickId(R.string.canNotOperateHere))));
+
         return new Confirm1().setMessage("确认消息").setBinding(new DialogButtonBinding(
                 ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
 //        while (true){
