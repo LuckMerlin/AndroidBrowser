@@ -1,9 +1,7 @@
 package com.luckmerlin.browser.client;
 
 import com.luckmerlin.browser.Client;
-import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
-import com.luckmerlin.core.OnChangeUpdate;
 import com.luckmerlin.core.OnFinish;
 
 public abstract class AbstractClient implements Client {

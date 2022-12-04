@@ -86,7 +86,8 @@ public class FilesCopyTask extends FilesTask {
         }
         final Ongoing ongoing = new Ongoing();
         final FileFromTo fileFromTo=new FileFromTo();
-        ongoing.set(fileFromTo.setMode(Mode.MODE_COPY).setFrom(fromFile).setTo(toFile));
+        ongoing.set(fileFromTo.setMode(Mode.MODE_COPY).setFrom(fromFile).setTo(toFile)).
+                setTitle(fromFile.getName());
         updateOnGoing(ongoing,onGoingUpdate);
         Debug.D("Copy file.\nfrom="+fromFile.getPath()+"\n  to="+toFile.getPath());
         //Check file is directory
@@ -192,7 +193,8 @@ public class FilesCopyTask extends FilesTask {
         }
         Result result = new StreamTask(fromStream, toStream).execute(runtime, (Task task) -> {
             Ongoing childOnGoing=null!=task?task.getOngoing():null;
-            updateOnGoing(ongoing.setProgress(null!=childOnGoing?childOnGoing.getProgress():0),onGoingUpdate);
+            updateOnGoing(ongoing.setProgress(null!=childOnGoing?childOnGoing.getProgress():0).
+                    setSpeed(null!=childOnGoing?childOnGoing.getSpeed():null),onGoingUpdate);
         });
         Utils.closeStream(fromStream, toStream);
 //        if (mDeleteSrcWhileSucceed&&null!=result&&result instanceof Response&&((Response)result).isSucceed()){

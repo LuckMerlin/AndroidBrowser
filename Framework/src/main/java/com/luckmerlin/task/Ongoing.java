@@ -38,6 +38,15 @@ public class Ongoing implements Parcelable {
         dest.writeParcelable(null!=binding&&binding instanceof Parcelable?(Parcelable)binding:null,flags);
     }
 
+    public Ongoing applyChild(Ongoing ongoing){
+        mProgress=null!=ongoing?ongoing.getProgress():0;
+        mSpeed=null!=ongoing?ongoing.getSpeed():null;
+        mTitle=null!=ongoing?ongoing.getTitle():null;
+        mDoing=null!=ongoing?ongoing.get():null;
+        mBinding=null!=ongoing?ongoing.getBinding():null;
+        return this;
+    }
+
     public Ongoing set(Object doing) {
         this.mDoing = doing;
         return this;

@@ -37,7 +37,7 @@
                     android:secondaryProgress="@{content.secondProgress}"
                     android:layout_marginLeft="1dp" android:layout_marginRight="1dp"/>
                 <TextView android:text="@{content.doingName??``}" android:textColor="@color/textMain"
-                    android:maxLines="2" android:ellipsize="end" android:gravity="center"
+                    android:maxLines="2" android:ellipsize="middle" android:gravity="center"
                     android:layout_width="90dp" android:layout_height="wrap_content"/>
             </LinearLayout>
 

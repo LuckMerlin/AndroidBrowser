@@ -3,14 +3,12 @@ package com.luckmerlin.browser.task;
 import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Code;
-import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.task.Ongoing;
-import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
 
 public class FilesDeleteTask extends FilesTask {

@@ -9,7 +9,6 @@ import androidx.databinding.ObservableField;
 
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.browser.dialog.DoingTaskContent;
-import com.luckmerlin.browser.dialog.DoingTaskContent1;
 import com.luckmerlin.browser.http.JavaHttp;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;

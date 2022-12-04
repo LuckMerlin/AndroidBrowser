@@ -74,9 +74,7 @@ public abstract class FilesTask extends AbstractFileTask {
             notifyProgress(ongoing.setSecondProgress(Utils.progress(mCursor,size)).setTitle(child.getName()));
             if (null==(response=onExecuteFile(child, mCursor, runtime, (Ongoing childOngoing)->{
                 if (null!=childOngoing){
-                    notifyProgress(ongoing.set(childOngoing.get()).setTitle(childOngoing.getTitle()).
-                    setProgress(childOngoing.getProgress()).
-                    setSpeed(childOngoing.getSpeed()).setBinding(childOngoing.getBinding()));
+                    notifyProgress(ongoing.applyChild(childOngoing));
                 }
             }))||(!response.isSucceed())){
                 Debug.W("Fail execute file."+response);

@@ -2,13 +2,11 @@ package com.luckmerlin.browser.file;
 
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.binding.ViewBinding;
-import com.luckmerlin.browser.BrowserActivityModel;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.click.Listener;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.core.OnConfirm;
-import com.luckmerlin.core.OnFinish;
 
 import java.util.ArrayList;
 import java.util.HashMap;

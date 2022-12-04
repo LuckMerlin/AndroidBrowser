@@ -6,9 +6,9 @@ import android.net.Uri;
 import android.os.Parcelable;
 import androidx.documentfile.provider.DocumentFile;
 import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Utils;
-import com.luckmerlin.browser.file.DoingFiles;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
@@ -143,9 +143,9 @@ public class UriFileUploadTask extends AbstractFileTask {
             final long finalLength=fileLength;
             final OutputStream finalOutputStream=outputStream;
             final InputStream finalInputStream=inputStream;
-            final DoingFiles doingFiles=new DoingFiles();
-            doingFiles.setDoingMode(Mode.MODE_UPLOAD);
-            doingFiles.setSucceed(false).setTo(toFile);
+            final FileFromTo doingFiles=new FileFromTo().setMode(Mode.MODE_UPLOAD);
+//            documentFile.getName();
+            doingFiles.setFrom(null).setTo(toFile);
             return new StreamTask(new com.luckmerlin.stream.InputStream(0) {
                 @Override
                 public long length() {

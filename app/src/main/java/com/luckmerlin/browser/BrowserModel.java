@@ -31,14 +31,11 @@ import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
-import com.luckmerlin.browser.dialog.DoingContent;
 import com.luckmerlin.browser.dialog.DoingTaskContent;
-import com.luckmerlin.browser.dialog.DoingTaskContent1;
 import com.luckmerlin.browser.dialog.FileContextDialogContent;
 import com.luckmerlin.browser.dialog.GoToFolderContent;
 import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.RenameFileContent;
-import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.browser.file.FileFromTo;
@@ -49,12 +46,10 @@ import com.luckmerlin.browser.task.FilesDeleteTask;
 import com.luckmerlin.browser.task.UriFileUploadTask;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.click.OnLongClickListener;
-import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.MatchedCollector;
 import com.luckmerlin.core.OnConfirm;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
-import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.dialog.PopupWindow;
@@ -64,11 +59,9 @@ import com.luckmerlin.model.OnActivityStart;
 import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Confirm;
-import com.luckmerlin.task.Confirm1;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Option;
-import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.view.ClickableSpan;
 import com.luckmerlin.view.OnViewAttachedToWindow;
@@ -160,14 +153,13 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return renameFile(null!=obj&&obj instanceof File?(File)obj:null)||true;
             case R.string.multiChoose:
                 return entryMode(new Mode(Mode.MODE_MULTI_CHOOSE).addArg(null!=obj&&obj instanceof File?(File)obj:null).
-                        setBinding(new DialogButtonBinding(
-                        ViewBinding.clickId(R.string.move),ViewBinding.clickId(R.string.copy),
-                        ViewBinding.clickId(R.string.delete)).setListener((OnClickListener)
+                setBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.move), ViewBinding.clickId(R.string.copy),
+                ViewBinding.clickId(R.string.delete)).setListener((OnClickListener)
                         (View view1, int clickId1, int count1, Object obj1)->{
-                        Mode mode=mBrowserAdapter.getCurrentMode();
-                        FileArrayList args=null!=mode&&mode.isMode(Mode.MODE_MULTI_CHOOSE)?mode.getArgs():null;
-                        entryMode(null);
-                        return (null!=args&&args.size()>0&&BrowserModel.this.onClick(view1,clickId1,count,args))||true;
+                    Mode mode=mBrowserAdapter.getCurrentMode();
+                    FileArrayList args=null!=mode&&mode.isMode(Mode.MODE_MULTI_CHOOSE)?mode.getArgs():null;
+                    entryMode(null);
+                    return (null!=args&&args.size()>0&&BrowserModel.this.onClick(view1,clickId1,count,args))||true;
                 })));
             case R.drawable.selector_checkbox:
                 return null!=obj&&obj instanceof File&&toggleSelectFile((File)obj);
@@ -201,21 +193,27 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return false;
     }
 
-    private boolean launchCopyFile(Object fileObj,int mode,String taskName,int option){
-        final File file=null!=fileObj&&fileObj instanceof File?(File)fileObj:null;
-        return null!=file&&entryMode(new Mode(mode).makeSureBinding(
-            (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
-                Folder folder=mBrowserAdapter.getFolder();
-                if (null==folder||folder.isChild(fileObj,false,true)){
-                    toast(R.string.canNotOperateHere,-1);
-                    return true;
-                }
-                String name=taskName;
-                name=null!=name?name:folder.isLocalFile()?getString(file.isLocalFile()?R.string.copy:
-                        R.string.download): getString(file.isLocalFile()?R.string.upload:R.string.copy);
-                entryMode(null);
-                return launchTask(new FilesCopyTask(new FileArrayList((File) fileObj),folder).
-                        setName(name), option,true)||true;}));
+    private boolean launchCopyFile(Object filesObj,int mode,String taskName,int option){
+        if (null==filesObj){
+            return false;
+        }else if (filesObj instanceof File){
+            return launchCopyFile(new FileArrayList((File)filesObj),mode,taskName,option);
+        }else if (!(filesObj instanceof FileArrayList)){
+            return false;
+        }
+        FileArrayList files=(FileArrayList)filesObj;
+        return null!=files&&entryMode(new Mode(mode).makeSureBinding(
+        (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
+            Folder folder=mBrowserAdapter.getFolder();
+            if (null==folder||folder.isChild(files,false,true)){
+                toast(R.string.canNotOperateHere,-1);
+                return true;
+            }
+            String name=taskName;
+            name=null!=name?name:getString(R.string.copy);
+            entryMode(null);
+            return launchTask(new FilesCopyTask(files,folder).
+                    setName(name), option,true)||true;}));
     }
 
     private boolean openFile(File openFile){

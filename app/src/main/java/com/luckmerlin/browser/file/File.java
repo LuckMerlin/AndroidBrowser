@@ -1,21 +1,13 @@
 package com.luckmerlin.browser.file;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
-import com.luckmerlin.core.Brief;
 import com.luckmerlin.core.ParcelObject;
-import com.luckmerlin.debug.Debug;
-import com.luckmerlin.json.Json;
 import com.luckmerlin.json.JsonObject;
-import com.luckmerlin.utils.Utils;
-
+import com.luckmerlin.task.Brief;
 import org.json.JSONObject;
-
-import java.nio.file.Files;
-import java.util.logging.Handler;
 
 public class File implements Brief,Permission, ParcelObject {
     private String mHost;
@@ -321,13 +313,13 @@ public class File implements Brief,Permission, ParcelObject {
     }
 
     @Override
-    public CharSequence getNote() {
-        return Utils.formatSizeText(getLength());
+    public String getLogoUrl() {
+        return null;
     }
 
     @Override
-    public final Object getIcon() {
-        return null;
+    public String getTitle() {
+        return getName();
     }
 
     @Override
