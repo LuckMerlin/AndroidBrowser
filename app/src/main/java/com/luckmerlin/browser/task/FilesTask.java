@@ -71,7 +71,7 @@ public abstract class FilesTask extends AbstractFileTask {
             if (null==(child=files.get(mCursor))){
                 continue;
             }
-            notifyProgress(ongoing.setSecondProgress(Utils.progress(mCursor,size)).setTitle(child.getName()));
+            notifyProgress(ongoing.setSecondProgress(Utils.progress(mCursor+1,size)).setTitle(child.getName()));
             if (null==(response=onExecuteFile(child, mCursor, runtime, (Ongoing childOngoing)->{
                 if (null!=childOngoing){
                     notifyProgress(ongoing.applyChild(childOngoing));
@@ -90,7 +90,7 @@ public abstract class FilesTask extends AbstractFileTask {
         }
     }
 
-    protected static interface OngoingUpdate{
+    protected interface OngoingUpdate{
         void ongoingUpdate(Ongoing ongoing);
     }
 }

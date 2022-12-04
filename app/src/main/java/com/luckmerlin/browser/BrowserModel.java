@@ -60,6 +60,8 @@ import com.luckmerlin.model.OnBackPress;
 import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.FromTo;
+import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
@@ -71,7 +73,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class BrowserModel extends BaseModel implements OnActivityCreate, Executor.OnStatusChangeListener,
-        OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick,
+        OnViewAttachedToWindow,PathSpanClick.OnPathSpanClick, OnProgressChange,
         OnViewDetachedFromWindow, OnClickListener, OnLongClickListener, OnBackPress, OnActivityNewIntent, OnActivityStart {
     private final BrowserListAdapter mBrowserAdapter=new BrowserListAdapter();
     private final ObservableField<ListAdapter> mContentAdapter=new ObservableField<>();
@@ -402,39 +404,41 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     @Override
-    public void onStatusChanged(int status, Task task, Executor executor) {
-        showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")).setTimeout(1000));
-        switch (status){
-            case Executor.STATUS_FINISH:
-                checkDoingFileSucceed(null!=task?task.getOngoing():null);
-                break;
+    public void onProgressChanged(Task task) {
+        Ongoing ongoing=null!=task?task.getOngoing():null;
+        if (null==ongoing){
+            return;
+        }
+        FromTo fromTo=null;
+        if (ongoing.isSucceed()&&null!=(fromTo=ongoing.getFromTo())&&fromTo instanceof FileFromTo){
+            checkDoingFileSucceed((FileFromTo)fromTo);
         }
     }
 
-    private boolean checkDoingFileSucceed(Ongoing ongoing){
-        if (!isUiThread()){
-            return post(()->checkDoingFileSucceed(ongoing));
-        }
+    @Override
+    public void onStatusChanged(int status, Task task, Executor executor) {
+        showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")).setTimeout(1000));
+    }
+
+    private boolean checkDoingFileSucceed(FileFromTo fromTo){
         BrowserListAdapter browserListAdapter=mBrowserAdapter;
-        Object doingObj=null!=ongoing?ongoing.get():null;
-        FileFromTo doing=null!=doingObj&&doingObj instanceof FileFromTo ?(FileFromTo)doingObj:null;
-        if (null==doing||!ongoing.isSucceed()||null==browserListAdapter){
+        if (null==fromTo||null==browserListAdapter){
             return false;
         }
-        int mode=doing.getMode();
-        Debug.D("AAAAAAAAA "+doing);
+        if (!isUiThread()){
+            return post(()->checkDoingFileSucceed(fromTo));
+        }
+        int mode=fromTo.getMode();
+        File from=fromTo.getFrom();
+        File to=fromTo.getTo();
         if (mode==Mode.MODE_DELETE){
-            File file=doing.getFrom();
-            file=null!=file?file:doing.getTo();
-            return null!=file&&file instanceof File&&browserListAdapter.removeIfInFolder(file);
-        }else if (mode==Mode.MODE_COPY||mode==Mode.MODE_UPLOAD||mode==Mode.MODE_DOWNLOAD){
-            File file=doing.getTo();
-            return null!=file&&browserListAdapter.isCurrentFolder(file)&& null!=(file=file.getParentFile())&&
-                    showFolderFilesChangeAlert(file.getName());
+            return browserListAdapter.removeIfInFolder(null!=from?from:to);
+        }else if (mode==Mode.MODE_COPY){
+            return browserListAdapter.isCurrentFolder(to)&& null!=(to=to.getParentFile())&&
+                    showFolderFilesChangeAlert(to.getName());
         }else if (mode==Mode.MODE_MOVE){
-            File file=doing.getFrom();
-            file=null!=file?file:doing.getTo();
-            return null!=file&&file instanceof File&&browserListAdapter.removeIfInFolder(file);
+            return browserListAdapter.isCurrentFolder(to)&& null!=(to=to.getParentFile())&&
+                    showFolderFilesChangeAlert(to.getName());
         }
         return false;
     }
