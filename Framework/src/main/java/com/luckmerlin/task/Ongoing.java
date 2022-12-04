@@ -80,9 +80,8 @@ public class Ongoing implements Parcelable {
         return mBinding;
     }
 
-    public Doing getDoing(){
-        Object doing=mDoing;
-        return null!=doing&&doing instanceof Doing?(Doing)doing:null;
+    public Object get(){
+        return mDoing;
     }
 
     public Confirm getConfirm(){

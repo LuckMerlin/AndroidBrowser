@@ -17,7 +17,6 @@ import com.luckmerlin.task.Task;
 
 public class DoingTaskContent extends ConfirmContent implements
         Executor.OnStatusChangeListener, OnProgressChange,OnClickListener{
-    private final ObservableField<Doing> mDoing=new ObservableField<>();
     private final ObservableField<Binding> mBinding=new ObservableField<>();
     private final ObservableField<Integer> mProgress=new ObservableField<>();
     private final ObservableField<Integer> mSecondProgress=new ObservableField<>();
@@ -50,7 +49,6 @@ public class DoingTaskContent extends ConfirmContent implements
             return;
         }
         Ongoing ongoing=null!=task?task.getOngoing():null;
-        mDoing.set(null!=ongoing?ongoing.getDoing():null);
         mBinding.set(null!=ongoing?ongoing.getBinding():null);
         mProgress.set(null!=ongoing?ongoing.getProgress():0);
         mSecondProgress.set(null!=ongoing?ongoing.getSecondProgress():0);
@@ -103,10 +101,6 @@ public class DoingTaskContent extends ConfirmContent implements
 
     public ObservableField<String> getDoingName() {
         return mDoingName;
-    }
-
-    public final ObservableField<Doing> getDoing() {
-        return mDoing;
     }
 
     public final ObservableField<Binding> getBinding(){

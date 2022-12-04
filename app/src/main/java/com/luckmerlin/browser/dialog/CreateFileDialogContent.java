@@ -9,7 +9,6 @@ import com.luckmerlin.browser.databinding.CreateFileContentDialogBinding;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.click.OnClickListener;
 
-@Deprecated
 public abstract class CreateFileDialogContent extends BaseContent implements OnClickListener {
     public final ObservableField<Boolean> mCreateDir=new ObservableField<>();
     public final ObservableField<String> mInputName=new ObservableField<>();

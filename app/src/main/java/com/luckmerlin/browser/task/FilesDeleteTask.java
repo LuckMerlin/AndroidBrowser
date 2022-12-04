@@ -36,9 +36,8 @@ public class FilesDeleteTask extends FilesTask {
         fileFromTo.setFrom(childFile);
         final Ongoing ongoing=new Ongoing().setTitle(childFile.getName()).setProgress(0).set(fileFromTo);
         return client.deleteFile(childFile,(int code, CharSequence msg, File file)-> {
-            ongoing.setTitle(null!=file?file.getName():null).set(fileFromTo.setFrom(file)).
-                    setProgressSucceed(code==Code.CODE_SUCCEED);
-            updateOnGoing(ongoing,onGoingUpdate);
+            updateOnGoing(ongoing.setTitle(null!=file?file.getName():null).set(fileFromTo.setFrom(file)).
+                    setProgressSucceed(code==Code.CODE_SUCCEED),onGoingUpdate);
             return runtime.isCancelEnabled();
         });
     }

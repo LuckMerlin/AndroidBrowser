@@ -40,6 +40,7 @@ import com.luckmerlin.browser.dialog.RenameFileContent;
 import com.luckmerlin.browser.file.Doing;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.FileArrayList;
+import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.browser.task.FilesCopyTask;
@@ -270,7 +271,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         FilesDeleteTask filesDeleteTask=new FilesDeleteTask(files);
         filesDeleteTask.setCursor(0).setName(getString(R.string.delete));
         startTask(filesDeleteTask, Option.LAUNCH);
-        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingTaskContent()))||true;
+        return (showDialog&&showTaskDialog(mExecutor,filesDeleteTask,new DoingTaskContent().
+                setAutoDismiss(autoDismiss)))||true;
     }
 
     private boolean createFile(){
@@ -321,8 +323,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
                 setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }
-
-
     private boolean goToFolder(){
         return null!=showContentDialog(new GoToFolderContent(){
             @Override
@@ -408,35 +408,35 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         showAlertText(new AlertText().setMessage(""+status+" "+(null!=task?task.getName():"")).setTimeout(1000));
         switch (status){
             case Executor.STATUS_FINISH:
-//                checkDoingFileSucceed(null!=task?task.getProgress():null);
+                checkDoingFileSucceed(null!=task?task.getOngoing():null);
                 break;
         }
     }
 
-    private boolean checkDoingFileSucceed(Progress progress){
+    private boolean checkDoingFileSucceed(Ongoing ongoing){
         if (!isUiThread()){
-            return post(()->checkDoingFileSucceed(progress));
+            return post(()->checkDoingFileSucceed(ongoing));
         }
         BrowserListAdapter browserListAdapter=mBrowserAdapter;
-        Object doingObj=null!=progress?progress.getDoing():null;
-        Doing doing=null!=doingObj&&doingObj instanceof Doing?(Doing)doingObj:null;
-        if (null==doing||!doing.isSucceed()||null==browserListAdapter){
+        Object doingObj=null!=ongoing?ongoing.get():null;
+        FileFromTo doing=null!=doingObj&&doingObj instanceof FileFromTo ?(FileFromTo)doingObj:null;
+        if (null==doing||!ongoing.isSucceed()||null==browserListAdapter){
             return false;
         }
+        int mode=doing.getMode();
         Debug.D("AAAAAAAAA "+doing);
-        if (doing.isDoingMode(Mode.MODE_DELETE)){
-            Brief brief=doing.getFrom();
-            brief=null!=brief?brief:doing.getTo();
-            return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
-        }else if (doing.isDoingMode(Mode.MODE_COPY)||doing.isDoingMode(Mode.MODE_UPLOAD)||doing.isDoingMode(Mode.MODE_DOWNLOAD)){
-            Brief to=doing.getTo();
-            File toFile=null!=to&&to instanceof File?(File)to:null;
-            return null!=toFile&&browserListAdapter.isCurrentFolder(toFile)&& null!=(toFile=toFile.getParentFile())&&
-                    showFolderFilesChangeAlert(toFile.getName());
-        }else if (doing.isDoingMode(Mode.MODE_MOVE)){
-            Brief brief=doing.getFrom();
-            brief=null!=brief?brief:doing.getTo();
-            return null!=brief&&brief instanceof File&&browserListAdapter.removeIfInFolder((File)brief);
+        if (mode==Mode.MODE_DELETE){
+            File file=doing.getFrom();
+            file=null!=file?file:doing.getTo();
+            return null!=file&&file instanceof File&&browserListAdapter.removeIfInFolder(file);
+        }else if (mode==Mode.MODE_COPY||mode==Mode.MODE_UPLOAD||mode==Mode.MODE_DOWNLOAD){
+            File file=doing.getTo();
+            return null!=file&&browserListAdapter.isCurrentFolder(file)&& null!=(file=file.getParentFile())&&
+                    showFolderFilesChangeAlert(file.getName());
+        }else if (mode==Mode.MODE_MOVE){
+            File file=doing.getFrom();
+            file=null!=file?file:doing.getTo();
+            return null!=file&&file instanceof File&&browserListAdapter.removeIfInFolder(file);
         }
         return false;
     }

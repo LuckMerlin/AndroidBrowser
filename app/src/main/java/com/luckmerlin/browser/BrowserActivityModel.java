@@ -375,10 +375,10 @@ public class BrowserActivityModel extends BaseModel implements OnActivityCreate,
             return false;
         }
         if (files.isDoingMode(Mode.MODE_DELETE)){
-            return browserListAdapter.removeIfInFolder(files.getFrom());
+            return browserListAdapter.remove(files.getFrom());
         }
         if (files.isDoingMode(Mode.MODE_MOVE)){
-            browserListAdapter.removeIfInFolder(files.getFrom());
+            browserListAdapter.remove(files.getFrom());
         }
         if (files.isDoingMode(Mode.MODE_COPY)||files.isDoingMode(Mode.MODE_MOVE)){
             File toFile=files.getTo();

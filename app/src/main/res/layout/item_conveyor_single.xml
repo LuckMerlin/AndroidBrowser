@@ -8,7 +8,7 @@
         <variable name="selectEnable" type="boolean" />
         <variable name="position" type="int" />
         <variable name="iconBinding" type="com.luckmerlin.binding.ViewBinding" />
-        <variable name="confirm" type="com.luckmerlin.task.Confirm1" />
+        <variable name="confirm" type="com.luckmerlin.task.Confirm" />
         <variable name="iconResId" type="int" />
         <variable name="mode" type="com.luckmerlin.browser.file.Mode" />
         <import type="com.luckmerlin.utils.Utils"/>
@@ -41,7 +41,7 @@
                     android:ellipsize="middle" android:singleLine="true"
                     android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold"/>
 
-                <TextView android:text="@{task.ongoing.doing.title??``}" android:textColor="@color/textMainSub"
+                <TextView android:text="@{task.ongoing.title??``}" android:textColor="@color/textMainSub"
                     android:textSize="12sp" android:layout_marginLeft="5dp" android:paddingTop="1dp"
                     android:ellipsize="middle" android:singleLine="true"
                     android:paddingBottom="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>

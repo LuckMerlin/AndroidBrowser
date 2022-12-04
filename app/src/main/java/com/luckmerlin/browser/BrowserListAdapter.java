@@ -200,16 +200,16 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         return null!=file&&isCurrentFolder(file.getPath())&&remove(file);
     }
 
-    public boolean isCurrentFolder(File file){
-        return null!=file&&isCurrentFolder(file.getPath());
+    public boolean isCurrentFolder(File file) {
+        return null != file && isCurrentFolder(file.getPath());
     }
 
     public boolean isCurrentFolder(String path){
         if (null==path||path.length()<=0){
             return false;
         }
-        BrowseQuery current=getCurrent();
-        String folderPath=null!=current?current.mFolder:null;
+        File current=mCurrentFolder.get();
+        String folderPath=null!=current?current.getPath():null;
         return null!=folderPath&&path.startsWith(folderPath);
     }
 

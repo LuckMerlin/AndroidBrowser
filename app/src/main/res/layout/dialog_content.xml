@@ -12,7 +12,7 @@
         android:layout_height="match_parent" android:minHeight="70dp">
         <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content"
             android:paddingTop="5dp" android:paddingBottom="5dp">
-            <TextView android:text="@{content.title??``}" android:textColor="@color/textTitle"
+            <TextView android:text="@{content.title??``}" android:textColor="@color/textMain"
                 android:visibility="@{content.title==null?View.GONE:View.VISIBLE}" android:textStyle="bold"
                 android:textSize="@dimen/textTitle" android:layout_gravity="center_horizontal" android:layout_marginBottom="10dp"
                 android:layout_width="wrap_content" android:layout_height="wrap_content"/>
