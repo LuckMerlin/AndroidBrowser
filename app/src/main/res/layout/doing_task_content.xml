@@ -19,20 +19,11 @@
             android:textStyle="bold" android:paddingLeft="5dp" android:paddingRight="5dp"/>
 
         <LinearLayout android:visibility="@{content.confirm.message.length()>0?View.GONE:View.VISIBLE}"
-            android:layout_width="wrap_content" android:gravity="center"
-            android:layout_height="wrap_content"
+            android:layout_width="wrap_content" android:gravity="center" android:layout_height="wrap_content"
             android:orientation="@{content.toBrief==null||content.fromBrief==null?1:0}">
 
-            <LinearLayout android:visibility="@{content.fromBrief==null?View.GONE:View.VISIBLE}"
-                android:orientation="vertical" android:gravity="center"
-                android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <ImageView android:src="@mipmap/ic_launcher"
-                    android:layout_width="60dp" android:layout_height="60dp"/>
-                <TextView android:textColor="@color/textMain" android:text="@{content.fromBrief.title??``}"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:maxWidth="90dp" android:maxLines="3" android:ellipsize="end"
-                    android:gravity="center"/>
-            </LinearLayout>
+            <include android:visibility="@{content.fromBrief==null?View.GONE:View.VISIBLE}"
+                binding:brief="@{content.fromBrief}" binding:speed="@{content.speed}" layout="@layout/task_brief" />
 
             <LinearLayout android:orientation="vertical" android:layout_width="wrap_content"
                 android:layout_height="wrap_content" android:gravity="center"
@@ -49,16 +40,8 @@
                     android:layout_width="90dp" android:layout_height="wrap_content"/>
             </LinearLayout>
 
-            <LinearLayout android:visibility="@{content.toBrief==null?View.GONE:View.VISIBLE}"
-                android:orientation="vertical" android:gravity="center"
-                android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <ImageView android:src="@mipmap/ic_launcher"
-                    android:layout_width="60dp" android:layout_height="60dp"/>
-                <TextView android:textColor="@color/textMain" android:text="@{content.toBrief.title??``}"
-                    android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center"
-                    android:maxWidth="90dp" android:maxLines="3" android:ellipsize="end"/>
-            </LinearLayout>
-
+            <include android:visibility="@{content.toBrief==null?View.GONE:View.VISIBLE}"
+                binding:brief="@{content.toBrief}" binding:speed="@{content.speed}" layout="@layout/task_brief"  />
         </LinearLayout>
 
         <TextView android:text="@{content.confirm.message??``}" android:textColor="@color/textMain"
@@ -67,7 +50,7 @@
             android:layout_marginBottom="10dp" android:layout_marginTop="10dp"
             android:layout_width="wrap_content" android:layout_height="wrap_content"/>
 
-        <LinearLayout android:orientation="horizontal" android:paddingLeft="15dp" android:paddingRight="15dp"
+        <LinearLayout android:orientation="horizontal" android:paddingLeft="15dp" android:paddingRight="15dp" android:layout_marginTop="5dp"
             android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="5dp"
             binding:bind="@{LayoutBinding.layout(null!=content.confirm?content.confirm.binding:content.binding).removeAll(true).toParent(false)}" />
     </LinearLayout>

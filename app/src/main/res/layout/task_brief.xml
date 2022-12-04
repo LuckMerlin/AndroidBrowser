@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:binding="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable name="brief" type="com.luckmerlin.task.Brief" />
+        <variable name="speed" type="String" />
+        <import type="android.view.View"/>
+    </data>
+
+    <LinearLayout android:orientation="vertical" android:gravity="center"
+        android:layout_width="90dp" android:layout_height="90dp">
+
+        <FrameLayout android:layout_width="65dp" android:layout_height="65dp">
+            <ImageView android:src="@mipmap/ic_launcher" android:scaleType="fitXY"
+                android:layout_width="match_parent" android:layout_height="match_parent"/>
+
+            <TextView android:text="@{speed??``}" android:background="#3000" android:gravity="center"
+                android:visibility="@{speed.length()>0?View.VISIBLE:View.INVISIBLE}" android:layout_gravity="center"
+                android:textStyle="bold" android:textSize="12sp" android:textColor="@color/textTitle"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </FrameLayout>
+
+        <TextView android:textColor="@color/textMain" android:text="@{brief.title??``}"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:maxWidth="90dp" android:maxLines="3" android:ellipsize="end" android:gravity="center"/>
+    </LinearLayout>
+</layout>

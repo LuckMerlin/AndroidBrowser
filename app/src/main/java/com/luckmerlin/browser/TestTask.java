@@ -29,8 +29,8 @@ public class TestTask extends AbstractTask {
 //                setBinding(new DialogButtonBinding().add(ViewBinding.clickId(R.string.app_name))));
         notifyProgress(ongoing);
 //        if (System.currentTimeMillis()%2!=0){
-            Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
-                    setSpeed("666MB/S");
+        Progress progress=new Progress().setPosition(0).setTotal(60).setTitle("progressTitle").
+                setSpeed("666MB/S");
         DialogButtonBinding buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.scanCurrent));
         FromTo fromTo=new FromTo();
         fromTo.setFrom(new Brief() {
@@ -58,11 +58,12 @@ public class TestTask extends AbstractTask {
         while (true){
             if (progress.getPosition()>=progress.getTotal()){
                 progress.setPosition(0);
+//                break;
 //                buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.copy));
             }
 //            buttonBinding=new DialogButtonBinding().add(ViewBinding.clickId(R.string.download));
             progress.setPosition(progress.getPosition()+1);
-            notifyProgress(ongoing.set(fromTo).setProgress(progress.intValue()).
+            notifyProgress(ongoing.set(fromTo).setProgress(progress.intValue()).setSpeed(progress.intValue()+"MB/s").
                     setTitle("wocha"+progress.getPosition()).setBinding(buttonBinding));
             try {
                 Thread.sleep(100);
@@ -75,21 +76,7 @@ public class TestTask extends AbstractTask {
 //        }
         ongoing.set(new Confirm().setTitle("rrrrr").setMessage("bbbbbb").
                 setBinding(new DialogButtonBinding().add(ViewBinding.clickId(R.string.canNotOperateHere))));
-
-        return new Confirm1().setMessage("确认消息").setBinding(new DialogButtonBinding(
-                ViewBinding.clickId(R.string.sure),ViewBinding.clickId(R.string.cancel)));
-//        while (true){
-//            try {
-//
-////                notifyProgress();
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-
-
-
+        return null;
 //        try {
 //            HttpURLConnection connection= (HttpURLConnection) new URL("http://192.168.0.10:5001/file/test").openConnection();
 //            connection.setRequestMethod("POST");

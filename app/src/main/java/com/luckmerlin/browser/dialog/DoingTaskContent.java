@@ -7,7 +7,6 @@ import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.DoingTaskContentBinding;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Result;
-import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Brief;
 import com.luckmerlin.task.Doing;
 import com.luckmerlin.task.Executor;
@@ -24,6 +23,7 @@ public class DoingTaskContent extends ConfirmContent implements
     private final ObservableField<String> mDoingName=new ObservableField<>();
     private final ObservableField<Brief> mFromBrief=new ObservableField<>();
     private final ObservableField<Brief> mToBrief=new ObservableField<>();
+    private final ObservableField<String> mSpeed=new ObservableField<>();
     private AutoDismiss mAutoDismiss;
 
     public interface AutoDismiss{
@@ -53,6 +53,7 @@ public class DoingTaskContent extends ConfirmContent implements
         mBinding.set(null!=ongoing?ongoing.getBinding():null);
         mProgress.set(null!=ongoing?ongoing.getProgress():0);
         mDoingName.set(null!=ongoing?ongoing.getTitle():null);
+        mSpeed.set(null!=ongoing?ongoing.getSpeed():null);
         setConfirm(null!=ongoing?ongoing.getConfirm():null);
         FromTo fromTo=null!=ongoing?ongoing.getFromTo():null;
         Object from=null!=fromTo?fromTo.getFrom():null;
@@ -68,65 +69,13 @@ public class DoingTaskContent extends ConfirmContent implements
         mBinding.set(null!=ongoing?ongoing.getBinding():null);
         mProgress.set(null!=ongoing?ongoing.getProgress():0);
         mDoingName.set(null!=ongoing?ongoing.getTitle():null);
+        mSpeed.set(null!=ongoing?ongoing.getSpeed():null);
         setConfirm(null!=ongoing?ongoing.getConfirm():null);
         FromTo fromTo=null!=ongoing?ongoing.getFromTo():null;
         Object from=null!=fromTo?fromTo.getFrom():null;
         mFromBrief.set(null!=from&&from instanceof Brief?(Brief) from:null);
         Object to=null!=fromTo?fromTo.getTo():null;
         mToBrief.set(null!=to&&to instanceof Brief?(Brief) to:null);
-        Debug.D("AAAAA "+status+" "+executor);
-        switch (status){
-            case Executor.STATUS_FINISH:
-        }
-//        switch (status){
-//            case Executor.STATUS_EXECUTING:
-//                setConfirm(null);
-//                setMessage(null);
-//                setDoingBinding(new DialogButtonBinding(ViewBinding.clickId(R.string.cancel).setListener(
-//                        (OnClickListener)(View view, int clickId, int count, Object obj)->
-//                                null!=executor&&executor.execute(task,Option.CANCEL))));
-//                break;
-//            case Executor.STATUS_FINISH:
-//                Result result=null!=task?task.getResult():null;
-//                result=result instanceof ConfirmResult?((ConfirmResult)result).makeConfirm(getContext()):result;
-//                result=null!=result?result:new Response<>(Code.CODE_UNKNOWN,"Unknown error.");
-//                Binding binding=null;
-//                if (result instanceof BindingResult){
-//                    binding=((BindingResult)result).getBinding();
-//                }
-//                if (result instanceof Confirm1){
-//                    setConfirm(((Confirm1)result));
-//                    return;
-//                }
-//                AutoDismiss autoDismiss=mAutoDismiss;
-//                int autoDismissDelay=null!=autoDismiss?autoDismiss.onResolveAutoDismiss(result):-1;
-//                if (autoDismissDelay>=0){
-//                    post(()->removeFromParent(),autoDismissDelay>10000?10000:autoDismissDelay);//Auto dismiss
-//                }
-//                setMessage(result instanceof MessageResult?((MessageResult)result).getMessage():null);
-//                if (null==binding){
-//                    int textResId=R.string.succeed;
-//                    if (!result.isSucceed()){
-//                        textResId=R.string.fail;
-//                        if (result instanceof CodeResult&&((CodeResult)result).getCode(Code.CODE_UNKNOWN)==Code.CODE_CANCEL){
-//                            textResId=R.string.cancel;
-//                        }
-//                    }
-//                    DialogButtonBinding buttonBinding=new DialogButtonBinding(ViewBinding.clickId(textResId).setListener
-//                            ((OnClickListener) (View view, int clickId, int count, Object obj)-> removeFromParent()||true));
-//                    //
-//                    if (null!=task&&task instanceof TaskRestartEnabler&&((TaskRestartEnabler)task).isTaskRestartEnable()){
-//                        buttonBinding.add(ViewBinding.clickId(R.string.restart).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-//                                (null!=executor&&executor.execute(task, Option.EXECUTE))||true));
-//                    }
-//                    //
-//                    buttonBinding.add(ViewBinding.clickId(R.string.remove).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-//                            (null!=executor&&executor.execute(task, Option.DELETE)&& removeFromParent())||true));
-//                    binding=buttonBinding;
-//                }
-//                setDoingBinding(binding);
-//                break;
-//        }
     }
 
     public final DoingTaskContent setDoingBinding(Binding binding){
@@ -158,6 +107,10 @@ public class DoingTaskContent extends ConfirmContent implements
 
     public final ObservableField<Binding> getBinding(){
         return mBinding;
+    }
+
+    public ObservableField<String> getSpeed() {
+        return mSpeed;
     }
 
     public ObservableField<Brief> getFromBrief() {

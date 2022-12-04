@@ -91,6 +91,11 @@ public class Ongoing implements Parcelable {
         return mProgress;
     }
 
+    public Ongoing setSpeed(String speed) {
+        this.mSpeed = speed;
+        return this;
+    }
+
     public String getSpeed() {
         return mSpeed;
     }
