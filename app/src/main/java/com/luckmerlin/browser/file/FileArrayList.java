@@ -1,6 +1,8 @@
 package com.luckmerlin.browser.file;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
@@ -43,4 +45,5 @@ public class FileArrayList extends ArrayList<File> {
         builder.append(" ").append(null!=context?context.getString(R.string.summeryItemWhich,size):size+" Items");
         return builder.toString();
     }
+
 }

@@ -109,7 +109,7 @@ public class NasClient extends AbstractClient{
     @Override
     public Response<File> loadFile(String file) {
         return mHttp.call(new Request().headerEncode(Label.LABEL_PATH, file).url("/file/detail").post().post(),
-                new MResponse<File>((Object data)-> null!=data?new Folder(data):null));
+                new MResponse<File>((Object data)-> null!=data?new File(data):null));
     }
 
     @Override

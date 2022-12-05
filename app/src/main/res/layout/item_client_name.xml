@@ -2,7 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:binding="http://schemas.android.com/apk/res-auto">
     <data>
-        <variable name="client" type="com.luckmerlin.browser.Client" />
+        <variable name="client" type="com.luckmerlin.browser.client.Client" />
         <variable name="listener" type="com.luckmerlin.click.Listener" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>

@@ -1,5 +1,6 @@
 package com.luckmerlin.browser;
 
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.task.Executor;
 

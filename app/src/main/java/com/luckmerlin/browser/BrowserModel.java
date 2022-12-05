@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.ListAdapter;
 import com.luckmerlin.binding.BindingGroup;
 import com.luckmerlin.binding.DataBindingUtil;
 import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.client.LocalClient;
 import com.luckmerlin.browser.databinding.BrowserModelBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
@@ -207,14 +208,15 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         return null!=files&&entryMode(new Mode(mode).makeSureBinding(
         (OnClickListener)(View view1, int clickId1, int count1, Object obj1)-> {
             Folder folder=mBrowserAdapter.getFolder();
-            if (null==folder||folder.isChild(files,false,true)){
+            File folderFile=null!=folder?folder.getFile():null;
+            if (null==folderFile||folderFile.isChild(files,false,true)){
                 toast(R.string.canNotOperateHere,-1);
                 return true;
             }
             String name=taskName;
             name=null!=name?name:getString(R.string.copy);
             entryMode(null);
-            return launchTask(new FilesCopyTask(files,folder).
+            return launchTask(new FilesCopyTask(files,folderFile).
                     setName(name), option,true)||true;}));
     }
 
@@ -277,7 +279,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     private boolean createFile(){
         Client client=mBrowserAdapter.getClient();
         Folder parent=getCurrentFolder();
-        return null!=parent&&null!=client&&null!=showContentDialog(new CreateFileContent(){
+        File parentFile=null!=parent?parent.getFile():null;
+        return null!=parentFile&&null!=client&&null!=showContentDialog(new CreateFileContent(){
             @Override
             protected boolean onCreateFile(String inputName, boolean createDir) {
                 final OnFinish<Response<File>> callback=(Response<File> reply)-> {
@@ -291,10 +294,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 };
                 removeFromParent();
                 if (client instanceof LocalClient){
-                    callback.onFinish(client.createFile(parent,inputName,createDir));
+                    callback.onFinish(client.createFile(parentFile,inputName,createDir));
                     return true;
                 }
-                return execute(()-> callback.onFinish(client.createFile(parent,inputName,createDir)));
+                return execute(()-> callback.onFinish(client.createFile(parentFile,inputName,createDir)));
             }}.setLayoutParams(new FixedLayoutParams().wrapContentAndCenter().
                setWidth(0.8f)).outsideDismiss(), new FixedLayoutParams().fillParentAndCenter());
     }

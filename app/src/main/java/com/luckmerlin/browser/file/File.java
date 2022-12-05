@@ -1,15 +1,14 @@
 package com.luckmerlin.browser.file;
 
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
-import androidx.annotation.Nullable;
 import com.luckmerlin.browser.Label;
-import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.task.Brief;
 import org.json.JSONObject;
 
-public class File implements Brief,Permission, ParcelObject {
+public class File implements Brief,Permission, Parcelable {
     private String mHost;
     private long mUsedVolume;
     private long mTotalVolume;
@@ -323,7 +322,7 @@ public class File implements Brief,Permission, ParcelObject {
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
+    public boolean equals( Object obj) {
         if (null==obj){
             return false;
         }else if (obj instanceof File){
@@ -333,41 +332,55 @@ public class File implements Brief,Permission, ParcelObject {
         }
         return super.equals(obj);
     }
-/////////////////////
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        mHost=parcel.readString();
-        mThumb=parcel.readString();
-        mParent=parcel.readString();
-        mSep=parcel.readString();
-        mName=parcel.readString();
-        mMime=parcel.readString();
-        mPermission=parcel.readInt();
-        mUsedVolume=parcel.readLong();
-        mTotalVolume=parcel.readLong();
-        mModifyTime=parcel.readLong();
-        mLength=parcel.readLong();
-        mTotal=parcel.readLong();
-    }
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-        parcel.writeString(mHost);
-        parcel.writeString(mThumb);
-        parcel.writeString(mParent);
-        parcel.writeString(mSep);
-        parcel.writeString(mName);
-        parcel.writeString(mMime);
-        parcel.writeLong(mPermission);
-        parcel.writeLong(mUsedVolume);
-        parcel.writeLong(mTotalVolume);
-        parcel.writeLong(mModifyTime);
-        parcel.writeLong(mLength);
-        parcel.writeLong(mTotal);
-    }
 
     @Override
     public String toString() {
         return "File{"+getPath()+"}";
+    }
+    ///////////////
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mHost);
+        dest.writeString(mThumb);
+        dest.writeString(mParent);
+        dest.writeString(mSep);
+        dest.writeString(mName);
+        dest.writeString(mMime);
+        dest.writeLong(mPermission);
+        dest.writeLong(mUsedVolume);
+        dest.writeLong(mTotalVolume);
+        dest.writeLong(mModifyTime);
+        dest.writeLong(mLength);
+        dest.writeLong(mTotal);
+    }
+
+    public static final Creator<File> CREATOR = new Creator<File>() {
+        @Override
+        public File createFromParcel(Parcel parcel) {
+            File file=new File();
+            file.mHost=parcel.readString();
+            file.mThumb=parcel.readString();
+            file.mParent=parcel.readString();
+            file.mSep=parcel.readString();
+            file.mName=parcel.readString();
+            file.mMime=parcel.readString();
+            file.mPermission=parcel.readInt();
+            file.mUsedVolume=parcel.readLong();
+            file.mTotalVolume=parcel.readLong();
+            file.mModifyTime=parcel.readLong();
+            file.mLength=parcel.readLong();
+            file.mTotal=parcel.readLong();
+            return file;
+        }
+
+        @Override
+        public File[] newArray(int size) {
+            return new File[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 }

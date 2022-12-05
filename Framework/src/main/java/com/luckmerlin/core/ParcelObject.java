@@ -6,7 +6,9 @@ import com.luckmerlin.object.ObjectCreator;
 import java.util.Collection;
 
 public interface ParcelObject {
+    @Deprecated
     void onParcelRead(Parcel parcel);
+    @Deprecated
     void onParcelWrite(Parcel parcel);
 
     final static class Parceler{

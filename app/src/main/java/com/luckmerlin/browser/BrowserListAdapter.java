@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import com.luckmerlin.binding.ViewBinding;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.databinding.ItemBrowserFileBinding;
 import com.luckmerlin.browser.databinding.ItemBrowserFileGirdBinding;
 import com.luckmerlin.browser.file.File;
@@ -156,7 +157,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
             if (null!=page&&page instanceof Folder){
                 Folder folder=(Folder)page;
                 mCurrentFolder.set(folder);
-                mCurrentPath.set(mPathSpanClick.generate(folder, Color.parseColor("#483fe6")));
+                mCurrentPath.set(mPathSpanClick.generate(folder.getFile(), Color.parseColor("#483fe6")));
                 if (getSize()>0&&folder.isEmpty()){
 //                    toast(R.string.noMoreData,500);
                 }
@@ -208,7 +209,7 @@ public class BrowserListAdapter extends PageListAdapter<BrowseQuery,File> {
         if (null==path||path.length()<=0){
             return false;
         }
-        File current=mCurrentFolder.get();
+        Folder current=mCurrentFolder.get();
         String folderPath=null!=current?current.getPath():null;
         return null!=folderPath&&path.startsWith(folderPath);
     }

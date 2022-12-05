@@ -2,9 +2,10 @@ package com.luckmerlin.browser.task;
 
 import android.content.Context;
 import android.os.Parcel;
+import android.os.Parcelable;
 import android.view.View;
 import com.luckmerlin.binding.ViewBinding;
-import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Code;
@@ -16,6 +17,7 @@ import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
@@ -26,35 +28,18 @@ import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.utils.Utils;
+import java.util.ArrayList;
 import java.util.List;
 
-public class FilesCopyTask extends FilesTask {
-    private Folder mToFolder;
+public final class FilesCopyTask extends FilesTask implements Parcelable {
+    private File mToFolder;
     private boolean mCoverEnabled=false;
     private boolean mAppendEnable=false;
     private boolean mDeleteSrcWhileSucceed=false;
 
-    public FilesCopyTask(FileArrayList files,Folder toFolder) {
+    public FilesCopyTask(FileArrayList files,File toFolder) {
         super(files);
         mToFolder=toFolder;
-    }
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-        super.onParcelWrite(parcel);
-        Parceler.write(parcel,mToFolder);
-        parcel.writeInt(mCoverEnabled?1:0);
-        parcel.writeInt(mAppendEnable?1:0);
-        parcel.writeInt(mDeleteSrcWhileSucceed?1:0);
-    }
-
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        super.onParcelRead(parcel);
-        mToFolder=Parceler.read(parcel);
-        mCoverEnabled=parcel.readInt()==1;
-        mAppendEnable=parcel.readInt()==1;
-        mDeleteSrcWhileSucceed=parcel.readInt()==1;
     }
 
     public final boolean EnableCover(boolean enable){
@@ -203,5 +188,58 @@ public class FilesCopyTask extends FilesTask {
 //            fromClient.deleteFile(fromFile,);
 //        }
         return result;
+    }
+
+    /////////////
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        Parceler parceler=new Parceler(dest);
+        parceler.writeAsParcelable(mToFolder,flags).
+        writeBoolean(mCoverEnabled).
+        writeBoolean(mAppendEnable).
+        writeBoolean(mDeleteSrcWhileSucceed).
+        writeInt(getCursor()).
+        writeParcelableList(getFiles(),flags).
+        writeString(getName()).
+        writeAsParcelable(getOngoing(),flags).
+        writeAsParcelable(getResult(),flags);
+    }
+
+    public static final Creator<FilesCopyTask> CREATOR = new Creator<FilesCopyTask>() {
+        @Override
+        public FilesCopyTask createFromParcel(Parcel in) {
+            Parceler parceler=new Parceler(in);
+            File toFolder=parceler.readParcelable();
+            boolean coverEnabled = parceler.readBoolean(false);
+            boolean appendEnable = parceler.readBoolean(false);
+            boolean deleteSrcWhileSucceed = parceler.readBoolean(false);
+            int cursor=parceler.readInt(-1);
+            ArrayList<File> arrayList=new ArrayList<>();
+            parceler.readParcelableList(arrayList);
+            FileArrayList files=new FileArrayList();
+            files.addAll(arrayList);
+            String name=parceler.readString(null);
+            Ongoing ongoing=parceler.readParcelable();
+            Result result=parceler.readParcelable();
+            //
+            FilesCopyTask filesCopyTask=new FilesCopyTask(files,toFolder);
+            filesCopyTask.setOngoing(ongoing);
+            filesCopyTask.setResult(result);
+            filesCopyTask.setCursor(cursor).setName(name);
+            filesCopyTask.mCoverEnabled=coverEnabled;
+            filesCopyTask.mAppendEnable=appendEnable;
+            filesCopyTask.mDeleteSrcWhileSucceed=deleteSrcWhileSucceed;
+            return filesCopyTask;
+        }
+
+        @Override
+        public FilesCopyTask[] newArray(int size) {
+            return new FilesCopyTask[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 }

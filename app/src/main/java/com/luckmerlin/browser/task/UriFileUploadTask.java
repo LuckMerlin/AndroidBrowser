@@ -5,7 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Parcelable;
 import androidx.documentfile.provider.DocumentFile;
-import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Utils;
@@ -58,12 +58,13 @@ public class UriFileUploadTask extends AbstractFileTask {
             notifyProgress(ongoing.setProgressSucceed(true));
             return new Response<>(Code.CODE_ALREADY,"Uris size empty");
         }
-        final Folder folder=mFolder;
-        if (null==folder){
+        Folder folder=mFolder;
+        final File folderFile=null!=folder?folder.getFile():null;
+        if (null==folderFile){
             Debug.D("Not need execute task while folder invalid."+this);
             return new Response<>(Code.CODE_FAIL,"Folder invalid");
         }
-        Client client=getFileClient(folder);
+        Client client=getFileClient(folderFile);
         if (null==client){
             Debug.D("Not need execute task while folder client invalid."+this);
             return new Response<>(Code.CODE_FAIL,"Folder client invalid");

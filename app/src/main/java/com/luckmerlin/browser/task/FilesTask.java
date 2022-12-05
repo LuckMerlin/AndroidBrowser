@@ -1,7 +1,5 @@
 package com.luckmerlin.browser.task;
 
-import android.os.Parcel;
-
 import com.luckmerlin.browser.Utils;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.File;
@@ -9,11 +7,8 @@ import com.luckmerlin.browser.file.FileArrayList;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
 import com.luckmerlin.debug.Debug;
-import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Ongoing;
-import com.luckmerlin.task.Progress;
 import com.luckmerlin.task.Runtime;
-import com.luckmerlin.task.Task;
 
 public abstract class FilesTask extends AbstractFileTask {
     private FileArrayList mFiles;
@@ -41,22 +36,6 @@ public abstract class FilesTask extends AbstractFileTask {
     }
 
     protected abstract Result onExecuteFile(File file, int index, Runtime runtime, OngoingUpdate onGoingUpdate);
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-        super.onParcelWrite(parcel);
-        parcel.writeInt(mCursor);
-        Parceler.writeList(parcel,mFiles);
-    }
-
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        super.onParcelRead(parcel);
-        mCursor=parcel.readInt();
-        FileArrayList arrayList=new FileArrayList();
-        Parceler.readList(parcel, arrayList,null);
-        mFiles=arrayList;
-    }
 
     @Override
     protected final Result onExecute(Runtime runtime) {

@@ -1,14 +1,11 @@
 package com.luckmerlin.task;
 
 import android.content.Context;
-import android.os.Parcel;
-import android.os.Parcelable;
 import com.luckmerlin.core.ChangeUpdater;
 import com.luckmerlin.core.OnChangeUpdate;
-import com.luckmerlin.core.ParcelObject;
 import com.luckmerlin.core.Result;
 
-public abstract class AbstractTask extends ChangeUpdater implements Task, ParcelObject {
+public abstract class AbstractTask extends ChangeUpdater implements Task {
     private String mName;
     private Ongoing mOngoing;
     private Result mResult;
@@ -18,19 +15,6 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
 
     public AbstractTask(){
 
-    }
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-        Ongoing doing=mOngoing;
-        parcel.writeString(mName);
-        parcel.writeParcelable(null!=doing&&doing instanceof Parcelable?(Parcelable)doing:null,0);
-    }
-
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        mName=parcel.readString();
-        mOngoing=parcel.readParcelable(getClass().getClassLoader());
     }
 
     public final AbstractTask setName(String name) {
@@ -61,6 +45,16 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
     }
 
     protected abstract Result onExecute(Runtime runtime);
+
+    protected final AbstractTask setOngoing(Ongoing ongoing){
+        mOngoing=ongoing;
+        return this;
+    }
+
+    protected final AbstractTask setResult(Result result){
+        mResult=result;
+        return this;
+    }
 
     @Override
     public final Result execute(Runtime runtime, OnProgressChange callback) {

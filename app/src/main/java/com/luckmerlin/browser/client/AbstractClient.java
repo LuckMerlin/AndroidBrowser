@@ -1,6 +1,5 @@
 package com.luckmerlin.browser.client;
 
-import com.luckmerlin.browser.Client;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.OnFinish;
 

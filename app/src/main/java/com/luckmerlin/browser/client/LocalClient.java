@@ -90,7 +90,8 @@ public class LocalClient extends AbstractClient {
         Folder queryFiles=new Folder(createLocalFile(browserFile,true)).setFrom(start);
         queryFiles.setTotal(total);
         long totalVolume=browserFile.getTotalSpace();
-        queryFiles.setUsedVolume(totalVolume-browserFile.getUsableSpace()).setTotalVolume(totalVolume);
+        queryFiles.setUsedVolume(totalVolume-browserFile.getUsableSpace()).
+                setTotalVolume(totalVolume);
         int end=Math.min((int)(start+size),(int)total);
         ArrayList<File> subFiles=null;
         if (end>0&&start<end) {

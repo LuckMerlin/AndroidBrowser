@@ -1,6 +1,6 @@
 package com.luckmerlin.browser.task;
 
-import com.luckmerlin.browser.Client;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.file.FileFromTo;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.file.File;

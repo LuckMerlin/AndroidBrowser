@@ -9,12 +9,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Base64;
 
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.client.LocalClient;
-import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Executor;
-import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;

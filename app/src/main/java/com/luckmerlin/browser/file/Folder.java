@@ -1,7 +1,5 @@
 package com.luckmerlin.browser.file;
 
-import android.os.Parcel;
-
 import com.luckmerlin.adapter.PageListAdapter;
 import com.luckmerlin.browser.Label;
 import org.json.JSONArray;
@@ -9,8 +7,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Folder extends File implements PageListAdapter.Page<File> {
+public class Folder implements PageListAdapter.Page<File> {
     private long mFrom;
+    private File mFile;
     private ArrayList<File> mFiles;
 
     public Folder(){
@@ -18,7 +17,6 @@ public class Folder extends File implements PageListAdapter.Page<File> {
     }
 
     public Folder(Object obj){
-        super(obj);
         apply(obj);
     }
 
@@ -55,6 +53,143 @@ public class Folder extends File implements PageListAdapter.Page<File> {
     public Folder setFrom(long from) {
         this.mFrom = from;
         return this;
+    }
+
+    public final Folder setFile(File file) {
+        this.mFile = file;
+        return this;
+    }
+
+    public File getFile(){
+        return mFile;
+    }
+
+    public Folder setTotal(long total) {
+        File file=mFile;
+        if (null!=file){
+            file.setTotal(total);
+        }
+        return this;
+    }
+
+    public Folder setUsedVolume(long total) {
+        File file=mFile;
+        if (null!=file){
+            file.setUsedVolume(total);
+        }
+        return this;
+    }
+
+    public Folder setTotalVolume(long total) {
+        File file=mFile;
+        if (null!=file){
+            file.setTotalVolume(total);
+        }
+        return this;
+    }
+
+    public final boolean isChild(Object pathObj, boolean parent){
+        return isChild(pathObj,parent,false);
+    }
+
+    public final boolean isChild(Object pathObj,boolean parent,boolean recursion){
+        File file=mFile;
+        return null!=file&&file.isChild(pathObj,parent,recursion);
+    }
+
+    public boolean isLocalFile(){
+        File file=mFile;
+        return null!=file&&file.isLocalFile();
+    }
+
+    public long getTotalVolume(){
+        File file=mFile;
+        return null!=file?file.getTotalVolume():0;
+    }
+
+    public long getUsedVolume(){
+        File file=mFile;
+        return null!=file?file.getUsedVolume():0;
+    }
+
+    public long getLength(){
+        File file=mFile;
+        return null!=file?file.getLength():0;
+    }
+
+    public long getTotal(){
+        File file=mFile;
+        return null!=file?file.getTotal():0;
+    }
+
+    public int getPermission(){
+        File file=mFile;
+        return null!=file?file.getPermission():0;
+    }
+
+    public File generateFile(String path){
+        File file=mFile;
+        return null!=file?file.generateFile(path):null;
+    }
+
+    public String getPath(){
+        File file=mFile;
+        return null!=file?file.getPath():null;
+    }
+
+    public String getExtension(boolean include){
+        File file=mFile;
+        return null!=file?file.getExtension(include):null;
+    }
+
+    public String getHost(){
+        File file=mFile;
+        return null!=file?file.getHost():null;
+    }
+
+    public String getMime(){
+        File file=mFile;
+        return null!=file?file.getMime():null;
+    }
+
+    public String getName(){
+        File file=mFile;
+        return null!=file?file.getName():null;
+    }
+
+    public String getLogoUrl(){
+        File file=mFile;
+        return null!=file?file.getLogoUrl():null;
+    }
+
+    public String getParent(){
+        File file=mFile;
+        return null!=file?file.getParent():null;
+    }
+
+    public String getSep(){
+        File file=mFile;
+        return null!=file?file.getSep():null;
+    }
+
+    public String getThumb(){
+        File file=mFile;
+        return null!=file?file.getThumb():null;
+    }
+
+    public String getTitle(){
+        File file=mFile;
+        return null!=file?file.getTitle():null;
+    }
+
+    public long getModifyTime(){
+        File file=mFile;
+        return null!=file?file.getModifyTime():0;
+    }
+
+    public File getParentFile(){
+        File file=mFile;
+        return null!=file?file.getParentFile():null;
     }
 
     public int getVolumePercent(){
@@ -98,19 +233,4 @@ public class Folder extends File implements PageListAdapter.Page<File> {
         return getChildren();
     }
 
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        super.onParcelRead(parcel);
-        mFrom=parcel.readLong();
-        ArrayList<File> files=new ArrayList<>();
-        Parceler.readList(parcel,files,null);
-        mFiles=files;
-    }
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-        super.onParcelWrite(parcel);
-        parcel.writeLong(mFrom);
-        Parceler.writeList(parcel,mFiles);
-    }
 }
