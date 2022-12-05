@@ -67,7 +67,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
         mOngoing=null;
         mRuntime=runtime;
         mOnProgressChange=callback;
-        mNotifier=(Task task)-> {
+        final OnProgressChange onProgressChange=mNotifier=(Task task)-> {
             iterateUpdaters((OnChangeUpdate data)-> null!=data&&data.onChangeUpdated(task));
             if (null!=callback){
                 callback.onProgressChanged(null!=task?task:this);
@@ -78,6 +78,7 @@ public abstract class AbstractTask extends ChangeUpdater implements Task, Parcel
         mNotifier=null;
         mRuntime=null;
         mOnProgressChange=null;
+        onProgressChange.onProgressChanged(this);
         return result;
     }
 

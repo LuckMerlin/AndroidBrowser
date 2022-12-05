@@ -34,12 +34,14 @@ public class StreamTask extends AbstractTask {
             Debug.W("Fail execute stream task while input stream invalid.");
             return new Response(Code.CODE_FAIL,"Input stream invalid.");
         }
+        final Ongoing ongoing=new Ongoing();
         final long inputTotalLength=inputStream.getTotalLength();
         if (inputTotalLength<0){
             Debug.W("Fail execute stream task while input stream length invalid."+inputTotalLength);
             return new Response(Code.CODE_FAIL,"Output stream invalid."+inputTotalLength);
         }else if (inputTotalLength==currentOutLength){
             Debug.W("Not need execute stream task while already done"+inputTotalLength);
+            notifyProgress(ongoing.setProgress(Utils.progress(currentOutLength,inputTotalLength)));
             return new Response(Code.CODE_ALREADY,"Already done."+inputTotalLength);
         }else if (inputTotalLength<currentOutLength){
             Debug.W("Fail execute stream task while input length not match out length"+inputTotalLength+"/"+currentOutLength);
@@ -48,7 +50,6 @@ public class StreamTask extends AbstractTask {
         byte[] buffer=new byte[1024*8];int read=0;
         Debug.D("Copy stream."+currentOutLength+"/"+inputTotalLength);
         try {
-            Ongoing ongoing=new Ongoing();
             notifyProgress(ongoing.setProgress(Utils.progress(currentOutLength,inputTotalLength)));
             long time=System.currentTimeMillis();long lastTime=System.currentTimeMillis();
             while ((read=inputStream.read(buffer))>=0){

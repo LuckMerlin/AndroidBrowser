@@ -65,7 +65,7 @@
                         <ProgressBar android:layout_width="match_parent" android:layout_height="4dp"
                             android:progress="@{vm.browserAdapter.currentFolder.volumePercent}"
                             style="@android:style/Widget.ProgressBar.Horizontal"
-                            android:progressDrawable="@drawable/seekbar_bg"/>
+                            android:progressDrawable="@drawable/client_progress_bg"/>
                     </LinearLayout>
                 </LinearLayout>
                 <LinearLayout android:background="@drawable/client_bg_sub"  android:gravity="center_vertical" android:layout_weight="1"

@@ -103,7 +103,7 @@ public class FilesCopyTask extends FilesTask {
                                     setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
                                             execute(FilesCopyTask.this, Option.CANCEL)&&false))));
                     updateOnGoing(ongoing,onGoingUpdate);
-                    return new Response(Code.CODE_FAIL, "Need cofirm.");
+                    return new Response(Code.CODE_FAIL, "Need confirm.");
                 }
             }
             if (null == response || !response.isSucceed()) {
@@ -169,17 +169,19 @@ public class FilesCopyTask extends FilesTask {
                     if (null==executor){
                         return new Response<>(Code.CODE_ERROR,"Need confirm file copy cover,But not exist executor");
                     }
+                    final int option=null!=runtime?runtime.getOption():Option.LAUNCH;
                     Context context=null!=runtime?runtime.getContext():null;
                     ongoing.set(new Confirm().setTitle(Utils.getString(context,R.string.sureWhich,
                     null,Utils.getString(context,R.string.replace,null))).
                     setMessage(Utils.getString(context,R.string.alreadyWhich,null,Utils.getString(context,R.string.exist,null))).
                     setMessage(toFile.getName()).setBinding(new DialogButtonBinding(
                         ViewBinding.clickId(R.string.replace).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-                                ((EnableCover(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)||true)),
+                                ((EnableCover(true)||true)&&executor.execute(FilesCopyTask.this,option)||true)),
                         ViewBinding.clickId(R.string.append).setListener((OnClickListener) (View view, int clickId, int count, Object obj)->
-                                ((EnableAppend(true)||true)&&executor.execute(FilesCopyTask.this,Option.EXECUTE)||true)),
+                                ((EnableAppend(true)||true)&&executor.execute(FilesCopyTask.this,option)||true)),
                         ViewBinding.clickId(R.string.cancel)
                     )));
+                    updateOnGoing(ongoing,onGoingUpdate);
                     return new Response<>(Code.CODE_ERROR,"Need confirm.");
                 }
                 Debug.D("To delete exist file while copy cover enable.");
