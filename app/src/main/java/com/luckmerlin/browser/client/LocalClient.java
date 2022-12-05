@@ -87,7 +87,8 @@ public class LocalClient extends AbstractClient {
         });
         List<java.io.File> fileList=files.getList();
         long total=null!=fileList?fileList.size():0;
-        Folder queryFiles=new Folder(createLocalFile(browserFile,true)).setFrom(start);
+        File file=createLocalFile(browserFile,true);
+        Folder queryFiles=new Folder(file).setFile(file).setFrom(start);
         queryFiles.setTotal(total);
         long totalVolume=browserFile.getTotalSpace();
         queryFiles.setUsedVolume(totalVolume-browserFile.getUsableSpace()).

@@ -5,6 +5,7 @@ import android.os.Parcel;
 import com.luckmerlin.object.ObjectCreator;
 import java.util.Collection;
 
+@Deprecated
 public interface ParcelObject {
     @Deprecated
     void onParcelRead(Parcel parcel);

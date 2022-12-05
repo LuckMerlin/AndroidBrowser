@@ -27,13 +27,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class TaskExecutor extends MatcherInvoker implements Executor{
-    private final List<ExecuteTask> mQueue=new CopyOnWriteArrayList<>();
+    private final Map<Task,ExecuteTask> mQueue=new ConcurrentHashMap<>();
     private ExecutorService mExecutor;
     private boolean mFullExecuting=false;
     private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
-    private final ParcelObject.Parceler mParcelParser=new ParcelObject.Parceler();
     private final TaskSaver mTaskSaver;
 
     public TaskExecutor(Context context,TaskSaver taskSaver){
@@ -68,7 +67,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             public Result execute(Runtime runtime, OnProgressChange callback) {
                 onExecutorPrepare();
                 updateStatusChange(STATUS_START_LOAD_SAVED,null,mListeners);
-                taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
+//                taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
                 poolExecutor.setMaximumPoolSize(maxPoolSize);
                 updateStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
                 return null;
@@ -173,14 +172,14 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         return true;
     }
 
-    private boolean removeFromQueue(ExecuteTask executeTask){
-        List<ExecuteTask> queue=mQueue;
-        return null!=executeTask&&null!=queue&&queue.remove(executeTask);
-    }
-
-    private ExecuteTask findFirst(Task task){
-        return null!=task?findFirst((ExecuteTask data)->null!=data&&data.isTask(task)):null;
-    }
+//    private boolean removeFromQueue(ExecuteTask executeTask){
+//        List<ExecuteTask> queue=mQueue;
+//        return null!=executeTask&&null!=queue&&queue.remove(executeTask);
+//    }
+//
+//    private ExecuteTask findFirst(Task task){
+//        return null!=task?findFirst((ExecuteTask data)->null!=data&&data.isTask(task)):null;
+//    }
 
     private ExecuteTask findFirst(Matcher<ExecuteTask> matcher){
         MatchedCollector<ExecuteTask> collector=new MatchedCollector<ExecuteTask>(1).setMatcher(matcher);
@@ -190,11 +189,11 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     private boolean deleteSaveTask(ExecuteTask executeTask){
         if (null!=executeTask){
-            TaskSaver taskSaver=mTaskSaver;
-            boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
-            removeFromQueue(executeTask);
-            updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
-            return succeed;
+//            TaskSaver taskSaver=mTaskSaver;
+//            boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
+//            removeFromQueue(executeTask);
+//            updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
+//            return succeed;
         }
         return false;
     }
@@ -208,7 +207,7 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         parcel.setDataPosition(0);
         int option=parcel.readInt();
         parcel.readString();//Version
-        ParcelObject parcelObject=mParcelParser.read(parcel);
+//        ParcelObject parcelObject=mParcelParser.read(parcel);
         parcel.recycle();
         if (null==parcelObject){
             return null;
@@ -224,12 +223,12 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     private boolean saveTask(Task task,int option){
         TaskSaver taskSaver=null!=task?mTaskSaver:null;
-        if (null!=taskSaver&&task instanceof ParcelObject){
+        if (null!=taskSaver&&task instanceof Parcelable){
             Parcel parcel=Parcel.obtain();
             parcel.setDataPosition(0);
             parcel.writeInt(option);
             parcel.writeString("");//Version
-            mParcelParser.write(parcel,(ParcelObject) task);
+            ((Parcelable)task).writeToParcel(parcel,0);
             byte[] bytes=parcel.marshall();
             boolean succeed=taskSaver.write(task,bytes);
             parcel.recycle();
@@ -260,7 +259,8 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
         protected final Executor mExecutor;
         private boolean mSaved;
 
-        protected ExecuteTask(Executor executor, Task task, Context context,int option, Handler handler, boolean fromSaved){
+        protected ExecuteTask(Executor executor, Task task, Context context,
+                              int option, Handler handler, boolean fromSaved){
             super(option,handler,context);
             mExecutor=executor;
             mTask=task;
