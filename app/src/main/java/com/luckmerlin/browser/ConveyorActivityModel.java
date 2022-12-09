@@ -20,6 +20,7 @@ import com.luckmerlin.browser.dialog.DialogButtonBinding;
 import com.luckmerlin.browser.dialog.ModelMenuItemModel;
 import com.luckmerlin.browser.dialog.TaskMenuContextDialogContent;
 import com.luckmerlin.click.OnClickListener;
+import com.luckmerlin.core.Matcher;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.dialog.FixedLayoutParams;
 import com.luckmerlin.model.OnBackPress;
@@ -73,7 +74,7 @@ public class ConveyorActivityModel extends BaseModel implements
         }
         mExecutor=executor;
         if (null!=executor){
-            executor.putListener(this,null,true);
+            executor.putListener(this, (Task data)-> true, true);
         }
     }
 
@@ -121,7 +122,7 @@ public class ConveyorActivityModel extends BaseModel implements
                                 mConveyorListAdapter.remove(task))||true),
                 ViewBinding.clickId(R.string.cancel).setListener((OnClickListener) (View view1, int clickId1, int count1, Object obj1)->
                         confirmContent.removeFromParent()||true)));
-//        confirmContent.setConfirm(confirm);
+        confirmContent.setConfirm(confirm);
         return null!=showContentDialog(confirmContent, new FixedLayoutParams().wrapContentAndCenter());
     }
 

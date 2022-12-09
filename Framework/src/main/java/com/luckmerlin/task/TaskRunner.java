@@ -38,7 +38,8 @@ abstract class TaskRunner implements Runnable{
     public final boolean isNeedDelete(){
         Task task=getTask();
         String taskId=mTaskId;
-        return null!=task&&task instanceof Parcelable &&Option.isOptionEnabled(mOption,Option.DELETE)&&null!=taskId&&taskId.length()>0;
+        return null!=task&&task instanceof Parcelable &&Option.
+                isOptionEnabled(mOption,Option.DELETE)&&null!=taskId&&taskId.length()>0;
     }
 
     public final boolean isTaskIdEquals(String taskId){

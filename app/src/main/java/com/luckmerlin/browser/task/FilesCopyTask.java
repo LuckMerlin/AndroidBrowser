@@ -200,11 +200,7 @@ public final class FilesCopyTask extends FilesTask implements Parcelable {
         setName(parceler.readString(parcel,getName()));
         setOngoing(parceler.readParcelable(parcel));
         setResult(parceler.readParcelable(parcel));
-        FileArrayList ddd=parceler.readParcelable(parcel);
-        setFiles(ddd);
-        if (mToFolder!=null){
-
-        }
+        setFiles(parceler.readParcelable(parcel));
     }
 
     @Override
