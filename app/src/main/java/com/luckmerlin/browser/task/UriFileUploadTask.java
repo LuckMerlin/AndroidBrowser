@@ -3,7 +3,8 @@ package com.luckmerlin.browser.task;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Parcelable;
+import android.os.Parcel;
+
 import androidx.documentfile.provider.DocumentFile;
 import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.file.FileFromTo;
@@ -14,6 +15,8 @@ import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.browser.file.Mode;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.OnProgressChange;
@@ -26,12 +29,17 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UriFileUploadTask extends AbstractFileTask {
+public class UriFileUploadTask extends AbstractFileTask implements Parcelable {
     private ArrayList<Parcelable> mUris;
-    private final Folder mFolder;
+    private Folder mFolder;
 
-    public UriFileUploadTask(Folder folder) {
-        mFolder=folder;
+    public UriFileUploadTask(){
+
+    }
+
+    public final UriFileUploadTask setFolder(Folder folder) {
+        this.mFolder = folder;
+        return this;
     }
 
     public final UriFileUploadTask add(Parcelable uri){
@@ -122,6 +130,7 @@ public class UriFileUploadTask extends AbstractFileTask {
         }
         Uri uri=null;DocumentFile documentFile=null;long fileLength=-1;
         InputStream inputStream=null;OutputStream outputStream=null;
+//        Uri.parse()
         if (null==(documentFile=DocumentFile.fromSingleUri(context,uri=(Uri)parcelable))){
             Debug.D("Skip upload uri while uri document null."+parcelable);
             return new Response<>(Code.CODE_SKIP,"Uri document null");
@@ -145,7 +154,6 @@ public class UriFileUploadTask extends AbstractFileTask {
             final OutputStream finalOutputStream=outputStream;
             final InputStream finalInputStream=inputStream;
             final FileFromTo doingFiles=new FileFromTo().setMode(Mode.MODE_UPLOAD);
-//            documentFile.getName();
             doingFiles.setFrom(null).setTo(toFile);
             return new StreamTask(new com.luckmerlin.stream.InputStream(0) {
                 @Override
@@ -170,5 +178,16 @@ public class UriFileUploadTask extends AbstractFileTask {
         }finally {
             Utils.closeStream(inputStream,outputStream);
         }
+    }
+
+    private UriFileUploadTask(Parceler parceler,Parcel parcel){
+        mUris=parceler.readParcelable(parcel);
+        mFolder=parceler.readParcelable(parcel);
+    }
+
+    @Override
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeParcelable(parcel,mUris,flags);
+        parceler.writeParcelable(parcel,mFolder,flags);
     }
 }

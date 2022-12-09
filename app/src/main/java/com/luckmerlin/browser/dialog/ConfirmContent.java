@@ -7,7 +7,6 @@ import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.ConfirmContentBinding;
 import com.luckmerlin.task.Confirm;
-import com.luckmerlin.task.Confirm1;
 
 public class ConfirmContent extends BaseContent {
     private final ObservableField<String> mTitle=new ObservableField<>();

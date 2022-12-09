@@ -657,7 +657,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     return true;
                 }
                 entryMode(null);
-                UriFileUploadTask uploadTask=new UriFileUploadTask(folder).add(parcelable);
+//                UriFileUploadTask uploadTask=new UriFileUploadTask().setFolder(folder).add(parcelable);
+                UriFileUploadTask uploadTask=new UriFileUploadTask().setFolder(folder);
                 uploadTask.setName(getString(R.string.upload));
                 return launchTask(uploadTask,Option.LAUNCH_NOT_SAVE,true)&&false;
             }));
@@ -671,7 +672,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                     return true;
                 }
                 entryMode(null);
-                UriFileUploadTask uploadTask=new UriFileUploadTask(folder).setUris(parcelables);
+//                UriFileUploadTask uploadTask=new UriFileUploadTask().setFolder(folder).setUris(parcelables);
+                UriFileUploadTask uploadTask=new UriFileUploadTask().setFolder(folder);
                 uploadTask.setName(getString(R.string.upload));
                 return launchTask(uploadTask,Option.LAUNCH,true)&&false;
             }));

@@ -1,13 +1,16 @@
 package com.luckmerlin.browser.file;
 
+import android.os.Parcel;
 import com.luckmerlin.adapter.PageListAdapter;
 import com.luckmerlin.browser.Label;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Folder implements PageListAdapter.Page<File> {
+public class Folder implements PageListAdapter.Page<File>, Parcelable {
     private long mFrom;
     private File mFile;
     private ArrayList<File> mFiles;
@@ -233,4 +236,17 @@ public class Folder implements PageListAdapter.Page<File> {
         return getChildren();
     }
 
+    ///////
+    private Folder(Parceler parceler, Parcel parcel){
+        mFrom=parceler.readLong(parcel,mFrom);
+        mFrom=parceler.readParcelable(parcel);
+        mFiles=parceler.readParcelable(parcel);
+    }
+
+    @Override
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeLong(parcel,mFrom);
+        parceler.writeParcelable(parcel,mFrom,flags);
+        parceler.writeParcelable(parcel,mFiles,flags);
+    }
 }
