@@ -115,9 +115,9 @@ public class BrowserActivity extends BrowserContentActivity {
 //                (new java.io.File("/sdcard"),true)));
 //        filesDeleteTask.setName("我爱你是第发散发");
 //        filesDeleteTask.setCursor(3333);
-//        byte[] bytes= ParcelObject.Parceler.write(filesDeleteTask);
+//        byte[] bytes= ParcelObject.Parceler1.write(filesDeleteTask);
 //        Debug.D("EEEEEE "+bytes.length);
-//        FilesDeleteTask ddd=ParcelObject.Parceler.read(bytes,null);
+//        FilesDeleteTask ddd=ParcelObject.Parceler1.read(bytes,null);
 //        Debug.D("EEEEEE "+ddd.getName()+" "+ddd.getCursor()+" "+ddd.getFiles());
         //
 //        return null;

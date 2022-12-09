@@ -18,7 +18,6 @@ import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
 import com.luckmerlin.task.TaskSaver;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +40,7 @@ public class ConveyorService extends Service {
         mExecutorBinder=new ExecutorBinder(executor);
 //        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
         //git remote set-url origin https://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@github.com/LuckMerlin/TsServer.git
+    //
     }
 
     @Override
@@ -59,81 +59,6 @@ public class ConveyorService extends Service {
         Debug.D("EEEE onDestroy "+this);
     }
 
-    private static class ConveyorTaskSaver implements com.luckmerlin.task.TaskSaver{
-        private final SharedPreferences mPreferences;
-        private final static String POSTFIX="LMTask";
-
-        protected ConveyorTaskSaver(Application application){
-            mPreferences=null!=application?application.getSharedPreferences("TaskSaver", Context.MODE_PRIVATE):null;
-        }
-
-        @Override
-        public void load(TaskBytesReader bytesReader) {
-            SharedPreferences preferences=mPreferences;
-            if (null==bytesReader||null==preferences){
-                return;
-            }
-            Map<String,?> objectMap=preferences.getAll();
-            Set<String> set=null!=objectMap?objectMap.keySet():null;
-            if (null==set){
-                return;
-            }
-            Object childObj=null;
-            SharedPreferences.Editor editor=preferences.edit();
-            Debug.D("Loading saved tasK."+set.size());
-            for (String taskId:set) {
-                if (null==taskId||!taskId.endsWith(POSTFIX)){
-                    continue;
-                }
-                childObj=objectMap.get(taskId);
-                byte[] bytes=null!=childObj&&childObj instanceof String? Base64.decode((String)childObj,Base64.URL_SAFE):null;
-                editor.remove(taskId);
-                Task task=null; String newId=null;
-                if (null==bytes||bytes.length<=0||null==(task=bytesReader.readTaskBytes(bytes))||
-                        null==(newId=generateTaskId(task))||newId.length()<=0){
-                    Debug.D("Delete saved task while bytes invalid.");
-                }else{
-                    editor.putString(newId,(String)childObj);
-                }
-                editor.commit();
-            }
-        }
-
-        @Override
-        public boolean delete(Task task) {
-            SharedPreferences preferences=null!=task?mPreferences:null;
-            if (null==preferences){
-                return false;
-            }
-            Debug.D("Deleting save tasK."+task);
-            String id=generateTaskId(task);
-            return null!=id&&preferences.edit().remove(id).commit();
-        }
-
-        @Override
-        public boolean write(Task task, byte[] taskBytes) {
-            SharedPreferences preferences=mPreferences;
-            if (null==task||null==taskBytes||taskBytes.length<=0||null==preferences){
-                return false;
-            }
-            String id=generateTaskId(task);
-            if (null==id||id.length()<=0){
-                Debug.W("Fail save tasK while generate task id invalid."+task);
-                return false;
-            }
-            Debug.D("Saving tasK."+task);
-            return preferences.edit().putString(id,Base64.encodeToString(taskBytes, Base64.URL_SAFE)).commit();
-        }
-
-        private String generateTaskId(Task task){
-            if (null==task){
-                return null;
-            }
-            int hasCode=System.identityHashCode(this);
-            return hasCode+"_"+System.identityHashCode(task)+POSTFIX;
-        }
-    }
-
     private static class BrowserTaskExecutor extends TaskExecutor implements BrowserExecutor{
         private List<Client> mClients;
 
@@ -144,7 +69,13 @@ public class ConveyorService extends Service {
 
         @Override
         public boolean client(Matcher<Client> matcher) {
-            return match(mClients,matcher);
+            List<Client> clients=mClients;
+            if (null!=clients&&null!=matcher){
+                for (Client child:clients) {
+                    matcher.match(child);
+                }
+            }
+            return true;
         }
     }
 
@@ -179,6 +110,51 @@ public class ConveyorService extends Service {
         @Override
         public Executor removeListener(Listener listener) {
             return mExecutor.removeListener(listener);
+        }
+    }
+
+    private static class ConveyorTaskSaver implements TaskSaver{
+        private final SharedPreferences mPreferences;
+
+        protected ConveyorTaskSaver(Application application){
+            mPreferences=null!=application?application.getSharedPreferences("tasks",Context.MODE_PRIVATE):null;
+        }
+
+        @Override
+        public boolean delete(Object obj) {
+            SharedPreferences preferences=mPreferences;
+            if (null==obj||null==preferences){
+                return false;
+            }else if (obj instanceof String){
+                return preferences.edit().remove((String)obj).commit();
+            }
+            return false;
+        }
+
+        @Override
+        public void load(OnTaskLoad onTaskLoad) {
+            SharedPreferences preferences=mPreferences;
+            Map<String,?> map=null!=onTaskLoad&&null!=preferences?preferences.getAll():null;
+            Set<String> set=null!=map?map.keySet():null;
+            if (null!=set){
+                Object value=null;byte[] bytes=null;
+                for (String child:set) {
+                    if (null!=(value=null!=child?map.get(child):null)&& value instanceof String&&
+                            null!=(bytes=Base64.decode((String)value, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING))){
+                        onTaskLoad.onTaskLoaded(child,bytes);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public boolean write(String taskId, byte[] taskBytes) {
+            SharedPreferences preferences=mPreferences;
+            if (null==taskId||taskId.length()<=0||null==preferences||null==taskBytes||taskBytes.length<=0){
+                return false;
+            }
+            return preferences.edit().putString(taskId,
+                    Base64.encodeToString(taskBytes,  Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING)).commit();
         }
     }
 }

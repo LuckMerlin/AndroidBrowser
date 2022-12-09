@@ -4,21 +4,16 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcel;
-import android.os.Parcelable;
-import com.luckmerlin.core.MatchedCollector;
+import com.luckmerlin.data.Parcelable;
 import com.luckmerlin.core.Matcher;
-import com.luckmerlin.core.MatcherInvoker;
-import com.luckmerlin.core.OnInvoke;
-import com.luckmerlin.core.ParcelObject;
-import com.luckmerlin.core.Result;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
+import com.luckmerlin.utils.Utils;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import com.luckmerlin.object.ObjectCreator;
-import com.luckmerlin.task.Option;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
@@ -26,58 +21,34 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class TaskExecutor extends MatcherInvoker implements Executor{
-    private final Map<Task,ExecuteTask> mQueue=new ConcurrentHashMap<>();
-    private ExecutorService mExecutor;
-    private boolean mFullExecuting=false;
+public class TaskExecutor implements Executor{
+    private final List<TaskRunner> mQueue=new CopyOnWriteArrayList<>();
+    private final ExecutorService mExecutor;
     private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
+    private final Parceler mParceler=new Parceler();
     private final TaskSaver mTaskSaver;
+    private boolean mExecutorFull=false;
 
     public TaskExecutor(Context context,TaskSaver taskSaver){
         mTaskSaver=taskSaver;
         mContextReference=null!=context?new WeakReference<>(context):null;
-        final int maxPoolSize=4;
-        ThreadPoolExecutor poolExecutor=new ThreadPoolExecutor(0, maxPoolSize,
+        int maxPoolSize=4;
+        ExecutorService executor=mExecutor=new ThreadPoolExecutor(0, maxPoolSize,
                 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), (Runnable r) -> {
             Thread thread = new Thread(r);
             thread.setName("TaskExecutorTask");
             return thread;
-        },(Runnable r, ThreadPoolExecutor executor)-> {
-            mFullExecuting=true;
-            if (null!=r&&r instanceof ExecuteTask){
-                ExecuteTask taskRunnable=(ExecuteTask)r;
-                Task task=taskRunnable.mTask;
-                setStatusChange(STATUS_WAITING,taskRunnable,mListeners);
-                if (null!=task&&(task instanceof OnExecuteWaiting)
-                    &&((OnExecuteWaiting)task).onExecuteWaiting(TaskExecutor.this)){
-                    Debug.D("Task is interrupted."+task);
-                    setStatusChange(STATUS_INTERRUPTED,taskRunnable,mListeners);
-                }else {
-                    Debug.D("Task is waiting."+task);
-                }
+        },(Runnable r, ThreadPoolExecutor ex)-> {
+            mExecutorFull=true;
+            if (null!=r&&r instanceof TaskRunner){
+               ((TaskRunner)r).setStatus(STATUS_WAITING,true);
             }
         });
-        mExecutor=poolExecutor;
-        //Preload
-        poolExecutor.setMaximumPoolSize(1);
-        execute(new InnerTask(){
-            @Override
-            public Result execute(Runtime runtime, OnProgressChange callback) {
-                onExecutorPrepare();
-                updateStatusChange(STATUS_START_LOAD_SAVED,null,mListeners);
-//                taskSaver.load((byte[] bytes)->executeWithTaskBytes(bytes));
-                poolExecutor.setMaximumPoolSize(maxPoolSize);
-                updateStatusChange(STATUS_FINISH_LOAD_SAVED,null,mListeners);
-                return null;
-            }
-        }, Option.LAUNCH_NOT_SAVE);
-    }
-
-
-    protected void onExecutorPrepare(){
-        //Do nothing
+        if (null!=taskSaver){
+            executor.submit(()->taskSaver.load((String taskId, byte[] bytes)->executeSavedTask(taskId,bytes,true)));
+        }
     }
 
     public final Context getContext(){
@@ -91,15 +62,6 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
             Map<Listener,Matcher<Task>> listeners=mListeners;
             if (null!=listeners){
                 listeners.put(listener,null!=matcher?matcher:(Task data)-> true);
-            }
-            if (notify&&listener instanceof OnStatusChangeListener){
-                match(mQueue,(ExecuteTask data)-> {
-                    Boolean matched=null!=matcher?null!=data?!isInnerTask(data.mTask)&&matcher.match(data.mTask):null:true;
-                    if (null!=matched&&matched){
-                        updateStatusChange(data.getStatus(),data.mTask,(OnStatusChangeListener)listener);
-                    }
-                    return matched;
-                });
             }
         }
         return this;
@@ -116,121 +78,112 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     @Override
     public boolean execute(Object taskObj, int optionArg) {
-        return execute(taskObj,optionArg,false);
+        return execute(taskObj,optionArg,null);
     }
 
-    private boolean execute(Object taskObj,final int optionArg,boolean fromSaved){
-        ExecutorService executor=mExecutor;
-        if (null==executor){
-            Debug.E("Fail execute task while executor is invalid.");
-            return false;
-        }else if (null==taskObj){
+    private boolean execute(Object taskObj,int option,String taskId){
+        if (null==taskObj){
+            Debug.E("Fail execute task while task null.");
             return false;
         }else if (!(taskObj instanceof Task)){
+            Debug.E("Fail execute task while not task.");
             return false;
         }
-        final Task task=(Task)taskObj;
-        final boolean innerTask=isInnerTask(task);
-        ExecuteTask executeTask=findFirst((ExecuteTask data)-> null!=data&&data.isTask(task)?true:false);
-        if (null==executeTask){
-            executeTask=new ExecuteTask(this,task,getContext(), optionArg,mHandler, fromSaved);
-            mQueue.add(executeTask);
-            if (!innerTask){
-                updateStatusChange(STATUS_ADD,task,mListeners);
-            }
+        TaskRunner taskRunner=findTaskData((Task)taskObj,true);
+        return execute(null!=taskRunner?taskRunner.setOption(option).setTaskId(taskId):null);
+    }
+
+    private boolean execute(TaskRunner runner){
+        ExecutorService executor=mExecutor;
+        if (null==executor){
+            Debug.E("Fail execute runner while executor is invalid.");
+            return false;
         }
-        executeTask.setOption(Option.isOptionEnabled(optionArg,Option.RESET)?(optionArg&~Option.RESET): executeTask.getOption()|optionArg);
-        //Check save
-        if (!innerTask){
-            if (Option.isOptionEnabled(optionArg,Option.DELETE)){
-                deleteSaveTask(executeTask);
-            }else{
-                boolean saved=saveTask(task,optionArg);
-                executeTask.mSaved=saved;
-            }
+        Task task=null!=runner?runner.getTask():null;
+        if (null==task){
+            Debug.E("Fail execute runner while runner is invalid.");
+            return false;
         }
-        //Check pending
-        if (!Option.isOptionEnabled(optionArg, Option.PENDING)){
+        final int option=runner.getOption();
+        final boolean isNeedDelete= runner.isNeedDelete();
+        final TaskSaver taskSaver=mTaskSaver;
+        final String taskId=runner.getTaskId();
+        if (isNeedDelete&&null!=taskSaver&&null!=taskId&&taskId.length()>0){//To delete task while need delete
+            taskSaver.delete(taskId);//Try to delete saved task
+        }
+        if (!Option.isOptionEnabled(option,Option.EXECUTE)){//Just return while not need execute
+            Debug.D("Not need execute while execute not enabled."+runner.getTask());
             return true;
         }
-        if (task instanceof OnExecutePending &&(((OnExecutePending)task).onExecutePending(this))){
-            return true;
+        if (runner.isAnyStatus(STATUS_EXECUTING,STATUS_PENDING)){
+            Debug.E("Fail execute runner while already executing.");
+            return false;
         }
-        if (executeTask.isRunning()){
-            return true;
+        if (taskId==null||taskId.length()<=0){
+            mQueue.add(runner.setTaskId(task.getClass().getName()+"_"+task.hashCode()+"_"+
+                    option+"_"+hashCode()+ "_"+System.currentTimeMillis()+(Math.random()*10000000)));
+            runner.setStatus(STATUS_ADD,true);
         }
-        //Check execute
-        if (!Option.isOptionEnabled(optionArg, Option.EXECUTE)){
-            Debug.D("Task just option pending."+task);
-            return true;
-        }
-        //Clean cancel option while execute
-        executeTask.setOption(Option.enableOption(executeTask.getOption(),Option.CANCEL,false));
-        Debug.D("Pending execute task."+task);
-        setStatusChange(STATUS_PENDING,executeTask,mListeners);
-        executor.execute(executeTask);
+        runner.setStatus(STATUS_PENDING,true);
+        executor.execute(runner);
         return true;
     }
 
-//    private boolean removeFromQueue(ExecuteTask executeTask){
-//        List<ExecuteTask> queue=mQueue;
-//        return null!=executeTask&&null!=queue&&queue.remove(executeTask);
-//    }
-//
-//    private ExecuteTask findFirst(Task task){
-//        return null!=task?findFirst((ExecuteTask data)->null!=data&&data.isTask(task)):null;
-//    }
-
-    private ExecuteTask findFirst(Matcher<ExecuteTask> matcher){
-        MatchedCollector<ExecuteTask> collector=new MatchedCollector<ExecuteTask>(1).setMatcher(matcher);
-        match(mQueue,collector);
-        return collector.getFirstMatched();
-    }
-
-    private boolean deleteSaveTask(ExecuteTask executeTask){
-        if (null!=executeTask){
-//            TaskSaver taskSaver=mTaskSaver;
-//            boolean succeed=null!=taskSaver&&taskSaver.delete(executeTask.mTask);
-//            removeFromQueue(executeTask);
-//            updateStatusChange(STATUS_REMOVE,executeTask.mTask,mListeners);
-//            return succeed;
+    private boolean executeSavedTask(String taskId,byte[] bytes,boolean deleteWhileFail){
+        if (null==taskId||taskId.length()<=0||null==bytes||bytes.length<=0){
+            return false;
+        }
+        TaskRunner taskRunner=findFirst((TaskRunner data)->null!=data&&data.isTaskIdEquals(taskId));
+        if (null!=taskRunner){
+            return false;//Not need execute while already executing
+        }
+        Parcel parcel=Parcel.obtain();
+        try {
+            parcel.unmarshall(bytes,0,bytes.length);
+            parcel.setDataPosition(0);
+            String version=parcel.readString();
+            int option=parcel.readInt();
+            Parcelable parcelable=mParceler.readParcelable(parcel);
+            parcel.recycle();
+            parcel=null;
+            Debug.D("读取到 "+parcelable);
+            if (null!=parcelable&&parcelable instanceof Task){
+                return execute(parcelable,option&(~Option.EXECUTE),taskId);
+            }
+        }catch (Exception e){
+            Debug.E("Exception execute saved task.e="+e,e);
+            e.printStackTrace();
+        }finally {
+            if (null!=parcel){
+                parcel.recycle();
+            }
+        }
+        if (deleteWhileFail){
+            TaskSaver taskSaver=mTaskSaver;
+            if (null!=taskSaver){
+                Debug.D("To delete save task while execute load fail."+taskId);
+                taskSaver.delete(taskId);
+            }
         }
         return false;
     }
 
-    private Task executeWithTaskBytes(byte[] taskBytes){
-        if (null==taskBytes){
-            return null;
+    private boolean saveTask(TaskRunner runner){
+        Task task=null!=runner?runner.getTask():null;
+        if (null==task||!(task instanceof Parcelable)){
+            return false;
         }
-        Parcel parcel=Parcel.obtain();
-        parcel.unmarshall(taskBytes,0,taskBytes.length);
-        parcel.setDataPosition(0);
-        int option=parcel.readInt();
-        parcel.readString();//Version
-//        ParcelObject parcelObject=mParcelParser.read(parcel);
-        parcel.recycle();
-        if (null==parcelObject){
-            return null;
-        }else if (!(parcelObject instanceof Task)){
-            return null;
-        }
-        Task task=(Task)parcelObject;
-        option=Option.enableOption(option,Option.EXECUTE,false);
-        option=Option.enableOption(option,Option.CANCEL,false);
-        option=Option.enableOption(option,Option.PENDING,false);
-        return TaskExecutor.this.execute(task,option)?task:null;
-    }
-
-    private boolean saveTask(Task task,int option){
-        TaskSaver taskSaver=null!=task?mTaskSaver:null;
-        if (null!=taskSaver&&task instanceof Parcelable){
+        String taskId=runner.getTaskId();
+        TaskSaver taskSaver=mTaskSaver;
+        if (null!=taskId&&taskId.length()>0&&null!=taskSaver){//To save task
+            Debug.D("写入 "+task);
             Parcel parcel=Parcel.obtain();
             parcel.setDataPosition(0);
-            parcel.writeInt(option);
-            parcel.writeString("");//Version
-            ((Parcelable)task).writeToParcel(parcel,0);
+            parcel.writeString("version");
+            parcel.writeInt(runner.getOption());
+            mParceler.writeParcelable(parcel,task,0);
             byte[] bytes=parcel.marshall();
-            boolean succeed=taskSaver.write(task,bytes);
+            boolean succeed=taskSaver.write(taskId,bytes);
             parcel.recycle();
             return succeed;
         }
@@ -239,164 +192,88 @@ public class TaskExecutor extends MatcherInvoker implements Executor{
 
     @Override
     public void findTask(OnTaskFind onTaskFind) {
-        match(mQueue,(ExecuteTask data)-> null!=data&&!isInnerTask(data.mTask)&&
-                onTaskFind.onTaskFind(data.mTask,data.getStatus(),data.getOption())?null:false);
+        findAllTask((TaskRunner data)-> null!=data&&onTaskFind.onTaskFind(data.getTask(),
+        data.getStatus(),data.getOption())?null:false,Integer.MAX_VALUE);
     }
 
-    public final boolean post(Runnable runnable, int delay){
-        return null!=runnable&mHandler.post(runnable);
-    }
-
-    public static boolean isUiThread(){
-        Looper looper=Looper.myLooper();
-        Looper uiLooper=Looper.getMainLooper();
-        return null!=looper&&null!=uiLooper&&looper==uiLooper;
-    }
-
-    private class ExecuteTask extends Runtime implements Runnable{
-        protected final Task mTask;
-        protected final boolean mFromSaved;
-        protected final Executor mExecutor;
-        private boolean mSaved;
-
-        protected ExecuteTask(Executor executor, Task task, Context context,
-                              int option, Handler handler, boolean fromSaved){
-            super(option,handler,context);
-            mExecutor=executor;
-            mTask=task;
-            mFromSaved=fromSaved;
-        }
-
-        @Override
-        public void run() {
-            setStatusChange(STATUS_EXECUTING,this,mListeners);
-            if (!(mTask instanceof OnExecuteStart)||!((OnExecuteStart)mTask).onExecuteStart(TaskExecutor.this)){
-                mTask.execute(this, (Task task)->
-                iterateListener(task,(Listener data)->{
-                    if (null!=data&&data instanceof OnProgressChange){
-                        ((OnProgressChange)data).onProgressChanged(task);
-                    }
-                    return false;
-                }));
-            }
-            mFullExecuting=false;
-            setStatusChange(STATUS_FINISH,this,mListeners);
-            boolean deleteSucceed=false;
-            if (mTask instanceof OnExecuteFinish&&((OnExecuteFinish)mTask).onExecuteFinish(TaskExecutor.this)){
-                deleteSucceed=true;
-            }
-            deleteSucceed=deleteSucceed||Option.isOptionEnabled(getOption(),Option.DELETE_SUCCEED);
-            Ongoing ongoing=null;
-            if (deleteSucceed&&null!=(ongoing=mTask.getOngoing())&&ongoing.isSucceed()){
-                deleteSaveTask(this);
-            }else if (!Option.isOptionEnabled(getOption(),Option.DELETE)){
-                saveTask(mTask,getOption());
-            }else if (mSaved){
-                deleteSaveTask(this);
-            }
-            post(()->{
-                List<ExecuteTask> waitingQueue=mQueue;//Check waiting
-                ExecuteTask taskRunnable=null;
-                int size=null!=waitingQueue?waitingQueue.size():-1;
-                for (int i = 0; i < size; i++) {
-                    if (mFullExecuting){
-                        break;
-                    }else if (null!=(taskRunnable=waitingQueue.get(i))&& taskRunnable.isStatus(STATUS_WAITING)){
-                        Debug.D("Task to execute again."+taskRunnable.mTask);
-                        execute(taskRunnable.mTask,taskRunnable.getOption(),taskRunnable.mFromSaved);
-                    }
+    private TaskRunner findTaskData(Task task, boolean autoCreate){
+        TaskRunner taskData= null!=task?findFirst((TaskRunner data)-> null!=data&&data.isTaskEquals(task)):null;
+        return null!=taskData?taskData:(autoCreate?new TaskRunner(){
+            @Override
+            protected void onStatusChanged(int last, int current) {
+                mExecutorFull=current==STATUS_FINISH?false:mExecutorFull;
+                //任务开始和结束的时候需要检查是否需要保存
+                if ((current==STATUS_FINISH||current==STATUS_PENDING)&&!isNeedDelete()){
+                    saveTask(this);
                 }
-            },-1);
-        }
+                notifyStatusChange(current,this,mListeners);
+                //
+                if (!mExecutorFull&&post(()->{
+                    TaskRunner nextRunner=findFirst((TaskRunner data)->null!=data&&data.isAnyStatus(STATUS_WAITING));
+                    if (!mExecutorFull&&null!=nextRunner){
+                        execute(nextRunner);
+                    }
+                },0)){
+                    //Do nothing
+                }
+            }
 
-        private boolean isBackgroundEnabled(){
-            return Option.isOptionEnabled(getOption(),Option.BACKGROUND);
-        }
-
-        @Override
-        public Executor getExecutor() {
-            return mExecutor;
-        }
-
-        public final boolean isTask(Task task){
-            Task current=mTask;
-            return null!=current&&null!=task&&current==task;
-        }
-
-        public final Task getTask() {
-            return mTask;
-        }
+            @Override
+            protected Task getTask() {
+                return task;
+            }
+        }:null);
     }
 
-    private void setStatusChange(int status,ExecuteTask task,Map<Listener,Matcher<Task>> listeners){
-        if (null!=task){
-            task.setStatus(status);
-        }
-        updateStatusChange(status,null!=task?task.mTask:null,listeners);
+    private TaskRunner findFirst(Matcher<TaskRunner> matcher){
+        List<TaskRunner> runners=findAllTask(matcher,1);
+        return null!=runners&&runners.size()>0?runners.get(0):null;
     }
 
-    private void updateStatusChange(int status,Task task,Map<Listener,Matcher<Task>> listeners){
-        Set<Listener> set=null!=listeners&&!isInnerTask(task)?listeners.keySet():null;
+    private List<TaskRunner> findAllTask(Matcher<TaskRunner> matcher,int max){
+        List<TaskRunner> queue=null!=matcher?mQueue:null;
+        List<TaskRunner> result=null;
+        if(null!=queue){
+            result=new ArrayList<>(Math.min(10,max<=0?0:max));
+            for (TaskRunner runner:queue) {
+                if (result.size()>=max){
+                    break;
+                }
+                Boolean match=matcher.match(runner);
+                if (null==match){
+                    break;
+                }else if (match&&null!=runner){
+                    result.add(runner);
+                }
+            }
+        }
+        return result;
+    }
+
+    private void notifyStatusChange(int status,TaskRunner runner,Map<Listener,Matcher<Task>> listeners){
+        Set<Listener> set=null!=listeners&&null!=runner?listeners.keySet():null;
         if (null!=set){
             Matcher<Task> matcher=null;Boolean matched=null;
             for (Listener listener:set) {
                 if (null!=listener&&listener instanceof OnStatusChangeListener&&null!=
-                        (matcher=listeners.get(listener))&&null!= (matched=matcher.match(task))&&matched){
-                    updateStatusChange(status,task,(OnStatusChangeListener)listener);
+                        (matcher=listeners.get(listener))&&null!= (matched=matcher.match(runner.getTask()))&&matched){
+                    notifyStatusChange(status,runner,(OnStatusChangeListener)listener);
                 }
             }
         }
     }
 
-    private void iterateListener(Task task,Matcher<Listener> listenerMatcher){
-        if (null==listenerMatcher){
+    private void notifyStatusChange(int status,TaskRunner runner,OnStatusChangeListener listener){
+        if (null==listener||null==runner){
+            return;
+        }else if (listener instanceof UiListener&&!Utils.isUiThread()){
+            post(()->notifyStatusChange(status,runner,listener),-1);
             return;
         }
-        Map<Listener,Matcher<Task>> listeners=mListeners;
-        Set<Listener> set=null!=listeners&&!isInnerTask(task)?listeners.keySet():null;
-        if (null==set) {
-            return;
-        }
-        Matcher<Task> matcher = null;
-        Boolean matched = null;
-        for (Listener listener : set) {
-            if (null!=(matcher=listeners.get(listener))&&null!=(matched=matcher.match(task))&&matched){
-                if (null==listenerMatcher.match(listener)) {
-                    break;
-                }
-            }
-        }
+        listener.onStatusChanged(status,runner.getTask(), TaskExecutor.this);
     }
 
-    private void updateStatusChange(int status,Task task,OnStatusChangeListener listener){
-        if (null==listener||isInnerTask(task)){
-            return;
-        }else if (listener instanceof UiListener&&!isUiThread()){
-            post(()->updateStatusChange(status,task,listener),-1);
-            return;
-        }
-        listener.onStatusChanged(status,task,TaskExecutor.this);
+    public final boolean post(Runnable runnable, int delay){
+        return null!=runnable&mHandler.postDelayed(runnable,delay<=0?0:delay);
     }
-
-    private boolean isInnerTask(Task task){
-        return null!=task&&task instanceof InnerTask;
-    }
-
-    private static abstract class InnerTask implements Task {
-        @Override
-        public String getName() {
-            return "Inner task.";
-        }
-
-        @Override
-        public Ongoing getOngoing() {
-            return null;
-        }
-
-        @Override
-        public Result getResult() {
-            return null;
-        }
-    }
-
 }

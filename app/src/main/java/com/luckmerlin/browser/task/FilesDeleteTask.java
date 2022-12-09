@@ -13,8 +13,8 @@ import com.luckmerlin.task.Runtime;
 
 public class FilesDeleteTask extends FilesTask {
 
-    public FilesDeleteTask(File... files) {
-        this(null!=files&&files.length>0?new FileArrayList(files):null);
+    public FilesDeleteTask() {
+        this(null);
     }
 
     public FilesDeleteTask(FileArrayList files) {

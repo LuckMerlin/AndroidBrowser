@@ -1,10 +1,14 @@
 package com.luckmerlin.task;
 
 public interface TaskSaver {
-//    public interface TaskBytesReader{
-//        Task readTaskBytes(byte[] bytes);
-//    }
-//    boolean delete(Task task);
-//    void load(TaskBytesReader bytesReader);
-//    boolean write(Task task, byte[] taskBytes);
+
+   boolean delete(Object obj);
+
+    public interface OnTaskLoad{
+        void onTaskLoaded(String taskId,byte[] bytes);
+    }
+
+    void load(OnTaskLoad onTaskLoad);
+
+    boolean write(String taskId, byte[] taskBytes);
 }

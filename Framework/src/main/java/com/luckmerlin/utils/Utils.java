@@ -3,6 +3,7 @@ package com.luckmerlin.utils;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.os.Looper;
 import android.security.ConfirmationCallback;
 
 import com.luckmerlin.task.Progress;
@@ -58,6 +59,12 @@ public class Utils {
 
     public static boolean isEqualed(Object arg1,Object arg2,boolean ignoreNull){
         return (null!=arg1&&null!=arg2&&arg1.equals(arg2))&&(ignoreNull?false:(null==arg1&&null==arg2));
+    }
+
+    public static boolean isUiThread(){
+        Looper looper=Looper.myLooper();
+        Looper uiLooper=Looper.getMainLooper();
+        return null!=looper&&null!=uiLooper&&looper==uiLooper;
     }
 
     public static String formatSizeText(Object fileSize){

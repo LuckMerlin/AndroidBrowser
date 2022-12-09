@@ -13,6 +13,7 @@ public final class  Option {
     public final static int LAUNCH=EXECUTE|PENDING;
     public final static int LAUNCH_NOT_SAVE=LAUNCH|DELETE;
     public final static int DELETE_SUCCEED=0b10000000;
+    public final static int HIDE=0b100000000;
 
     private Option(){
 

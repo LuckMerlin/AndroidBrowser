@@ -1,9 +1,10 @@
 package com.luckmerlin.browser.file;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.webkit.MimeTypeMap;
 import com.luckmerlin.browser.Label;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.json.JsonObject;
 import com.luckmerlin.task.Brief;
 import org.json.JSONObject;
@@ -338,49 +339,36 @@ public class File implements Brief,Permission, Parcelable {
         return "File{"+getPath()+"}";
     }
     ///////////////
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mHost);
-        dest.writeString(mThumb);
-        dest.writeString(mParent);
-        dest.writeString(mSep);
-        dest.writeString(mName);
-        dest.writeString(mMime);
-        dest.writeLong(mPermission);
-        dest.writeLong(mUsedVolume);
-        dest.writeLong(mTotalVolume);
-        dest.writeLong(mModifyTime);
-        dest.writeLong(mLength);
-        dest.writeLong(mTotal);
+
+    private File(Parceler parceler, Parcel parcel){
+        mHost=parceler.readString(parcel,null);
+        mThumb=parceler.readString(parcel,null);
+        mParent=parceler.readString(parcel,null);
+        mSep=parceler.readString(parcel,null);
+        mName=parceler.readString(parcel,null);
+        mMime=parceler.readString(parcel,null);
+        mPermission=parceler.readInt(parcel,mPermission);
+        mUsedVolume=parceler.readLong(parcel,mUsedVolume);
+        mTotalVolume=parceler.readLong(parcel,mTotalVolume);
+        mModifyTime=parceler.readLong(parcel,mModifyTime);
+        mLength=parceler.readLong(parcel,mLength);
+        mTotal=parceler.readLong(parcel,mTotal);
     }
 
-    public static final Creator<File> CREATOR = new Creator<File>() {
-        @Override
-        public File createFromParcel(Parcel parcel) {
-            File file=new File();
-            file.mHost=parcel.readString();
-            file.mThumb=parcel.readString();
-            file.mParent=parcel.readString();
-            file.mSep=parcel.readString();
-            file.mName=parcel.readString();
-            file.mMime=parcel.readString();
-            file.mPermission=parcel.readInt();
-            file.mUsedVolume=parcel.readLong();
-            file.mTotalVolume=parcel.readLong();
-            file.mModifyTime=parcel.readLong();
-            file.mLength=parcel.readLong();
-            file.mTotal=parcel.readLong();
-            return file;
-        }
-
-        @Override
-        public File[] newArray(int size) {
-            return new File[size];
-        }
-    };
-
     @Override
-    public int describeContents() {
-        return 0;
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeString(parcel,mHost);
+        parceler.writeString(parcel,mThumb);
+        parceler.writeString(parcel,mParent);
+        parceler.writeString(parcel,mSep);
+        parceler.writeString(parcel,mName);
+        parceler.writeString(parcel,mMime);
+        parceler.writeInt(parcel,mPermission);
+        parceler.writeLong(parcel,mUsedVolume);
+        parceler.writeLong(parcel,mTotalVolume);
+        parceler.writeLong(parcel,mModifyTime);
+        parceler.writeLong(parcel,mLength);
+        parceler.writeLong(parcel,mTotal);
     }
+
 }

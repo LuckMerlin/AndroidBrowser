@@ -1,8 +1,6 @@
 package com.luckmerlin.core;
 
-import android.os.Parcel;
-
-public class Response<T> implements MessageResult ,ParcelObject {
+public class Response<T> implements MessageResult {
     private int mCode;
     private String mMsg;
     private T mData;
@@ -82,20 +80,5 @@ public class Response<T> implements MessageResult ,ParcelObject {
                 ", mMsg='" + mMsg + '\'' +
                 ", mData=" + mData +
                 '}';
-    }
-
-    @Override
-    public void onParcelRead(Parcel parcel) {
-        mCode=parcel.readInt();
-        mMsg=parcel.readString();
-        mData=Parceler.read(parcel);
-    }
-
-    @Override
-    public void onParcelWrite(Parcel parcel) {
-         parcel.writeInt(mCode);
-         parcel.writeString(mMsg);
-         T data=mData;
-         Parceler.write(null!=data&&data instanceof ParcelObject?(ParcelObject) data:null);
     }
 }

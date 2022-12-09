@@ -200,7 +200,9 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (null==filesObj){
             return false;
         }else if (filesObj instanceof File){
-            return launchCopyFile(new FileArrayList((File)filesObj),mode,taskName,option);
+            FileArrayList files=new FileArrayList();
+            files.add((File)filesObj);
+            return launchCopyFile(files,mode,taskName,option);
         }else if (!(filesObj instanceof FileArrayList)){
             return false;
         }
@@ -251,7 +253,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
             toast(getString(R.string.whichFailed,getString(R.string.delete)));
             return false;
         }else if (obj instanceof File){
-            return deleteFile(new FileArrayList((File) obj),showDialog,confirmed,autoDismiss);
+            return deleteFile(new FileArrayList().add((File) obj),showDialog,confirmed,autoDismiss);
         }else if (!(obj instanceof FileArrayList)||((FileArrayList)obj).size()<=0){
             return deleteFile(null,showDialog,confirmed,autoDismiss);
         }

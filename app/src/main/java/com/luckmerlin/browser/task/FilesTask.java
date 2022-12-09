@@ -14,12 +14,13 @@ public abstract class FilesTask extends AbstractFileTask {
     private FileArrayList mFiles;
     private int mCursor;
 
-    public FilesTask(File[] files) {
-        this(null!=files?new FileArrayList(files):null);
-    }
-
     public FilesTask(FileArrayList files) {
         mFiles=null!=files?files:new FileArrayList();
+    }
+
+    protected final FilesTask setFiles(FileArrayList files){
+        mFiles=files;
+        return this;
     }
 
     protected final FileArrayList getFiles(){

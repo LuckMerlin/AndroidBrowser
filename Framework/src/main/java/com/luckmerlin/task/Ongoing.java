@@ -1,9 +1,10 @@
 package com.luckmerlin.task;
 
 import android.os.Parcel;
-import android.os.Parcelable;
 import com.luckmerlin.binding.Binding;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 
 public class Ongoing implements Parcelable {
     private int mProgress;
@@ -15,27 +16,6 @@ public class Ongoing implements Parcelable {
 
     public Ongoing() {
 
-    }
-
-    private Ongoing(Parcel in) {
-        mProgress = in.readInt();
-        mSecondProgress = in.readInt();
-        mSpeed = in.readString();
-        mTitle = in.readString();
-        mDoing=in.readParcelable(getClass().getClassLoader());
-        mBinding=in.readParcelable(getClass().getClassLoader());
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(mProgress);
-        dest.writeInt(mSecondProgress);
-        dest.writeString(mSpeed);
-        dest.writeString(mTitle);
-        Object doing=mDoing;
-        dest.writeParcelable(null!=doing&&doing instanceof Parcelable?(Parcelable)doing:null,flags);
-        Binding binding=mBinding;
-        dest.writeParcelable(null!=binding&&binding instanceof Parcelable?(Parcelable)binding:null,flags);
     }
 
     public Ongoing applyChild(Ongoing ongoing){
@@ -125,20 +105,22 @@ public class Ongoing implements Parcelable {
         return mSpeed;
     }
 
-    public static final Creator<Ongoing> CREATOR = new Creator<Ongoing>() {
-        @Override
-        public Ongoing createFromParcel(Parcel in) {
-            return new Ongoing(in);
-        }
-
-        @Override
-        public Ongoing[] newArray(int size) {
-            return new Ongoing[size];
-        }
-    };
+    private Ongoing(Parceler parceler,Parcel parcel) {
+        mProgress = parceler.readInt(parcel,mProgress);
+        mSecondProgress = parceler.readInt(parcel,mSecondProgress);
+        mSpeed = parceler.readString(parcel,mSpeed);
+        mTitle = parceler.readString(parcel,mTitle);
+        mDoing=parceler.readParcelable(parcel);
+        mBinding=parceler.readParcelable(parcel);
+    }
 
     @Override
-    public int describeContents() {
-        return 0;
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeInt(parcel,mProgress);
+        parceler.writeInt(parcel,mSecondProgress);
+        parceler.writeString(parcel,mSpeed);
+        parceler.writeString(parcel,mTitle);
+        parceler.writeParcelable(parcel,mDoing,flags);
+        parceler.writeParcelable(parcel,mBinding,flags);
     }
 }

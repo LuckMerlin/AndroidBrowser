@@ -2,7 +2,6 @@ package com.luckmerlin.browser.task;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.os.Parcelable;
 import android.view.View;
 import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.client.Client;
@@ -17,18 +16,19 @@ import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.click.OnClickListener;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.core.Result;
+import com.luckmerlin.data.Parcelable;
 import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
+import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Ongoing;
 import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Runtime;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.utils.Utils;
-import java.util.ArrayList;
 import java.util.List;
 
 public final class FilesCopyTask extends FilesTask implements Parcelable {
@@ -190,56 +190,33 @@ public final class FilesCopyTask extends FilesTask implements Parcelable {
         return result;
     }
 
-    /////////////
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        Parceler parceler=new Parceler(dest);
-        parceler.writeAsParcelable(mToFolder,flags).
-        writeBoolean(mCoverEnabled).
-        writeBoolean(mAppendEnable).
-        writeBoolean(mDeleteSrcWhileSucceed).
-        writeInt(getCursor()).
-        writeParcelableList(getFiles(),flags).
-        writeString(getName()).
-        writeAsParcelable(getOngoing(),flags).
-        writeAsParcelable(getResult(),flags);
+    private FilesCopyTask(Parceler parceler,Parcel parcel){
+        super(null);
+        mToFolder=parceler.readParcelable(parcel);
+        mDeleteSrcWhileSucceed=parceler.readBoolean(parcel,mDeleteSrcWhileSucceed);
+        mAppendEnable=parceler.readBoolean(parcel,mAppendEnable);
+        mCoverEnabled=parceler.readBoolean(parcel,mCoverEnabled);
+        setCursor(parceler.readInt(parcel,getCursor()));
+        setName(parceler.readString(parcel,getName()));
+        setOngoing(parceler.readParcelable(parcel));
+        setResult(parceler.readParcelable(parcel));
+        FileArrayList ddd=parceler.readParcelable(parcel);
+        setFiles(ddd);
+        if (mToFolder!=null){
+
+        }
     }
 
-    public static final Creator<FilesCopyTask> CREATOR = new Creator<FilesCopyTask>() {
-        @Override
-        public FilesCopyTask createFromParcel(Parcel in) {
-            Parceler parceler=new Parceler(in);
-            File toFolder=parceler.readParcelable();
-            boolean coverEnabled = parceler.readBoolean(false);
-            boolean appendEnable = parceler.readBoolean(false);
-            boolean deleteSrcWhileSucceed = parceler.readBoolean(false);
-            int cursor=parceler.readInt(-1);
-            ArrayList<File> arrayList=new ArrayList<>();
-            parceler.readParcelableList(arrayList);
-            FileArrayList files=new FileArrayList();
-            files.addAll(arrayList);
-            String name=parceler.readString(null);
-            Ongoing ongoing=parceler.readParcelable();
-            Result result=parceler.readParcelable();
-            //
-            FilesCopyTask filesCopyTask=new FilesCopyTask(files,toFolder);
-            filesCopyTask.setOngoing(ongoing);
-            filesCopyTask.setResult(result);
-            filesCopyTask.setCursor(cursor).setName(name);
-            filesCopyTask.mCoverEnabled=coverEnabled;
-            filesCopyTask.mAppendEnable=appendEnable;
-            filesCopyTask.mDeleteSrcWhileSucceed=deleteSrcWhileSucceed;
-            return filesCopyTask;
-        }
-
-        @Override
-        public FilesCopyTask[] newArray(int size) {
-            return new FilesCopyTask[size];
-        }
-    };
-
     @Override
-    public int describeContents() {
-        return 0;
+    public void writeToParcel(Parceler parceler,Parcel parcel, int flags) {
+        parceler.writeParcelable(parcel,mToFolder,flags);
+        parceler.writeBoolean(parcel,mDeleteSrcWhileSucceed);
+        parceler.writeBoolean(parcel,mAppendEnable);
+        parceler.writeBoolean(parcel,mCoverEnabled);
+        parceler.writeInt(parcel,getCursor());
+        parceler.writeString(parcel,getName());
+        parceler.writeParcelable(parcel,getOngoing(),flags);
+        parceler.writeParcelable(parcel,getResult(),flags);
+        parceler.writeParcelable(parcel,getFiles(),flags);
     }
 }

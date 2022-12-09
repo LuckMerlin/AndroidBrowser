@@ -2,23 +2,21 @@ package com.luckmerlin.browser.file;
 
 import android.content.Context;
 import android.os.Parcel;
-import android.os.Parcelable;
-
-import androidx.annotation.NonNull;
-
 import com.luckmerlin.browser.R;
-
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileArrayList extends ArrayList<File> {
 
-    public FileArrayList(File... files){
-        if (null!=files&&files.length>0){
-            for (File child:files) {
-                if (null!=child){
-                    add(child);
-                }
-            }
+    public FileArrayList(){
+        this(null);
+    }
+
+    public FileArrayList(List<File> files){
+        if (null!=files&&files.size()>0){
+            addAll(files);
         }
     }
 
@@ -45,5 +43,4 @@ public class FileArrayList extends ArrayList<File> {
         builder.append(" ").append(null!=context?context.getString(R.string.summeryItemWhich,size):size+" Items");
         return builder.toString();
     }
-
 }
