@@ -3,6 +3,8 @@ package com.luckmerlin.browser.dialog;
 import android.content.Context;
 import android.view.View;
 import androidx.databinding.ObservableField;
+
+import com.luckmerlin.binding.Binding;
 import com.luckmerlin.browser.BaseContent;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.ConfirmContentBinding;
@@ -10,7 +12,9 @@ import com.luckmerlin.task.Confirm;
 
 public class ConfirmContent extends BaseContent {
     private final ObservableField<String> mTitle=new ObservableField<>();
+    private final ObservableField<String> mMessage=new ObservableField<>();
     private final ObservableField<Confirm> mConfirm=new ObservableField<>();
+    private final ObservableField<Binding> mBinding=new ObservableField<>();
 
     @Override
     protected View onCreateContent(Context context) {
@@ -24,6 +28,16 @@ public class ConfirmContent extends BaseContent {
 
     public final ConfirmContent setTitle(String name){
         mTitle.set(name);
+        return this;
+    }
+
+    public final ConfirmContent setMessage(String msg){
+        mMessage.set(msg);
+        return this;
+    }
+
+    public final ConfirmContent setConfirmBinding(Binding binding){
+        mBinding.set(binding);
         return this;
     }
 
@@ -42,5 +56,13 @@ public class ConfirmContent extends BaseContent {
 
     public final ObservableField<Confirm> getConfirm() {
         return mConfirm;
+    }
+
+    public ObservableField<String> getMessage() {
+        return mMessage;
+    }
+
+    public ObservableField<Binding> getConfirmBinding() {
+        return mBinding;
     }
 }

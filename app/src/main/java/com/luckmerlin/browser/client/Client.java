@@ -3,10 +3,8 @@ package com.luckmerlin.browser.client;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.ClientMeta;
-import com.luckmerlin.browser.client.OnFileDeleteUpdate;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.browser.file.Folder;
 import com.luckmerlin.core.Canceled;

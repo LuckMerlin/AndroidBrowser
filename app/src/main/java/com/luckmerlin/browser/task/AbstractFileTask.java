@@ -16,12 +16,14 @@ public abstract class AbstractFileTask extends AbstractTask {
             return null;
         }
         String host=file.getHost();
-        MatchedCollector<Client> collector=new MatchedCollector<Client>(1).setMatcher((obj)->{
-            ClientMeta meta=null!=obj?obj.getMeta():null;
-            String childHost=null!=meta?meta.getHost():null;
-            return (null==host&&null==childHost)||(null!=host&&null!=childHost&&host.equals(childHost));
-        });
+        MatchedCollector<Client> collector=new MatchedCollector<Client>(1).setMatcher((obj)->isClientHost(obj,host));
         return client(collector)?collector.getFirstMatched():null;
+    }
+
+    public final boolean isClientHost(Client client,String host){
+        ClientMeta meta=null!=client?client.getMeta():null;
+        String childHost=null!=meta?meta.getHost():null;
+        return (null==host&&null==childHost)||(null!=host&&null!=childHost&&host.equals(childHost));
     }
 
     public final boolean client(Matcher<Client> matcher){

@@ -1,7 +1,7 @@
 package com.luckmerlin.task;
 
 public final class  Option {
-//    public final static int ENABLE=0b01;
+    public final static int NONE=0b00;
     public final static int CANCEL=0b10;
     public final static int DELETE=0b100;
     @Deprecated

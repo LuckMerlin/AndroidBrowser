@@ -92,6 +92,9 @@ public class ConveyorActivityModel extends BaseModel implements
             case R.drawable.selector_confirm:
                 Task task=null!=obj&&obj instanceof Task?(Task)obj:null;
                 return showTaskDialog(mExecutor,task,null);
+            case R.drawable.selector_start:
+            case R.drawable.selector_fail:
+                return executeTask(obj,Option.LAUNCH)||true;
             case R.layout.item_conveyor_single:
             case R.layout.item_conveyor_group:
                 return deleteTask(null!=obj&&obj instanceof Task?(Task)obj:null)||true;

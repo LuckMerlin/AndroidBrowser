@@ -1,23 +1,14 @@
 package com.luckmerlin.task;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 
-import com.luckmerlin.debug.Debug;
-
-import java.lang.ref.WeakReference;
-
-public abstract class Runtime {
-    private int mOption;
+public abstract class Runtime{
+    private int mOption=Option.NONE;
     private int mStatus=Executor.STATUS_IDLE;
-    private Handler mHandler;
-    private final WeakReference<Context> mContextReference;
+    private final TaskExecutor mExecutor;
 
-    protected Runtime(int option,Handler handler,Context context){
-        mOption=option;
-        mHandler=handler;
-        mContextReference=null!=context?new WeakReference<>(context):null;
+    protected Runtime(TaskExecutor executor){
+        mExecutor=executor;
     }
 
     protected final Runtime setStatus(int status){
@@ -25,13 +16,33 @@ public abstract class Runtime {
         return this;
     }
 
-    public final Runtime post(Runnable runnable,int delay){
-        if (null!=runnable){
-            Handler handler=mHandler;
-            handler=null!=handler?handler:(mHandler=new Handler(Looper.getMainLooper()));
-            handler.postDelayed(runnable,delay<=0?0:delay);
+    public final Executor getExecutor() {
+        return mExecutor;
+    }
+
+    public boolean isAnyStatus(int... status){
+        for (int i = 0; i < status.length; i++) {
+            if (status[i]==mStatus){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Runtime setStatus(int status,boolean notify){
+        int last=mStatus;
+        mStatus=status;
+        if (notify){
+            onStatusChanged(last,status);
         }
         return this;
+    }
+
+    protected abstract void onStatusChanged(int last,int current);
+
+    public final boolean post(Runnable runnable, int delay){
+        TaskExecutor executor=mExecutor;
+        return null!=runnable&&null!=executor&&executor.post(runnable,delay);
     }
 
     public int getOption() {
@@ -63,11 +74,9 @@ public abstract class Runtime {
         return this;
     }
 
-    public abstract Executor getExecutor();
-
     public final Context getContext() {
-        WeakReference<Context> reference=mContextReference;
-        return null!=reference?reference.get():null;
+        TaskExecutor executor=mExecutor;
+        return null!=executor?executor.getContext():null;
     }
 
     protected int getStatus() {

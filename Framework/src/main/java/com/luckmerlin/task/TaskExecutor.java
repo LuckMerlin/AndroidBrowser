@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class TaskExecutor implements Executor{
-    private final List<TaskRunner> mQueue=new CopyOnWriteArrayList<>();
+    private final List<TaskRuntime> mQueue=new CopyOnWriteArrayList<>();
     private final ExecutorService mExecutor;
     private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
@@ -42,8 +42,8 @@ public class TaskExecutor implements Executor{
             return thread;
         },(Runnable r, ThreadPoolExecutor ex)-> {
             mExecutorFull=true;
-            if (null!=r&&r instanceof TaskRunner){
-               ((TaskRunner)r).setStatus(STATUS_WAITING,true);
+            if (null!=r&&r instanceof TaskRuntime){
+               ((TaskRuntime)r).setStatus(STATUS_WAITING,true);
             }
         });
         if (null!=taskSaver){
@@ -63,9 +63,9 @@ public class TaskExecutor implements Executor{
             if (null!=listeners){
                 listeners.put(listener,null!=matcher?matcher:(Task data)-> true);
             }
-            List<TaskRunner> queue=notify?mQueue:null;
+            List<TaskRuntime> queue=notify?mQueue:null;
             if (null!=queue){
-                for (TaskRunner runner:queue) {
+                for (TaskRuntime runner:queue) {
                     notifyStatusChange(runner,matcher,listener);
                 }
             }
@@ -95,17 +95,18 @@ public class TaskExecutor implements Executor{
             Debug.E("Fail execute task while not task.");
             return false;
         }
-        TaskRunner taskRunner=findTaskData((Task)taskObj,true);
-        if (null==taskRunner){
+        TaskRuntime taskRuntime=findTaskData((Task)taskObj,true);
+        if (null==taskRuntime){
             Debug.E("Fail execute task while find task data fail.");
             return false;
         }else if (null!=taskId&&taskId.length()>0){
-            taskRunner.setTaskId(taskId);
+            taskRuntime.setTaskId(taskId);
         }
-        return execute(taskRunner.setOption(option));
+        taskRuntime.setOption(option);
+        return execute(taskRuntime);
     }
 
-    private boolean execute(TaskRunner runner){
+    private boolean execute(TaskRuntime runner){
         ExecutorService executor=mExecutor;
         if (null==executor){
             Debug.E("Fail execute runner while executor is invalid.");
@@ -147,7 +148,7 @@ public class TaskExecutor implements Executor{
         if (null==taskId||taskId.length()<=0||null==bytes||bytes.length<=0){
             return false;
         }
-        TaskRunner taskRunner=findFirst((TaskRunner data)->null!=data&&data.isTaskIdEquals(taskId));
+        TaskRuntime taskRunner=findFirst((TaskRuntime data)->null!=data&&data.isTaskIdEquals(taskId));
         if (null!=taskRunner){
             return false;//Not need execute while already executing
         }
@@ -182,7 +183,7 @@ public class TaskExecutor implements Executor{
         return false;
     }
 
-    private boolean saveTask(TaskRunner runner){
+    private boolean saveTask(TaskRuntime runner){
         Task task=null!=runner?runner.getTask():null;
         if (null==task||!(task instanceof Parcelable)){
             return false;
@@ -206,13 +207,13 @@ public class TaskExecutor implements Executor{
 
     @Override
     public void findTask(OnTaskFind onTaskFind) {
-        findAllTask((TaskRunner data)-> null!=data&&onTaskFind.onTaskFind(data.getTask(),
+        findAllTask((TaskRuntime data)-> null!=data&&onTaskFind.onTaskFind(data.getTask(),
         data.getStatus(),data.getOption())?null:false,Integer.MAX_VALUE);
     }
 
-    private TaskRunner findTaskData(Task task, boolean autoCreate){
-        TaskRunner taskData= null!=task?findFirst((TaskRunner data)-> null!=data&&data.isTaskEquals(task)):null;
-        return null!=taskData?taskData:(autoCreate?new TaskRunner(){
+    private TaskRuntime findTaskData(Task task, boolean autoCreate){
+        TaskRuntime taskData= null!=task?findFirst((TaskRuntime data)-> null!=data&&data.isTaskEquals(task)):null;
+        return null!=taskData?taskData:(autoCreate?new TaskRuntime(task,this){
             @Override
             protected void onStatusChanged(int last, int current) {
                 mExecutorFull=current==STATUS_FINISH?false:mExecutorFull;
@@ -223,7 +224,7 @@ public class TaskExecutor implements Executor{
                 notifyStatusChange(this,mListeners);
                 //
                 if (!mExecutorFull&&post(()->{
-                    TaskRunner nextRunner=findFirst((TaskRunner data)->null!=data&&data.isAnyStatus(STATUS_WAITING));
+                    TaskRuntime nextRunner=findFirst((TaskRuntime data)->null!=data&&data.isAnyStatus(STATUS_WAITING));
                     if (!mExecutorFull&&null!=nextRunner){
                         execute(nextRunner);
                     }
@@ -231,25 +232,20 @@ public class TaskExecutor implements Executor{
                     //Do nothing
                 }
             }
-
-            @Override
-            protected Task getTask() {
-                return task;
-            }
         }:null);
     }
 
-    private TaskRunner findFirst(Matcher<TaskRunner> matcher){
-        List<TaskRunner> runners=findAllTask(matcher,1);
+    private TaskRuntime findFirst(Matcher<TaskRuntime> matcher){
+        List<TaskRuntime> runners=findAllTask(matcher,1);
         return null!=runners&&runners.size()>0?runners.get(0):null;
     }
 
-    private List<TaskRunner> findAllTask(Matcher<TaskRunner> matcher,int max){
-        List<TaskRunner> queue=null!=matcher?mQueue:null;
-        List<TaskRunner> result=null;
+    private List<TaskRuntime> findAllTask(Matcher<TaskRuntime> matcher,int max){
+        List<TaskRuntime> queue=null!=matcher?mQueue:null;
+        List<TaskRuntime> result=null;
         if(null!=queue){
             result=new ArrayList<>(Math.min(10,max<=0?0:max));
-            for (TaskRunner runner:queue) {
+            for (TaskRuntime runner:queue) {
                 if (result.size()>=max){
                     break;
                 }
@@ -264,7 +260,7 @@ public class TaskExecutor implements Executor{
         return result;
     }
 
-    private void notifyStatusChange(TaskRunner runner,Map<Listener,Matcher<Task>> listeners){
+    private void notifyStatusChange(TaskRuntime runner,Map<Listener,Matcher<Task>> listeners){
         Set<Listener> set=null!=listeners&&null!=runner?listeners.keySet():null;
         if (null!=set){
             for (Listener listener:set) {
@@ -275,14 +271,14 @@ public class TaskExecutor implements Executor{
         }
     }
 
-    private void notifyStatusChange(TaskRunner runner,Matcher<Task> matcher ,Listener listener){
+    private void notifyStatusChange(TaskRuntime runner,Matcher<Task> matcher ,Listener listener){
         Boolean matched=null!=matcher&&null!=listener?matcher.match(runner.getTask()):null;
         if (null!=matched&&matched){
             notifyStatusChange(runner,listener);
         }
     }
 
-    private void notifyStatusChange(TaskRunner runner,Listener listener){
+    private void notifyStatusChange(TaskRuntime runner,Listener listener){
         if (null==listener||null==runner){
             return;
         }else if (listener instanceof UiListener&&!Utils.isUiThread()){
