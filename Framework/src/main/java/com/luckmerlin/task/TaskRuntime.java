@@ -3,7 +3,7 @@ package com.luckmerlin.task;
 import com.luckmerlin.data.Parcelable;
 import com.luckmerlin.utils.Utils;
 
-public abstract class TaskRuntime extends Runtime implements Runnable {
+ abstract class TaskRuntime extends Runtime implements Runnable {
     private Task mTask;
     private String mTaskId;
 
@@ -39,9 +39,11 @@ public abstract class TaskRuntime extends Runtime implements Runnable {
             return;
         }
         setStatus(Executor.STATUS_EXECUTING,true);
-        task.execute(this, (Task task1)-> {
-
-        });
+        Executor executor=getExecutor();
+        TaskExecutor taskExecutor=null!=executor&&executor instanceof TaskExecutor?
+                ((TaskExecutor)executor):null;
+        task.execute(this,null!=taskExecutor?(Task task1)->
+                taskExecutor.notifyUpdateChangeToAll(this):null);
         setStatus(Executor.STATUS_FINISH,true);
     }
 
@@ -53,5 +55,4 @@ public abstract class TaskRuntime extends Runtime implements Runnable {
         Task task=getTask();
         return null!=task&&null!=obj&&task.equals(obj);
     }
-
-}
+ }

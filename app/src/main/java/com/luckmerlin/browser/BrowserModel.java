@@ -250,10 +250,11 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingTaskContent.AutoDismiss autoDismiss){
         Executor executor=mExecutor;
         if (null==executor||null==obj){
-            toast(getString(R.string.whichFailed,getString(R.string.delete)));
-            return false;
+            return toast(getString(R.string.whichFailed,getString(R.string.delete)))&&false;
         }else if (obj instanceof File){
-            return deleteFile(new FileArrayList().add((File) obj),showDialog,confirmed,autoDismiss);
+            FileArrayList files=new FileArrayList();
+            files.add((File)obj);
+            return deleteFile(files,showDialog,confirmed,autoDismiss);
         }else if (!(obj instanceof FileArrayList)||((FileArrayList)obj).size()<=0){
             return deleteFile(null,showDialog,confirmed,autoDismiss);
         }
@@ -439,6 +440,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
         if (mode==Mode.MODE_DELETE){
             return browserListAdapter.removeIfInFolder(null!=from?from:to);
         }else if (mode==Mode.MODE_COPY){
+            Debug.D("EE 厉害 EEE "+browserListAdapter.isCurrentFolder(to)+"\n"+
+                    to.getParentFile()+"\n");
             return browserListAdapter.isCurrentFolder(to)&& null!=(to=to.getParentFile())&&
                     showFolderFilesChangeAlert(to.getName());
         }else if (mode==Mode.MODE_MOVE){
@@ -566,10 +569,6 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 //            startTask(new TestTask(getActivity()).setName("沙发沙发大a"),Option.EXECUTE_NOT_SAVE);
 //            launchTask(new TestTask(),Option.LAUNCH_NOT_SAVE,true);
 //            post(()-> startActivity(ConveyorActivity.class),1000);
-            //Test
-            AbstractTask testTask=null;
-            testTask=new TestTask(getActivity());
-            testTask.setName("eeeeeeeee");
 //            createFile();
 //            deleteFile(LocalClient.createLocalFile(new java.io.File("/")),true,true);
 //            launchTask(testTask, Option.LAUNCH_NOT_SAVE,true);

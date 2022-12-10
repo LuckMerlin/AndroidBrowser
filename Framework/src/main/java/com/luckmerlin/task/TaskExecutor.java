@@ -30,6 +30,17 @@ public class TaskExecutor implements Executor{
     private final Parceler mParceler=new Parceler();
     private final TaskSaver mTaskSaver;
     private boolean mExecutorFull=false;
+    private final ChangedInvoker mStatusChangeInvoker=(Listener listener, TaskRuntime runner)-> {
+        if (null!=listener&&null!=runner&&listener instanceof OnStatusChangeListener){
+            ((OnStatusChangeListener)listener).onStatusChanged(runner.getStatus(),
+                    runner.getTask(), TaskExecutor.this);
+        }
+    };
+    private final ChangedInvoker mProgressChangeInvoker=(Listener listener, TaskRuntime runner)-> {
+        if (null!=listener&&null!=runner&&listener instanceof OnProgressChange){
+            ((OnProgressChange)listener).onProgressChanged(runner.getTask());
+        }
+    };
 
     public TaskExecutor(Context context,TaskSaver taskSaver){
         mTaskSaver=taskSaver;
@@ -66,7 +77,7 @@ public class TaskExecutor implements Executor{
             List<TaskRuntime> queue=notify?mQueue:null;
             if (null!=queue){
                 for (TaskRuntime runner:queue) {
-                    notifyStatusChange(runner,matcher,listener);
+                    notifyChange(runner,matcher,listener,mStatusChangeInvoker);
                 }
             }
         }
@@ -119,11 +130,10 @@ public class TaskExecutor implements Executor{
         }
         final int option=runner.getOption();
         final boolean isNeedDelete= runner.isNeedDelete();
-        final TaskSaver taskSaver=mTaskSaver;
         final String taskId=runner.getTaskId();
-        if (isNeedDelete&&null!=taskSaver&&null!=taskId&&taskId.length()>0){//To delete task while need delete
+        if (isNeedDelete){//To delete task while need delete
             Debug.D("To delete task."+taskId);
-            taskSaver.delete(taskId);//Try to delete saved task
+            deleteTask(runner);//Try to delete saved task
         }
         if (runner.isAnyStatus(STATUS_EXECUTING,STATUS_PENDING)){
             Debug.E("Fail execute runner while already executing.");
@@ -131,6 +141,10 @@ public class TaskExecutor implements Executor{
         }
         if (taskId==null||taskId.length()<=0){
             runner.setTaskId(task.getClass().getName()+"_"+task.hashCode()+"_"+ option+"_"+hashCode()+ "_"+System.currentTimeMillis()+(Math.random()*10000000));
+        }
+        if (!Option.isOptionEnabled(option,Option.PENDING)){
+            Debug.D("Not need execute while pending not enabled."+runner.getTask());
+            return true;
         }
         if (!mQueue.contains(runner)&&mQueue.add(runner)){
             runner.setStatus(STATUS_ADD,true);
@@ -142,6 +156,18 @@ public class TaskExecutor implements Executor{
         runner.setStatus(STATUS_PENDING,true);
         executor.execute(runner);
         return true;
+    }
+
+    private boolean deleteTask(TaskRuntime runner){
+        final TaskSaver taskSaver=mTaskSaver;
+        final String taskId=null!=runner?runner.getTaskId():null;
+        if (null!=taskSaver&&null!=taskId&&taskId.length()>0){//To delete task while need delete
+            Debug.D("To delete task."+taskId);
+            boolean succeed=taskSaver.delete(taskId);
+            succeed=mQueue.remove(runner)||succeed;
+            return succeed;
+        }
+        return false;
     }
 
     private boolean executeSavedTask(String taskId,byte[] bytes,boolean deleteWhileFail){
@@ -221,7 +247,7 @@ public class TaskExecutor implements Executor{
                 if ((current==STATUS_FINISH||current==STATUS_PENDING)&&!isNeedDelete()){
                     saveTask(this);
                 }
-                notifyStatusChange(this,mListeners);
+                notifyChange(this,mListeners,mStatusChangeInvoker);
                 //
                 if (!mExecutorFull&&post(()->{
                     TaskRuntime nextRunner=findFirst((TaskRuntime data)->null!=data&&data.isAnyStatus(STATUS_WAITING));
@@ -260,36 +286,43 @@ public class TaskExecutor implements Executor{
         return result;
     }
 
-    private void notifyStatusChange(TaskRuntime runner,Map<Listener,Matcher<Task>> listeners){
+    public void notifyUpdateChangeToAll(TaskRuntime runner){
+        notifyChange(runner,mListeners,mProgressChangeInvoker);
+    }
+
+    private void notifyChange(TaskRuntime runner,Map<Listener,Matcher<Task>> listeners,ChangedInvoker invoker){
         Set<Listener> set=null!=listeners&&null!=runner?listeners.keySet():null;
         if (null!=set){
             for (Listener listener:set) {
                 if (null!=listener&&listener instanceof OnStatusChangeListener){
-                    notifyStatusChange(runner,listeners.get(listener),(OnStatusChangeListener)listener);
+                    notifyChange(runner,listeners.get(listener),(OnStatusChangeListener)listener,invoker);
                 }
             }
         }
     }
 
-    private void notifyStatusChange(TaskRuntime runner,Matcher<Task> matcher ,Listener listener){
+    private void notifyChange(TaskRuntime runner,Matcher<Task> matcher,Listener listener,ChangedInvoker invoker){
         Boolean matched=null!=matcher&&null!=listener?matcher.match(runner.getTask()):null;
         if (null!=matched&&matched){
-            notifyStatusChange(runner,listener);
+            notifyChange(runner,listener,invoker);
         }
     }
 
-    private void notifyStatusChange(TaskRuntime runner,Listener listener){
-        if (null==listener||null==runner){
+    private void notifyChange(TaskRuntime runner,Listener listener,ChangedInvoker invoker){
+        if (null==listener||null==runner||null==invoker){
             return;
         }else if (listener instanceof UiListener&&!Utils.isUiThread()){
-            post(()->notifyStatusChange(runner,listener),-1);
+            post(()->notifyChange(runner,listener,invoker),-1);
             return;
-        }else if (listener instanceof OnStatusChangeListener){
-            ((OnStatusChangeListener)listener).onStatusChanged(runner.getStatus(),runner.getTask(), TaskExecutor.this);
         }
+        invoker.onInvoke(listener,runner);
     }
 
     public final boolean post(Runnable runnable, int delay){
         return null!=runnable&mHandler.postDelayed(runnable,delay<=0?0:delay);
+    }
+
+    private interface ChangedInvoker{
+        void onInvoke(Listener listener,TaskRuntime runner);
     }
 }
