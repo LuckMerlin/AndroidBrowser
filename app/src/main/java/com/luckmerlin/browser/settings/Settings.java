@@ -3,8 +3,9 @@ package com.luckmerlin.browser.settings;
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.databinding.ObservableArrayMap;
-import com.luckmerlin.browser.client.Client;
+
 import com.luckmerlin.browser.ClientMeta;
+import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.json.JsonObject;
 import org.json.JSONObject;
 import java.util.Map;

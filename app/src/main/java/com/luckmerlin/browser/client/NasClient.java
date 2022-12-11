@@ -4,9 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Parcel;
 import android.view.View;
 import com.luckmerlin.browser.BrowseQuery;
-import com.luckmerlin.browser.ClientMeta;
 import com.luckmerlin.core.Code;
 import com.luckmerlin.browser.Label;
 import com.luckmerlin.browser.R;
@@ -19,6 +19,8 @@ import com.luckmerlin.core.Canceled;
 import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.http.Answer;
 import com.luckmerlin.http.AnswerBody;
@@ -32,19 +34,12 @@ import com.luckmerlin.stream.OutputStream;
 import org.json.JSONObject;
 import java.io.IOException;
 
-public class NasClient extends AbstractClient{
-    private String mName;
-    private final String mHost;
-    private final Http mHttp;
+public class NasClient extends AbstractClient implements Parcelable {
+    private Http mHttp;
 
-    public NasClient(String host,String name){
-        mHttp=new JavaHttp().setBaseUrl(mHost=host);
-        mName=name;
-    }
-
-    @Override
-    public ClientMeta getMeta() {
-        return new ClientMeta().setName(mName).setHost(mHost).setIcon(R.drawable.hidisk_icon_nas);
+    public NasClient(String host){
+        super(host);
+        mHttp=new JavaHttp().setBaseUrl(host);
     }
 
     @Override
@@ -142,28 +137,6 @@ public class NasClient extends AbstractClient{
         }
     }
 
-//    @Override
-//    public Response<File> deleteFile(File file, OnFileDoingUpdate update) {
-//        String filePath=null!=file?file.getPath():null;
-//        Request request=new Request().url("/file/delete").headerEncode(Label.LABEL_PATH,filePath).post();
-//        Connection connection=mHttp.connect(request);
-//        if (null==connection){
-//            Debug.E("Fail delete file while connect http invalid.");
-//            return new Response<>(Code.CODE_FAIL,"Connect http invalid.");
-//        }
-//        AnswerChunkInputStreamReader reader=new AnswerChunkInputStreamReader(connection);
-//        try {
-//            return reader.readAllChunk(new DoingFileChunkUpdateParser(Mode.MODE_DELETE, update),
-//                    (byte[] bytes)-> MResponse.parse(bytes,(data)->File.fromJson(data)), 1024);
-//        } catch (IOException e) {
-//            Debug.E("Exception delete file.e="+e,e);
-//            e.printStackTrace();
-//            return null;
-//        }finally {
-//            Utils.closeStream(connection);
-//        }
-//    }
-
     @Override
     public Response<InputStream> openInputStream(long skip, File file) {
         String filePath=null!=file?file.getPath():null;
@@ -231,95 +204,16 @@ public class NasClient extends AbstractClient{
         });
     }
 
-    //    @Override
-//    public Response<InputStream> openInputStream(File file) {
-//        Request request=new Request().header(Label.LABEL_FROM,openLength).
-//                headerEncode(Label.LABEL_PATH,null!=file?file.getPath():null).url("/file/inputStream").post();
-//        Connection connection=mHttp.connect(request);
-//        if (null==connection){
-//            Debug.W("Fail open file input stream.");
-//            return new Response<>(Code.CODE_FAIL, "Fail open file input stream.");
-//        }
-//        Requested requested=null!=connection?connection.getRequested():null;
-//        Answer answer=null!=requested?requested.getAnswer():null;
-//        AnswerBody answerBody=null!=answer?answer.getAnswerBody():null;
-//        java.io.InputStream inputStream=null!=answerBody?answerBody.getInputStream():null;
-//        Headers headers=null!=answer?answer.getHeaders():null;
-////        long contentLength=answerBody.getContentLength();
-//        final long finalContentLength=headers.getLong("MerlinTotalLength",-1);
-//        ByteArrayOutputStream arrayOutputStream=new ByteArrayOutputStream();
-//        if (null==inputStream){
-//            Debug.W("Fail open file input stream while input stream null.");
-//            return new Response<>(Code.CODE_FAIL, "Input stream null.");
-//        }
-//        InputStreamReader inputStreamReader=new InputStreamReader(inputStream,finalContentLength).
-//                setOnEndBytesRead((byte[] buffer, int offset, int size)->
-//                        arrayOutputStream.write(buffer,offset,size));
-//        return new Response<InputStream>(Code.CODE_SUCCEED, "Succeed", new InputStream(openLength) {
-//            @Override
-//            public long length() {
-//                return finalContentLength;
-//            }
-//
-//            @Override
-//            public int onRead(byte[] b, int off, int len) throws IOException {
-//                return inputStreamReader.read(b,off,len);
-//            }
-//
-//            @Override
-//            public void close() throws IOException {
-//                connection.close();
-//                Debug.D("结束 "+new String(arrayOutputStream.toByteArray()));
-//            }
-//        });
-//        return null;
-//    }
-//
-//    @Override
-//    public Response<OutputStream> openOutputStream(File file) {
-//        if (null==file){
-//            Debug.E("Fail open nas file output stream while file invalid.");
-//            return new Response<>(Code.CODE_ERROR,"File invalid.",null);
-//        }
-//        Http http=mHttp;
-//        if (null==http){
-//            Debug.E("Fail open nas file output stream while none http.");
-//            return new Response<>(Code.CODE_ERROR,"None http.",null);
-//        }
-//        Response<File> response=getFileDetail(file,false);
-//        response=null!=response?response:new Response<>(Code.CODE_FAIL,"Unknown error.");
-//        if (null==response||!response.isAnyCode(Code.CODE_SUCCEED,Code.CODE_NOT_EXIST)){
-//            Debug.E("Fail open nas file output stream while fetch file error.");
-//            return new Response<>(response.getCode(Code.CODE_FAIL),response.getMessage(),null);
-//        }
-//        File currentFile=null!=response?response.getData():null;
-//        long length=null!=currentFile?currentFile.getLength():0;
-//        Debug.D("Open nas file output stream. from="+length+" "+file.getPath());
-//        String filePath=null!=file?file.getPath():null;
-//        final Request request=new Request().headerEncode(Label.LABEL_PATH, filePath).
-//                header(Label.LABEL_SIZE,length).url("/file/outputStream").post();
-//        Connection connection=mHttp.connect(request);
-//        Requested requested=null!=connection?connection.getRequested():null;
-//        java.io.OutputStream outputStream=null!=requested?requested.getOutputStream():null;
-//        if (null==outputStream){
-//            Utils.closeStream(connection);
-//            Debug.E("Fail open nas file output stream while open http output stream invalid.");
-//            return new Response<>(Code.CODE_ERROR,"Open http output stream invalid.",null);
-//        }
-//        final OnHttpParse<Response<File>> responseParser=new MResponse<File>((Object data)-> null!=data&&data instanceof JSONObject?new Folder((JSONObject)data):null);
-//        return new Response(Code.CODE_SUCCEED, "", new OutputStream(length) {
-//            @Override
-//            protected void onWrite(byte[] b, int off, int len) throws IOException {
-//                outputStream.write(b,off,len);
-//            }
-//
-//            @Override
-//            public void close() throws IOException {
-//                Response<File> response=responseParser.onParse(mHttp,requested.getAnswer());
-//                Utils.closeStream(connection);
-//                Debug.D("SSSS "+response);
-//            }
-//        });
-//    }
+    private NasClient(Parceler parceler, Parcel parcel){
+        this(parceler.readString(parcel,null));
+        setName(parceler.readString(parcel,getName()));
+        setIcon(parceler.readString(parcel,getIcon()));
+    }
 
+    @Override
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeString(parcel,getHost());
+        parceler.writeString(parcel,getName());
+        parceler.writeString(parcel,getIcon());
+    }
 }

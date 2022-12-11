@@ -6,4 +6,5 @@ import com.luckmerlin.task.Executor;
 
 public interface BrowserExecutor extends Executor {
     boolean client(Matcher<Client> matcher);
+    boolean saveClient(Client client,boolean delete);
 }

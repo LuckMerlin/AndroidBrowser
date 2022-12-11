@@ -127,4 +127,9 @@
         <item name="android:maxHeight">20dip</item>
         <item name="android:mirrorForRtl">true</item>
     </style>
+
+    <style name="clientDetailEditText">
+        <item name="android:textColor">@color/textMain</item>
+        <item name="android:background">@null</item>
+    </style>
 </resources>

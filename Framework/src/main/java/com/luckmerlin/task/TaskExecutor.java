@@ -7,6 +7,7 @@ import android.os.Parcel;
 import com.luckmerlin.data.Parcelable;
 import com.luckmerlin.core.Matcher;
 import com.luckmerlin.data.Parceler;
+import com.luckmerlin.data.Preferences;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.utils.Utils;
 import java.lang.ref.WeakReference;
@@ -21,14 +22,13 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class TaskExecutor implements Executor{
+public class TaskExecutor extends Parceler implements Executor{
     private final List<TaskRuntime> mQueue=new CopyOnWriteArrayList<>();
     private final ExecutorService mExecutor;
     private WeakReference<Context> mContextReference;
     private final Map<Listener,Matcher<Task>> mListeners=new ConcurrentHashMap<>();
     private final Handler mHandler=new Handler(Looper.getMainLooper());
-    private final Parceler mParceler=new Parceler();
-    private final TaskSaver mTaskSaver;
+    private final Preferences mTaskSaver;
     private boolean mExecutorFull=false;
     private final ChangedInvoker mStatusChangeInvoker=(Listener listener, TaskRuntime runner)-> {
         if (null!=listener&&null!=runner&&listener instanceof OnStatusChangeListener){
@@ -42,7 +42,7 @@ public class TaskExecutor implements Executor{
         }
     };
 
-    public TaskExecutor(Context context,TaskSaver taskSaver){
+    public TaskExecutor(Context context, Preferences taskSaver){
         mTaskSaver=taskSaver;
         mContextReference=null!=context?new WeakReference<>(context):null;
         int maxPoolSize=4;
@@ -159,7 +159,7 @@ public class TaskExecutor implements Executor{
     }
 
     private boolean deleteTask(TaskRuntime runner){
-        final TaskSaver taskSaver=mTaskSaver;
+        final Preferences taskSaver=mTaskSaver;
         final String taskId=null!=runner?runner.getTaskId():null;
         if (null!=taskSaver&&null!=taskId&&taskId.length()>0){//To delete task while need delete
             Debug.D("To delete task."+taskId);
@@ -184,7 +184,7 @@ public class TaskExecutor implements Executor{
             parcel.setDataPosition(0);
             String version=parcel.readString();
             int option=parcel.readInt();
-            Parcelable parcelable=mParceler.readParcelable(parcel);
+            Parcelable parcelable=readParcelable(parcel);
             parcel.recycle();
             parcel=null;
             Debug.D("读取到 "+parcelable);
@@ -200,7 +200,7 @@ public class TaskExecutor implements Executor{
             }
         }
         if (deleteWhileFail){
-            TaskSaver taskSaver=mTaskSaver;
+            Preferences taskSaver=mTaskSaver;
             if (null!=taskSaver){
                 Debug.D("To delete save task while execute load fail."+taskId);
                 taskSaver.delete(taskId);
@@ -215,14 +215,14 @@ public class TaskExecutor implements Executor{
             return false;
         }
         String taskId=runner.getTaskId();
-        TaskSaver taskSaver=mTaskSaver;
+        Preferences taskSaver=mTaskSaver;
         if (null!=taskId&&taskId.length()>0&&null!=taskSaver){//To save task
             Debug.D("写入 "+task);
             Parcel parcel=Parcel.obtain();
             parcel.setDataPosition(0);
             parcel.writeString("version");
             parcel.writeInt(runner.getOption());
-            mParceler.writeParcelable(parcel,task,0);
+            writeParcelable(parcel,task,0);
             byte[] bytes=parcel.marshall();
             boolean succeed=taskSaver.write(taskId,bytes);
             parcel.recycle();

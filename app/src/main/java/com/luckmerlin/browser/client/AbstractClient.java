@@ -1,9 +1,18 @@
 package com.luckmerlin.browser.client;
 
+import com.luckmerlin.browser.ClientMeta;
 import com.luckmerlin.browser.file.File;
 import com.luckmerlin.core.OnFinish;
 
-public abstract class AbstractClient implements Client {
+public abstract class AbstractClient extends ClientMeta implements Client {
+
+    public AbstractClient(String host){
+        setHost(host);
+    }
+
+    public final ClientMeta getMeta() {
+        return this;
+    }
 
     public final <T> void notifyFinish(T data, OnFinish<T> callback){
         if (null!=callback){

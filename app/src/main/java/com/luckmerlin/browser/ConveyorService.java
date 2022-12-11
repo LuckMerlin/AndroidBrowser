@@ -1,27 +1,26 @@
 package com.luckmerlin.browser;
 
-import android.app.Application;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Base64;
+import android.os.Parcel;
 
 import com.luckmerlin.browser.client.Client;
 import com.luckmerlin.browser.client.LocalClient;
+import com.luckmerlin.browser.client.NasClient;
 import com.luckmerlin.core.Matcher;
+import com.luckmerlin.data.Preferences;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.OnTaskFind;
 import com.luckmerlin.task.Task;
 import com.luckmerlin.task.TaskExecutor;
-import com.luckmerlin.task.TaskSaver;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ConveyorService extends Service {
     private ExecutorBinder mExecutorBinder;
@@ -30,13 +29,8 @@ public class ConveyorService extends Service {
     public void onCreate() {
         super.onCreate();
         Debug.D("EEEE onCreate "+this);
-        List<Client> clients=new ArrayList<>();
-//        clients.add(new NasClient("http://192.168.0.2:6666","NAS"));
-//        clients.add(new NasClient("http://192.168.0.6:89","Dev"));
-        clients.add(new LocalClient());
-//        clients.add(new NasClient("http://192.168.0.10:6666","DEV"));
-        ConveyorTaskSaver taskSaver=new ConveyorTaskSaver(getApplication());
-        BrowserTaskExecutor executor=new BrowserTaskExecutor(getApplication(),taskSaver,clients);
+//        SharedPreferences preferences=getSharedPreferences("tasks",Context.MODE_PRIVATE);
+        BrowserTaskExecutor executor=new BrowserTaskExecutor(getApplication());
         mExecutorBinder=new ExecutorBinder(executor);
 //        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
         //git remote set-url origin https://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@github.com/LuckMerlin/TsServer.git
@@ -61,10 +55,55 @@ public class ConveyorService extends Service {
 
     private static class BrowserTaskExecutor extends TaskExecutor implements BrowserExecutor{
         private List<Client> mClients;
+        private Preferences mClientPreferences;
 
-        public BrowserTaskExecutor(Context context,TaskSaver taskSaver,List<Client> clients){
-            super(context,taskSaver);
+        public BrowserTaskExecutor(Context context){
+            super(context,new Preferences(context.getSharedPreferences("tasks",Context.MODE_PRIVATE)));
+            Preferences preferences=mClientPreferences=new Preferences(context.getSharedPreferences("clients",MODE_PRIVATE));
+            List<Client> clients=new ArrayList<>();
+            preferences.load((String key, byte[] bytes)-> {
+                if (null==key||key.length()<=0||null==bytes||bytes.length<=0){
+                    return;
+                }
+                Parcel parcel=Parcel.obtain();
+                parcel.unmarshall(bytes,0,bytes.length);
+                parcel.setDataPosition(0);
+                Object obj=readParcelable(parcel);
+                parcel.recycle();
+                if (null!=obj&&obj instanceof Client){
+                    clients.add((Client)obj);
+                }
+            });
+            if (clients.size()<=0){
+                NasClient client=new NasClient("http://192.168.0.2:6666");
+                client.setName("NAS");
+                clients.add(client);
+                client=new NasClient("http://192.168.0.6:89");
+                client.setName("DEV");
+                clients.add(client);
+                LocalClient localClient=new LocalClient();
+                localClient.setName(context.getString(R.string.local));
+                clients.add(localClient);
+            }
             mClients=clients;
+        }
+
+        @Override
+        public boolean saveClient(Client client, boolean delete) {
+            ClientMeta meta=null!=client?client.getMeta():null;
+            String host=null!=meta?meta.getHost():null;
+            Preferences clientPreferences=mClientPreferences;
+            if (null==host||host.length()<=0||null==clientPreferences){
+                return false;
+            }else if (delete){
+                return clientPreferences.delete(host);
+            }
+            Parcel parcel=Parcel.obtain();
+            parcel.setDataPosition(0);
+            writeParcelable(parcel,client,0);
+            byte[] bytes=parcel.marshall();
+            parcel.recycle();
+            return clientPreferences.write(host,bytes);
         }
 
         @Override
@@ -111,50 +150,10 @@ public class ConveyorService extends Service {
         public Executor removeListener(Listener listener) {
             return mExecutor.removeListener(listener);
         }
-    }
-
-    private static class ConveyorTaskSaver implements TaskSaver{
-        private final SharedPreferences mPreferences;
-
-        protected ConveyorTaskSaver(Application application){
-            mPreferences=null!=application?application.getSharedPreferences("tasks",Context.MODE_PRIVATE):null;
-        }
 
         @Override
-        public boolean delete(Object obj) {
-            SharedPreferences preferences=mPreferences;
-            if (null==obj||null==preferences){
-                return false;
-            }else if (obj instanceof String){
-                return preferences.edit().remove((String)obj).commit();
-            }
-            return false;
-        }
-
-        @Override
-        public void load(OnTaskLoad onTaskLoad) {
-            SharedPreferences preferences=mPreferences;
-            Map<String,?> map=null!=onTaskLoad&&null!=preferences?preferences.getAll():null;
-            Set<String> set=null!=map?map.keySet():null;
-            if (null!=set){
-                Object value=null;byte[] bytes=null;
-                for (String child:set) {
-                    if (null!=(value=null!=child?map.get(child):null)&& value instanceof String&&
-                            null!=(bytes=Base64.decode((String)value, Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING))){
-                        onTaskLoad.onTaskLoaded(child,bytes);
-                    }
-                }
-            }
-        }
-
-        @Override
-        public boolean write(String taskId, byte[] taskBytes) {
-            SharedPreferences preferences=mPreferences;
-            if (null==taskId||taskId.length()<=0||null==preferences||null==taskBytes||taskBytes.length<=0){
-                return false;
-            }
-            return preferences.edit().putString(taskId,
-                    Base64.encodeToString(taskBytes,  Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING)).commit();
+        public boolean saveClient(Client client, boolean delete) {
+            return mExecutor.saveClient(client,delete);
         }
     }
 }

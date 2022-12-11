@@ -3,7 +3,7 @@ package com.luckmerlin.browser;
 public class ClientMeta {
     private String mName;
     private String mHost;
-    private Object mIcon;
+    private String mIcon;
 
     public ClientMeta setHost(String host) {
         this.mHost = host;
@@ -15,7 +15,7 @@ public class ClientMeta {
         return this;
     }
 
-    public ClientMeta setIcon(Object icon) {
+    public ClientMeta setIcon(String icon) {
         this.mIcon = icon;
         return this;
     }
@@ -28,7 +28,7 @@ public class ClientMeta {
         return mName;
     }
 
-    public Object getIcon() {
+    public String getIcon() {
         return mIcon;
     }
 }

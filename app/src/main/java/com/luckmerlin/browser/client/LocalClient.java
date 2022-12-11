@@ -9,9 +9,9 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Parcel;
 import android.provider.MediaStore;
 import android.view.View;
-
 import com.luckmerlin.browser.BrowseQuery;
 import com.luckmerlin.browser.ClientMeta;
 import com.luckmerlin.core.Code;
@@ -23,23 +23,24 @@ import com.luckmerlin.core.Canceler;
 import com.luckmerlin.core.OnFinish;
 import com.luckmerlin.core.Response;
 import com.luckmerlin.data.ComparedList;
+import com.luckmerlin.data.Parcelable;
+import com.luckmerlin.data.Parceler;
 import com.luckmerlin.debug.Debug;
 import com.luckmerlin.stream.InputStream;
 import com.luckmerlin.stream.OutputStream;
 import com.luckmerlin.utils.Utils;
-
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalClient extends AbstractClient {
+public class LocalClient extends AbstractClient implements Parcelable {
     private String mRootPath="/sdcard";
+    private final static String LOCAL_HOST="Local";
 
-    @Override
-    public ClientMeta getMeta() {
-        return new ClientMeta().setName("Local").setHost(null);
+    public LocalClient(){
+        super(LOCAL_HOST);
     }
 
     @Override
@@ -435,5 +436,34 @@ public class LocalClient extends AbstractClient {
 
     private boolean notifyDeleteUpdate(int code, String msg, File file,OnFileDeleteUpdate update){
         return null!=update&&update.onFileDeleteUpdate(code,msg,file);
+    }
+
+    @Override
+    public ClientMeta setHost(String host) {
+        return super.setHost(LOCAL_HOST);
+    }
+
+    public static boolean isLocal(Object obj){
+        if (null==obj){
+            return false;
+        }else if (obj instanceof Client){
+            ClientMeta meta=((Client)obj).getMeta();
+            return isLocal(null!=meta?meta.getHost():null);
+        }
+        return obj.equals(LOCAL_HOST);
+    }
+
+    private LocalClient(Parceler parceler, Parcel parcel){
+        super(LOCAL_HOST);
+        mRootPath=parceler.readString(parcel,mRootPath);
+        setName(parceler.readString(parcel,getName()));
+        setIcon(parceler.readString(parcel,getIcon()));
+    }
+
+    @Override
+    public void writeToParcel(Parceler parceler, Parcel parcel, int flags) {
+        parceler.writeString(parcel,mRootPath);
+        parceler.writeString(parcel,getName());
+        parceler.writeString(parcel,getIcon());
     }
 }

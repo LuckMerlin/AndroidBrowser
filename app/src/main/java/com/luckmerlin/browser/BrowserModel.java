@@ -249,7 +249,7 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
     }
 
     private boolean showClientDetail(Client client){
-        return null!=showContentDialog(new ClientDetailContent().setClient(client),null);
+        return null!=showContentDialog(new ClientDetailContent(mExecutor).setClient(client),null);
     }
 
     private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingTaskContent.AutoDismiss autoDismiss){

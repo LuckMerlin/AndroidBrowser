@@ -5,22 +5,39 @@
         <variable name="vm" type="com.luckmerlin.browser.dialog.ClientDetailContent" />
         <import type="com.luckmerlin.binding.ViewBinding" alias="VB"/>
         <import type="com.luckmerlin.browser.R"/>
+        <import type="android.text.InputType"/>
         <import type="android.view.View"/>
     </data>
 
-    <LinearLayout android:orientation="vertical" android:background="@drawable/client_card_bg"
+    <LinearLayout android:orientation="vertical" android:background="@drawable/dialog_bg"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingLeft="10dp" android:paddingRight="10dp"
         android:paddingTop="6dp" android:paddingBottom="6dp">
 
-        <EditText android:text="@{vm.client.meta.name??``}"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <EditText android:text="@={vm.inputName}" style="@style/clientDetailEditText" android:textSize="19sp"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold"
+                android:layout_centerInParent="true" android:enabled="@{vm.editEnable}"/>
+            <TextView binding:bind="@{VB.clickId(vm.editEnable?R.string.cancel:R.string.edit)}"
+                android:layout_alignParentRight="true" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                style="@style/dialogButton" android:paddingLeft="15dp" android:paddingRight="15dp"/>
+        </RelativeLayout>
 
-        <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="wrap_content">
-            <TextView android:text="@{@string/host+`:`}"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-            <EditText android:text="@{vm.client.meta.host??``}"
-                android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <View android:background="@color/textMain" android:layout_marginLeft="20dp" android:layout_marginRight="20dp"
+            android:layout_width="match_parent" android:layout_height="1dp" android:alpha="0.5"
+            android:layout_marginTop="5dp" android:layout_marginBottom="20dp"/>
+
+        <LinearLayout android:orientation="horizontal" android:layout_width="260dp" android:layout_height="wrap_content">
+            <TextView android:text="@{@string/host+`: `}" style="@style/clientDetailEditText"
+                android:textSize="16sp" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+            <EditText android:text="@={vm.inputHost}" style="@style/clientDetailEditText"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:enabled="@{vm.editEnable&amp;&amp;vm.hostEditEnable}" android:textSize="13sp"/>
         </LinearLayout>
+
+        <TextView binding:bind="@{VB.clickId(vm.editEnable?R.string.save:R.string.close)}"
+            android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="10dp"
+            android:layout_marginLeft="30dp" android:layout_marginRight="30dp" android:paddingBottom="10dp"
+            style="@style/dialogButton" android:layout_gravity="center" android:layout_marginTop="20dp"/>
     </LinearLayout>
 </layout>

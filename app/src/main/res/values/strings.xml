@@ -83,4 +83,6 @@
     <string name="notActionHere">Not access for action here</string>
     <string name="canNotOperateHere">Can not operate here.</string>
     <string name="host">Host</string>
+    <string name="edit">Edit</string>
+    <string name="save">Save</string>
 </resources>
