@@ -32,6 +32,7 @@
                     android:orientation="horizontal" android:layout_width="0dp" android:layout_height="wrap_content">
 
                     <com.google.android.material.imageview.ShapeableImageView android:src="@mipmap/ic_launcher"
+                        binding:bind="@{VB.clickId(R.drawable.round_client_logo_bg,vm.browserAdapter.browserClient).img(vm.browserAdapter.browserClient)}"
                         android:padding="1dp" android:background="@drawable/round_client_logo_bg"
                         android:layout_marginRight="5dp" android:layout_width="55dp" android:layout_height="55dp"
                         android:elevation="4dp" binding:shapeAppearanceOverlay="@style/roundedCornerStyle" />

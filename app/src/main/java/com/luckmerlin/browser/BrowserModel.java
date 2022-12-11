@@ -29,6 +29,7 @@ import com.luckmerlin.browser.databinding.BrowserModelBinding;
 import com.luckmerlin.browser.databinding.ItemClientNameBinding;
 import com.luckmerlin.browser.dialog.AutoDismissSucceedTask;
 import com.luckmerlin.browser.dialog.BrowserMenuContextDialogContent;
+import com.luckmerlin.browser.dialog.ClientDetailContent;
 import com.luckmerlin.browser.dialog.ConfirmContent;
 import com.luckmerlin.browser.dialog.CreateFileContent;
 import com.luckmerlin.browser.dialog.DialogButtonBinding;
@@ -58,7 +59,6 @@ import com.luckmerlin.model.OnActivityCreate;
 import com.luckmerlin.model.OnActivityNewIntent;
 import com.luckmerlin.model.OnActivityStart;
 import com.luckmerlin.model.OnBackPress;
-import com.luckmerlin.task.AbstractTask;
 import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.FromTo;
@@ -184,7 +184,8 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
                 return goToFolder()||true;
             case R.string.settings:
                 return startActivity(SettingsActivity.class)||true;
-
+            case R.drawable.round_client_logo_bg:
+                return showClientDetail(null!=obj&&obj instanceof Client?(Client) obj:null)||true;
         }
         if (null!=obj&&obj instanceof File){
             File file=(File)obj;
@@ -245,6 +246,10 @@ public class BrowserModel extends BaseModel implements OnActivityCreate, Executo
 
     public boolean entryMode(Object mode, OnConfirm<Object,Boolean> onConfirm, Object... args){
         return mBrowserAdapter.entryMode(mode,onConfirm,args);
+    }
+
+    private boolean showClientDetail(Client client){
+        return null!=showContentDialog(new ClientDetailContent().setClient(client),null);
     }
 
     private boolean deleteFile(Object obj, boolean showDialog, boolean confirmed, DoingTaskContent.AutoDismiss autoDismiss){

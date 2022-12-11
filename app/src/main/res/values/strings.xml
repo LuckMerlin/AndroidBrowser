@@ -82,4 +82,5 @@
     <string name="noneTargetFolder">None target folder</string>
     <string name="notActionHere">Not access for action here</string>
     <string name="canNotOperateHere">Can not operate here.</string>
+    <string name="host">Host</string>
 </resources>

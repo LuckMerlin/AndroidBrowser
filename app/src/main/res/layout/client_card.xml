@@ -15,6 +15,7 @@
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_marginBottom="5dp"
             android:layout_height="wrap_content" android:layout_weight="1.5" android:gravity="center_vertical">
             <ImageView android:padding="1dp" android:background="@drawable/round_client_logo_bg"
+
                 android:src="@mipmap/ic_launcher" android:layout_width="50dp" android:layout_height="50dp"/>
             <LinearLayout android:orientation="vertical" android:layout_gravity="center_vertical"
                 android:paddingLeft="5dp" android:paddingRight="5dp"
