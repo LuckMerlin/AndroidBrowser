@@ -37,6 +37,10 @@ public class ConfirmContent extends BaseContent {
     }
 
     public final ConfirmContent setConfirmBinding(Binding binding){
+        if (!isUiThread()){
+            post(()->setConfirmBinding(binding));
+            return this;
+        }
         mBinding.set(binding);
         return this;
     }
@@ -62,7 +66,9 @@ public class ConfirmContent extends BaseContent {
         return mMessage;
     }
 
-    public ObservableField<Binding> getConfirmBinding() {
+    public final ObservableField<Binding> getBinding() {
         return mBinding;
     }
+
+
 }

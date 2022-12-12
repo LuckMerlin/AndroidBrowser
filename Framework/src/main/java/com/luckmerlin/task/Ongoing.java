@@ -84,7 +84,11 @@ public class Ongoing implements Parcelable {
     }
 
     public final boolean isSucceed(){
-        return mProgress==100;
+        return isProgressSucceed(mProgress);
+    }
+
+    public static boolean isProgressSucceed(Integer progress){
+        return null!=progress&&progress==100;
     }
 
     public final Ongoing setProgressSucceed(boolean succeed){

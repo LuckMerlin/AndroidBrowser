@@ -71,14 +71,14 @@ public class ConveyorService extends Service {
                 Object obj=readParcelable(parcel);
                 parcel.recycle();
                 if (null!=obj&&obj instanceof Client){
-                    clients.add((Client)obj);
+//                    clients.add((Client)obj);
                 }
             });
             if (clients.size()<=0){
                 NasClient client=new NasClient("http://192.168.0.2:6666");
                 client.setName("NAS");
                 clients.add(client);
-                client=new NasClient("http://192.168.0.6:89");
+                client=new NasClient("http://192.168.1.4:89");
                 client.setName("DEV");
                 clients.add(client);
                 LocalClient localClient=new LocalClient();

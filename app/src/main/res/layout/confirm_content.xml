@@ -24,7 +24,7 @@
         <LinearLayout android:orientation="horizontal" android:paddingLeft="15dp" android:paddingRight="15dp"
             android:layout_width="250dp" android:layout_height="wrap_content"
             android:layout_gravity="center" android:gravity="center"
-            binding:bind="@{LayoutBinding.layout(vm.confirm.binding??vm.confirmBinding).removeAll(true).toParent(false)}" />
+            binding:bind="@{LayoutBinding.layout(vm.confirm.binding??vm.binding).removeAll(true).toParent(false)}" />
 
     </LinearLayout>
 </layout>

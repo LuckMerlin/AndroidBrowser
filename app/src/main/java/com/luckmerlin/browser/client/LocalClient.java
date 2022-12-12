@@ -345,7 +345,7 @@ public class LocalClient extends AbstractClient implements Parcelable {
             total=null!=files?files.length:0;
         }
         return localFile.setReadable(file.canRead()).setWriteable(file.canWrite()).
-                setExecutable(file.canExecute()).setTotal(total);
+                setExecutable(file.canExecute()).setTotal(total).setHost(LOCAL_HOST);
     }
 
     private Response<File> deleteAndroidFile(java.io.File file,OnFileDeleteUpdate update){

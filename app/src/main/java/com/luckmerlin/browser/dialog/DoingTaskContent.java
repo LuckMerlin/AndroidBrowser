@@ -2,22 +2,24 @@ package com.luckmerlin.browser.dialog;
 
 import android.content.Context;
 import android.view.View;
+
 import com.luckmerlin.binding.Binding;
+import com.luckmerlin.binding.ViewBinding;
 import com.luckmerlin.browser.R;
 import com.luckmerlin.browser.databinding.DoingTaskContentBinding;
 import com.luckmerlin.click.OnClickListener;
-import com.luckmerlin.core.Result;
+import com.luckmerlin.debug.Debug;
 import com.luckmerlin.task.Brief;
-import com.luckmerlin.task.Doing;
+import com.luckmerlin.task.Confirm;
 import com.luckmerlin.task.Executor;
 import com.luckmerlin.task.FromTo;
 import com.luckmerlin.task.OnProgressChange;
 import com.luckmerlin.task.Ongoing;
+import com.luckmerlin.task.Option;
 import com.luckmerlin.task.Task;
 
 public class DoingTaskContent extends ConfirmContent implements
         Executor.OnStatusChangeListener, OnProgressChange,OnClickListener{
-    private final ObservableField<Binding> mBinding=new ObservableField<>();
     private final ObservableField<Integer> mProgress=new ObservableField<>();
     private final ObservableField<Integer> mSecondProgress=new ObservableField<>();
     private final ObservableField<String> mDoingName=new ObservableField<>();
@@ -49,7 +51,7 @@ public class DoingTaskContent extends ConfirmContent implements
             return;
         }
         Ongoing ongoing=null!=task?task.getOngoing():null;
-        mBinding.set(null!=ongoing?ongoing.getBinding():null);
+        setConfirmBinding(null!=ongoing?ongoing.getBinding():null);
         mProgress.set(null!=ongoing?ongoing.getProgress():0);
         mSecondProgress.set(null!=ongoing?ongoing.getSecondProgress():0);
         mDoingName.set(null!=ongoing?ongoing.getTitle():null);
@@ -72,27 +74,47 @@ public class DoingTaskContent extends ConfirmContent implements
         updateTask(task);
         switch (status){
             case Executor.STATUS_FINISH:
-                AutoDismiss autoDismiss=mAutoDismiss;
-                int delay=null!=autoDismiss?autoDismiss.onResolveAutoDismiss(task):-1;
-                if (delay>=0){
-                    post(mAutoDismissRunnable,delay);
+                Integer progress=mProgress.get();
+                Integer secondProgress=mSecondProgress.get();
+                boolean succeed=false;
+                if (Ongoing.isProgressSucceed(progress)&&Ongoing.isProgressSucceed(secondProgress)){
+                    succeed=true;
+                    AutoDismiss autoDismiss=mAutoDismiss;
+                    int delay=null!=autoDismiss?autoDismiss.onResolveAutoDismiss(task):-1;
+                    if (delay>=0){
+                        post(mAutoDismissRunnable,delay);
+                    }
+                }
+                if (!isExistBinding()){
+                    setConfirmBinding(new DialogButtonBinding(succeed?ViewBinding.clickId(R.string.succeed).
+                            setListener((OnClickListener)(View view, int clickId, int count, Object obj)->
+                                    removeFromParent()||true):
+                            ViewBinding.clickId(R.string.restart).setListener((OnClickListener)
+                                    (View view, int clickId, int count, Object obj)->
+                                  (null!=executor&&executor.execute(task, Option.LAUNCH))||true),
+                            ViewBinding.clickId(R.string.delete).setListener((OnClickListener)
+                                    (View view, int clickId, int count, Object obj)->
+                                   (null!=executor&&executor.execute(task, Option.DELETE)&&removeFromParent())||true),
+                            ViewBinding.clickId(R.string.fail).setListener((OnClickListener)
+                            (View view, int clickId, int count, Object obj)->
+                                    removeFromParent()||true)));
                 }
                 break;
         }
     }
 
-    public final DoingTaskContent setDoingBinding(Binding binding){
-        if (!isUiThread()){
-            post(()->setDoingBinding(binding));
-            return this;
-        }
-        mBinding.set(binding);
-        return this;
-    }
-
     public final DoingTaskContent setAutoDismiss(AutoDismiss autoDismiss) {
         this.mAutoDismiss = autoDismiss;
         return this;
+    }
+
+    private boolean isExistBinding(){
+        androidx.databinding.ObservableField<Binding> field=getBinding();
+        if (null!=field&&field.get()!=null){
+            return true;
+        }
+        androidx.databinding.ObservableField<Confirm> confirmObservableField=getConfirm();
+        return null!=confirmObservableField&&confirmObservableField.get()!=null;
     }
 
     public ObservableField<Integer> getProgress() {
@@ -101,10 +123,6 @@ public class DoingTaskContent extends ConfirmContent implements
 
     public ObservableField<String> getDoingName() {
         return mDoingName;
-    }
-
-    public final ObservableField<Binding> getBinding(){
-        return mBinding;
     }
 
     public ObservableField<String> getSpeed() {
